@@ -115,7 +115,7 @@ A **ticket number is the GitHub issue number**, written `#12`. Every piece of wo
 | Board | What's on it | Columns (`Stage`) |
 |---|---|---|
 | **Tallyn Ideas** | Every `type:idea` issue: things that *might* be built | New → Exploring → Promoted · Parked · Rejected |
-| **Tallyn Board** | Committed work: features, bugs, design, docs, tech debt | Backlog → In Progress → Review → Done |
+| **Tallyn Board** | Committed work: features, bugs, design, docs, tech debt | Backlog → In Progress → Review → Done, plus **Blocked** |
 
 The Ideas board also has **Impact** (High/Medium/Low) and **Effort** (S/M/L) fields for triage.
 
@@ -127,7 +127,7 @@ The Ideas board also has **Impact** (High/Medium/Low) and **Effort** (S/M/L) fie
    - run `/promote <N> [type]` in Claude Code, or `python3 scripts/promote.py <N> [type]` in Terminal.
 
    Promotion adds the issue to Tallyn Board under **Backlog**, swaps the label `type:idea` → `type:feature` (or the type given), and comments on the issue with the date. Write a Feature Spec if it's bigger than about a day's work.
-4. **Build:** move it to In Progress when work starts and to Review when a PR is open. Merging a PR with `Closes #N` closes it. Then add a Log entry starting with `#N`.
+4. **Build:** move it to In Progress when work starts and to Review when a PR is open. If it can't move, put it in **Blocked**, add the `blocker` label and say what blocks it in a comment. Merging a PR with `Closes #N` closes it. Then add a Log entry starting with `#N`.
 5. **Park or reject** ideas you won't do now, with a one-line reason in a comment. Don't delete them.
 6. **Sync:** `python3 scripts/sync_board.py` first auto-promotes cards in **Promoted**, then regenerates both board notes in Obsidian. Edit on GitHub, not in the mirrors. It runs:
    - at the start of every Claude session (§3)
@@ -136,7 +136,7 @@ The Ideas board also has **Impact** (High/Medium/Low) and **Effort** (S/M/L) fie
 
    Use `--no-promote` to mirror without moving anything.
 
-Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand, design, frontend, backend, infra), `priority:*` (p0, p1, p2), and `blocker` for a ticket that can't move until something else is resolved (it keeps its Stage; say what blocks it in a comment). Full list: `scripts/github/labels.yml` (copied to `.github/` by `setup_github.sh`).
+Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand, design, frontend, backend, infra), `priority:*` (p0, p1, p2), and `blocker` for a ticket that can't move until something else is resolved (pairs with the **Blocked** column). Full list: `scripts/github/labels.yml` (copied to `.github/` by `setup_github.sh`).
 
 ## 6. Brand and design guardrails
 

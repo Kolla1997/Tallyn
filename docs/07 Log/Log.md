@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-08
+- #1 Tallyn Board has a new **Blocked** column (added on GitHub). `sync_board.py` now mirrors it and warns about any Stage it doesn't know instead of quietly showing the card under Backlog. Updated `setup_github.sh` and CLAUDE.md to match.
 - #1 Added the `blocker` label (red) for tickets that can't move. It's a label, not a column, so blocked tickets keep their Stage. Backlog stays as is.
 - #1 Filled Tallyn Board from the Roadmap: #5–#10 (Now, p0) and #11–#14 (Next, p1/p2) in Backlog. Each has Problem, Definition of done and related docs. Numbers added to [[Roadmap]].
 - #15 AI assistant (Roadmap "Later") logged on Tallyn Ideas as Parked, not on Tallyn Board.

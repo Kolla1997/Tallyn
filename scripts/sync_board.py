@@ -13,7 +13,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 env = dict(l.split("=", 1) for l in (ROOT / "scripts/board.env").read_text().split() if "=" in l)
 
 BOARDS = [
-    ("BOARD_NUMBER", ["Backlog", "In Progress", "Review", "Done"], {"Done"}, "docs/05 Board/Board.md"),
+    ("BOARD_NUMBER", ["Backlog", "In Progress", "Review", "Blocked", "Done"], {"Done"}, "docs/05 Board/Board.md"),
     ("IDEAS_NUMBER", ["New", "Exploring", "Promoted", "Parked", "Rejected"], {"Promoted", "Parked", "Rejected"},
      "docs/06 Ideas/Ideas Board.md"),
 ]
@@ -29,8 +29,11 @@ def sync(key, columns, collapsed, dest):
     cols = {c: [] for c in columns}
     for it in json.loads(out.stdout).get("items", []):
         stage = next((v for k, v in it.items() if k.lower() == "stage"), None)
-        stage = stage if stage in cols else columns[0]
         c = it.get("content") or {}
+        if stage and stage not in cols:
+            print(f"! #{c.get('number', '?')} has unknown Stage '{stage}', shown under {columns[0]}. "
+                  f"Add it to BOARDS in sync_board.py")
+        stage = stage if stage in cols else columns[0]
         num = f"#{c['number']} " if c.get("number") else ""
         title = (c.get("title") or it.get("title") or "untitled").replace("[", "(").replace("]", ")")
         tags = " ".join("#" + l.replace(":", "/") for l in it.get("labels", []) or [])

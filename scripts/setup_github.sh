@@ -27,7 +27,7 @@ PY
 echo "→ Creating project 'Tallyn Board'"
 NUM=$(gh project create --owner "$OWNER" --title "Tallyn Board" --format json --jq .number)
 gh project field-create "$NUM" --owner "$OWNER" --name "Stage" \
-  --data-type SINGLE_SELECT --single-select-options "Ideas,Backlog,In Progress,Review,Done"
+  --data-type SINGLE_SELECT --single-select-options "Backlog,In Progress,Review,Blocked,Done"
 gh project link "$NUM" --owner "$OWNER" --repo "$REPO"
 
 cat > scripts/board.env <<EOF
