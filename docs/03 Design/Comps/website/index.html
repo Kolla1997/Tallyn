@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tallyn — It all adds up.</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Space+Grotesk:wght@400;500;700&family=Montserrat:wght@400;500;700;800&family=Bricolage+Grotesque:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--fh:'Space Grotesk',system-ui,sans-serif;--fb:'Montserrat',system-ui,sans-serif;--fw:700;--f3:'Space Grotesk',system-ui,sans-serif;--fw3:700;--fbt:'Bricolage Grotesque',system-ui,sans-serif;--tr:-.03em;--dk:#3B2F2F;--dt:#F6F1E9;--cl:#F6F1E9;--rc:22px;--rb:99px;--hs:1;--sp:1;--lf:var(--a2);--hb:#F6F1E9;--ht:#3B2F2F;--hc:#fff;--ac:#C8553D;--dg:#C8553D;--a2:#6F9575;--bt:#FFFFFF;--lb:#ECE5D6;--lt:#3B2F2F;--pos:#2F8F5B;
+--hm:color-mix(in srgb,var(--ht) 66%,var(--hb));--hl:color-mix(in srgb,var(--ht) 16%,var(--hb));
+--lm:color-mix(in srgb,var(--lt) 66%,var(--lb));--cb:color-mix(in srgb,var(--lt) 12%,var(--lb));
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--hb);color:var(--ht);font-family:var(--fb);line-height:1.55;transition:background .3s,color .3s}
+a{color:inherit;text-decoration:none}
+.w{max-width:1040px;margin:0 auto;padding:0 20px}
+nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.lg{display:flex;align-items:center;gap:10px;font-family:'Nunito','Avenir Next',sans-serif;font-weight:900;font-size:26px;letter-spacing:-.035em}
+.lg i{font-style:normal;color:var(--ac)}
+.lg svg{width:36px;height:36px}
+.nl{font-family:var(--fbt);display:none;gap:26px;font-weight:800;font-size:15px;color:var(--hm)}
+.btn{display:inline-block;font-family:var(--fbt);font-weight:700;font-size:15px;border-radius:var(--rb);padding:12px 22px;border:2px solid transparent}
+.pri{background:var(--ac);color:var(--bt)}
+.gh{border-color:var(--hl);color:var(--ht)}
+.hero{display:grid;gap:36px;padding:calc(28px*var(--sp)) 0 calc(64px*var(--sp));align-items:center}
+h1{font-size:calc(clamp(36px,9vw,64px)*var(--hs));line-height:1.06;font-family:var(--fh);font-weight:var(--fw);letter-spacing:var(--tr);margin:0 0 16px}
+h1 em{font-style:normal;color:var(--dg)}
+.sub{color:var(--hm);font-size:18px;max-width:46ch;margin:0 0 24px}
+.ct{display:flex;gap:10px;flex-wrap:wrap}
+.ph{--ht:var(--dt);--hb:var(--dk);--hl:color-mix(in srgb,var(--dt) 16%,var(--dk));--hm:color-mix(in srgb,var(--dt) 62%,var(--dk));--pos:#3FBF8A;background:var(--dk);color:var(--dt);border:1px solid var(--dk);border-radius:calc(var(--rc) + 8px);padding:20px;max-width:340px;width:100%;margin:0 auto}
+.ph small{color:var(--hm);font-weight:800;font-size:12px}
+.bal{font-size:34px;font-family:var(--fh);font-weight:var(--fw);letter-spacing:-.02em;margin:2px 0 14px}
+.bal span{color:var(--pos);font-size:14px;font-weight:800;margin-left:8px}
+.mem{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--hl);font-weight:800;font-size:14px}
+.mem b{margin-left:auto}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--hb);font-weight:900;font-size:14px}
+.bar{height:9px;background:var(--hl);border-radius:9px;margin:8px 0 4px;overflow:hidden}
+.bar div{height:100%;width:68%;background:var(--ac);border-radius:9px}
+.lt{background:var(--lb);color:var(--lt);padding:calc(64px*var(--sp)) 0;transition:background .3s}
+h2{font-size:calc(clamp(28px,6vw,42px)*var(--hs));font-family:var(--fh);font-weight:var(--fw);letter-spacing:var(--tr);line-height:1.1;margin:0 0 10px}
+.lead{color:var(--lm);font-size:17px;max-width:52ch;margin:0 0 30px}
+.cards{display:grid;gap:14px}
+.card{background:#fff;border:1px solid var(--cb);border-radius:var(--rc);padding:24px}
+.card h3{margin:14px 0 4px;font-size:20px;font-family:var(--f3);font-weight:var(--fw3)}
+.card p{margin:0;color:var(--lm)}
+.ic{width:46px;height:46px;border-radius:14px;background:var(--lt);display:grid;place-items:center}
+.ic svg{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.cta{text-align:center;padding:calc(72px*var(--sp)) 0;background:var(--cl);color:var(--ht)}
+.cta .pri{background:var(--dk);color:var(--dt)}
+.cta svg.m{width:64px;height:64px}
+.cta p{color:color-mix(in srgb,var(--ht) 66%,var(--cl));margin:0 auto 24px;max-width:44ch}
+footer{background:var(--dk);color:color-mix(in srgb,var(--dt) 62%,var(--dk));font-size:14px;padding:32px 0 calc(32px + env(safe-area-inset-bottom,0px));--lf:#A9C5AC;--ht:var(--dt)}
+.fi{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+footer .lg{font-size:22px;color:var(--dt)}footer .lg svg{width:30px;height:30px}
+
+.top,.ft{background:var(--dk);color:var(--dt);--ht:var(--dt);--lf:#A9C5AC;--hm:color-mix(in srgb,var(--dt) 62%,var(--dk))}
+.top nav{padding:16px 0}
+.ft{padding:30px 0 calc(32px + env(safe-area-inset-bottom,0px))}
+.fr{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.ft .lg{font-size:22px}.ft .lg svg{width:30px;height:30px}
+.ft span{color:color-mix(in srgb,var(--dt) 62%,var(--dk));font-weight:800;font-size:14px}
+.fs{margin-top:18px;padding-top:16px;border-top:1px solid color-mix(in srgb,var(--dt) 16%,var(--dk))}.fs span{font-weight:600;font-size:13px}
+.bal,.bal span,.mem b,.cur{font-family:'Space Grotesk',system-ui,sans-serif!important;font-variant-numeric:tabular-nums;font-weight:700!important;letter-spacing:-.01em}
+.lg svg.wm{width:auto;height:37px}
+footer .lg svg.wm{height:32px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--a2);outline-offset:3px}
+@media(min-width:760px){.nl{display:flex}.hero{grid-template-columns:1.2fr 1fr}.cards{grid-template-columns:repeat(3,1fr)}}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="m" viewBox="0 0 100 100"><g transform="translate(-7.5 -6.35) scale(1.15)"><path d="M47 82C47 52 26 42 12 18C44 16 52 44 47 82Z" fill="var(--lf)"/><path d="M53 82C53 52 74 42 88 18C56 16 48 44 53 82Z" fill="var(--ac)"/><circle cx="50" cy="26" r="7" fill="var(--ht)"/></g></symbol>
+</defs></svg>
+<header class="top"><div class="w">
+<nav><a class="lg" href="#"><svg><use href="#m"/></svg><svg class="wm" viewBox="-2 -92 275.8 120" role="img" aria-label="Tallyn"><path d="M2 -76V-68.2C6.9 -70.5 16.4 -73.6 23.8 -74.3V-20C23.8 -11.3 23.3 -2 21.9 -0.2V0H35.9V-0.2C34.5 -2 34 -11.3 34 -20V-74.3C41.4 -73.6 51 -70.5 55.8 -68.2V-76Z" fill="currentColor"/><path d="M77.6 1.6C84.5 1.6 92 -1.8 96.1 -8.7H96.4V0H108.3V-0.2C106.9 -2 106.4 -11.3 106.4 -20V-29.5C106.4 -43.6 101.2 -55.3 85.4 -55.3C81.3 -55.3 76.4 -54.5 70.6 -52.7L72.4 -47.7C78.3 -52.1 82.8 -54 86.2 -54C94.1 -54 96.2 -44.1 96.2 -32.7V-15.3C96.2 -5.6 85.9 0.2 77.9 0.2C72.9 0.2 68.7 -2.4 68.7 -7C68.7 -20.6 83.8 -37.7 83.8 -43.5C83.8 -47.9 81.3 -49.7 78.2 -49.7C78.2 -43.5 61.8 -26.2 61.8 -12.8C61.9 -3.3 69.3 1.6 77.6 1.6Z" fill="currentColor"/><path d="M117.3 0H131.3V-0.2C129.9 -2 129.4 -11.3 129.4 -20V-76H117.3V-75.8C118.7 -74 119.2 -64.7 119.2 -56V-20C119.2 -11.3 118.7 -2 117.3 -0.2Z" fill="currentColor"/><path d="M141.3 0H155.3V-0.2C153.9 -2 153.4 -11.3 153.4 -20V-76H141.3V-75.8C142.7 -74 143.2 -64.7 143.2 -56V-20C143.2 -11.3 142.7 -2 141.3 -0.2Z" fill="currentColor"/><path d="M171.9 19.7C177.6 19.7 185.1 15.7 194 -7.4L212.1 -54.3H202.1C202.1 -45.5 202.4 -32.7 197.8 -21.2L192.3 -7.4C186.4 7.4 176.2 12 171.2 12C169.3 12 168.1 11.4 168.1 10.4C168.1 4.3 187.5 1.9 187.5 -12.6C187.5 -14.8 187.1 -17.2 186.1 -20L180.5 -35.5C177.5 -43.7 174.2 -52.3 175.6 -54.1V-54.3H161.3V-54.1C162.7 -52.3 167.2 -43.7 170.2 -35.6L179.8 -10C180.4 -8.5 180.6 -7.2 180.6 -6C180.6 3.6 165.1 5 165.1 12.9C165.1 17.4 168.2 19.7 171.9 19.7Z" fill="var(--ac)"/><path d="M217.9 0H231.9V-0.2C230.5 -2 230 -11.3 230 -20V-28.1C230.1 -44.1 239 -50.9 246.2 -50.9C251.2 -50.9 255.7 -48.8 255.7 -37.6V-20C255.8 -11.3 255.3 -2 253.9 -0.2V0H267.9V-0.2C266.5 -2 266 -11.3 266 -20V-37.6C266 -49.5 258.5 -55.4 250.3 -55.4C242.2 -55.4 233.3 -49.7 230.2 -38.4H230V-54.3H217.9V-54.1C219.3 -52.3 219.8 -43 219.8 -34.3V-20C219.8 -11.3 219.3 -2 217.9 -0.2Z" fill="currentColor"/></svg></a>
+<div class="nl"><a href="#features">Features</a><a href="#family">Accounts</a><a href="#start">Pricing</a></div>
+<a class="btn pri" href="#start">Get the app</a></nav></div></header>
+<div class="w">
+<section class="hero">
+<div><h1>All your family's money, <em>in every currency.</em></h1>
+<p class="sub">Link bank accounts in any currency, track spending and savings in real time, and open joint accounts for partners, kids and parents.</p>
+<div class="ct"><a class="btn pri" href="#start">Start free</a><a class="btn gh" href="#features">See how it works</a></div></div>
+<div class="ph" aria-label="App preview">
+<small>Total balance · USD</small><div class="bal">$9,958.00<span>+$320.00 this month</span></div>
+<div class="mem"><div class="av" style="background:var(--ac)">$</div>Joint checking<b>$4,210.00</b></div>
+<div class="mem"><div class="av" style="background:var(--a2)">€</div>Family savings<b>€3,970.00</b></div>
+<div class="mem"><div class="av" style="background:var(--ht)">£</div>Travel fund<b>£1,150.00</b></div>
+<div style="margin-top:12px;font-weight:800;font-size:14px">Beach trip <span class="cur" style="float:right;color:var(--ac)">68%</span></div>
+<div class="bar"><div></div></div><small class="cur">$3,400.00 of $5,000.00</small></div>
+</section></div>
+<section class="lt" id="features"><div class="w">
+<h2>Built for family finances</h2><p class="lead">See what comes in, what goes out, and what you're saving, across every account and currency.</p>
+<div class="cards">
+<div class="card"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" style="stroke:#E9C46A"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></div><h3>Every account, one view</h3><p>Link banks and cards securely and see every balance in one place, converted to your home currency.</p></div>
+<div class="card" id="family"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" style="stroke:#E76F51"><circle cx="8" cy="9" r="3.2"/><circle cx="17" cy="10" r="2.6"/><path d="M2.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6M15 15c2.6-.4 5 .8 5.5 4"/></svg></div><h3>Joint accounts</h3><p>Open shared accounts for partners, kids or parents, with spending limits and clear permissions for each member.</p></div>
+<div class="card"><div class="ic"><svg width="26" height="26" viewBox="0 0 24 24" style="stroke:var(--lb)"><path d="M4 18l5-5 4 4 7-8M15 9h5v5"/></svg></div><h3>Budgets and savings goals</h3><p>Set shared budgets, track spending by category, and save toward goals in any currency.</p></div>
+</div></div></section>
+<section class="cta" id="start"><div class="w">
+<svg class="m"><use href="#m"/></svg>
+<h2 style="margin-top:14px">It all adds up.</h2>
+<p>Join the waitlist and be first to manage your family's money with Tallyn.</p>
+<a class="btn pri" href="#">Join the waitlist</a>
+</div></section>
+<footer><div class="w fi"><a class="lg" href="#"><svg><use href="#m"/></svg><svg class="wm" viewBox="-2 -92 275.8 120" role="img" aria-label="Tallyn"><path d="M2 -76V-68.2C6.9 -70.5 16.4 -73.6 23.8 -74.3V-20C23.8 -11.3 23.3 -2 21.9 -0.2V0H35.9V-0.2C34.5 -2 34 -11.3 34 -20V-74.3C41.4 -73.6 51 -70.5 55.8 -68.2V-76Z" fill="currentColor"/><path d="M77.6 1.6C84.5 1.6 92 -1.8 96.1 -8.7H96.4V0H108.3V-0.2C106.9 -2 106.4 -11.3 106.4 -20V-29.5C106.4 -43.6 101.2 -55.3 85.4 -55.3C81.3 -55.3 76.4 -54.5 70.6 -52.7L72.4 -47.7C78.3 -52.1 82.8 -54 86.2 -54C94.1 -54 96.2 -44.1 96.2 -32.7V-15.3C96.2 -5.6 85.9 0.2 77.9 0.2C72.9 0.2 68.7 -2.4 68.7 -7C68.7 -20.6 83.8 -37.7 83.8 -43.5C83.8 -47.9 81.3 -49.7 78.2 -49.7C78.2 -43.5 61.8 -26.2 61.8 -12.8C61.9 -3.3 69.3 1.6 77.6 1.6Z" fill="currentColor"/><path d="M117.3 0H131.3V-0.2C129.9 -2 129.4 -11.3 129.4 -20V-76H117.3V-75.8C118.7 -74 119.2 -64.7 119.2 -56V-20C119.2 -11.3 118.7 -2 117.3 -0.2Z" fill="currentColor"/><path d="M141.3 0H155.3V-0.2C153.9 -2 153.4 -11.3 153.4 -20V-76H141.3V-75.8C142.7 -74 143.2 -64.7 143.2 -56V-20C143.2 -11.3 142.7 -2 141.3 -0.2Z" fill="currentColor"/><path d="M171.9 19.7C177.6 19.7 185.1 15.7 194 -7.4L212.1 -54.3H202.1C202.1 -45.5 202.4 -32.7 197.8 -21.2L192.3 -7.4C186.4 7.4 176.2 12 171.2 12C169.3 12 168.1 11.4 168.1 10.4C168.1 4.3 187.5 1.9 187.5 -12.6C187.5 -14.8 187.1 -17.2 186.1 -20L180.5 -35.5C177.5 -43.7 174.2 -52.3 175.6 -54.1V-54.3H161.3V-54.1C162.7 -52.3 167.2 -43.7 170.2 -35.6L179.8 -10C180.4 -8.5 180.6 -7.2 180.6 -6C180.6 3.6 165.1 5 165.1 12.9C165.1 17.4 168.2 19.7 171.9 19.7Z" fill="var(--ac)"/><path d="M217.9 0H231.9V-0.2C230.5 -2 230 -11.3 230 -20V-28.1C230.1 -44.1 239 -50.9 246.2 -50.9C251.2 -50.9 255.7 -48.8 255.7 -37.6V-20C255.8 -11.3 255.3 -2 253.9 -0.2V0H267.9V-0.2C266.5 -2 266 -11.3 266 -20V-37.6C266 -49.5 258.5 -55.4 250.3 -55.4C242.2 -55.4 233.3 -49.7 230.2 -38.4H230V-54.3H217.9V-54.1C219.3 -52.3 219.8 -43 219.8 -34.3V-20C219.8 -11.3 219.3 -2 217.9 -0.2Z" fill="currentColor"/></svg></a><span>Privacy · Terms · Contact</span><span>© 2026 Tallyn. It all adds up.</span></div></footer>
+</body></html>
