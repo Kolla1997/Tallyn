@@ -1,0 +1,51 @@
+# Mirrors Tallyn Board and Tallyn Ideas into docs/ (scripts/sync_board.py) and commits the result.
+# Card moves on user-level Projects send no events, so the hourly run catches those (#16).
+name: Sync board mirrors
+
+on:
+  issues:
+    types: [opened, edited, closed, reopened, labeled, unlabeled]
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-board
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Sync boards
+        env:
+          GH_TOKEN: ${{ secrets.BOARD_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Missing repo secret BOARD_TOKEN (classic PAT with repo + project scopes)."
+            exit 1
+          fi
+          python3 scripts/sync_board.py
+
+      - name: Commit changed mirrors
+        run: |
+          git add "docs/05 Board/Board.md" "docs/06 Ideas/Ideas Board.md"
+          if git diff --cached --quiet; then
+            echo "Mirrors unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Sync board mirrors (#1)"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push origin HEAD:main && exit 0
+            sleep 5
+          done
+          exit 1
