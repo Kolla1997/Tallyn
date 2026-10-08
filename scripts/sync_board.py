@@ -47,7 +47,13 @@ def sync(key, columns, collapsed, dest):
         lines += [f"## {col}", ""] + (["**Complete**"] if col == "Done" else []) + cards + ["", ""]
     settings = {"kanban-plugin": "board", "list-collapse": [c in collapsed for c in columns]}
     lines += ["%% kanban:settings", "```", json.dumps(settings, separators=(",", ":")), "```", "%%", ""]
-    (ROOT / dest).write_text("\n".join(lines))
+    path, text = ROOT / dest, "\n".join(lines)
+    # Skip rewrites that would only change the date stamp, so automated runs don't commit daily noise.
+    strip = lambda s: [l for l in s.splitlines() if not l.startswith("<!-- Generated")]
+    if path.exists() and strip(path.read_text()) == strip(text):
+        print(f"= {sum(map(len, cols.values()))} cards, unchanged → {dest}")
+        return
+    path.write_text(text)
     print(f"✓ {sum(map(len, cols.values()))} cards → {dest}")
 
 if "--no-promote" not in sys.argv:
