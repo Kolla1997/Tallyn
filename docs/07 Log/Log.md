@@ -17,6 +17,8 @@ Newest first. One entry per working session or decision.
 - Decision: the table is `households` (not `families`). One person can be in several households. Kids get their own logins. Money is whole minor units in bigint plus a currency code.
 - Decision (pending ADR acceptance): the backend no longer uses the service role for database access. Bank sync writes go through a separate system path (#8, #9).
 - #6 Added `go.sum` for pgx. Opened PR #20.
+- #6 Schema/RLS tests all pass on Postgres 16 (5 tests, 24 subtests). Merged PR #20, so #6 is closed. Moved it to Done by hand: the board's "Item closed → Done" workflow still doesn't fire.
+- Open: local Go is 1.21.3 and `go.mod` says `go 1.24`, so Go commands need `GOTOOLCHAIN=go1.24.0` until `go.mod` says `go 1.24.0` or Go is upgraded. Another Postgres 16 (`/Library/PostgreSQL/16`) holds port 5432 on Dinesh's Mac, so the test Postgres runs on 5434 with `LC_ALL` set (steps in PR #20).
 - Open: Teens and shared totals, invitations (#12), FX rate source (#11). Not yet tried on a real Supabase project.
 - #10 Added brand and design kit: logo files (SVG and PNG), app icons, social and splash images, colour and type tokens (`design-tokens.json`), fonts, style guide, six app screen comps, website comp, animations (Lottie, SVG, GIF, MP4).
 - #10 Added notes: Animation Guide, Design Comps. Replaced Brand Guide, Logo Guide, Voice and Tone and Design System with the kit versions, keeping the communications checklist, the name rule, the tagline decision, breakpoints and the "JSON wins" rule.
