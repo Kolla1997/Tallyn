@@ -3,6 +3,7 @@ type: meeting
 status: active
 owner: Dinesh
 updated: {{date:YYYY-MM-DD}}
+issues: []
 tags: [meeting]
 ---
 
@@ -14,4 +15,4 @@ tags: [meeting]
 ## Notes
 ## Decisions
 ## Action items
-- [ ] @who — what — by when
+- [ ] @who: what, by when (#ticket)

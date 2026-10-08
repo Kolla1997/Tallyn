@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Rejects commits whose message has no ticket number (#123). See CLAUDE.md §5.
+msg=$(grep -v '^#' "$1")
+if echo "$msg" | grep -qE '^(Merge|Revert|fixup!|squash!)'; then exit 0; fi
+if echo "$msg" | grep -qE '#[0-9]+'; then exit 0; fi
+echo "✗ Commit rejected: add a ticket number, e.g. \"Add Plaid Link (#12)\"." >&2
+echo "  Small fixes: use the pinned Housekeeping issue." >&2
+exit 1

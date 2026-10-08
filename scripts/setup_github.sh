@@ -11,6 +11,8 @@ echo "→ Installing issue forms into .github/ISSUE_TEMPLATE"
 mkdir -p .github/ISSUE_TEMPLATE
 cp scripts/github/ISSUE_TEMPLATE/*.yml .github/ISSUE_TEMPLATE/
 cp scripts/github/labels.yml .github/labels.yml
+cp scripts/github/pull_request_template.md .github/pull_request_template.md
+git config core.hooksPath scripts/hooks
 
 echo "→ Creating labels in $REPO"
 python3 - "$REPO" <<'PY'

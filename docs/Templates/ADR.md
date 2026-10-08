@@ -3,6 +3,7 @@ type: adr
 status: draft
 owner: Dinesh
 updated: {{date:YYYY-MM-DD}}
+issue:
 tags: [adr]
 ---
 
@@ -10,6 +11,7 @@ tags: [adr]
 
 - **Status:** Proposed | Accepted | Superseded by [[NNNN-...]]
 - **Date:** {{date:YYYY-MM-DD}}
+- **Ticket:** #
 
 ## Context
 ## Options considered
