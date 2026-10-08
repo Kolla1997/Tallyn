@@ -136,7 +136,7 @@ The Ideas board also has **Impact** (High/Medium/Low) and **Effort** (S/M/L) fie
 
    Use `--no-promote` to mirror without moving anything.
 
-Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand, design, frontend, backend, infra), `priority:*` (p0, p1, p2). Full list: `scripts/github/labels.yml` (copied to `.github/` by `setup_github.sh`).
+Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand, design, frontend, backend, infra), `priority:*` (p0, p1, p2), and `blocker` for a ticket that can't move until something else is resolved (it keeps its Stage; say what blocks it in a comment). Full list: `scripts/github/labels.yml` (copied to `.github/` by `setup_github.sh`).
 
 ## 6. Brand and design guardrails
 

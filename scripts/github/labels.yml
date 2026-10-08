@@ -40,3 +40,6 @@
 - name: "priority:p2"
   color: "fef2c0"
   description: "Nice to have"
+- name: "blocker"
+  color: "b60205"
+  description: "Blocked: can't move until something else is resolved"

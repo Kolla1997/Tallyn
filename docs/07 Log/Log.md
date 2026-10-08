@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-08
+- #1 Added the `blocker` label (red) for tickets that can't move. It's a label, not a column, so blocked tickets keep their Stage. Backlog stays as is.
 - #1 Filled Tallyn Board from the Roadmap: #5–#10 (Now, p0) and #11–#14 (Next, p1/p2) in Backlog. Each has Problem, Definition of done and related docs. Numbers added to [[Roadmap]].
 - #15 AI assistant (Roadmap "Later") logged on Tallyn Ideas as Parked, not on Tallyn Board.
 - #1 Reopened Housekeeping (PR #3 had closed it) and set it to In Progress. PRs under it should say `Part of #1`, not `Closes #1`.
