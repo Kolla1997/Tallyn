@@ -11,6 +11,13 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-08
+- #6 Schema and RLS on branch `6-schema-rls`: migrations `0001_households.sql` (profiles, households, members with roles owner/adult/teen/child/viewer, `create_household()`, at-least-one-owner rule), `0002_bank.sql` (plaid_items with encrypted token, accounts, transactions; money as bigint minor units) and `0003_fx_rates.sql`. RLS on every table.
+- #6 `internal/db`: pgx pool, `Ping`, and `AsUser` which runs each request as the `authenticated` role with the user's ID, so RLS applies. Integration tests cover cross-household isolation, kids seeing only their own accounts, the unreadable token column, blocked writes and no identity leaking between pooled connections.
+- #6 Added [[Feature - Data Model]] and ADR [[0002-backend-database-access]] (Proposed).
+- Decision: the table is `households` (not `families`). One person can be in several households. Kids get their own logins. Money is whole minor units in bigint plus a currency code.
+- Decision (pending ADR acceptance): the backend no longer uses the service role for database access. Bank sync writes go through a separate system path (#8, #9).
+- #6 Added `go.sum` for pgx. Opened PR #20.
+- Open: Teens and shared totals, invitations (#12), FX rate source (#11). Not yet tried on a real Supabase project.
 - #10 Added brand and design kit: logo files (SVG and PNG), app icons, social and splash images, colour and type tokens (`design-tokens.json`), fonts, style guide, six app screen comps, website comp, animations (Lottie, SVG, GIF, MP4).
 - #10 Added notes: Animation Guide, Design Comps. Replaced Brand Guide, Logo Guide, Voice and Tone and Design System with the kit versions, keeping the communications checklist, the name rule, the tagline decision, breakpoints and the "JSON wins" rule.
 - #10 Decided: Sage & Clay palette, Jedira wordmark (outlined), Space Grotesk / Montserrat / Bricolage Grotesque, Clay Deep for buttons and small text.

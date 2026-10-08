@@ -3,7 +3,7 @@ type: guide
 status: draft
 owner: Dinesh
 updated: 2026-10-08
-issue: 5
+issues: [5, 6]
 tags: [tech, onboarding]
 ---
 
@@ -14,7 +14,7 @@ Go 1.24+, Node 22+ and npm, a Supabase project, Plaid sandbox keys. Docker is op
 
 ## Run locally
 1. Copy `.env.example` to `.env` and fill in your keys
-2. Run the SQL in `migrations/` on your Supabase project
+2. Run the SQL in `migrations/` on your Supabase project, in filename order
 3. Backend: `go run ./cmd/server` (API on http://localhost:8080, check `/api/health`)
 4. Frontend: `cd web && npm install && npm run dev` (Vite forwards `/api` to the Go server)
 
@@ -24,7 +24,8 @@ To try the single-deployment setup: `cd web && npm run build`, then `go run ./cm
 | Task | Command |
 |---|---|
 | Sync board into docs | Automatic (hourly GitHub Action, `git pull` to get it). By hand: `python3 scripts/sync_board.py` |
-| Test | `go test ./...` |
+| Test | `go test ./...` (database tests skip unless `TALLYN_TEST_DATABASE_URL` is set) |
+| Test the schema and RLS | Start a throwaway Postgres: `docker run --rm -d -p 5433:5432 -e POSTGRES_PASSWORD=postgres postgres:16`, then `TALLYN_TEST_DATABASE_URL=postgres://postgres:postgres@localhost:5433/postgres go test ./internal/db` |
 | Lint | `go vet ./...` (frontend lint: > [!todo]) |
 | Build the web app | `cd web && npm run build` |
 | Build the Docker image | `docker build -t tallyn .` then `docker run -p 8080:8080 --env-file .env tallyn` |
