@@ -8,7 +8,6 @@ kanban-plugin: board
 
 ## Backlog
 
-- [ ] [#6 Supabase schema and RLS](https://github.com/Kolla1997/Tallyn/issues/6) #type/feature #area/backend #priority/p0
 - [ ] [#7 Auth: email + 2FA with Supabase Auth](https://github.com/Kolla1997/Tallyn/issues/7) #type/feature #area/backend #priority/p0
 - [ ] [#8 Plaid Link and encrypted token storage](https://github.com/Kolla1997/Tallyn/issues/8) #type/feature #area/backend #priority/p0
 - [ ] [#9 Scheduled bank sync (Transactions, Liabilities)](https://github.com/Kolla1997/Tallyn/issues/9) #type/feature #area/backend #priority/p0
@@ -25,6 +24,7 @@ kanban-plugin: board
 
 ## Review
 
+- [ ] [#6 Supabase schema and RLS](https://github.com/Kolla1997/Tallyn/issues/6) #type/feature #area/backend #priority/p0
 - [ ] [#10 Brand: logo and design tokens](https://github.com/Kolla1997/Tallyn/issues/10) #type/design #area/brand #priority/p0
 
 
