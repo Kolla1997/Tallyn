@@ -12,7 +12,7 @@ tags: [product, roadmap]
 > [!note] Live status is in [[Board]]. This note holds direction, not tickets.
 
 ## Now: v1 foundation
-- [ ] [#5](https://github.com/Kolla1997/Tallyn/issues/5) Repo scaffold: Go server, Vite React app, Dockerfile
+- [x] [#5](https://github.com/Kolla1997/Tallyn/issues/5) Repo scaffold: Go server, Vite React app, Dockerfile
 - [x] [#6](https://github.com/Kolla1997/Tallyn/issues/6) Supabase schema and RLS (`migrations/`)
 - [ ] [#7](https://github.com/Kolla1997/Tallyn/issues/7) Auth: email + 2FA (Supabase Auth)
 - [ ] [#8](https://github.com/Kolla1997/Tallyn/issues/8) Plaid Link + encrypted token storage
@@ -33,3 +33,4 @@ tags: [product, roadmap]
 |---|---|---|
 | 2026-10-08 | Supabase schema and RLS: households, members, bank data, FX rates, `AsUser` | [#6](https://github.com/Kolla1997/Tallyn/issues/6) |
 | 2026-10-08 | Brand and design kit: logo, icons, tokens, fonts, comps, animations | [#10](https://github.com/Kolla1997/Tallyn/issues/10) |
+| 2026-10-08 | Repo scaffold: Go server, Vite React app, Dockerfile | [#5](https://github.com/Kolla1997/Tallyn/issues/5) |
