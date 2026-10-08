@@ -17,7 +17,7 @@ tags: [product, roadmap]
 - [ ] [#7](https://github.com/Kolla1997/Tallyn/issues/7) Auth: email + 2FA (Supabase Auth)
 - [ ] [#8](https://github.com/Kolla1997/Tallyn/issues/8) Plaid Link + encrypted token storage
 - [ ] [#9](https://github.com/Kolla1997/Tallyn/issues/9) Scheduled bank sync (Transactions, Liabilities)
-- [ ] [#10](https://github.com/Kolla1997/Tallyn/issues/10) Brand: logo, `design-tokens.json`
+- [x] [#10](https://github.com/Kolla1997/Tallyn/issues/10) Brand: logo, `design-tokens.json`
 
 ## Next: v1 features
 - [ ] [#11](https://github.com/Kolla1997/Tallyn/issues/11) Multi-currency total balance
@@ -31,3 +31,4 @@ tags: [product, roadmap]
 ## Shipped
 | Date | What | Link |
 |---|---|---|
+| 2026-10-08 | Brand and design kit: logo, icons, tokens, fonts, comps, animations | [#10](https://github.com/Kolla1997/Tallyn/issues/10) |

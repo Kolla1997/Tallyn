@@ -1,0 +1,1 @@
+Adaptive icon: foreground ic_launcher_foreground-432.png over background colour #3B2F2F (ic_launcher_background-432.png). Monochrome layer is for Android 13+ themed icons.

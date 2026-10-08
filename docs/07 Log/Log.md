@@ -11,6 +11,10 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-08
+- #10 Added brand and design kit: logo files (SVG and PNG), app icons, social and splash images, colour and type tokens (`design-tokens.json`), fonts, style guide, six app screen comps, website comp, animations (Lottie, SVG, GIF, MP4).
+- #10 Added notes: Animation Guide, Design Comps. Replaced Brand Guide, Logo Guide, Voice and Tone and Design System with the kit versions, keeping the communications checklist, the name rule, the tagline decision, breakpoints and the "JSON wins" rule.
+- #10 Decided: Sage & Clay palette, Jedira wordmark (outlined), Space Grotesk / Montserrat / Bricolage Grotesque, Clay Deep for buttons and small text.
+- Open: Jedira licence for logo and commercial use; OFL licence texts to ship with `brand/fonts/`; missing screens (sign in, add bank, transactions, budgets, settings, empty and error states); app dark mode; Lottie device testing; wiring tokens into `web/` (`web/src/App.jsx` waits on #10).
 - #5 Repo scaffold: Go server (`cmd/server`, stdlib only) with `GET /api/health` and the React app served from `web/dist` with SPA fallback, plus tests. Empty packages with `TODO(#N)` for `internal/auth` (#7), `db` (#6), `plaid` (#8) and `sync` (#9). Vite + React app in `web/` (proxies `/api` in dev), multi-stage `Dockerfile`, `.env.example` with fake values, and `migrations/` with the RLS rule.
 - #16 Fast-forwarded local `main` to `16-board-sync-action`, so the sync Action is on `main` once it's pushed.
 - Decision: the frontend starts in plain JavaScript (JSX). No styling until `design-tokens.json` lands (#10).
