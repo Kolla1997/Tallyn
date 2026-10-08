@@ -1,0 +1,40 @@
+name: Feature
+description: Plan a feature to build
+title: "[Feature] "
+labels: ["type:feature"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Definition of done
+    validations:
+      required: true
+  - type: textarea
+    id: spec
+    attributes:
+      label: Spec
+      description: Link to docs/01 Product feature spec
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [brand, design, frontend, backend, infra, other]
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: [p2 - nice to have, p1 - important, p0 - urgent]

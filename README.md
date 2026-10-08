@@ -50,6 +50,16 @@ The Go service serves both the API and the built React app as a single deploymen
 3. Start the backend: `go run ./cmd/server`
 4. Start the frontend: `cd web && npm install && npm run dev`
 
+## Docs and planning
+
+This repo is also an Obsidian vault: open the repo folder in Obsidian and start at `docs/00 Home.md`. Claude's working rules are in [`CLAUDE.md`](CLAUDE.md).
+
+    /docs             Product, brand, design and tech guides (Obsidian)
+    /scripts          GitHub board setup and sync
+
+Work is tracked in GitHub Issues and the "Tallyn Board" project. One-time setup:
+`gh auth refresh -s project && scripts/setup_github.sh Kolla1997/Tallyn`, then `python3 scripts/sync_board.py` to mirror the board into `docs/05 Board/Board.md`.
+
 ## Status
 
 In early development. Not yet open to the public.

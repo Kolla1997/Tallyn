@@ -1,0 +1,35 @@
+name: Idea
+description: Capture an idea to explore
+title: "[Idea] "
+labels: ["type:idea"]
+body:
+  - type: textarea
+    id: pitch
+    attributes:
+      label: One-liner
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it matters
+    validations:
+      required: false
+  - type: textarea
+    id: shape
+    attributes:
+      label: Rough shape
+    validations:
+      required: false
+  - type: textarea
+    id: vault
+    attributes:
+      label: Vault note
+      description: Link to the note in docs/06 Ideas, if one exists
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [brand, design, frontend, backend, infra, other]

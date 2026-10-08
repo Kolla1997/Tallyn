@@ -1,0 +1,16 @@
+{
+  "newFileLocation": "folder",
+  "newFileFolderPath": "docs/00 Inbox",
+  "attachmentFolderPath": "brand",
+  "useMarkdownLinks": false,
+  "alwaysUpdateLinks": true,
+  "userIgnoreFilters": [
+    "node_modules/",
+    "web/",
+    "cmd/",
+    "internal/",
+    "migrations/",
+    "scripts/",
+    ".github/"
+  ]
+}

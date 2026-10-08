@@ -1,0 +1,29 @@
+name: Design
+description: Brand, logo, UI or visual work
+title: "[Design] "
+labels: ["type:design"]
+body:
+  - type: textarea
+    id: brief
+    attributes:
+      label: Brief
+    validations:
+      required: true
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables and formats
+    validations:
+      required: true
+  - type: textarea
+    id: refs
+    attributes:
+      label: References / constraints
+      description: Link the relevant Brand Guide, Logo Guide or Design System sections
+    validations:
+      required: false
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: [p2 - nice to have, p1 - important, p0 - urgent]
