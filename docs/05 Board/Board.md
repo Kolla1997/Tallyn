@@ -8,11 +8,22 @@ kanban-plugin: board
 
 ## Backlog
 
-- [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
+- [ ] [#4 Test idea, please ignore](https://github.com/Kolla1997/Tallyn/issues/4) #type/feature
+- [ ] [#5 Repo scaffold: Go server, Vite React app, Dockerfile](https://github.com/Kolla1997/Tallyn/issues/5) #type/feature #area/infra #priority/p0
+- [ ] [#6 Supabase schema and RLS](https://github.com/Kolla1997/Tallyn/issues/6) #type/feature #area/backend #priority/p0
+- [ ] [#7 Auth: email + 2FA with Supabase Auth](https://github.com/Kolla1997/Tallyn/issues/7) #type/feature #area/backend #priority/p0
+- [ ] [#8 Plaid Link and encrypted token storage](https://github.com/Kolla1997/Tallyn/issues/8) #type/feature #area/backend #priority/p0
+- [ ] [#9 Scheduled bank sync (Transactions, Liabilities)](https://github.com/Kolla1997/Tallyn/issues/9) #type/feature #area/backend #priority/p0
+- [ ] [#10 Brand: logo and design tokens](https://github.com/Kolla1997/Tallyn/issues/10) #type/design #area/brand #priority/p0
+- [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p1
+- [ ] [#12 Joint accounts: member roles and spending limits](https://github.com/Kolla1997/Tallyn/issues/12) #type/feature #area/backend #priority/p1
+- [ ] [#13 Shared budgets and spending categories](https://github.com/Kolla1997/Tallyn/issues/13) #type/feature #area/frontend #priority/p1
+- [ ] [#14 Savings goals](https://github.com/Kolla1997/Tallyn/issues/14) #type/feature #area/frontend #priority/p2
 
 
 ## In Progress
 
+- [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 
 
 ## Review

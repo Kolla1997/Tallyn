@@ -17,10 +17,12 @@ kanban-plugin: board
 
 ## Promoted
 
+- [x] [#4 Test idea, please ignore](https://github.com/Kolla1997/Tallyn/issues/4) #type/feature
 
 
 ## Parked
 
+- [ ] [#15 AI assistant (pgvector RAG)](https://github.com/Kolla1997/Tallyn/issues/15) #type/idea #area/backend
 
 
 ## Rejected
