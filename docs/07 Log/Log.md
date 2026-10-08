@@ -11,6 +11,10 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-08
+- #5 Repo scaffold: Go server (`cmd/server`, stdlib only) with `GET /api/health` and the React app served from `web/dist` with SPA fallback, plus tests. Empty packages with `TODO(#N)` for `internal/auth` (#7), `db` (#6), `plaid` (#8) and `sync` (#9). Vite + React app in `web/` (proxies `/api` in dev), multi-stage `Dockerfile`, `.env.example` with fake values, and `migrations/` with the RLS rule.
+- #16 Fast-forwarded local `main` to `16-board-sync-action`, so the sync Action is on `main` once it's pushed.
+- Decision: the frontend starts in plain JavaScript (JSX). No styling until `design-tokens.json` lands (#10).
+- Open: TypeScript for `web/`? Go router (stdlib for now)? Frontend linting and CI (GitHub Actions) are still to do.
 - #16 Board sync is automated: the GitHub Action `sync-board.yml` runs `sync_board.py` hourly, on issue changes and on demand, and commits changed mirrors as `Sync board mirrors (#1)`. `sync_board.py` skips rewrites that would only change the date stamp.
 - Decision: automated mirror commits go under Housekeeping #1, not #16, because they're ongoing upkeep.
 - Open: Dinesh to add the `BOARD_TOKEN` repo secret (classic PAT, `repo` + `project`). The Action fails with a clear error until then.
