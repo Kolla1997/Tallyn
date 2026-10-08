@@ -1,0 +1,161 @@
+{
+  "name": "Tallyn Sage & Clay",
+  "colors": {
+    "clay": {
+      "hex": "#C8553D",
+      "usage": "Primary. Buttons, key accents, the right leaf and the \"y\"."
+    },
+    "sage": {
+      "hex": "#6F9575",
+      "usage": "Secondary. Left leaf, positive-neutral accents, tags."
+    },
+    "clay-deep": {
+      "hex": "#B04A34",
+      "usage": "Accessible clay: button backgrounds with white text, links and small clay text."
+    },
+    "sage-deep": {
+      "hex": "#4F7355",
+      "usage": "Accessible sage for small text on cream."
+    },
+    "sage-light": {
+      "hex": "#A9C5AC",
+      "usage": "Sage on dark backgrounds."
+    },
+    "cocoa": {
+      "hex": "#3B2F2F",
+      "usage": "Text, dark surfaces, header and footer."
+    },
+    "cream": {
+      "hex": "#F6F1E9",
+      "usage": "Page background, text on dark."
+    },
+    "sand": {
+      "hex": "#ECE5D6",
+      "usage": "Section bands, subtle fills."
+    },
+    "white": {
+      "hex": "#FFFFFF",
+      "usage": "Cards, inputs, text on clay."
+    },
+    "text-secondary": {
+      "hex": "#6B5F5C",
+      "usage": "Secondary text on cream and white."
+    },
+    "border": {
+      "hex": "#DDD3C3",
+      "usage": "Dividers and card borders."
+    },
+    "success": {
+      "hex": "#267A4C",
+      "usage": "Positive amounts, success states."
+    },
+    "warning": {
+      "hex": "#D9962B",
+      "usage": "Warnings, pending states."
+    },
+    "error": {
+      "hex": "#B93A32",
+      "usage": "Negative amounts, errors."
+    }
+  },
+  "contrast": [
+    {
+      "text": "cocoa",
+      "background": "cream",
+      "ratio": 11.43,
+      "AA_normal": true,
+      "AA_large": true
+    },
+    {
+      "text": "cream",
+      "background": "cocoa",
+      "ratio": 11.43,
+      "AA_normal": true,
+      "AA_large": true
+    },
+    {
+      "text": "white",
+      "background": "clay-deep",
+      "ratio": 5.42,
+      "AA_normal": true,
+      "AA_large": true
+    },
+    {
+      "text": "clay-deep",
+      "background": "cream",
+      "ratio": 4.82,
+      "AA_normal": true,
+      "AA_large": true
+    },
+    {
+      "text": "sage-deep",
+      "background": "cream",
+      "ratio": 4.77,
+      "AA_normal": true,
+      "AA_large": true
+    },
+    {
+      "text": "white",
+      "background": "clay",
+      "ratio": 4.35,
+      "AA_normal": false,
+      "AA_large": true
+    },
+    {
+      "text": "clay",
+      "background": "cream",
+      "ratio": 3.87,
+      "AA_normal": false,
+      "AA_large": true
+    },
+    {
+      "text": "text-secondary",
+      "background": "cream",
+      "ratio": 5.47,
+      "AA_normal": true,
+      "AA_large": true
+    },
+    {
+      "text": "success",
+      "background": "cream",
+      "ratio": 4.7,
+      "AA_normal": true,
+      "AA_large": true
+    },
+    {
+      "text": "error",
+      "background": "cream",
+      "ratio": 5.03,
+      "AA_normal": true,
+      "AA_large": true
+    },
+    {
+      "text": "sage",
+      "background": "cream",
+      "ratio": 3.0,
+      "AA_normal": false,
+      "AA_large": true
+    },
+    {
+      "text": "cream",
+      "background": "sage",
+      "ratio": 3.0,
+      "AA_normal": false,
+      "AA_large": true
+    },
+    {
+      "text": "sage-light",
+      "background": "cocoa",
+      "ratio": 6.9,
+      "AA_normal": true,
+      "AA_large": true
+    },
+    {
+      "text": "clay",
+      "background": "cocoa",
+      "ratio": 2.95,
+      "AA_normal": false,
+      "AA_large": false
+    }
+  ]
+}

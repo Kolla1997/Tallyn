@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 112 112" width="112" height="112" fill="none"><style>.l,.r,.d{transform-box:fill-box}.l,.r{transform-origin:50% 100%}.d{transform-origin:50% 50%}
+.l{animation:wL 1.6s ease-out both,bL 2.6s ease-in-out 1.6s infinite alternate}.r{animation:wR 1.6s ease-out .15s both,bR 2.6s ease-in-out 1.75s infinite alternate}
+.d{animation:pop .6s cubic-bezier(.3,1.6,.5,1) 1s both,bob 2.6s ease-in-out 1.8s infinite alternate}
+.w{animation:up .5s cubic-bezier(.2,.8,.3,1) both;transform-box:fill-box}.tg{animation:fd .8s ease 2.1s both}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}@keyframes fd{from{opacity:0}to{opacity:.8}}
+@keyframes wL{0%{transform:scale(.8) rotate(-30deg);opacity:0}25%{opacity:1;transform:scale(1) rotate(14deg)}50%{transform:rotate(-9deg)}75%{transform:rotate(4deg)}100%{transform:rotate(0)}}
+@keyframes wR{0%{transform:scale(.8) rotate(30deg);opacity:0}25%{opacity:1;transform:scale(1) rotate(-14deg)}50%{transform:rotate(9deg)}75%{transform:rotate(-4deg)}100%{transform:rotate(0)}}
+@keyframes bL{from{transform:scale(1) rotate(-1.2deg)}to{transform:scale(1.06,1.04) rotate(1.2deg)}}@keyframes bR{from{transform:scale(1) rotate(1.2deg)}to{transform:scale(1.06,1.04) rotate(-1.2deg)}}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-4px)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}.w,.tg{opacity:1!important}}</style><g transform="translate(-7.5 -6.35) scale(1.15)"><path class="l" d="M47 82C47 52 26 42 12 18C44 16 52 44 47 82Z" fill="#6F9575"/><path class="r" d="M53 82C53 52 74 42 88 18C56 16 48 44 53 82Z" fill="#C8553D"/><circle class="d" cx="50" cy="26" r="7" fill="#3B2F2F"/></g></svg>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tallyn_clay">#C8553D</color>
+    <color name="tallyn_sage">#6F9575</color>
+    <color name="tallyn_clay_deep">#B04A34</color>
+    <color name="tallyn_sage_deep">#4F7355</color>
+    <color name="tallyn_sage_light">#A9C5AC</color>
+    <color name="tallyn_cocoa">#3B2F2F</color>
+    <color name="tallyn_cream">#F6F1E9</color>
+    <color name="tallyn_sand">#ECE5D6</color>
+    <color name="tallyn_white">#FFFFFF</color>
+    <color name="tallyn_text_secondary">#6B5F5C</color>
+    <color name="tallyn_border">#DDD3C3</color>
+    <color name="tallyn_success">#267A4C</color>
+    <color name="tallyn_warning">#D9962B</color>
+    <color name="tallyn_error">#B93A32</color>
+</resources>
