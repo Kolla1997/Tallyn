@@ -16,6 +16,8 @@ Then stop and wait. Don't start until Dinesh approves (a plan he has already app
 **No approval needed for:**
 - Read-only steps: reading files, `gh issue list` / `view`, running `scripts/sync_board.py`
 - `/i <idea>`: typing the command is the approval. Log the idea and change nothing else
+- `/promote <N>`: typing the command is the approval to move the card. Ask before writing a Feature Spec
+- Auto-promotion done by `scripts/sync_board.py` (see §5)
 
 ## 1. What Tallyn is
 
@@ -120,10 +122,19 @@ The Ideas board also has **Impact** (High/Medium/Low) and **Effort** (S/M/L) fie
 **From idea to done:**
 1. **Capture:** `/i <idea>` in Claude Code (or `scripts/idea.sh "Title"` in Terminal, or the GitHub app's Idea form). It creates a `type:idea` issue on Tallyn Ideas under **New**.
 2. **Explore (optional):** write it up in `docs/06 Ideas/` from `Templates/Idea.md` with `issue: N`, and move it to **Exploring**.
-3. **Promote:** when Dinesh decides to build it, keep the **same issue number**: add it to Tallyn Board under **Backlog**, set Ideas Stage to **Promoted**, add `type:feature` (or the right type), and write a Feature Spec if it's bigger than a day's work.
+3. **Promote:** keep the **same issue number**. Either:
+   - drag the card to **Promoted** on Tallyn Ideas, and the next sync moves it automatically, or
+   - run `/promote <N> [type]` in Claude Code, or `python3 scripts/promote.py <N> [type]` in Terminal.
+
+   Promotion adds the issue to Tallyn Board under **Backlog**, swaps the label `type:idea` → `type:feature` (or the type given), and comments on the issue with the date. Write a Feature Spec if it's bigger than about a day's work.
 4. **Build:** move it to In Progress when work starts and to Review when a PR is open. Merging a PR with `Closes #N` closes it. Then add a Log entry starting with `#N`.
 5. **Park or reject** ideas you won't do now, with a one-line reason in a comment. Don't delete them.
-6. **Mirror:** `python3 scripts/sync_board.py` regenerates both board notes. Edit on GitHub, not in the mirrors.
+6. **Sync:** `python3 scripts/sync_board.py` first auto-promotes cards in **Promoted**, then regenerates both board notes in Obsidian. Edit on GitHub, not in the mirrors. It runs:
+   - at the start of every Claude session (§3)
+   - after every `/i` and `/promote`
+   - whenever Dinesh runs it by hand
+
+   Use `--no-promote` to mirror without moving anything.
 
 Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand, design, frontend, backend, infra), `priority:*` (p0, p1, p2). Full list: `scripts/github/labels.yml` (copied to `.github/` by `setup_github.sh`).
 

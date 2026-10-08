@@ -1,7 +1,7 @@
 ---
 description: Log an idea to the Tallyn Ideas board
 argument-hint: <your idea>
-allowed-tools: Bash(scripts/idea.sh:*), Bash(gh issue list:*), Bash(gh issue comment:*)
+allowed-tools: Bash(scripts/idea.sh:*), Bash(gh issue list:*), Bash(gh issue comment:*), Bash(python3 scripts/sync_board.py:*)
 ---
 
 Log this idea to the Tallyn Ideas board: $ARGUMENTS
@@ -20,4 +20,5 @@ Typing `/i` is the approval, so don't ask before logging (CLAUDE.md §0 exceptio
    ```
 4. **Area:** pick one of brand, design, frontend, backend, infra, or leave it empty if unclear.
 5. **Log it:** `scripts/idea.sh "<title>" "<body>" "<area>"`
-6. **Reply in at most two lines:** `Logged #N: <title> → Tallyn Ideas (New)`, then a one-line Impact (High/Medium/Low) and Effort (S/M/L) guess for Dinesh to set on the board.
+6. **Sync:** `python3 scripts/sync_board.py` so the Obsidian boards are up to date.
+7. **Reply in at most two lines:** `Logged #N: <title> → Tallyn Ideas (New)`, then a one-line Impact (High/Medium/Low) and Effort (S/M/L) guess for Dinesh to set on the board.
