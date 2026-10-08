@@ -16,6 +16,7 @@ tags: [home]
 ## Product
 - [[Vision]]: what we're building and why
 - [[Roadmap]]: now / next / later
+- [[Feature - Data Model]]: tables, roles and RLS rules
 
 ## Brand
 - [[Brand Guide]]: positioning, personality, brand basics

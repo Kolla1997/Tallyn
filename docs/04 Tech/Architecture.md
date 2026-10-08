@@ -3,6 +3,7 @@ type: guide
 status: draft
 owner: Dinesh
 updated: 2026-10-08
+issue: 6
 tags: [tech, architecture]
 ---
 
@@ -12,7 +13,7 @@ tags: [tech, architecture]
 ```mermaid
 flowchart LR
   U[User browser] -->|HTTPS| G[Go server<br/>API + static React]
-  G -->|SQL, service role| DB[(Supabase Postgres<br/>RLS on)]
+  G -->|SQL as the user| DB[(Supabase Postgres<br/>RLS on)]
   G -->|Auth| SA[Supabase Auth<br/>email + 2FA]
   G -->|Link, Transactions, Liabilities| P[Plaid]
   S[Scheduled sync<br/>in Go service] --> P
@@ -34,12 +35,14 @@ One Go service, one deployment: it serves the API and the built React app (`web/
 | Schema | SQL migrations | `migrations/` |
 
 ## Data model (draft)
-> [!todo] Key entities: users, families / households, members + roles, accounts, transactions, budgets, categories, goals, fx rates.
+profiles, households, household_members (with roles), plaid_items, accounts, transactions and fx_rates. Tables, roles and rules: [[Feature - Data Model]]. Budgets, categories and goals come with #13 and #14.
+
+The backend runs each request as the signed-in user so RLS applies: [[0002-backend-database-access]].
 
 ## Security
 - Plaid access tokens are **encrypted by the Go backend** before they're stored
 - **RLS on every Supabase table**
-- Only the backend connects to the database
+- Only the backend connects to the database, and it runs user requests as the user (`internal/db` `AsUser`), not as the service role
 - Secrets live in environment variables, never in the repo
 
 ## Environments
