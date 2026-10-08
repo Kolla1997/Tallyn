@@ -20,6 +20,6 @@ Go, Node + npm, a Supabase project, Plaid sandbox keys.
 ## Common tasks
 | Task | Command |
 |---|---|
-| Sync board into docs | `python3 scripts/sync_board.py` |
+| Sync board into docs | Automatic (hourly GitHub Action, `git pull` to get it). By hand: `python3 scripts/sync_board.py` |
 | Test | > [!todo] |
 | Lint | > [!todo] |

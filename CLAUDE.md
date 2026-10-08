@@ -130,11 +130,12 @@ The Ideas board also has **Impact** (High/Medium/Low) and **Effort** (S/M/L) fie
 4. **Build:** move it to In Progress when work starts and to Review when a PR is open. If it can't move, put it in **Blocked**, add the `blocker` label and say what blocks it in a comment. Merging a PR with `Closes #N` closes it. Then add a Log entry starting with `#N`.
 5. **Park or reject** ideas you won't do now, with a one-line reason in a comment. Don't delete them.
 6. **Sync:** `python3 scripts/sync_board.py` first auto-promotes cards in **Promoted**, then regenerates both board notes in Obsidian. Edit on GitHub, not in the mirrors. It runs:
+   - automatically, via the GitHub Action `.github/workflows/sync-board.yml`: every hour (card moves send no events, so allow up to an hour), on issue changes, and from Actions → "Sync board mirrors" → Run workflow. It commits changed mirrors to `main` as `Sync board mirrors (#1)`, so `git pull` before reading them
    - at the start of every Claude session (§3)
    - after every `/i` and `/promote`
    - whenever Dinesh runs it by hand
 
-   Use `--no-promote` to mirror without moving anything.
+   Use `--no-promote` to mirror without moving anything. A run that would only change the date stamp writes nothing. The Action needs the repo secret `BOARD_TOKEN`: a classic personal access token with `repo` and `project` scopes. Never put the token in the repo.
 
 Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand, design, frontend, backend, infra), `priority:*` (p0, p1, p2), and `blocker` for a ticket that can't move until something else is resolved (pairs with the **Blocked** column). Full list: `scripts/github/labels.yml` (copied to `.github/` by `setup_github.sh`).
 
