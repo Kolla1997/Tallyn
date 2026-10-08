@@ -74,7 +74,7 @@ The **repo root is the Obsidian vault**. Notes live in `docs/`. Code folders are
   tags: []
   ---
   ```
-- Link notes with `[[Wikilinks]]`. Refer to code and assets by repo path in backticks (`internal/plaid`, `brand/logo/tallyn-mark.svg`).
+- Link notes with `[[Wikilinks]]`. Refer to code and assets by repo path in backticks (`internal/plaid`, `brand/logo/svg/tallyn-mark-light.svg`).
 - Put one concept in each note. If a note runs past ~300 lines, split it and link the parts.
 - Note names use Title Case with spaces (`Feature - Joint Accounts.md`). ADRs use `NNNN-kebab-title.md`.
 - Never delete a note that others link to. Set `status: deprecated` and link to its replacement.
