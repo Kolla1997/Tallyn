@@ -8,6 +8,7 @@ kanban-plugin: board
 
 ## New
 
+- [ ] [#2 Test idea, please ignore](https://github.com/Kolla1997/Tallyn/issues/2) #type/idea
 
 
 ## Exploring

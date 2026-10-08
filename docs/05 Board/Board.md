@@ -8,6 +8,7 @@ kanban-plugin: board
 
 ## Backlog
 
+- [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 
 
 ## In Progress

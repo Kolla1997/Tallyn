@@ -11,6 +11,8 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-08
+- #1 Added Housekeeping to Tallyn Board under Backlog and re-synced both board mirrors.
+- #2 Tested `/i` end to end. The test idea landed only on Tallyn Ideas (New), not on Tallyn Board. Closed as not planned.
 - Rule: think before building. Claude shares its understanding, approach, alternatives, improvements and risks, then waits for an OK (`CLAUDE.md` §0).
 - Added a separate **Tallyn Ideas** board (New → Exploring → Promoted / Parked / Rejected) and the `/i <idea>` command. Tallyn Board now holds committed work only.
 - Rule: every change has a ticket number (GitHub issue `#N`) in its branch, commits, PR, notes and Log. A commit-msg hook enforces it (`CLAUDE.md` §5).
