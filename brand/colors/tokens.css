@@ -1,0 +1,22 @@
+:root{
+  --color-clay: #C8553D;
+  --color-sage: #6F9575;
+  --color-clay-deep: #B04A34;
+  --color-sage-deep: #4F7355;
+  --color-sage-light: #A9C5AC;
+  --color-cocoa: #3B2F2F;
+  --color-cream: #F6F1E9;
+  --color-sand: #ECE5D6;
+  --color-white: #FFFFFF;
+  --color-text-secondary: #6B5F5C;
+  --color-border: #DDD3C3;
+  --color-success: #267A4C;
+  --color-warning: #D9962B;
+  --color-error: #B93A32;
+  --font-heading: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Montserrat', system-ui, sans-serif;
+  --font-button: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-currency: 'Space Grotesk', system-ui, sans-serif;
+  --radius-card: 22px; --radius-button: 999px; --radius-input: 14px; --radius-small: 10px;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+}

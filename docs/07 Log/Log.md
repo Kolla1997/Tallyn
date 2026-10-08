@@ -16,7 +16,12 @@ Newest first. One entry per working session or decision.
 - #6 Added [[Feature - Data Model]] and ADR [[0002-backend-database-access]] (Proposed).
 - Decision: the table is `households` (not `families`). One person can be in several households. Kids get their own logins. Money is whole minor units in bigint plus a currency code.
 - Decision (pending ADR acceptance): the backend no longer uses the service role for database access. Bank sync writes go through a separate system path (#8, #9).
-- Open: run `go mod tidy` to create `go.sum` (pgx added). Teens and shared totals, invitations (#12), FX rate source (#11). Not yet tried on a real Supabase project.
+- #6 Added `go.sum` for pgx. Opened PR #20.
+- Open: Teens and shared totals, invitations (#12), FX rate source (#11). Not yet tried on a real Supabase project.
+- #10 Added brand and design kit: logo files (SVG and PNG), app icons, social and splash images, colour and type tokens (`design-tokens.json`), fonts, style guide, six app screen comps, website comp, animations (Lottie, SVG, GIF, MP4).
+- #10 Added notes: Animation Guide, Design Comps. Replaced Brand Guide, Logo Guide, Voice and Tone and Design System with the kit versions, keeping the communications checklist, the name rule, the tagline decision, breakpoints and the "JSON wins" rule.
+- #10 Decided: Sage & Clay palette, Jedira wordmark (outlined), Space Grotesk / Montserrat / Bricolage Grotesque, Clay Deep for buttons and small text.
+- Open: Jedira licence for logo and commercial use; OFL licence texts to ship with `brand/fonts/`; missing screens (sign in, add bank, transactions, budgets, settings, empty and error states); app dark mode; Lottie device testing; wiring tokens into `web/` (`web/src/App.jsx` waits on #10).
 - #5 Repo scaffold: Go server (`cmd/server`, stdlib only) with `GET /api/health` and the React app served from `web/dist` with SPA fallback, plus tests. Empty packages with `TODO(#N)` for `internal/auth` (#7), `db` (#6), `plaid` (#8) and `sync` (#9). Vite + React app in `web/` (proxies `/api` in dev), multi-stage `Dockerfile`, `.env.example` with fake values, and `migrations/` with the RLS rule.
 - #16 Fast-forwarded local `main` to `16-board-sync-action`, so the sync Action is on `main` once it's pushed.
 - Decision: the frontend starts in plain JavaScript (JSX). No styling until `design-tokens.json` lands (#10).

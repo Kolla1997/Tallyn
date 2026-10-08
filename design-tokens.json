@@ -1,0 +1,106 @@
+{
+  "color": {
+    "clay": {
+      "value": "#C8553D"
+    },
+    "sage": {
+      "value": "#6F9575"
+    },
+    "clay-deep": {
+      "value": "#B04A34"
+    },
+    "sage-deep": {
+      "value": "#4F7355"
+    },
+    "sage-light": {
+      "value": "#A9C5AC"
+    },
+    "cocoa": {
+      "value": "#3B2F2F"
+    },
+    "cream": {
+      "value": "#F6F1E9"
+    },
+    "sand": {
+      "value": "#ECE5D6"
+    },
+    "white": {
+      "value": "#FFFFFF"
+    },
+    "text-secondary": {
+      "value": "#6B5F5C"
+    },
+    "border": {
+      "value": "#DDD3C3"
+    },
+    "success": {
+      "value": "#267A4C"
+    },
+    "warning": {
+      "value": "#D9962B"
+    },
+    "error": {
+      "value": "#B93A32"
+    }
+  },
+  "font": {
+    "heading": {
+      "value": "Space Grotesk"
+    },
+    "body": {
+      "value": "Montserrat"
+    },
+    "button": {
+      "value": "Bricolage Grotesque"
+    }
+  },
+  "radius": {
+    "card": {
+      "value": "22px"
+    },
+    "button": {
+      "value": "999px"
+    },
+    "input": {
+      "value": "14px"
+    }
+  },
+  "spacing": {
+    "s1": {
+      "value": 4
+    },
+    "s2": {
+      "value": 8
+    },
+    "s3": {
+      "value": 12
+    },
+    "s4": {
+      "value": 16
+    },
+    "s5": {
+      "value": 24
+    },
+    "s6": {
+      "value": 32
+    },
+    "s7": {
+      "value": 48
+    },
+    "s8": {
+      "value": 64
+    }
+  },
+  "motion": {
+    "logo-intro": {
+      "value": "1.6s ease-out, dot pop 0.6s from 1.0s"
+    },
+    "idle-breathe": {
+      "value": "2.6s ease-in-out alternate"
+    },
+    "ui-transition": {
+      "value": "200-300ms ease-out"
+    }
+  },
+  "$description": "Tallyn design tokens. Source of truth for colour, type, radius, spacing and motion values."
+}

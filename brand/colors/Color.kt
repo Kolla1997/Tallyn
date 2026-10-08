@@ -1,0 +1,16 @@
+import androidx.compose.ui.graphics.Color
+
+val TallynClay = Color(0xFFC8553D)
+val TallynSage = Color(0xFF6F9575)
+val TallynClayDeep = Color(0xFFB04A34)
+val TallynSageDeep = Color(0xFF4F7355)
+val TallynSageLight = Color(0xFFA9C5AC)
+val TallynCocoa = Color(0xFF3B2F2F)
+val TallynCream = Color(0xFFF6F1E9)
+val TallynSand = Color(0xFFECE5D6)
+val TallynWhite = Color(0xFFFFFFFF)
+val TallynTextSecondary = Color(0xFF6B5F5C)
+val TallynBorder = Color(0xFFDDD3C3)
+val TallynSuccess = Color(0xFF267A4C)
+val TallynWarning = Color(0xFFD9962B)
+val TallynError = Color(0xFFB93A32)

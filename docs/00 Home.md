@@ -22,9 +22,11 @@ tags: [home]
 - [[Brand Guide]]: positioning, personality, brand basics
 - [[Logo Guide]]: logo variants, clear space, misuse
 - [[Voice and Tone]]: how Tallyn sounds
+- [[Animation Guide]]: logo and UI motion
 
 ## Design
 - [[Design System]]: color, type, spacing, components
+- [[Design Comps]]: app and website screen comps
 - [[UI Patterns]]: recurring layouts and interactions
 
 ## Tech
