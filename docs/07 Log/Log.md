@@ -10,6 +10,9 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-10-09
+- #8 Merged PR #26, so #8 is closed. Moved it to Done by hand (the board's close → Done workflow still doesn't fire). Ticked in [[Roadmap]].
+
 ## 2026-10-08
 - #8 End-to-end test passed in Plaid sandbox on `tallyn-dev`: created a household, linked First Platypus Bank (14 accounts, balances correct), token stored encrypted (version 1, 80 bytes, no readable token text), unlink revoked at Plaid and removed the bank, accounts and transactions. Fixed: Unlink used `window.confirm`, which the embedded browser silently answers "no", so it did nothing; the confirmation is now shown in the page.
 - #8 Bank linking on branch `8-plaid-link`: Plaid Link (US only, Transactions only), public token exchange, accounts with balances in exact minor units, unlink that revokes at Plaid (`/item/remove`) before deleting our copy. If saving a new link fails, the item is revoked at Plaid straight away.
