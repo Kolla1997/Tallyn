@@ -37,6 +37,6 @@ Sync option 1 now; option 3 as hardening (below). Location option 2.
 
 ## Consequences
 - **Finding while testing:** Postgres checks `SET ROLE` against the *login* role, and Supabase's `postgres` login also has `BYPASSRLS`. So code running inside `AsUser` could switch to `tallyn_sync`, or `reset role` to `postgres`. This was already true before #9. RLS therefore protects against **logic bugs** in handlers (a wrong `WHERE`), not against **SQL injection**. Every query in Tallyn is fixed text with parameters, so there is no injection path today, but the second lock is weaker than ADR 0002 implies.
-- **Hardening (follow-up):** give the API its own login role that is a member of `authenticated` only (no `BYPASSRLS`), and the sync its own login as `tallyn_sync`. Then even injected SQL can't leave the user's role. It needs two connection strings and Supabase custom-role logins through the pooler.
+- **Hardening:** done in #30, [[0006-separate-database-logins]]. Give the API its own login role that is a member of `authenticated` only (no `BYPASSRLS`), and the sync its own login as `tallyn_sync`. Then even injected SQL can't leave the user's role. It needs two connection strings and Supabase custom-role logins through the pooler.
 - `can_see_whereabouts` is `security definer`; changes to it need careful review and the visibility tests in `internal/db/system_test.go`.
 - Until #28, adults (partners) don't see each other's time and location; they still see each other's transactions.
