@@ -2,8 +2,8 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-08
-issue: 10
+updated: 2026-10-09
+issues: [10, 39]
 tags: [design, comps]
 ---
 # Design Comps
@@ -21,7 +21,12 @@ Visual comps, not production code. Amounts and rates are placeholders.
 | Family | `Comps/App Screens/05-Family.png` |
 | Goals | `Comps/App Screens/06-Goals.png` |
 
-## Website
+## Web app (draft, #39)
+`Comps/web-app-draft.html`: Home for web (sidebar from 1024px) and phone (bottom tab bar). Open it through a local web server so the brand fonts and logo load (e.g. `python3 -m http.server` at the repo root, then `/docs/03%20Design/Comps/web-app-draft.html`).
+- Send, Request and Convert are replaced by **Link a bank**, **Share** and **Invite**: Tallyn is read-only and can't move money (#36)
+- Your accounts and **Shared with you** are separate (#37); the total balance shows yours, shared and your kids'
+- Transactions can be filtered by person; time and place appear only where visible (#28)
+
 Desktop and mobile screenshots: `Comps/website-desktop-1440.png`, `Comps/website-mobile-390.png`. Source: `Comps/website/index.html`.
 
 > [!warning] Update before build
