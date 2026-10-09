@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tallyn · Accounts (draft, #39)</title>
+<link rel="stylesheet" href="draft.css" />
+</head>
+<body>
+<div class="draft-banner">Draft for <strong>#39</strong> · not production code · all names and amounts are made up</div>
+
+<div class="app">
+  <aside class="sidebar" aria-label="Main">
+    <img class="logo" src="../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg" alt="Tallyn" />
+    <nav class="nav">
+      <a href="web-app-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-home"/></svg>Home</a>
+      <a href="web-accounts-draft.html" aria-current="page"><svg aria-hidden="true"><use href="draft-icons.svg#i-accounts"/></svg>Accounts</a>
+      <a href="web-family-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-family"/></svg>Family</a>
+      <a href="#"><svg aria-hidden="true"><use href="draft-icons.svg#i-goals"/></svg>Goals</a>
+      <a href="#"><svg aria-hidden="true"><use href="draft-icons.svg#i-settings"/></svg>Settings</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="household"><p class="small muted">Household</p><p><strong>The Rivera family</strong></p></div>
+      <div class="me"><span class="avatar maya">M</span><div><p><strong>Maya</strong></p><p class="small muted">Owner</p></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="mobile-head"><img src="../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg" alt="Tallyn" /><span class="avatar maya">M</span></div>
+
+    <div class="top">
+      <div>
+        <h1>Accounts</h1>
+        <p class="muted page-sub">5 accounts in 3 banks · $9,958.00 in total</p>
+      </div>
+      <div class="actions">
+        <button class="btn"><svg aria-hidden="true"><use href="draft-icons.svg#i-plus"/></svg>Link a bank</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col">
+        <p class="section-label">YOUR BANKS</p>
+
+        <section class="card" aria-labelledby="b1">
+          <div class="bank-head">
+            <div class="who"><span class="coin sand">P</span><div><h2 id="b1">Platypus Bank</h2><p class="small muted">Linked by you · updated today, 9:14 AM</p></div></div>
+            <button class="link">Unlink</button>
+          </div>
+          <ul class="list">
+            <li class="selected"><span class="coin sage">$</span><div class="grow"><p class="name">Everyday checking</p><p class="small muted">Checking ••0000</p></div><span class="amount">$4,210.00</span></li>
+            <li><span class="coin sage">$</span><div class="grow"><p class="name">High-yield savings</p><p class="small muted">Savings ••1111</p></div><span class="amount">$3,970.00</span></li>
+            <li style="flex-wrap:wrap"><span class="coin clay">$</span><div class="grow"><p class="name">Rewards card</p><p class="small muted">Credit card ••3333 · owed, not in your total balance</p></div><span class="amount out">$412.40</span>
+              <div class="debt" style="flex-basis:100%">
+                <div><span class="k">Interest rate (APR)</span><span class="amount">24.99%</span></div>
+                <div><span class="k">Minimum payment</span><span class="amount">$35.00</span></div>
+                <div><span class="k">Due</span><span class="amount">Oct 14</span></div>
+              </div>
+              <span class="tag preview">Preview: debt details come with #27</span>
+            </li>
+          </ul>
+        </section>
+
+        <p class="section-label">SHARED WITH YOU</p>
+
+        <section class="card shared" aria-labelledby="b2">
+          <div class="bank-head">
+            <div class="who"><span class="avatar james">J</span><div><h2 id="b2">Lakeside Bank</h2><p class="small muted">James's · he shares balances and transactions with you</p></div></div>
+            <span class="tag sage">You can't unlink this</span>
+          </div>
+          <ul class="list">
+            <li><span class="coin sage">$</span><div class="grow"><p class="name">Checking</p><p class="small muted">Checking ••4821</p></div><span class="amount">$1,366.00</span></li>
+          </ul>
+        </section>
+
+        <section class="card shared" aria-labelledby="b3">
+          <div class="bank-head">
+            <div class="who"><span class="avatar leo">L</span><div><h2 id="b3">Platypus Bank</h2><p class="small muted">Leo's · you see it as his parent</p></div></div>
+            <button class="link">Unlink</button>
+          </div>
+          <ul class="list">
+            <li><span class="coin sage">$</span><div class="grow"><p class="name">Teen savings</p><p class="small muted">Savings ••7710</p></div><span class="amount">$412.00</span></li>
+          </ul>
+        </section>
+
+        <p class="section-label">HOW OTHER STATES LOOK</p>
+
+        <section class="card warn" aria-labelledby="b4">
+          <div class="bank-head">
+            <div class="who"><span class="coin sand">R</span><div><h2 id="b4">Riverbend Credit Union</h2><p class="small note">Reconnect needed: the bank asked you to sign in again, so it stopped updating on Oct 2.</p></div></div>
+            <span class="tag warn-tag">Not updating</span>
+          </div>
+          <button class="btn secondary" style="align-self:flex-start">Sign in to Riverbend again</button>
+        </section>
+      </div>
+
+      <div class="col">
+        <section class="card" aria-labelledby="detail">
+          <div class="card-head"><h2 id="detail">Everyday checking</h2><span class="small muted">Platypus Bank ••0000</span></div>
+          <p class="amount" style="font-size:32px">$4,210.00</p>
+          <div class="stat-row">
+            <div class="stat"><span class="k">Available</span><p class="amount">$4,180.55</p></div>
+            <div class="stat"><span class="k">Updated</span><p class="amount">9:14 AM</p></div>
+            <div class="stat"><span class="k">In this month</span><p class="amount in">+$2,400.00</p></div>
+            <div class="stat"><span class="k">Out this month</span><p class="amount out">−$2,187.60</p></div>
+          </div>
+          <h3>Recent</h3>
+          <ul class="list">
+            <li><span class="coin clay">F</span><div class="grow"><p class="name">Fresh Market</p><p class="small muted">Today · 2:14 PM · Chicago, IL</p></div><span class="amount out">−$64.20</span></li>
+            <li><span class="coin sage">P</span><div class="grow"><p class="name">Payroll</p><p class="small muted">Today · Income</p></div><span class="amount in">+$2,400.00</span></li>
+            <li><span class="coin sand">M</span><div class="grow"><p class="name">Metro Transit</p><p class="small muted">Oct 7 · 8:31 AM · online</p></div><span class="amount out">−$2.50</span></li>
+          </ul>
+          <a href="#" class="link" style="align-self:flex-start">All transactions in this account</a>
+        </section>
+
+        <section class="card" aria-labelledby="sec">
+          <h2 id="sec">Safe by design</h2>
+          <p class="small muted">Tallyn can see your accounts but can't move money. Your bank login stays with Plaid, and you can unlink a bank at any time. Unlinking asks you to confirm with a code from your authenticator app.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Main">
+  <a href="web-app-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-home"/></svg>Home</a>
+  <a href="web-accounts-draft.html" aria-current="page"><svg aria-hidden="true"><use href="draft-icons.svg#i-accounts"/></svg>Accounts</a>
+  <a href="web-family-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-family"/></svg>Family</a>
+  <a href="#"><svg aria-hidden="true"><use href="draft-icons.svg#i-goals"/></svg>Goals</a>
+</nav>
+</body>
+</html>

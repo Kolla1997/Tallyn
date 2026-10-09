@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tallyn · Family (draft, #39)</title>
+<link rel="stylesheet" href="draft.css" />
+</head>
+<body>
+<div class="draft-banner">Draft for <strong>#39</strong> · not production code · all names and amounts are made up</div>
+
+<div class="app">
+  <aside class="sidebar" aria-label="Main">
+    <img class="logo" src="../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg" alt="Tallyn" />
+    <nav class="nav">
+      <a href="web-app-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-home"/></svg>Home</a>
+      <a href="web-accounts-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-accounts"/></svg>Accounts</a>
+      <a href="web-family-draft.html" aria-current="page"><svg aria-hidden="true"><use href="draft-icons.svg#i-family"/></svg>Family</a>
+      <a href="#"><svg aria-hidden="true"><use href="draft-icons.svg#i-goals"/></svg>Goals</a>
+      <a href="#"><svg aria-hidden="true"><use href="draft-icons.svg#i-settings"/></svg>Settings</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="household"><p class="small muted">Household</p><p><strong>The Rivera family</strong></p></div>
+      <div class="me"><span class="avatar maya">M</span><div><p><strong>Maya</strong></p><p class="small muted">Owner</p></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="mobile-head"><img src="../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg" alt="Tallyn" /><span class="avatar maya">M</span></div>
+
+    <div class="top">
+      <div>
+        <h1>Family</h1>
+        <p class="muted page-sub">4 members · nobody sees your money until you share it</p>
+      </div>
+      <div class="actions">
+        <button class="btn"><svg aria-hidden="true"><use href="draft-icons.svg#i-invite"/></svg>Invite someone</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col">
+        <section class="card" aria-labelledby="members">
+          <h2 id="members">Members and sharing</h2>
+
+          <div class="member">
+            <div class="member-top">
+              <span class="avatar maya">M</span>
+              <div class="grow"><p class="name">Maya (you)</p><p class="small muted">Owner</p></div>
+              <button class="link">Leave household</button>
+            </div>
+          </div>
+
+          <div class="member">
+            <div class="member-top">
+              <span class="avatar james">J</span>
+              <div class="grow"><p class="name">James</p><p class="small muted">Shares with you: balances, transactions</p></div>
+              <select class="select" aria-label="James's role"><option>Adult</option><option>Owner</option><option>Teen</option><option>Viewer</option></select>
+            </div>
+            <p class="small muted">You share with James</p>
+            <div class="switches">
+              <span class="switch on"><span class="track"></span>Balances</span>
+              <span class="switch"><span class="track"></span>Transactions</span>
+              <span class="switch off-locked"><span class="track"></span><span>Time and location<br /><span class="small">needs transactions</span></span></span>
+            </div>
+            <button class="link" style="align-self:flex-start">Remove James</button>
+          </div>
+
+          <div class="member">
+            <div class="member-top">
+              <span class="avatar leo">L</span>
+              <div class="grow"><p class="name">Leo</p><p class="small muted">Teen</p></div>
+              <select class="select" aria-label="Leo's role"><option>Teen</option><option>Adult</option><option>Viewer</option></select>
+            </div>
+            <p class="note-box">You see Leo's money automatically as a parent. Leo sees only his own.</p>
+            <button class="link" style="align-self:flex-start">Remove Leo</button>
+          </div>
+
+          <div class="member">
+            <div class="member-top">
+              <span class="avatar" style="background:var(--sage)">R</span>
+              <div class="grow"><p class="name">Grandma Rosa</p><p class="small muted">Viewer · shares nothing with you</p></div>
+              <select class="select" aria-label="Rosa's role"><option>Viewer</option><option>Adult</option><option>Owner</option></select>
+            </div>
+            <p class="small muted">You share with Rosa</p>
+            <div class="switches">
+              <span class="switch"><span class="track"></span>Balances</span>
+              <span class="switch"><span class="track"></span>Transactions</span>
+              <span class="switch off-locked"><span class="track"></span><span>Time and location<br /><span class="small">needs transactions</span></span></span>
+            </div>
+            <button class="link" style="align-self:flex-start">Remove Rosa</button>
+          </div>
+        </section>
+
+        <p class="section-label">EXAMPLE: CONFIRMING A REMOVAL (#38)</p>
+        <div class="overlay">
+          <div class="dialog" role="dialog" aria-labelledby="dlg" aria-modal="true">
+            <h2 id="dlg">Remove James from The Rivera family?</h2>
+            <ul class="small" style="margin:0;padding-left:var(--s5);display:flex;flex-direction:column;gap:var(--s1)">
+              <li>James loses access to this household straight away.</li>
+              <li>His banks stay his. You stop seeing what he shared with you.</li>
+              <li>What you share with James stops too.</li>
+            </ul>
+            <label class="field"><span>Type <strong>James</strong> to confirm</span><input placeholder="James" /></label>
+            <label class="field">6-digit code from your authenticator app<input class="code" inputmode="numeric" placeholder="••••••" /></label>
+            <div class="row-actions">
+              <button class="btn secondary">Cancel</button>
+              <button class="btn danger">Remove James</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <section class="card" aria-labelledby="invite">
+          <h2 id="invite">Invite someone</h2>
+          <div class="form">
+            <label class="field">Their email<input placeholder="sam@example.com" /></label>
+            <label class="field">Role
+              <select><option>Adult</option><option>Teen (13 to 17)</option><option>Viewer (sees only what people share)</option></select>
+            </label>
+            <button class="btn" style="align-self:flex-start">Create invite link</button>
+            <p class="small muted">The link works once, only for that email, for 7 days. Children under 13 can't be invited yet.</p>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="waiting">
+          <h2 id="waiting">Waiting to join</h2>
+          <ul class="list">
+            <li><span class="coin sand">N</span><div class="grow"><p class="name">nina@example.com</p><p class="small muted">Adult · until Oct 16</p></div><button class="link">Cancel</button></li>
+          </ul>
+        </section>
+
+        <section class="card" aria-labelledby="how">
+          <h2 id="how">How sharing works</h2>
+          <ul class="small" style="margin:0;padding-left:var(--s5);display:flex;flex-direction:column;gap:var(--s2)">
+            <li>Everyone sees their own money.</li>
+            <li>Parents see their teens' and children's money.</li>
+            <li>Everything else only if that person shares it, and they can stop at any time.</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Main">
+  <a href="web-app-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-home"/></svg>Home</a>
+  <a href="web-accounts-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-accounts"/></svg>Accounts</a>
+  <a href="web-family-draft.html" aria-current="page"><svg aria-hidden="true"><use href="draft-icons.svg#i-family"/></svg>Family</a>
+  <a href="#"><svg aria-hidden="true"><use href="draft-icons.svg#i-goals"/></svg>Goals</a>
+</nav>
+</body>
+</html>

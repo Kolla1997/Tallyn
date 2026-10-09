@@ -4,137 +4,21 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tallyn · Home (draft, #39)</title>
-<style>
-/* Draft comp for #39. Values copied from design-tokens.json. Fake data only. */
-@font-face { font-family: "Space Grotesk"; src: url("../../../brand/fonts/SpaceGrotesk%5Bwght%5D.ttf") format("truetype"); font-weight: 300 700; }
-@font-face { font-family: "Montserrat"; src: url("../../../brand/fonts/Montserrat%5Bwght%5D.ttf") format("truetype"); font-weight: 100 900; }
-@font-face { font-family: "Bricolage Grotesque"; src: url("../../../brand/fonts/BricolageGrotesque%5Bopsz%2Cwdth%2Cwght%5D.ttf") format("truetype"); font-weight: 200 800; }
-
-:root {
-  --clay: #C8553D; --clay-deep: #B04A34; --sage: #6F9575; --sage-deep: #4F7355; --sage-light: #A9C5AC;
-  --cocoa: #3B2F2F; --cream: #F6F1E9; --sand: #ECE5D6; --white: #FFFFFF;
-  --text-2: #6B5F5C; --border: #DDD3C3; --success: #267A4C; --warning: #D9962B; --error: #B93A32;
-  --heading: "Space Grotesk", system-ui, sans-serif; --body: "Montserrat", system-ui, sans-serif; --button: "Bricolage Grotesque", system-ui, sans-serif;
-  --r-card: 22px; --r-input: 14px; --r-pill: 999px;
-  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
-}
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--cream); color: var(--cocoa); font-family: var(--body); font-size: 15px; line-height: 1.5; }
-h1, h2, h3 { font-family: var(--heading); font-weight: 700; margin: 0; line-height: 1.2; }
-h1 { font-size: 28px; } h2 { font-size: 18px; } h3 { font-size: 15px; }
-p { margin: 0; }
-.muted { color: var(--text-2); }
-.small { font-size: 13px; }
-.amount { font-family: var(--heading); font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.out { color: var(--error); } .in { color: var(--success); }
-
-.draft-banner { background: var(--sand); color: var(--cocoa); font-size: 13px; padding: var(--s2) var(--s4); text-align: center; border-bottom: 1px solid var(--border); }
-
-/* Layout: sidebar on web, tab bar on phones */
-.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
-.sidebar { background: var(--white); border-right: 1px solid var(--border); padding: var(--s5) var(--s4); display: flex; flex-direction: column; gap: var(--s5); position: sticky; top: 0; height: 100vh; }
-.sidebar .logo { width: 132px; margin: var(--s2) var(--s2) var(--s3); }
-.nav { display: flex; flex-direction: column; gap: var(--s1); }
-.nav a { display: flex; align-items: center; gap: var(--s3); padding: var(--s3) var(--s4); border-radius: var(--r-pill); color: var(--cocoa); text-decoration: none; font-family: var(--button); font-weight: 700; font-size: 15px; }
-.nav a svg { width: 20px; height: 20px; }
-.nav a[aria-current="page"] { background: var(--sand); color: var(--clay-deep); }
-.nav a:hover { background: var(--cream); }
-.side-bottom { margin-top: auto; display: flex; flex-direction: column; gap: var(--s3); }
-.household { border: 1px solid var(--border); border-radius: var(--r-input); padding: var(--s3) var(--s4); }
-.me { display: flex; align-items: center; gap: var(--s3); }
-
-.main { padding: var(--s6) var(--s7); max-width: 1240px; width: 100%; }
-.top { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s4); margin-bottom: var(--s5); flex-wrap: wrap; }
-.actions { display: flex; gap: var(--s2); flex-wrap: wrap; }
-.btn { font-family: var(--button); font-weight: 700; font-size: 15px; border-radius: var(--r-pill); padding: var(--s3) var(--s5); border: none; background: var(--clay-deep); color: var(--white); cursor: pointer; display: inline-flex; align-items: center; gap: var(--s2); }
-.btn.secondary { background: transparent; color: var(--cocoa); border: 2px solid var(--cocoa); padding: 10px 22px; }
-.btn svg { width: 18px; height: 18px; }
-
-.grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: var(--s5); align-items: start; }
-.col { display: flex; flex-direction: column; gap: var(--s5); }
-.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--r-card); padding: var(--s5); display: flex; flex-direction: column; gap: var(--s4); }
-.card-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); }
-.card-head a { color: var(--clay-deep); font-size: 14px; font-weight: 500; }
-
-.total { background: var(--cocoa); color: var(--cream); border: none; }
-.total .label { color: var(--sage-light); font-size: 13px; font-weight: 500; }
-.total .big { font-size: 44px; color: var(--cream); line-height: 1.1; }
-.total .row { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s4); flex-wrap: wrap; }
-.total .split { display: flex; gap: var(--s5); }
-.total .split div { display: flex; flex-direction: column; }
-.total .split span:first-child { color: var(--sage-light); font-size: 12px; }
-
-.list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
-.list li { display: flex; align-items: center; gap: var(--s3); padding: var(--s3) 0; border-top: 1px solid var(--border); }
-.list li:first-child { border-top: none; padding-top: 0; }
-.list .grow { flex: 1; min-width: 0; }
-.list .name { font-weight: 500; overflow-wrap: anywhere; }
-.coin { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-family: var(--heading); font-weight: 700; flex: none; }
-.coin.sage { background: #E3ECE3; color: var(--sage-deep); }
-.coin.clay { background: #F6E2DC; color: var(--clay-deep); }
-.coin.sand { background: var(--sand); color: var(--cocoa); }
-.avatar { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: var(--white); font-family: var(--heading); font-weight: 700; font-size: 14px; flex: none; }
-.avatar.maya { background: var(--clay-deep); } .avatar.james { background: var(--sage-deep); } .avatar.leo { background: var(--cocoa); }
-.avatar.sm { width: 22px; height: 22px; font-size: 11px; }
-
-.tag { display: inline-flex; align-items: center; gap: var(--s1); font-size: 12px; font-weight: 500; padding: 2px 10px; border-radius: var(--r-pill); background: var(--sand); color: var(--cocoa); white-space: nowrap; }
-.tag.sage { background: #E3ECE3; color: var(--sage-deep); }
-
-.shared { background: var(--cream); border-style: dashed; }
-
-.chips { display: flex; gap: var(--s2); flex-wrap: wrap; }
-.chip { font-size: 13px; padding: 6px 14px; border-radius: var(--r-pill); border: 1px solid var(--border); background: var(--white); color: var(--cocoa); cursor: pointer; font-family: var(--body); }
-.chip[aria-pressed="true"] { background: var(--cocoa); color: var(--cream); border-color: var(--cocoa); }
-
-.bar { height: 8px; background: var(--sand); border-radius: var(--r-pill); overflow: hidden; margin-top: 6px; }
-.bar > div { height: 100%; background: var(--clay); border-radius: var(--r-pill); }
-.spend li { display: block; }
-.spend .row { display: flex; justify-content: space-between; gap: var(--s3); }
-
-.goal-ring { display: flex; align-items: center; gap: var(--s4); }
-
-.tabbar { display: none; }
-
-@media (max-width: 1023px) {
-  .app { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
-  .main { padding: var(--s5) var(--s4) 104px; }
-  .grid { grid-template-columns: 1fr; }
-  .mobile-head { display: flex !important; }
-  .tabbar { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; bottom: 0; left: 0; right: 0; height: 86px; background: var(--white); border-top: 1px solid var(--border); padding: var(--s2) var(--s2) var(--s4); }
-  .tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--cocoa); text-decoration: none; font-family: var(--button); font-weight: 700; font-size: 12px; }
-  .tabbar a[aria-current="page"] { color: var(--clay-deep); }
-  .tabbar svg { width: 22px; height: 22px; }
-  .total .big { font-size: 36px; }
-  .top .actions .btn span.long { display: none; }
-}
-.mobile-head { display: none; justify-content: space-between; align-items: center; margin-bottom: var(--s4); }
-.mobile-head img { width: 104px; }
-</style>
+<link rel="stylesheet" href="draft.css" />
 </head>
 <body>
 <div class="draft-banner">Draft for <strong>#39</strong> · not production code · all names and amounts are made up</div>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></symbol>
-  <symbol id="i-accounts" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h3"/></symbol>
-  <symbol id="i-family" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9.5" r="2.2"/><path d="M3.5 19c.7-3 2.9-4.6 5.5-4.6s4.8 1.6 5.5 4.6M15 14.6c2.3 0 4.1 1.3 4.8 3.9"/></symbol>
-  <symbol id="i-goals" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></symbol>
-  <symbol id="i-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M5.6 18.4l1.6-1.6M16.8 7.2l1.6-1.6"/></symbol>
-  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
-  <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="2.5"/><circle cx="17" cy="6" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="m9.2 10.8 5.6-3.4M9.2 13.2l5.6 3.4"/></symbol>
-  <symbol id="i-invite" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="8" r="3.2"/><path d="M3.8 19c.8-3.2 3.2-4.8 6.2-4.8 1.3 0 2.5.3 3.5.9M18 14v6M15 17h6"/></symbol>
-</svg>
 
 <div class="app">
   <aside class="sidebar" aria-label="Main">
     <img class="logo" src="../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg" alt="Tallyn" />
     <nav class="nav">
-      <a href="#" aria-current="page"><svg aria-hidden="true"><use href="#i-home"/></svg>Home</a>
-      <a href="#"><svg aria-hidden="true"><use href="#i-accounts"/></svg>Accounts</a>
-      <a href="#"><svg aria-hidden="true"><use href="#i-family"/></svg>Family</a>
-      <a href="#"><svg aria-hidden="true"><use href="#i-goals"/></svg>Goals</a>
-      <a href="#"><svg aria-hidden="true"><use href="#i-settings"/></svg>Settings</a>
+      <a href="web-app-draft.html" aria-current="page"><svg aria-hidden="true"><use href="draft-icons.svg#i-home"/></svg>Home</a>
+      <a href="web-accounts-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-accounts"/></svg>Accounts</a>
+      <a href="web-family-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-family"/></svg>Family</a>
+      <a href="#"><svg aria-hidden="true"><use href="draft-icons.svg#i-goals"/></svg>Goals</a>
+      <a href="#"><svg aria-hidden="true"><use href="draft-icons.svg#i-settings"/></svg>Settings</a>
     </nav>
     <div class="side-bottom">
       <div class="household">
@@ -154,9 +38,9 @@ p { margin: 0; }
         <h1>The Rivera family</h1>
       </div>
       <div class="actions">
-        <button class="btn"><svg aria-hidden="true"><use href="#i-plus"/></svg>Link a bank</button>
-        <button class="btn secondary"><svg aria-hidden="true"><use href="#i-share"/></svg><span>Share<span class="long"> with family</span></span></button>
-        <button class="btn secondary"><svg aria-hidden="true"><use href="#i-invite"/></svg>Invite</button>
+        <button class="btn"><svg aria-hidden="true"><use href="draft-icons.svg#i-plus"/></svg>Link a bank</button>
+        <button class="btn secondary"><svg aria-hidden="true"><use href="draft-icons.svg#i-share"/></svg><span>Share<span class="long"> with family</span></span></button>
+        <button class="btn secondary"><svg aria-hidden="true"><use href="draft-icons.svg#i-invite"/></svg>Invite</button>
       </div>
     </div>
 
@@ -228,8 +112,9 @@ p { margin: 0; }
             <li><span class="avatar maya">M</span><div class="grow"><p class="name">Maya (you)</p><p class="small muted">Owner</p></div></li>
             <li><span class="avatar james">J</span><div class="grow"><p class="name">James</p><p class="small muted">Adult · shares with you · you share balances</p></div></li>
             <li><span class="avatar leo">L</span><div class="grow"><p class="name">Leo</p><p class="small muted">Teen</p></div></li>
+            <li><span class="avatar" style="background:var(--sage)">R</span><div class="grow"><p class="name">Grandma Rosa</p><p class="small muted">Viewer</p></div></li>
           </ul>
-          <button class="btn secondary" style="align-self:flex-start"><svg aria-hidden="true"><use href="#i-invite"/></svg>Invite someone</button>
+          <button class="btn secondary" style="align-self:flex-start"><svg aria-hidden="true"><use href="draft-icons.svg#i-invite"/></svg>Invite someone</button>
         </section>
 
         <section class="card" aria-labelledby="goals">
@@ -245,10 +130,10 @@ p { margin: 0; }
 </div>
 
 <nav class="tabbar" aria-label="Main">
-  <a href="#" aria-current="page"><svg aria-hidden="true"><use href="#i-home"/></svg>Home</a>
-  <a href="#"><svg aria-hidden="true"><use href="#i-accounts"/></svg>Accounts</a>
-  <a href="#"><svg aria-hidden="true"><use href="#i-family"/></svg>Family</a>
-  <a href="#"><svg aria-hidden="true"><use href="#i-goals"/></svg>Goals</a>
+  <a href="web-app-draft.html" aria-current="page"><svg aria-hidden="true"><use href="draft-icons.svg#i-home"/></svg>Home</a>
+  <a href="web-accounts-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-accounts"/></svg>Accounts</a>
+  <a href="web-family-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-family"/></svg>Family</a>
+  <a href="#"><svg aria-hidden="true"><use href="draft-icons.svg#i-goals"/></svg>Goals</a>
 </nav>
 </body>
 </html>

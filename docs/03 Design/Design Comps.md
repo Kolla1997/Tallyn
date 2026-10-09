@@ -27,6 +27,12 @@ Visual comps, not production code. Amounts and rates are placeholders.
 - Your accounts and **Shared with you** are separate (#37); the total balance shows yours, shared and your kids'
 - Transactions can be filtered by person; time and place appear only where visible (#28)
 
+`Comps/web-accounts-draft.html`: your banks, **Shared with you** (James's, and Leo's as his parent), a credit card with a debt-details preview (#27), a bank that needs signing in again, and an account detail panel.
+
+`Comps/web-family-draft.html`: members with roles and per-person sharing switches, a teen (parents see automatically), a viewer, invite form and waiting invites, and the removal confirmation with typed name and 2FA code (#38).
+
+Shared styles and icons: `Comps/draft.css`, `Comps/draft-icons.svg`. Two columns from 1280px, sidebar from 1024px, bottom tab bar below.
+
 Desktop and mobile screenshots: `Comps/website-desktop-1440.png`, `Comps/website-mobile-390.png`. Source: `Comps/website/index.html`.
 
 > [!warning] Update before build
