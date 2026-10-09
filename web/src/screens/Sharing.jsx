@@ -15,6 +15,7 @@ export default function Sharing({ householdId, onChanged }) {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
   const [name, setName] = useState('')
+  const [nameSaved, setNameSaved] = useState(false)
 
   const load = useCallback(() => {
     api(`/api/sharing?household_id=${encodeURIComponent(householdId)}`).then(
@@ -64,8 +65,10 @@ export default function Sharing({ householdId, onChanged }) {
   async function saveName(e) {
     e.preventDefault()
     setError('')
+    setNameSaved(false)
     try {
       await api('/api/me', { method: 'PUT', body: { display_name: name } })
+      setNameSaved(true)
       load()
     } catch {
       setError("We couldn't save your name.")
@@ -80,12 +83,25 @@ export default function Sharing({ householdId, onChanged }) {
       <form className="name-form" onSubmit={saveName}>
         <label>
           Your name, as your family sees it
-          <input value={name} maxLength={80} onChange={(e) => setName(e.target.value)} placeholder="Alex" />
+          <input
+            value={name}
+            maxLength={80}
+            onChange={(e) => {
+              setName(e.target.value)
+              setNameSaved(false)
+            }}
+            placeholder="Alex"
+          />
         </label>
         <button className="btn btn-secondary" type="submit">
           Save
         </button>
       </form>
+      {nameSaved && (
+        <p className="saved small" role="status">
+          Saved. Your family now sees you as {name.trim() || 'your role'}.
+        </p>
+      )}
       {error && (
         <p className="error" role="alert">
           {error}

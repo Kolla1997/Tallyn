@@ -356,3 +356,7 @@ fieldset.share label {
   flex-direction: column;
   gap: var(--space-s1);
 }
+
+.saved {
+  color: var(--color-success);
+}
