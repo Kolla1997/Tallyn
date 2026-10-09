@@ -8,7 +8,7 @@ kanban-plugin: board
 
 ## Backlog
 
-- [ ] [#9 Scheduled bank sync (Transactions, Liabilities)](https://github.com/Kolla1997/Tallyn/issues/9) #type/feature #area/backend #priority/p0
+- [ ] [#9 Scheduled bank sync (transactions and balances)](https://github.com/Kolla1997/Tallyn/issues/9) #type/feature #area/backend #priority/p0
 - [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p1
 - [ ] [#12 Joint accounts: member roles and spending limits](https://github.com/Kolla1997/Tallyn/issues/12) #type/feature #area/backend #priority/p1
 - [ ] [#13 Shared budgets and spending categories](https://github.com/Kolla1997/Tallyn/issues/13) #type/feature #area/frontend #priority/p1
