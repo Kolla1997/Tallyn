@@ -8,6 +8,8 @@ import { formatMoney } from '../lib/money.js'
 export default function Banks({ household }) {
   const [banks, setBanks] = useState(null)
   const [error, setError] = useState('')
+  const [confirming, setConfirming] = useState(null) // bank id awaiting "Unlink?"
+  const [unlinking, setUnlinking] = useState(false)
   const canLink = household.role === 'owner' || household.role === 'adult'
 
   const load = useCallback(() => {
@@ -19,16 +21,20 @@ export default function Banks({ household }) {
 
   useEffect(load, [load])
 
+  // Confirmation is shown in the page, not with window.confirm, which some
+  // embedded browsers block (it then silently answers "no").
   async function unlink(bank) {
     const name = bank.institution_name || 'this bank'
-    if (!window.confirm(`Unlink ${name}? Tallyn will disconnect it and remove its accounts and transactions.`)) return
     setError('')
+    setUnlinking(true)
     try {
       await api(`/api/banks/${bank.id}`, { method: 'DELETE' })
+      setConfirming(null)
       load()
     } catch {
       setError(`We couldn't unlink ${name} just now. It's still connected, so try again in a moment.`)
     }
+    setUnlinking(false)
   }
 
   return (
@@ -44,12 +50,28 @@ export default function Banks({ household }) {
         <div className="bank" key={b.id}>
           <div className="bank-head">
             <strong>{b.institution_name || 'Bank'}</strong>
-            {b.can_unlink && (
-              <button className="link" onClick={() => unlink(b)}>
+            {b.can_unlink && confirming !== b.id && (
+              <button className="link" onClick={() => setConfirming(b.id)}>
                 Unlink
               </button>
             )}
           </div>
+          {confirming === b.id && (
+            <div className="confirm" role="group" aria-label={`Unlink ${b.institution_name || 'this bank'}?`}>
+              <p>
+                Unlink {b.institution_name || 'this bank'}? Tallyn will disconnect it and remove its accounts and
+                transactions.
+              </p>
+              <div className="confirm-actions">
+                <button className="btn" onClick={() => unlink(b)} disabled={unlinking}>
+                  {unlinking ? 'Unlinking…' : 'Unlink'}
+                </button>
+                <button className="btn btn-secondary" onClick={() => setConfirming(null)} disabled={unlinking}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
           <ul className="accounts">
             {b.accounts.map((a) => (
               <li key={a.id}>
