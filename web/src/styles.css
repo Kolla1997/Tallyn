@@ -400,3 +400,276 @@ fieldset.share label {
   border-radius: var(--radius-input);
   padding: var(--space-s3) var(--space-s4);
 }
+
+/* App layout (#39): sidebar on web, tab bar on phones.
+   Matches docs/03 Design/Comps/web-*-draft.html. */
+.app-shell {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: var(--space-s2);
+  background: var(--color-white);
+  padding: var(--space-s2) var(--space-s4);
+  border-radius: var(--radius-input);
+  z-index: 10;
+}
+
+.skip-link:focus {
+  left: var(--space-s2);
+}
+
+.sidebar {
+  background: var(--color-white);
+  border-right: 1px solid var(--color-border);
+  padding: var(--space-s5) var(--space-s4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s5);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.sidebar-logo {
+  width: 132px;
+  margin: var(--space-s2) var(--space-s2) var(--space-s3);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s1);
+}
+
+.nav a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+  padding: var(--space-s3) var(--space-s4);
+  border-radius: var(--radius-button);
+  color: var(--color-cocoa);
+  text-decoration: none;
+  font-family: var(--font-button);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.nav a:hover {
+  background: var(--color-cream);
+}
+
+.nav a[aria-current='page'] {
+  background: var(--color-sand);
+  color: var(--color-clay-deep);
+}
+
+.nav a:focus-visible,
+.tabbar a:focus-visible,
+.me-chip:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s3);
+}
+
+.household-box {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  padding: var(--space-s3) var(--space-s4);
+}
+
+.household-box select {
+  width: 100%;
+  margin-top: var(--space-s1);
+}
+
+.me-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+  color: var(--color-cocoa);
+  text-decoration: none;
+  border-radius: var(--radius-input);
+  padding: var(--space-s1);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--color-clay-deep);
+  color: var(--color-white);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+  flex: none;
+}
+
+.block {
+  display: block;
+}
+
+.app-main {
+  min-width: 0;
+}
+
+.mobile-header {
+  display: none;
+}
+
+.content {
+  padding: var(--space-s6) var(--space-s7);
+  max-width: 1240px;
+}
+
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-s4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-s5);
+}
+
+.page-head h1 {
+  font-size: 28px;
+}
+
+.page-actions {
+  display: flex;
+  gap: var(--space-s2);
+  flex-wrap: wrap;
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--space-s5);
+  align-items: start;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s5);
+}
+
+.panel {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s4);
+}
+
+.empty-state {
+  align-items: flex-start;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-s3) var(--space-s4);
+  margin: 0;
+}
+
+.kv dt {
+  font-weight: 500;
+}
+
+.kv dd {
+  margin: 0;
+  text-align: right;
+}
+
+.status-on {
+  color: var(--color-success);
+  font-weight: 500;
+}
+
+.center-note {
+  text-align: center;
+  padding: var(--space-s7);
+}
+
+.tabbar {
+  display: none;
+}
+
+/* Two columns only where there's room for both. */
+@media (max-width: 1279px) {
+  .cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Phones and small tablets: header and bottom tab bar instead of the sidebar. */
+@media (max-width: 1023px) {
+  .app-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-s4) var(--space-s4) 0;
+  }
+
+  .mobile-header img {
+    width: 104px;
+  }
+
+  .content {
+    padding: var(--space-s4) var(--space-s4) 112px;
+  }
+
+  .tabbar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 86px;
+    background: var(--color-white);
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-s2) var(--space-s2) var(--space-s4);
+    z-index: 5;
+  }
+
+  .tabbar a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-s1);
+    color: var(--color-cocoa);
+    text-decoration: none;
+    font-family: var(--font-button);
+    font-weight: 700;
+    font-size: 12px;
+  }
+
+  .tabbar a[aria-current='page'] {
+    color: var(--color-clay-deep);
+  }
+}

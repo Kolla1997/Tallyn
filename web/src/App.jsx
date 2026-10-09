@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import logo from '../../brand/logo/svg/tallyn-lockup-horizontal-light.svg'
+import AuthPage from './components/AuthPage.jsx'
 import { configured, supabase } from './lib/supabase.js'
 import SignIn from './screens/SignIn.jsx'
 import SetUp2FA from './screens/SetUp2FA.jsx'
@@ -10,11 +10,12 @@ import Home from './screens/Home.jsx'
 // authenticator app. Only a 2FA-completed (aal2) session reaches Home, and the
 // Go API checks the same thing on every request.
 export default function App() {
-  return (
-    <main className="page">
-      <img className="logo" src={logo} alt="Tallyn" />
-      {configured ? <AuthFlow /> : <NotConfigured />}
-    </main>
+  return configured ? (
+    <AuthFlow />
+  ) : (
+    <AuthPage>
+      <NotConfigured />
+    </AuthPage>
   )
 }
 
@@ -46,13 +47,15 @@ function AuthFlow() {
 
   const signOut = () => supabase.auth.signOut()
 
-  if (session === undefined || (session && !aal)) {
-    return <p className="muted">Loading…</p>
-  }
-  if (!session) return <SignIn />
-  if (aal.currentLevel === 'aal2') return <Home email={session.user.email} onSignOut={signOut} />
-  if (aal.nextLevel === 'aal2') return <Verify2FA onSignOut={signOut} />
-  return <SetUp2FA onSignOut={signOut} />
+  // The signed-in app has its own layout (#39); everything before it uses
+  // the centered sign-in layout.
+  if (session && aal?.currentLevel === 'aal2') return <Home email={session.user.email} onSignOut={signOut} />
+  let screen
+  if (session === undefined || (session && !aal)) screen = <p className="muted">Loading…</p>
+  else if (!session) screen = <SignIn />
+  else if (aal.nextLevel === 'aal2') screen = <Verify2FA onSignOut={signOut} />
+  else screen = <SetUp2FA onSignOut={signOut} />
+  return <AuthPage>{screen}</AuthPage>
 }
 
 function NotConfigured() {

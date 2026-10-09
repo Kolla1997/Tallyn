@@ -14,15 +14,10 @@ const isKid = (role) => role === 'teen' || role === 'child'
 export default function Sharing({ householdId, onChanged }) {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
-  const [name, setName] = useState('')
-  const [nameSaved, setNameSaved] = useState(false)
 
   const load = useCallback(() => {
     api(`/api/sharing?household_id=${encodeURIComponent(householdId)}`).then(
-      (d) => {
-        setData(d)
-        setName(d.members.find((m) => m.is_you)?.display_name ?? '')
-      },
+      (d) => setData(d),
       () => setError("We couldn't load your sharing settings."),
     )
   }, [householdId])
@@ -62,46 +57,11 @@ export default function Sharing({ householdId, onChanged }) {
     }
   }
 
-  async function saveName(e) {
-    e.preventDefault()
-    setError('')
-    setNameSaved(false)
-    try {
-      await api('/api/me', { method: 'PUT', body: { display_name: name } })
-      setNameSaved(true)
-      load()
-    } catch {
-      setError("We couldn't save your name.")
-    }
-  }
-
   const received = isKid(me.role) ? [] : data.members.filter((m) => data.received[m.user_id]?.length)
 
   return (
     <>
       <h2>Sharing</h2>
-      <form className="name-form" onSubmit={saveName}>
-        <label>
-          Your name, as your family sees it
-          <input
-            value={name}
-            maxLength={80}
-            onChange={(e) => {
-              setName(e.target.value)
-              setNameSaved(false)
-            }}
-            placeholder="Alex"
-          />
-        </label>
-        <button className="btn btn-secondary" type="submit">
-          Save
-        </button>
-      </form>
-      {nameSaved && (
-        <p className="saved small" role="status">
-          Saved. Your family now sees you as {name.trim() || 'your role'}.
-        </p>
-      )}
       {error && (
         <p className="error" role="alert">
           {error}
@@ -113,7 +73,7 @@ export default function Sharing({ householdId, onChanged }) {
         {!isKid(me.role) && ' Parents always see their teens’ and children’s money.'}
       </p>
 
-      {others.length === 0 && <p className="muted">There&apos;s nobody to share with yet. Invites are coming soon.</p>}
+      {others.length === 0 && <p className="muted">There&apos;s nobody to share with yet. Invite someone below.</p>}
       {others.map((m) => {
         const given = data.given[m.user_id] ?? []
         return (

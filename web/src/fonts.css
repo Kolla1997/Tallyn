@@ -1,0 +1,21 @@
+/* Brand fonts from brand/fonts/ (SIL OFL), bundled by Vite (#39). */
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('../../brand/fonts/SpaceGrotesk[wght].ttf') format('truetype');
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../brand/fonts/Montserrat[wght].ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('../../brand/fonts/BricolageGrotesque[opsz,wdth,wght].ttf') format('truetype');
+  font-weight: 200 800;
+  font-display: swap;
+}
