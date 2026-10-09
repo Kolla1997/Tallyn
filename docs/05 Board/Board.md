@@ -19,7 +19,6 @@ kanban-plugin: board
 ## In Progress
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
-- [ ] [#7 Auth: email + 2FA with Supabase Auth](https://github.com/Kolla1997/Tallyn/issues/7) #type/feature #area/backend #priority/p0
 
 
 ## Review
@@ -37,6 +36,7 @@ kanban-plugin: board
 **Complete**
 - [x] [#5 Repo scaffold: Go server, Vite React app, Dockerfile](https://github.com/Kolla1997/Tallyn/issues/5) #type/feature #area/infra #priority/p0
 - [x] [#6 Supabase schema and RLS](https://github.com/Kolla1997/Tallyn/issues/6) #type/feature #area/backend #priority/p0
+- [x] [#7 Auth: email + 2FA with Supabase Auth](https://github.com/Kolla1997/Tallyn/issues/7) #type/feature #area/backend #priority/p0
 - [x] [#16 Automate board sync with a GitHub Action](https://github.com/Kolla1997/Tallyn/issues/16) #type/feature #area/infra #priority/p2
 
 
