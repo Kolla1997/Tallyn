@@ -11,3 +11,10 @@ export function formatMoney(minor, currency) {
     return `${minor} ${currency}` // a code Intl doesn't know (e.g. crypto)
   }
 }
+
+// Plaid's category codes as words: FOOD_AND_DRINK → "Food and drink".
+export function categoryLabel(code) {
+  if (!code || code === 'OTHER') return 'Other'
+  const words = code.toLowerCase().replace(/_/g, ' ')
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}

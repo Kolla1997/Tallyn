@@ -19,6 +19,7 @@ tags: [home]
 - [[Feature - Data Model]]: tables, roles and RLS rules
 - [[Feature - Auth]]: sign-up, log-in and 2FA
 - [[Feature - Bank Linking]]: Plaid Link, encrypted tokens, unlinking
+- [[Feature - Bank Sync]]: transactions, spending by category, time and location
 
 ## Brand
 - [[Brand Guide]]: positioning, personality, brand basics

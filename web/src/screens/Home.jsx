@@ -2,11 +2,14 @@ import { useCallback, useEffect, useState } from 'react'
 import { api } from '../lib/api.js'
 import Banks from './Banks.jsx'
 import CreateHousehold from './CreateHousehold.jsx'
+import Spending from './Spending.jsx'
+import Transactions from './Transactions.jsx'
 
 // Placeholder home: your household and its banks. Real screens come later (#25).
 export default function Home({ email, onSignOut }) {
   const [me, setMe] = useState(null)
   const [error, setError] = useState('')
+  const [refreshKey, setRefreshKey] = useState(0) // bumps when banks change
 
   const load = useCallback(() => {
     api('/api/me').then(setMe, (e) => setError(e.message))
@@ -27,7 +30,13 @@ export default function Home({ email, onSignOut }) {
         </p>
       )}
       {me && !household && <CreateHousehold onCreated={load} />}
-      {household && <Banks household={household} />}
+      {household && (
+        <>
+          <Banks household={household} onChanged={() => setRefreshKey((k) => k + 1)} />
+          <Spending householdId={household.id} refreshKey={refreshKey} />
+          <Transactions householdId={household.id} refreshKey={refreshKey} />
+        </>
+      )}
       <button className="btn btn-secondary" onClick={onSignOut}>
         Sign out
       </button>

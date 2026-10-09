@@ -87,6 +87,13 @@ func IsItemGone(err error) bool {
 	return errors.As(err, &pe) && (pe.Code == "ITEM_NOT_FOUND" || pe.Code == "INVALID_ACCESS_TOKEN")
 }
 
+// NeedsLogin reports whether the person must log in to their bank again
+// (Link update mode) before the item can sync.
+func NeedsLogin(err error) bool {
+	var pe *Error
+	return errors.As(err, &pe) && pe.Code == "ITEM_LOGIN_REQUIRED"
+}
+
 func (c *Client) post(ctx context.Context, path string, body, out any) error {
 	b, err := json.Marshal(body)
 	if err != nil {
@@ -135,6 +142,9 @@ func (c *Client) CreateLinkToken(ctx context.Context, userID string) (string, er
 		"country_codes": []string{"US"},
 		"user":          map[string]string{"client_user_id": userID},
 		"products":      []string{"transactions"},
+		// History for a new link (decided 2026-10-09). Can't be changed later
+		// for an item without unlinking and linking again.
+		"transactions": map[string]int{"days_requested": 90},
 	}
 	if c.redirectURI != "" {
 		body["redirect_uri"] = c.redirectURI
@@ -192,21 +202,8 @@ type Account struct {
 // Accounts returns the item and its accounts.
 func (c *Client) Accounts(ctx context.Context, accessToken string) (Item, []Account, error) {
 	var out struct {
-		Accounts []struct {
-			AccountID    string  `json:"account_id"`
-			Name         string  `json:"name"`
-			OfficialName *string `json:"official_name"`
-			Mask         *string `json:"mask"`
-			Type         string  `json:"type"`
-			Subtype      *string `json:"subtype"`
-			Balances     struct {
-				Current     *json.Number `json:"current"`
-				Available   *json.Number `json:"available"`
-				ISOCurrency *string      `json:"iso_currency_code"`
-				Unofficial  *string      `json:"unofficial_currency_code"`
-			} `json:"balances"`
-		} `json:"accounts"`
-		Item struct {
+		Accounts []rawAccount `json:"accounts"`
+		Item     struct {
 			ItemID          string  `json:"item_id"`
 			InstitutionID   *string `json:"institution_id"`
 			InstitutionName *string `json:"institution_name"`
@@ -215,10 +212,32 @@ func (c *Client) Accounts(ctx context.Context, accessToken string) (Item, []Acco
 	if err := c.post(ctx, "/accounts/get", map[string]string{"access_token": accessToken}, &out); err != nil {
 		return Item{}, nil, err
 	}
-
 	item := Item{ID: out.Item.ItemID, InstitutionID: deref(out.Item.InstitutionID), InstitutionName: deref(out.Item.InstitutionName)}
-	accounts := make([]Account, 0, len(out.Accounts))
-	for _, a := range out.Accounts {
+	accounts, err := convertAccounts(out.Accounts)
+	if err != nil {
+		return Item{}, nil, err
+	}
+	return item, accounts, nil
+}
+
+type rawAccount struct {
+	AccountID    string  `json:"account_id"`
+	Name         string  `json:"name"`
+	OfficialName *string `json:"official_name"`
+	Mask         *string `json:"mask"`
+	Type         string  `json:"type"`
+	Subtype      *string `json:"subtype"`
+	Balances     struct {
+		Current     *json.Number `json:"current"`
+		Available   *json.Number `json:"available"`
+		ISOCurrency *string      `json:"iso_currency_code"`
+		Unofficial  *string      `json:"unofficial_currency_code"`
+	} `json:"balances"`
+}
+
+func convertAccounts(raw []rawAccount) ([]Account, error) {
+	accounts := make([]Account, 0, len(raw))
+	for _, a := range raw {
 		acct := Account{
 			PlaidAccountID: a.AccountID,
 			Name:           a.Name,
@@ -232,19 +251,19 @@ func (c *Client) Accounts(ctx context.Context, accessToken string) (Item, []Acco
 			acct.Currency = *a.Balances.ISOCurrency
 			var err error
 			if acct.CurrentMinor, err = minor(a.Balances.Current, acct.Currency); err != nil {
-				return Item{}, nil, err
+				return nil, err
 			}
 			if acct.AvailableMinor, err = minor(a.Balances.Available, acct.Currency); err != nil {
-				return Item{}, nil, err
+				return nil, err
 			}
 		case a.Balances.Unofficial != nil && *a.Balances.Unofficial != "":
 			acct.Currency = *a.Balances.Unofficial // decimals unknown: keep balances empty
 		default:
-			return Item{}, nil, fmt.Errorf("plaid: account %s has no currency", a.AccountID)
+			return nil, fmt.Errorf("plaid: account %s has no currency", a.AccountID)
 		}
 		accounts = append(accounts, acct)
 	}
-	return item, accounts, nil
+	return accounts, nil
 }
 
 // InstitutionName looks up a bank's display name.
