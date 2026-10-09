@@ -33,9 +33,10 @@ type Tokens interface {
 // Tokens.Seal (link) or Tokens.Open and Plaid (unlink). They're never logged,
 // returned to the browser or stored unencrypted.
 type banks struct {
-	store  Store
-	plaid  Plaid
-	tokens Tokens
+	store   Store
+	plaid   Plaid
+	tokens  Tokens
+	syncNow func(bankID string)
 }
 
 func (b banks) needsPlaid(h http.HandlerFunc) http.HandlerFunc {
@@ -141,6 +142,9 @@ func (b banks) exchange(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "internal")
 	default:
 		saved = true
+		if b.syncNow != nil {
+			b.syncNow(id) // first transactions, without waiting for the next scheduled run
+		}
 		writeJSON(w, http.StatusCreated, map[string]string{"id": id})
 	}
 }

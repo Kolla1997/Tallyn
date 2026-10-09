@@ -24,6 +24,8 @@ type Store interface {
 	Banks(ctx context.Context, userID, householdID string) ([]db.Bank, error)
 	UnlinkTarget(ctx context.Context, userID, bankID string) (plaidItemID string, sealed []byte, err error)
 	DeleteBank(ctx context.Context, userID, bankID string) error
+	Transactions(ctx context.Context, userID, householdID string, limit int) ([]db.Transaction, error)
+	Spending(ctx context.Context, userID, householdID, month string) ([]db.Spend, error)
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -34,6 +36,7 @@ type Deps struct {
 	Store       Store                           // *db.DB
 	Plaid       Plaid                           // *plaid.Client
 	Tokens      Tokens                          // *tokencrypt.Box
+	SyncNow     func(bankID string)             // sync.Syncer.SyncNow; optional
 }
 
 // NewRouter returns the server's handler: JSON API under /api/ and the
@@ -50,11 +53,13 @@ func NewRouter(d Deps) http.Handler {
 	api := http.NewServeMux()
 	api.HandleFunc("GET /api/me", me(d.Store))
 	api.HandleFunc("POST /api/households", createHousehold(d.Store))
-	b := banks{store: d.Store, plaid: d.Plaid, tokens: d.Tokens}
+	b := banks{store: d.Store, plaid: d.Plaid, tokens: d.Tokens, syncNow: d.SyncNow}
 	api.HandleFunc("POST /api/plaid/link-token", b.needsPlaid(b.linkToken))
 	api.HandleFunc("POST /api/plaid/exchange", b.needsPlaid(b.exchange))
 	api.HandleFunc("GET /api/banks", b.list)
 	api.HandleFunc("DELETE /api/banks/{id}", b.needsPlaid(b.unlink))
+	api.HandleFunc("GET /api/transactions", transactions(d.Store))
+	api.HandleFunc("GET /api/spending", spending(d.Store))
 	api.HandleFunc("/api/", func(w http.ResponseWriter, _ *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found")
 	})

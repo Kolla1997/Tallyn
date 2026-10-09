@@ -15,6 +15,7 @@ import (
 	"github.com/Kolla1997/Tallyn/internal/auth"
 	"github.com/Kolla1997/Tallyn/internal/db"
 	"github.com/Kolla1997/Tallyn/internal/plaid"
+	banksync "github.com/Kolla1997/Tallyn/internal/sync"
 	"github.com/Kolla1997/Tallyn/internal/tokencrypt"
 )
 
@@ -40,27 +41,28 @@ func main() {
 	}
 
 	var store api.Store
+	var database *db.DB
 	if u := os.Getenv("DATABASE_URL"); u != "" {
 		d, err := db.Open(ctx, u)
 		if err != nil {
 			log.Fatalf("tallyn: %v", err)
 		}
 		defer d.Close()
-		store = d
+		store, database = d, d
 	} else {
 		log.Printf("tallyn: DATABASE_URL not set, /api/ routes will answer 503")
 	}
 
 	// Bank linking needs both Plaid keys and the token encryption key (#8).
 	// A malformed key stops the server: better than failing on the first link.
-	var plaidClient api.Plaid
-	var tokens api.Tokens
+	var box *tokencrypt.Box
+	var plaidClient *plaid.Client
 	if key := os.Getenv("TOKEN_ENCRYPTION_KEY"); key != "" && key != "replace-me" {
-		box, err := tokencrypt.New(key)
+		b, err := tokencrypt.New(key)
 		if err != nil {
 			log.Fatalf("tallyn: %v", err)
 		}
-		tokens = box
+		box = b
 	}
 	if id := os.Getenv("PLAID_CLIENT_ID"); id != "" && id != "replace-me" {
 		c, err := plaid.New(getenv("PLAID_ENV", "sandbox"), id, os.Getenv("PLAID_SECRET"), os.Getenv("PLAID_REDIRECT_URI"))
@@ -69,8 +71,27 @@ func main() {
 		}
 		plaidClient = c
 	}
-	if plaidClient == nil || tokens == nil {
+	// Interfaces only get non-nil values, so nil really means "not configured".
+	var bankAPI api.Plaid
+	var tokens api.Tokens
+	if plaidClient != nil && box != nil {
+		bankAPI, tokens = plaidClient, box
+	} else {
 		log.Printf("tallyn: PLAID_CLIENT_ID or TOKEN_ENCRYPTION_KEY not set, bank linking will answer 503")
+	}
+
+	// Bank sync (#9): every 6 hours, plus right after a bank is linked. It is
+	// the only code that gets the system database access (db.System).
+	var syncNow func(string)
+	if database != nil && plaidClient != nil && box != nil {
+		every, err := time.ParseDuration(getenv("SYNC_EVERY", "6h"))
+		if err != nil || every < time.Minute {
+			log.Fatalf("tallyn: SYNC_EVERY must be a duration of at least 1m (got %q)", os.Getenv("SYNC_EVERY"))
+		}
+		syncer := banksync.New(database.System(), plaidClient, box, every)
+		syncNow = syncer.SyncNow
+		go syncer.Run(ctx)
+		log.Printf("tallyn: bank sync every %s", every)
 	}
 
 	srv := &http.Server{
@@ -79,13 +100,12 @@ func main() {
 			WebDir:      webDir,
 			RequireAuth: requireAuth,
 			Store:       store,
-			Plaid:       plaidClient,
+			Plaid:       bankAPI,
 			Tokens:      tokens,
+			SyncNow:     syncNow,
 		}),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
-
-	// TODO(#9): start the scheduled bank sync alongside the HTTP server.
 
 	go func() {
 		log.Printf("tallyn: listening on :%s (web: %s)", port, webDir)
