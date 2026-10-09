@@ -8,7 +8,6 @@ kanban-plugin: board
 
 ## Backlog
 
-- [ ] [#8 Plaid Link and encrypted token storage](https://github.com/Kolla1997/Tallyn/issues/8) #type/feature #area/backend #priority/p0
 - [ ] [#9 Scheduled bank sync (Transactions, Liabilities)](https://github.com/Kolla1997/Tallyn/issues/9) #type/feature #area/backend #priority/p0
 - [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p1
 - [ ] [#12 Joint accounts: member roles and spending limits](https://github.com/Kolla1997/Tallyn/issues/12) #type/feature #area/backend #priority/p1
@@ -41,6 +40,7 @@ kanban-plugin: board
 - [x] [#5 Repo scaffold: Go server, Vite React app, Dockerfile](https://github.com/Kolla1997/Tallyn/issues/5) #type/feature #area/infra #priority/p0
 - [x] [#6 Supabase schema and RLS](https://github.com/Kolla1997/Tallyn/issues/6) #type/feature #area/backend #priority/p0
 - [x] [#7 Auth: email + 2FA with Supabase Auth](https://github.com/Kolla1997/Tallyn/issues/7) #type/feature #area/backend #priority/p0
+- [x] [#8 Plaid Link and encrypted token storage](https://github.com/Kolla1997/Tallyn/issues/8) #type/feature #area/backend #priority/p0
 - [x] [#16 Automate board sync with a GitHub Action](https://github.com/Kolla1997/Tallyn/issues/16) #type/feature #area/infra #priority/p2
 
 
