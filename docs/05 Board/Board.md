@@ -17,6 +17,8 @@ kanban-plugin: board
 - [ ] [#23 Recovery when someone loses their authenticator app](https://github.com/Kolla1997/Tallyn/issues/23) #type/feature #area/frontend #priority/p1
 - [ ] [#24 Content-Security-Policy and security headers](https://github.com/Kolla1997/Tallyn/issues/24) #type/feature #area/backend #priority/p1
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
+- [ ] [#27 Debt details: interest rates, due dates and minimum payments (Plaid Liabilities)](https://github.com/Kolla1997/Tallyn/issues/27) #type/feature #area/backend #priority/p0
+- [ ] [#28 Sharing settings: choose what each household member can see](https://github.com/Kolla1997/Tallyn/issues/28) #type/feature #area/backend #priority/p1
 
 
 ## In Progress
