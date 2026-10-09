@@ -11,6 +11,10 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-09
+- #28 Sharing settings on branch `28-sharing-settings`: `0007_sharing.sql` adds `shares` (owner, viewer, category) and `can_see_member_data()`, used by every bank, account, transaction and location policy; `can_unlink()` for the new unlink rule. `GET/PUT /api/sharing`, `PUT /api/me` (display name). Web: Sharing screen with per-member switches and "Shared with you".
+- Decision (Dinesh, using Claude's suggestions): default nothing until shared; owners and adults see teens' and children's money automatically; viewers only what's shared; teens and children see only their own, can share with viewers, and aren't shown parental access; you unlink your own banks, owners also kids'; household name and members visible to all members. Categories: balances, transactions, time and location (only with transactions).
+- #28 Added [[Feature - Sharing]] and ADR [[0007-consent-based-visibility]] (Proposed). Data Model and ADR 0005 marked as superseded in part.
+- Open: run 0007 on `tallyn-dev`; end-to-end needs a second account added by hand until invitations (#12); debts join sharing with #27.
 - #30 Merged PR #31, so #30 is closed. Moved it to Done by hand. The app now runs only on the `tallyn_api` and `tallyn_sync` logins; `postgres` is for migrations only.
 - #30 Separate database logins on branch `30-separate-db-logins`: `0006_app_logins.sql` adds `tallyn_api` (can only become `authenticated`, WITH INHERIT FALSE); `tallyn_sync` logs in as itself. The app reads `DATABASE_URL` (tallyn_api) and `DATABASE_URL_SYNC` (tallyn_sync) and **refuses to start** with a login that can bypass RLS; `postgres` is only for migrations (`ADMIN_DATABASE_URL`). Passwords set by hand in the SQL editor, never in git.
 - #30 Attack-simulation tests: inside `AsUser`, `reset role` then reading transactions, profiles or tokens, calling the link function, or switching to `tallyn_sync`/superuser/`service_role`/`anon` all fail. All DB tests now run through the real logins. `TestSQLIsAlwaysConstant` fails the build on SQL built at runtime.

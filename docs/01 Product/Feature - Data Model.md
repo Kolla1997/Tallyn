@@ -2,8 +2,8 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-08
-issues: [6, 8, 9]
+updated: 2026-10-09
+issues: [6, 8, 9, 28]
 tags: [spec, database]
 ---
 
@@ -78,3 +78,6 @@ Run the migrations in order on the Supabase project before #7 starts.
 > [!todo] Unknown — ask Dinesh: invitations: how does someone join a household? (#12)
 
 > [!todo] Unknown — ask Dinesh: FX rate source and refresh frequency (#11)
+
+> [!warning] Visibility changed with #28
+> Members no longer see each other's money by role. Everyone sees their own; owners and adults see their teens' and children's automatically; everything else only if the owner shared it. See [[Feature - Sharing]] and [[0007-consent-based-visibility]]. Role descriptions above that say "sees everything" are out of date.
