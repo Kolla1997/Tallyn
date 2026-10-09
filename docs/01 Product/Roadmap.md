@@ -16,7 +16,7 @@ tags: [product, roadmap]
 - [x] [#6](https://github.com/Kolla1997/Tallyn/issues/6) Supabase schema and RLS (`migrations/`)
 - [x] [#7](https://github.com/Kolla1997/Tallyn/issues/7) Auth: email + 2FA (Supabase Auth)
 - [x] [#8](https://github.com/Kolla1997/Tallyn/issues/8) Plaid Link + encrypted token storage
-- [ ] [#9](https://github.com/Kolla1997/Tallyn/issues/9) Scheduled bank sync (Transactions, Liabilities)
+- [x] [#9](https://github.com/Kolla1997/Tallyn/issues/9) Scheduled bank sync (Transactions, Liabilities)
 - [x] [#10](https://github.com/Kolla1997/Tallyn/issues/10) Brand: logo, `design-tokens.json`
 
 ## Next: v1 features
@@ -31,6 +31,7 @@ tags: [product, roadmap]
 ## Shipped
 | Date | What | Link |
 |---|---|---|
+| 2026-10-09 | Bank sync: transactions, balances, spending by category, time and location | [#9](https://github.com/Kolla1997/Tallyn/issues/9) |
 | 2026-10-09 | Bank linking: Plaid Link (US), encrypted tokens, unlink that revokes at Plaid | [#8](https://github.com/Kolla1997/Tallyn/issues/8) |
 | 2026-10-08 | Auth: email sign-up, authenticator-app 2FA, verified sessions on every API route | [#7](https://github.com/Kolla1997/Tallyn/issues/7) |
 | 2026-10-08 | Supabase schema and RLS: households, members, bank data, FX rates, `AsUser` | [#6](https://github.com/Kolla1997/Tallyn/issues/6) |
