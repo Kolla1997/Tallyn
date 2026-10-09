@@ -18,6 +18,8 @@ kanban-plugin: board
 - [ ] [#27 Debt details: interest rates, due dates and minimum payments (Plaid Liabilities)](https://github.com/Kolla1997/Tallyn/issues/27) #type/feature #area/backend #priority/p0
 - [ ] [#34 Spending limits per member, with progress and alerts](https://github.com/Kolla1997/Tallyn/issues/34) #type/feature #area/backend #priority/p1
 - [ ] [#36 Terms of Service and Privacy Policy pages, with consent at sign-up](https://github.com/Kolla1997/Tallyn/issues/36) #type/feature #area/frontend #priority/p0
+- [ ] [#37 Show shared money separately from your own](https://github.com/Kolla1997/Tallyn/issues/37) #type/design #area/frontend #priority/p1
+- [ ] [#38 Confirmation dialog before removing members, leaving or unlinking](https://github.com/Kolla1997/Tallyn/issues/38) #type/feature #area/frontend #priority/p1
 
 
 ## In Progress
