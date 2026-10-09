@@ -22,7 +22,6 @@ kanban-plugin: board
 ## In Progress
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
-- [ ] [#28 Sharing settings: choose what each household member can see](https://github.com/Kolla1997/Tallyn/issues/28) #type/feature #area/backend #priority/p1
 
 
 ## Review
@@ -44,6 +43,7 @@ kanban-plugin: board
 - [x] [#8 Plaid Link and encrypted token storage](https://github.com/Kolla1997/Tallyn/issues/8) #type/feature #area/backend #priority/p0
 - [x] [#9 Scheduled bank sync (transactions and balances)](https://github.com/Kolla1997/Tallyn/issues/9) #type/feature #area/backend #priority/p0
 - [x] [#16 Automate board sync with a GitHub Action](https://github.com/Kolla1997/Tallyn/issues/16) #type/feature #area/infra #priority/p2
+- [x] [#28 Sharing settings: choose what each household member can see](https://github.com/Kolla1997/Tallyn/issues/28) #type/feature #area/backend #priority/p1
 - [x] [#30 Separate database logins for the API and the bank sync](https://github.com/Kolla1997/Tallyn/issues/30) #type/tech-debt #area/backend #priority/p1
 
 
