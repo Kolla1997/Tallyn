@@ -34,8 +34,10 @@ const (
 )
 
 type fixture struct {
-	db        *DB
-	admin     *pgx.Conn // login role, bypasses RLS: only for seeding
+	db        *DB     // logs in as tallyn_api, like the running app
+	sys       *System // logs in as tallyn_sync, like the bank sync
+	apiURL    string
+	admin     *pgx.Conn // superuser, bypasses RLS: only for seeding and checks
 	testHH    string
 	otherHH   string
 	aliceItem string
@@ -93,13 +95,32 @@ func setup(t *testing.T) *fixture {
 		}
 	}
 
-	d, err := Open(ctx, dbURL)
+	// Log in the way the running app does (0006, ADR 0006): the API as
+	// tallyn_api, the sync as tallyn_sync. Test-only passwords, local
+	// throwaway database.
+	loginURL := func(role string) string {
+		mustExec(t, admin, `alter role `+role+` with login password 'test-only-password'`)
+		lu := *u
+		lu.User = url.UserPassword(role, "test-only-password")
+		return lu.String()
+	}
+	apiURL, syncURL := loginURL("tallyn_api"), loginURL("tallyn_sync")
+
+	d, err := Open(ctx, apiURL)
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
 	t.Cleanup(d.Close)
+	if err := d.CheckAPILogin(ctx); err != nil {
+		t.Fatalf("CheckAPILogin: %v", err)
+	}
+	sys, err := OpenSystem(ctx, syncURL)
+	if err != nil {
+		t.Fatalf("OpenSystem: %v", err)
+	}
+	t.Cleanup(sys.Close)
 
-	f := &fixture{db: d, admin: admin}
+	f := &fixture{db: d, sys: sys, apiURL: apiURL, admin: admin}
 	f.seed(t)
 	return f
 }

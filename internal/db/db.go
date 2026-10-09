@@ -25,13 +25,22 @@ type DB struct {
 }
 
 // Open connects to databaseURL (DATABASE_URL) and checks the connection.
+// In the running app it must be the tallyn_api login: see CheckAPILogin.
 func Open(ctx context.Context, databaseURL string) (*DB, error) {
+	pool, err := openPool(ctx, "DATABASE_URL", databaseURL)
+	if err != nil {
+		return nil, err
+	}
+	return &DB{pool: pool}, nil
+}
+
+func openPool(ctx context.Context, name, databaseURL string) (*pgxpool.Pool, error) {
 	if databaseURL == "" {
-		return nil, errors.New("db: DATABASE_URL is empty")
+		return nil, fmt.Errorf("db: %s is empty", name)
 	}
 	cfg, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
-		return nil, fmt.Errorf("db: parse DATABASE_URL: %w", err)
+		return nil, fmt.Errorf("db: parse %s: %w", name, err)
 	}
 	// Supabase's pooler in transaction mode can hand each transaction a
 	// different server connection, so avoid named prepared statements.
@@ -40,14 +49,62 @@ func Open(ctx context.Context, databaseURL string) (*DB, error) {
 
 	pool, err := pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
-		return nil, fmt.Errorf("db: open pool: %w", err)
+		return nil, fmt.Errorf("db: open %s pool: %w", name, err)
 	}
-	d := &DB{pool: pool}
-	if err := d.Ping(ctx); err != nil {
+	pctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	if err := pool.Ping(pctx); err != nil {
 		pool.Close()
-		return nil, err
+		return nil, fmt.Errorf("db: ping %s: %w", name, err)
 	}
-	return d, nil
+	return pool, nil
+}
+
+// loginInfo describes the role a pool logs in as.
+type loginInfo struct {
+	name                  string
+	superuser, bypassRLS  bool
+	canBeAuthenticated    bool // may SET ROLE authenticated
+	canBeSync             bool // may SET ROLE tallyn_sync
+	inheritsAuthenticated bool
+}
+
+func describeLogin(ctx context.Context, pool *pgxpool.Pool) (loginInfo, error) {
+	var l loginInfo
+	err := pool.QueryRow(ctx, `
+		select r.rolname, r.rolsuper, r.rolbypassrls,
+		       pg_has_role(session_user, 'authenticated', 'SET'),
+		       pg_has_role(session_user, 'tallyn_sync', 'SET'),
+		       pg_has_role(session_user, 'authenticated', 'USAGE')
+		from pg_roles r where r.rolname = session_user`).
+		Scan(&l.name, &l.superuser, &l.bypassRLS, &l.canBeAuthenticated, &l.canBeSync, &l.inheritsAuthenticated)
+	return l, err
+}
+
+// ErrUnsafeLogin means a connection string uses a login with more power than
+// its job needs (ADR 0006). The server refuses to start with it.
+var ErrUnsafeLogin = errors.New("db: unsafe database login")
+
+// CheckAPILogin makes sure DATABASE_URL logs in as a role that can only become
+// `authenticated`: not a superuser, no BYPASSRLS, no way into the sync role,
+// and no rights of its own. Otherwise SQL injected into a request could leave
+// the user's role (ADR 0006).
+func (d *DB) CheckAPILogin(ctx context.Context) error {
+	l, err := describeLogin(ctx, d.pool)
+	if err != nil {
+		return fmt.Errorf("db: check DATABASE_URL login: %w", err)
+	}
+	switch {
+	case l.superuser || l.bypassRLS:
+		return fmt.Errorf("%w: DATABASE_URL logs in as %q, which can bypass row-level security; use the tallyn_api login", ErrUnsafeLogin, l.name)
+	case l.canBeSync:
+		return fmt.Errorf("%w: DATABASE_URL login %q can become tallyn_sync; use the tallyn_api login", ErrUnsafeLogin, l.name)
+	case !l.canBeAuthenticated:
+		return fmt.Errorf("%w: DATABASE_URL login %q can't become authenticated; use the tallyn_api login", ErrUnsafeLogin, l.name)
+	case l.inheritsAuthenticated:
+		return fmt.Errorf("%w: DATABASE_URL login %q inherits authenticated's rights outside AsUser; grant it WITH INHERIT FALSE", ErrUnsafeLogin, l.name)
+	}
+	return nil
 }
 
 // Close closes all connections.

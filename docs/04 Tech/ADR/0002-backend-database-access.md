@@ -2,7 +2,7 @@
 type: adr
 status: draft
 owner: Dinesh
-updated: 2026-10-08
+updated: 2026-10-09
 issue: 6
 tags: [adr, security, database]
 ---
@@ -12,6 +12,7 @@ tags: [adr, security, database]
 - **Status:** Proposed
 - **Date:** 2026-10-08
 - **Ticket:** #6
+- **Superseded in part by:** [[0006-separate-database-logins]] (the app no longer logs in as `postgres`)
 
 ## Context
 Only the Go backend talks to the database (`CLAUDE.md` §7), and every table has row-level security (RLS). The original plan had the backend connect with Supabase's **service role**. That role skips every RLS policy, so RLS would protect nothing: one missing `WHERE household_id = ...` in Go code could show one family another family's money.

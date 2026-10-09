@@ -40,15 +40,20 @@ func main() {
 		log.Printf("tallyn: SUPABASE_URL not set, /api/ routes will answer 503")
 	}
 
+	// DATABASE_URL must be the tallyn_api login (#30, ADR 0006). The server
+	// refuses to start with a login that could step outside the user's role,
+	// such as Supabase's postgres.
 	var store api.Store
-	var database *db.DB
 	if u := os.Getenv("DATABASE_URL"); u != "" {
 		d, err := db.Open(ctx, u)
 		if err != nil {
 			log.Fatalf("tallyn: %v", err)
 		}
 		defer d.Close()
-		store, database = d, d
+		if err := d.CheckAPILogin(ctx); err != nil {
+			log.Fatalf("tallyn: %v", err)
+		}
+		store = d
 	} else {
 		log.Printf("tallyn: DATABASE_URL not set, /api/ routes will answer 503")
 	}
@@ -80,15 +85,27 @@ func main() {
 		log.Printf("tallyn: PLAID_CLIENT_ID or TOKEN_ENCRYPTION_KEY not set, bank linking will answer 503")
 	}
 
-	// Bank sync (#9): every 6 hours, plus right after a bank is linked. It is
-	// the only code that gets the system database access (db.System).
+	// Bank sync (#9): every 6 hours, plus right after a bank is linked. It has
+	// its own login, DATABASE_URL_SYNC as tallyn_sync (#30), and is the only
+	// code that gets the system database access (db.System).
 	var syncNow func(string)
-	if database != nil && plaidClient != nil && box != nil {
+	syncURL := os.Getenv("DATABASE_URL_SYNC")
+	switch {
+	case syncURL == "":
+		log.Printf("tallyn: DATABASE_URL_SYNC not set, bank sync is off")
+	case plaidClient == nil || box == nil:
+		log.Printf("tallyn: bank sync is off until bank linking is configured")
+	default:
 		every, err := time.ParseDuration(getenv("SYNC_EVERY", "6h"))
 		if err != nil || every < time.Minute {
 			log.Fatalf("tallyn: SYNC_EVERY must be a duration of at least 1m (got %q)", os.Getenv("SYNC_EVERY"))
 		}
-		syncer := banksync.New(database.System(), plaidClient, box, every)
+		system, err := db.OpenSystem(ctx, syncURL)
+		if err != nil {
+			log.Fatalf("tallyn: %v", err)
+		}
+		defer system.Close()
+		syncer := banksync.New(system, plaidClient, box, every)
 		syncNow = syncer.SyncNow
 		go syncer.Run(ctx)
 		log.Printf("tallyn: bank sync every %s", every)

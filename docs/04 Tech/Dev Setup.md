@@ -2,8 +2,8 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-08
-issues: [5, 6, 7, 8, 9]
+updated: 2026-10-09
+issues: [5, 6, 7, 8, 9, 30]
 tags: [tech, onboarding]
 ---
 
@@ -39,8 +39,22 @@ Without `SUPABASE_URL` or `DATABASE_URL` the server still starts, but every `/ap
 > [!warning] Keep the token key safe
 > Losing `TOKEN_ENCRYPTION_KEY` means every linked bank has to be linked again. Keep the production key in a password manager and the host's secret store, never in git or chat. See [[0004-plaid-token-encryption-and-link-path]].
 
+## Database logins (#30)
+The app never logs in as `postgres` (ADR 0006). After running `migrations/0006_app_logins.sql`:
+1. Make two passwords, letters and numbers only so they need no encoding: `openssl rand -hex 24`, twice. Save both in the password manager
+2. In the Supabase SQL editor, run (with your passwords):
+   ```sql
+   alter role tallyn_api  with login password 'API_PASSWORD';
+   alter role tallyn_sync with login password 'SYNC_PASSWORD';
+   ```
+3. In `.env`, copy the pooler host from **Connect → Session pooler**, then set:
+   - `DATABASE_URL=postgresql://tallyn_api.<project-ref>:API_PASSWORD@<pooler-host>:5432/postgres`
+   - `DATABASE_URL_SYNC=postgresql://tallyn_sync.<project-ref>:SYNC_PASSWORD@<pooler-host>:5432/postgres`
+   - move the old `postgres` connection string to `ADMIN_DATABASE_URL` (for migrations only)
+4. Start the backend. If a login is wrong, it stops with `unsafe database login: …` and says which one
+
 ## Bank sync (#9)
-1. Run `migrations/0005_bank_sync.sql` on the Supabase project, after 0001–0004
+1. Run `migrations/0005_bank_sync.sql` on the Supabase project, after 0001–0004 (and set `DATABASE_URL_SYNC`, see above)
 2. Restart the backend. It prints `bank sync every 6h` and syncs every linked bank straight away
 3. For testing, `SYNC_EVERY=2m` in `.env` makes it sync more often (minimum 1m)
 4. A new link syncs within a minute or two; the log shows counts only (`sync: bank <id>: 16 added or changed, ...`)

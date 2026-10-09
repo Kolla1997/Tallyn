@@ -11,18 +11,48 @@ import (
 	"github.com/Kolla1997/Tallyn/internal/plaid"
 )
 
-// System is the bank sync's database access (ADR 0002, ADR 0005). It runs as
-// the narrow tallyn_sync role, which works across households: it can read
-// encrypted tokens and write accounts and transactions, and nothing else.
+// System is the bank sync's database access (ADR 0005, ADR 0006). It has its
+// own pool and login (DATABASE_URL_SYNC, as tallyn_sync), separate from the
+// API's: tallyn_sync works across households, reading encrypted tokens and
+// writing accounts and transactions, and nothing else.
 //
-// Only cmd/server hands a *System to internal/sync. Request handlers never get
-// one: they only have *DB and AsUser.
+// Only cmd/server opens a *System, and only internal/sync gets it. Request
+// handlers only have *DB and AsUser, whose login can't reach tallyn_sync.
 type System struct {
 	pool *pgxpool.Pool
 }
 
-// System returns the bank sync's database access.
-func (d *DB) System() *System { return &System{pool: d.pool} }
+// OpenSystem connects to syncURL (DATABASE_URL_SYNC) and checks that it logs
+// in as a role that can become tallyn_sync and can't bypass RLS or become
+// authenticated.
+func OpenSystem(ctx context.Context, syncURL string) (*System, error) {
+	pool, err := openPool(ctx, "DATABASE_URL_SYNC", syncURL)
+	if err != nil {
+		return nil, err
+	}
+	l, err := describeLogin(ctx, pool)
+	if err != nil {
+		pool.Close()
+		return nil, fmt.Errorf("db: check DATABASE_URL_SYNC login: %w", err)
+	}
+	var problem string
+	switch {
+	case l.superuser || l.bypassRLS:
+		problem = "can bypass row-level security"
+	case !l.canBeSync:
+		problem = "can't become tallyn_sync"
+	case l.canBeAuthenticated:
+		problem = "can become authenticated"
+	}
+	if problem != "" {
+		pool.Close()
+		return nil, fmt.Errorf("%w: DATABASE_URL_SYNC logs in as %q, which %s; use the tallyn_sync login", ErrUnsafeLogin, l.name, problem)
+	}
+	return &System{pool: pool}, nil
+}
+
+// Close closes the sync's connections.
+func (s *System) Close() { s.pool.Close() }
 
 func (s *System) as(ctx context.Context, fn func(pgx.Tx) error) error {
 	return pgx.BeginFunc(ctx, s.pool, func(tx pgx.Tx) error {
