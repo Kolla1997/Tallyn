@@ -12,6 +12,7 @@ tags: [adr, security, database, sync]
 - **Status:** Proposed
 - **Date:** 2026-10-09
 - **Ticket:** #9
+- **Superseded in part by:** [[0007-consent-based-visibility]] (who sees time and location)
 
 ## Context
 The bank sync runs with no signed-in user, across every household, so `AsUser` and RLS-as-the-user don't apply. [[0002-backend-database-access]] said it would get "a separate system path with its own narrow role". Transactions now also carry time and location, which are more private than the transaction itself ([[Feature - Bank Sync]]).

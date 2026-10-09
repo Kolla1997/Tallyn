@@ -27,9 +27,9 @@ type Transaction struct {
 	Whereabouts      *Whereabouts `json:"whereabouts"` // nil when unknown or not visible to this user
 }
 
-// Whereabouts is when and where a purchase happened. Visible only to the
-// person who made it, plus household owners for teens and children
-// (can_see_whereabouts in 0005_bank_sync.sql).
+// Whereabouts is when and where a purchase happened. Visible to the person who
+// made it, parents for their kids, and members it was shared with
+// (can_see_member_data in 0007_sharing.sql).
 type Whereabouts struct {
 	AuthorizedAt *time.Time `json:"authorized_at"`
 	PostedAt     *time.Time `json:"posted_at"`
@@ -55,14 +55,16 @@ func (d *DB) Transactions(ctx context.Context, userID, householdID string, limit
 	}
 	err := d.AsUser(ctx, userID, func(tx pgx.Tx) error {
 		rows, err := tx.Query(ctx, `
-			select t.id, t.account_id, a.name, a.owner_user_id, t.amount_minor, t.currency,
+			select t.id, t.account_id, coalesce(a.name, ''), coalesce(a.owner_user_id::text, ''), t.amount_minor, t.currency,
 			       t.date::text, t.authorized_date::text, coalesce(t.merchant_name, t.name),
 			       t.category_primary, t.category_detailed, t.pending, t.payment_channel,
 			       d.transaction_id is not null,
 			       d.authorized_at, d.posted_at, d.address, d.city, d.region, d.postal_code, d.country,
 			       d.lat, d.lon, d.store_number
 			from public.transactions t
-			join public.accounts a on a.id = t.account_id
+			-- left join: transactions can be shared without balances, so the
+			-- account itself may be hidden (0007_sharing.sql)
+			left join public.accounts a on a.id = t.account_id
 			left join public.transaction_details d on d.transaction_id = t.id
 			where t.household_id = $1
 			order by t.date desc, t.created_at desc, t.id

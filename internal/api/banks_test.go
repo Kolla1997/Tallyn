@@ -50,6 +50,13 @@ func (stubStore) Transactions(context.Context, string, string, int) ([]db.Transa
 func (stubStore) Spending(context.Context, string, string, string) ([]db.Spend, error) {
 	return nil, errors.New("stub")
 }
+func (stubStore) Sharing(context.Context, string, string) (db.Sharing, error) {
+	return db.Sharing{}, errors.New("stub")
+}
+func (stubStore) SetSharing(context.Context, string, string, string, []string) error {
+	return errors.New("stub")
+}
+func (stubStore) SetDisplayName(context.Context, string, string) error { return errors.New("stub") }
 
 type bankStore struct {
 	stubStore
