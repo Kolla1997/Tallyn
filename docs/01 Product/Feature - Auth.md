@@ -3,7 +3,7 @@ type: spec
 status: active
 owner: Dinesh
 updated: 2026-10-08
-issue: 7
+issues: [7, 22, 23, 24, 25]
 tags: [spec, auth, security]
 ---
 
@@ -33,9 +33,9 @@ Every API call that touches family data comes from a person who signed in with e
 - Bare-bones screens using `design-tokens.json`
 
 **Out:**
-- Styled sign-in screens (the comps don't have them yet; see [[Design System]])
-- Password reset and changing email (needs its own ticket)
-- Recovery if someone loses their authenticator app (needs its own ticket: backup codes or a support flow)
+- Styled sign-in screens (the comps don't have them yet; see [[Design System]]): [#25](https://github.com/Kolla1997/Tallyn/issues/25)
+- Password reset: [#22](https://github.com/Kolla1997/Tallyn/issues/22). Changing email: not ticketed yet
+- Recovery if someone loses their authenticator app: [#23](https://github.com/Kolla1997/Tallyn/issues/23)
 - SMS 2FA (a paid Supabase add-on), social and SSO log-in
 - Invitations and finer role rules ([#12](https://github.com/Kolla1997/Tallyn/issues/12))
 
@@ -69,5 +69,5 @@ Dev Supabase project first: run migrations 0001–0003, apply the settings above
 
 ## Open questions
 - Kids' logins: is 2FA right for young children, or should a parent's device cover them? For now everyone needs it. #12 can relax it.
-- Add a Content-Security-Policy header to the Go server, to cut the XSS risk of keeping the token in the browser? (follow-up ticket)
+- Content-Security-Policy header in the Go server, to cut the XSS risk of keeping the token in the browser: [#24](https://github.com/Kolla1997/Tallyn/issues/24)
 - Pass `aal` into `AsUser`'s claims, so RLS can also require 2FA as a second line of defence?
