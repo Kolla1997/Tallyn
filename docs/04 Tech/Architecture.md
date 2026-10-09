@@ -3,7 +3,7 @@ type: guide
 status: draft
 owner: Dinesh
 updated: 2026-10-08
-issues: [6, 7]
+issues: [6, 7, 8]
 tags: [tech, architecture]
 ---
 
@@ -26,7 +26,9 @@ One Go service, one deployment: it serves the API and the built React app (`web/
 | Component | Responsibility | Path |
 |---|---|---|
 | Server entry | Boot, routing, static files | `cmd/server` |
-| plaid | Plaid client, Link token exchange | `internal/plaid` |
+| plaid | Plaid client: Link tokens, token exchange, accounts, item removal | `internal/plaid` |
+| tokencrypt | Encrypts Plaid access tokens | `internal/tokencrypt` |
+| money | Exact conversion to minor units | `internal/money` |
 | sync | Scheduled account and transaction sync | `internal/sync` |
 | db | Database access | `internal/db` |
 | auth | Verify Supabase sessions and require 2FA (roles are enforced by RLS) | `internal/auth` |
@@ -43,7 +45,8 @@ The backend runs each request as the signed-in user so RLS applies: [[0002-backe
 The React app signs in with `supabase-js` (publishable key only) and sends the access token to the API as `Authorization: Bearer`. `internal/auth` checks the signature against Supabase's public keys (JWKS), the expiry, issuer, audience and role, and requires 2FA (`aal2`) on every `/api/` route except `/api/health`. The verified user ID goes to `AsUser`. Details: [[Feature - Auth]], [[0003-browser-sign-in-with-supabase-js]].
 
 ## Security
-- Plaid access tokens are **encrypted by the Go backend** before they're stored
+- Plaid access tokens are **encrypted by the Go backend** (AES-256-GCM, `internal/tokencrypt`) before they're stored, and revoked at Plaid when a bank is unlinked: [[0004-plaid-token-encryption-and-link-path]]
+- Linking banks: US only, Transactions only, owners and adults for themselves only. Writes go through checked database functions
 - **RLS on every Supabase table**
 - Only the backend connects to the database, and it runs user requests as the user (`internal/db` `AsUser`), not as the service role
 - Every `/api/` route needs a verified Supabase session with 2FA; new routes are protected by default

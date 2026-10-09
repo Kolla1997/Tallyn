@@ -3,7 +3,7 @@ type: guide
 status: draft
 owner: Dinesh
 updated: 2026-10-08
-issues: [5, 6, 7]
+issues: [5, 6, 7, 8]
 tags: [tech, onboarding]
 ---
 
@@ -28,6 +28,16 @@ Without `SUPABASE_URL` or `DATABASE_URL` the server still starts, but every `/ap
 
 > [!warning] Node version
 > Vite 8 needs Node 20.19+ or 22.12+. An older `node` first on your `PATH` fails with `styleText` or "Cannot find native binding" errors. Check with `node -v`.
+
+## Bank linking (#8)
+1. Run `migrations/0004_plaid_link.sql` on the Supabase project (SQL editor), after 0001–0003
+2. Plaid keys: sign up free at dashboard.plaid.com → Developers → Keys. Put the **client ID** and the **sandbox secret** in `.env` as `PLAID_CLIENT_ID` and `PLAID_SECRET`, with `PLAID_ENV=sandbox`
+3. Token key: `openssl rand -base64 32`, then set `TOKEN_ENCRYPTION_KEY` in `.env`. Use a different key for production
+4. Restart the backend. It shouldn't print "bank linking will answer 503"
+5. In the app: create a household, **Link a bank**, pick any sandbox bank and sign in with `user_good` / `pass_good`
+
+> [!warning] Keep the token key safe
+> Losing `TOKEN_ENCRYPTION_KEY` means every linked bank has to be linked again. Keep the production key in a password manager and the host's secret store, never in git or chat. See [[0004-plaid-token-encryption-and-link-path]].
 
 ## Supabase Auth settings (#7)
 In the Supabase dashboard, for each project (dev and prod). See [[Feature - Auth]].

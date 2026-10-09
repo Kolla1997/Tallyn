@@ -11,6 +11,13 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-08
+- #8 Bank linking on branch `8-plaid-link`: Plaid Link (US only, Transactions only), public token exchange, accounts with balances in exact minor units, unlink that revokes at Plaid (`/item/remove`) before deleting our copy. If saving a new link fails, the item is revoked at Plaid straight away.
+- #8 `internal/tokencrypt`: AES-256-GCM with `TOKEN_ENCRYPTION_KEY`, fresh nonce, Plaid item ID bound in, version byte. `internal/plaid`: small hand-written client (credentials in headers, no bodies in errors). `internal/money`: exact decimal → minor units.
+- #8 `0004_plaid_link.sql`: `link_plaid_item` and `plaid_item_for_unlink`, `security definer` with fixed `search_path`, role checks inside the database, owner always `auth.uid()`. `POST /api/households`, `POST /api/plaid/link-token`, `POST /api/plaid/exchange`, `GET /api/banks`, `DELETE /api/banks/{id}`.
+- #8 Web: create household, Link a bank (`react-plaid-link`), banks and accounts list, unlink with confirmation.
+- #8 Added [[Feature - Bank Linking]] and ADR [[0004-plaid-token-encryption-and-link-path]] (Proposed). Updated Data Model, Architecture, Dev Setup, `.env.example` (`PLAID_REDIRECT_URI`), migrations README.
+- Decision (security-first): owners and adults link, only for themselves; teens and children can't. US only. Transactions only; never `auth`. Unlinking pulled into #8 so tokens are really revoked.
+- Open: end-to-end in Plaid sandbox; `TOKEN_ENCRYPTION_KEY` to a KMS before launch; OAuth redirect URI for production; audit log of link/unlink; #24 must allow `cdn.plaid.com`.
 - #7 Merged PR #21, so #7 is closed. Moved it to Done by hand (the board's close → Done workflow still doesn't fire). Ticked in [[Roadmap]].
 - #7 End-to-end test passed on the `tallyn-dev` Supabase project: sign-up, email confirmation, authenticator-app 2FA (Microsoft Authenticator), `/api/me` through `AsUser` and RLS. The account was created before the migrations ran, so its profile row was added by hand (the sign-up trigger only covers new users). Fixed the home screen calling `/api/me` four times per load.
 - #7 Started auth on branch `7-supabase-auth`. `internal/auth` checks Supabase access tokens on every `/api/` route except `/api/health`: signature against the project's public keys (JWKS, ES256/RS256), expiry, issuer, audience, role, and 2FA (`aal2`). Fails closed: `401` for anything wrong, `503` if auth or the database isn't configured. New `/api/` routes are protected by default.

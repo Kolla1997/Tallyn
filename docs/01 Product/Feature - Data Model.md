@@ -3,7 +3,7 @@ type: spec
 status: draft
 owner: Dinesh
 updated: 2026-10-08
-issue: 6
+issues: [6, 8]
 tags: [spec, database]
 ---
 
@@ -61,6 +61,7 @@ erDiagram
 - New households are made with `create_household(name, currency)`, which makes the caller the owner.
 - Every household keeps at least one owner.
 - Users can read bank data but never write it. The Plaid access token column isn't readable by users at all.
+- Linking and unlinking a bank go through two checked functions instead (`0004_plaid_link.sql`): only owners and adults link, only for themselves. See [[Feature - Bank Linking]].
 - Unlinking a bank or deleting a household removes everything under it.
 
 ## Tech notes
