@@ -23,7 +23,9 @@ create schema if not exists auth;
 
 create table if not exists auth.users (
   id    uuid primary key default gen_random_uuid(),
-  email text unique
+  email text unique,
+  -- Supabase sets this when the sign-up email is confirmed.
+  email_confirmed_at timestamptz default now()
 );
 
 -- Same definition Supabase uses: the user ID comes from the JWT claims of the request.

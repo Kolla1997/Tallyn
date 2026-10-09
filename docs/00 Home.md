@@ -21,6 +21,7 @@ tags: [home]
 - [[Feature - Bank Linking]]: Plaid Link, encrypted tokens, unlinking
 - [[Feature - Bank Sync]]: transactions, spending by category, time and location
 - [[Feature - Sharing]]: who sees whose money, by choice
+- [[Feature - Household Members]]: invitations, roles, leaving
 
 ## Brand
 - [[Brand Guide]]: positioning, personality, brand basics

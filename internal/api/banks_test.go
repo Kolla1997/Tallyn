@@ -57,6 +57,25 @@ func (stubStore) SetSharing(context.Context, string, string, string, []string) e
 	return errors.New("stub")
 }
 func (stubStore) SetDisplayName(context.Context, string, string) error { return errors.New("stub") }
+func (stubStore) Members(context.Context, string, string) ([]db.Member, error) {
+	return nil, errors.New("stub")
+}
+func (stubStore) SetMemberRole(context.Context, string, string, string, string) error {
+	return errors.New("stub")
+}
+func (stubStore) RemoveMember(context.Context, string, string, string) error {
+	return errors.New("stub")
+}
+func (stubStore) Invites(context.Context, string, string) ([]db.Invite, error) {
+	return nil, errors.New("stub")
+}
+func (stubStore) CreateInvite(context.Context, string, string, string, string) (db.Invite, string, error) {
+	return db.Invite{}, "", errors.New("stub")
+}
+func (stubStore) RevokeInvite(context.Context, string, string) error { return errors.New("stub") }
+func (stubStore) AcceptInvite(context.Context, string, string) (string, error) {
+	return "", errors.New("stub")
+}
 
 type bankStore struct {
 	stubStore

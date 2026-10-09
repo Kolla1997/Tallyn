@@ -15,6 +15,7 @@ Rules (see `CLAUDE.md` §7):
 | `0005_bank_sync.sql` | bank sync's system role, transaction time and location with their own visibility (#9, ADR 0005) |
 | `0006_app_logins.sql` | `tallyn_api` login role; the app stops using `postgres` (#30, ADR 0006). Passwords are set by hand, see Dev Setup |
 | `0007_sharing.sql` | sharing settings: consent-based visibility, new unlink rule (#28, ADR 0007) |
+| `0008_invites.sql` | invitations: hashed single-use links bound to the invited email (#12, ADR 0008) |
 
 Apply them in order on the Supabase project (SQL editor, or `psql "$ADMIN_DATABASE_URL" -f <file>`). Migrations run as `postgres`; the app itself never does (ADR 0006).
 Tests apply them to a throwaway Postgres: see `internal/db/db_test.go`. `TestEveryTableHasRLS` fails if a table is missing RLS.
