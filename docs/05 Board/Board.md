@@ -17,6 +17,7 @@ kanban-plugin: board
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#27 Debt details: interest rates, due dates and minimum payments (Plaid Liabilities)](https://github.com/Kolla1997/Tallyn/issues/27) #type/feature #area/backend #priority/p0
 - [ ] [#34 Spending limits per member, with progress and alerts](https://github.com/Kolla1997/Tallyn/issues/34) #type/feature #area/backend #priority/p1
+- [ ] [#36 Terms of Service and Privacy Policy pages, with consent at sign-up](https://github.com/Kolla1997/Tallyn/issues/36) #type/feature #area/frontend #priority/p0
 
 
 ## In Progress
