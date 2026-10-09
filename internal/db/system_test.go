@@ -19,7 +19,7 @@ func ptr[T any](v T) *T { return &v }
 // "acct-t" and transaction "txn-t".
 func syncItem(t *testing.T, f *fixture, id string) SyncItem {
 	t.Helper()
-	it, err := f.db.System().Item(context.Background(), id)
+	it, err := f.sys.Item(context.Background(), id)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +39,7 @@ func whereaboutsTxn(id, account string) plaid.Transaction {
 func TestSyncRoleLimits(t *testing.T) {
 	f := setup(t)
 	ctx := context.Background()
-	sys := f.db.System()
+	sys := f.sys
 
 	denied := map[string]string{
 		"read profiles":         `select count(*) from public.profiles`,
@@ -94,7 +94,7 @@ func TestSyncRoleLimits(t *testing.T) {
 func TestSaveSync(t *testing.T) {
 	f := setup(t)
 	ctx := context.Background()
-	sys := f.db.System()
+	sys := f.sys
 	item := syncItem(t, f, f.aliceItem)
 
 	bal := int64(5000)
@@ -201,7 +201,7 @@ func TestWhereaboutsVisibility(t *testing.T) {
 	f := setup(t)
 	addDave(t, f)
 	ctx := context.Background()
-	sys := f.db.System()
+	sys := f.sys
 
 	if _, err := sys.SaveSync(ctx, syncItem(t, f, f.aliceItem), plaid.SyncResult{Added: []plaid.Transaction{whereaboutsTxn("txn-alice", "acct-a")}, NextCursor: "c"}); err != nil {
 		t.Fatal(err)
@@ -285,7 +285,7 @@ func TestSpending(t *testing.T) {
 		mk("refund", -200, "FOOD_AND_DRINK", "FOOD_AND_DRINK_GROCERIES"),
 		{PlaidTransactionID: "sept", PlaidAccountID: "acct-a", AmountMinor: 9999, Currency: "USD", Date: "2026-09-30", Name: "sept", CategoryPrimary: "TRAVEL"},
 	}, NextCursor: "c"}
-	if _, err := f.db.System().SaveSync(ctx, syncItem(t, f, f.aliceItem), res); err != nil {
+	if _, err := f.sys.SaveSync(ctx, syncItem(t, f, f.aliceItem), res); err != nil {
 		t.Fatal(err)
 	}
 	got, err := f.db.Spending(ctx, alice, f.testHH, "2026-10")
