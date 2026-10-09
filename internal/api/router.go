@@ -15,31 +15,54 @@ import (
 	"github.com/Kolla1997/Tallyn/internal/db"
 )
 
-// Store is the data the API reads. *db.DB implements it.
+// Store is the data the API reads and writes. *db.DB implements it.
 type Store interface {
 	Me(ctx context.Context, userID string) (db.Me, error)
+	CreateHousehold(ctx context.Context, userID, name, homeCurrency string) (db.MyHousehold, error)
+	CanLink(ctx context.Context, userID, householdID string) (bool, error)
+	LinkBank(ctx context.Context, userID, householdID string, b db.NewBank) (string, error)
+	Banks(ctx context.Context, userID, householdID string) ([]db.Bank, error)
+	UnlinkTarget(ctx context.Context, userID, bankID string) (plaidItemID string, sealed []byte, err error)
+	DeleteBank(ctx context.Context, userID, bankID string) error
+}
+
+// Deps is what the router needs. Nil fields switch off the routes that need
+// them (they answer 503), so nothing is ever served half-configured.
+type Deps struct {
+	WebDir      string
+	RequireAuth func(http.Handler) http.Handler // auth.Verifier.Require
+	Store       Store                           // *db.DB
+	Plaid       Plaid                           // *plaid.Client
+	Tokens      Tokens                          // *tokencrypt.Box
 }
 
 // NewRouter returns the server's handler: JSON API under /api/ and the
 // React app (with SPA fallback to index.html) for everything else.
 //
-// Every /api/ route except the health check sits behind requireAuth
-// (auth.Verifier.Require), so new routes are protected by default. If auth or
-// the database isn't configured (nil), protected routes answer 503.
-func NewRouter(webDir string, requireAuth func(http.Handler) http.Handler, store Store) http.Handler {
-	if requireAuth == nil || store == nil {
+// Every /api/ route except the health check sits behind RequireAuth, so new
+// routes are protected by default. If auth or the database isn't configured,
+// protected routes answer 503. Bank routes also need Plaid and Tokens.
+func NewRouter(d Deps) http.Handler {
+	requireAuth := d.RequireAuth
+	if requireAuth == nil || d.Store == nil {
 		requireAuth = auth.Unavailable
 	}
 	api := http.NewServeMux()
-	api.HandleFunc("GET /api/me", me(store))
+	api.HandleFunc("GET /api/me", me(d.Store))
+	api.HandleFunc("POST /api/households", createHousehold(d.Store))
+	b := banks{store: d.Store, plaid: d.Plaid, tokens: d.Tokens}
+	api.HandleFunc("POST /api/plaid/link-token", b.needsPlaid(b.linkToken))
+	api.HandleFunc("POST /api/plaid/exchange", b.needsPlaid(b.exchange))
+	api.HandleFunc("GET /api/banks", b.list)
+	api.HandleFunc("DELETE /api/banks/{id}", b.needsPlaid(b.unlink))
 	api.HandleFunc("/api/", func(w http.ResponseWriter, _ *http.Request) {
-		writeJSON(w, http.StatusNotFound, map[string]string{"error": "not_found"})
+		writeError(w, http.StatusNotFound, "not_found")
 	})
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/health", health)
 	mux.Handle("/api/", requireAuth(api))
-	mux.Handle("/", spa(webDir))
+	mux.Handle("/", spa(d.WebDir))
 	return mux
 }
 
@@ -50,23 +73,75 @@ func health(w http.ResponseWriter, _ *http.Request) {
 // me returns the signed-in person's profile and households.
 func me(store Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		s, ok := auth.FromContext(r.Context())
+		uid, ok := userID(w, r)
 		if !ok {
-			writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "unauthorized"})
 			return
 		}
-		m, err := store.Me(r.Context(), s.UserID)
+		m, err := store.Me(r.Context(), uid)
 		if errors.Is(err, db.ErrNoProfile) {
-			writeJSON(w, http.StatusNotFound, map[string]string{"error": "no_profile"})
+			writeError(w, http.StatusNotFound, "no_profile")
 			return
 		}
 		if err != nil {
 			log.Printf("api: me: %v", err)
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "internal"})
+			writeError(w, http.StatusInternalServerError, "internal")
 			return
 		}
 		writeJSON(w, http.StatusOK, m)
 	}
+}
+
+// createHousehold makes a household with the caller as its owner.
+func createHousehold(store Store) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		uid, ok := userID(w, r)
+		if !ok {
+			return
+		}
+		var in struct {
+			Name         string `json:"name"`
+			HomeCurrency string `json:"home_currency"`
+		}
+		if !readJSON(w, r, &in) {
+			return
+		}
+		h, err := store.CreateHousehold(r.Context(), uid, strings.TrimSpace(in.Name), strings.TrimSpace(in.HomeCurrency))
+		if errors.Is(err, db.ErrInvalid) {
+			writeError(w, http.StatusBadRequest, "invalid_household")
+			return
+		}
+		if err != nil {
+			log.Printf("api: create household: %v", err)
+			writeError(w, http.StatusInternalServerError, "internal")
+			return
+		}
+		writeJSON(w, http.StatusCreated, h)
+	}
+}
+
+// userID returns the verified session's user, or writes a 401.
+func userID(w http.ResponseWriter, r *http.Request) (string, bool) {
+	s, ok := auth.FromContext(r.Context())
+	if !ok {
+		writeError(w, http.StatusUnauthorized, "unauthorized")
+		return "", false
+	}
+	return s.UserID, true
+}
+
+// readJSON decodes a small JSON body into v, or writes a 400.
+func readJSON(w http.ResponseWriter, r *http.Request, v any) bool {
+	dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, 64<<10))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(v); err != nil {
+		writeError(w, http.StatusBadRequest, "bad_request")
+		return false
+	}
+	return true
+}
+
+func writeError(w http.ResponseWriter, status int, code string) {
+	writeJSON(w, status, map[string]string{"error": code})
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {

@@ -1,40 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api } from '../lib/api.js'
+import Banks from './Banks.jsx'
+import CreateHousehold from './CreateHousehold.jsx'
 
-// Placeholder home: proves the chain browser token → Go → AsUser → RLS by
-// showing /api/me. Real screens come with later tickets.
+// Placeholder home: your household and its banks. Real screens come later (#25).
 export default function Home({ email, onSignOut }) {
   const [me, setMe] = useState(null)
   const [error, setError] = useState('')
 
-  useEffect(() => {
+  const load = useCallback(() => {
     api('/api/me').then(setMe, (e) => setError(e.message))
   }, [])
 
+  useEffect(load, [load])
+
+  // One household for now; choosing between several comes with #12.
+  const household = me?.households[0]
+
   return (
     <section className="card">
-      <h1>{me?.display_name ? `Hi, ${me.display_name}` : "You're signed in"}</h1>
+      <h1>{household ? household.name : me ? 'Create your household' : "You're signed in"}</h1>
       <p className="muted">Signed in as {email}, with 2FA.</p>
       {error && (
         <p className="error" role="alert">
           Couldn&apos;t load your details ({error}). Try again in a moment.
         </p>
       )}
-      {me &&
-        (me.households.length === 0 ? (
-          <p>You&apos;re not in a household yet.</p>
-        ) : (
-          <ul className="households">
-            {me.households.map((h) => (
-              <li key={h.id}>
-                <span>{h.name}</span>
-                <span className="muted">
-                  {h.role} · {h.home_currency}
-                </span>
-              </li>
-            ))}
-          </ul>
-        ))}
+      {me && !household && <CreateHousehold onCreated={load} />}
+      {household && <Banks household={household} />}
       <button className="btn btn-secondary" onClick={onSignOut}>
         Sign out
       </button>

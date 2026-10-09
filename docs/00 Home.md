@@ -18,6 +18,7 @@ tags: [home]
 - [[Roadmap]]: now / next / later
 - [[Feature - Data Model]]: tables, roles and RLS rules
 - [[Feature - Auth]]: sign-up, log-in and 2FA
+- [[Feature - Bank Linking]]: Plaid Link, encrypted tokens, unlinking
 
 ## Brand
 - [[Brand Guide]]: positioning, personality, brand basics
