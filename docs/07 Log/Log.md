@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-08
+- #8 End-to-end test passed in Plaid sandbox on `tallyn-dev`: created a household, linked First Platypus Bank (14 accounts, balances correct), token stored encrypted (version 1, 80 bytes, no readable token text), unlink revoked at Plaid and removed the bank, accounts and transactions. Fixed: Unlink used `window.confirm`, which the embedded browser silently answers "no", so it did nothing; the confirmation is now shown in the page.
 - #8 Bank linking on branch `8-plaid-link`: Plaid Link (US only, Transactions only), public token exchange, accounts with balances in exact minor units, unlink that revokes at Plaid (`/item/remove`) before deleting our copy. If saving a new link fails, the item is revoked at Plaid straight away.
 - #8 `internal/tokencrypt`: AES-256-GCM with `TOKEN_ENCRYPTION_KEY`, fresh nonce, Plaid item ID bound in, version byte. `internal/plaid`: small hand-written client (credentials in headers, no bodies in errors). `internal/money`: exact decimal → minor units.
 - #8 `0004_plaid_link.sql`: `link_plaid_item` and `plaid_item_for_unlink`, `security definer` with fixed `search_path`, role checks inside the database, owner always `auth.uid()`. `POST /api/households`, `POST /api/plaid/link-token`, `POST /api/plaid/exchange`, `GET /api/banks`, `DELETE /api/banks/{id}`.
