@@ -154,3 +154,35 @@ p { margin: 0; }
   .debt { grid-template-columns: 1fr 1fr; }
   .stat-row { grid-template-columns: 1fr 1fr; }
 }
+
+/* Net worth, Goals and Settings drafts */
+.total .networth { border-top: 1px solid rgba(246, 241, 233, 0.18); padding-top: var(--s3); display: flex; flex-direction: column; gap: 2px; }
+.total .networth div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); }
+.total .networth div span:first-child { color: var(--sage-light); font-size: 13px; }
+.total .networth .amount { font-size: 22px; }
+.total .networth p { color: var(--sage-light); }
+
+.goal-hero { display: grid; grid-template-columns: auto 1fr; gap: var(--s5); align-items: center; }
+.ring { position: relative; width: 132px; height: 132px; }
+.ring svg { width: 132px; height: 132px; }
+.ring .pct { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--heading); font-weight: 700; font-size: 26px; }
+.goal-meta { display: flex; flex-direction: column; gap: var(--s2); }
+.goal { display: flex; flex-direction: column; gap: var(--s2); padding: var(--s4) 0; border-top: 1px solid var(--border); }
+.goal:first-of-type { border-top: none; padding-top: 0; }
+.goal .row { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); }
+.bar.sage > div { background: var(--sage); }
+.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s3) var(--s4); align-items: center; }
+.kv dt { font-weight: 500; }
+.kv dd { margin: 0; text-align: right; }
+.kv .hint { grid-column: 1 / -1; margin-top: -8px; text-align: left; }
+.status-on { display: inline-flex; align-items: center; gap: 6px; color: var(--success); font-weight: 500; }
+.status-on::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+.danger-zone { border-color: #E7C4C1; }
+.btn.danger-outline { background: transparent; color: var(--error); border: 2px solid var(--error); padding: 10px 22px; }
+.split-plan li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s1) var(--s3); }
+.split-plan .bar { grid-column: 1 / -1; margin-top: 0; }
+
+@media (max-width: 1023px) {
+  .goal-hero { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .goal-meta { align-items: center; }
+}

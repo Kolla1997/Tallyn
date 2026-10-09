@@ -31,6 +31,12 @@ Visual comps, not production code. Amounts and rates are placeholders.
 
 `Comps/web-family-draft.html`: members with roles and per-person sharing switches, a teen (parents see automatically), a viewer, invite form and waiting invites, and the removal confirmation with typed name and 2FA code (#38).
 
+`Comps/web-goals-draft.html`: goals that **follow a savings account** (update on their own) or are updated by hand, how much a month keeps each on track, a new-goal form with who can see it, and a preview of idea #33 (where this month's income could go). No "Add money": Tallyn can't move money.
+
+`Comps/web-settings-draft.html`: profile, sign-in and security (2FA on; backup authenticator #23, password #22), household name and home currency, your data (download, Terms and Privacy #36), notifications (later), leave or close with 2FA confirmation.
+
+**Net worth** (decided 2026-10-09): shown on Home and Accounts as what you have minus what you owe on cards and loans; owed amounts stay out of "Total balance".
+
 Shared styles and icons: `Comps/draft.css`, `Comps/draft-icons.svg`. Two columns from 1280px, sidebar from 1024px, bottom tab bar below.
 
 Desktop and mobile screenshots: `Comps/website-desktop-1440.png`, `Comps/website-mobile-390.png`. Source: `Comps/website/index.html`.
