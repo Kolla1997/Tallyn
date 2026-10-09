@@ -5,7 +5,7 @@ import { formatMoney } from '../lib/money.js'
 
 // Linked banks and accounts for one household, plus Link and Unlink (#8).
 // Bank logins happen inside Plaid's own window; Tallyn never sees them.
-export default function Banks({ household }) {
+export default function Banks({ household, onChanged }) {
   const [banks, setBanks] = useState(null)
   const [error, setError] = useState('')
   const [confirming, setConfirming] = useState(null) // bank id awaiting "Unlink?"
@@ -31,6 +31,7 @@ export default function Banks({ household }) {
       await api(`/api/banks/${bank.id}`, { method: 'DELETE' })
       setConfirming(null)
       load()
+      onChanged?.()
     } catch {
       setError(`We couldn't unlink ${name} just now. It's still connected, so try again in a moment.`)
     }
@@ -72,6 +73,17 @@ export default function Banks({ household }) {
               </div>
             </div>
           )}
+          {b.status === 'needs_reauth' && (
+            <p className="error">Reconnect needed: this bank asked you to sign in again, so it isn&apos;t updating.</p>
+          )}
+          {b.status === 'disconnected' && <p className="error">This bank was disconnected and isn&apos;t updating.</p>}
+          {b.status === 'active' && (
+            <p className="muted small">
+              {b.last_synced_at
+                ? `Updated ${new Date(b.last_synced_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`
+                : 'Getting your transactions…'}
+            </p>
+          )}
           <ul className="accounts">
             {b.accounts.map((a) => (
               <li key={a.id}>
@@ -86,7 +98,14 @@ export default function Banks({ household }) {
         </div>
       ))}
       {canLink ? (
-        <LinkBank householdId={household.id} onLinked={load} onError={setError} />
+        <LinkBank
+          householdId={household.id}
+          onLinked={() => {
+            load()
+            onChanged?.()
+          }}
+          onError={setError}
+        />
       ) : (
         <p className="muted">Owners and adults in your household can link banks.</p>
       )}
