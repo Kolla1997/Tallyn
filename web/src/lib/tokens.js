@@ -1,0 +1,25 @@
+import tokens from '../../../design-tokens.json'
+
+// design-tokens.json is the source of truth for token values, so the app reads
+// it directly and exposes each value as a CSS variable:
+// --color-clay-deep, --font-body, --radius-card, --space-s4, ...
+const fallback = {
+  heading: 'system-ui, sans-serif',
+  body: 'system-ui, sans-serif',
+  button: 'system-ui, sans-serif',
+}
+
+export function applyTokens(root = document.documentElement) {
+  for (const [name, { value }] of Object.entries(tokens.color)) {
+    root.style.setProperty(`--color-${name}`, value)
+  }
+  for (const [name, { value }] of Object.entries(tokens.font)) {
+    root.style.setProperty(`--font-${name}`, `'${value}', ${fallback[name] ?? 'sans-serif'}`)
+  }
+  for (const [name, { value }] of Object.entries(tokens.radius)) {
+    root.style.setProperty(`--radius-${name}`, value)
+  }
+  for (const [name, { value }] of Object.entries(tokens.spacing)) {
+    root.style.setProperty(`--space-${name}`, `${value}px`)
+  }
+}

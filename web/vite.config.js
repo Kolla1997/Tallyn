@@ -9,5 +9,9 @@ export default defineConfig({
     proxy: {
       '/api': 'http://localhost:8080',
     },
+    // The app reads design-tokens.json and brand/ from the repo root.
+    fs: {
+      allow: ['..'],
+    },
   },
 })
