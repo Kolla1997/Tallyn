@@ -29,6 +29,7 @@ func fakeAuth(next http.Handler) http.Handler {
 }
 
 type fakeStore struct {
+	stubStore
 	me     db.Me
 	err    error
 	gotUID string
@@ -51,7 +52,7 @@ func get(h http.Handler, path, authz string) *httptest.ResponseRecorder {
 
 func TestHealth(t *testing.T) {
 	// Public, even when auth isn't configured.
-	rec := get(NewRouter(t.TempDir(), nil, nil), "/api/health", "")
+	rec := get(NewRouter(Deps{WebDir: t.TempDir()}), "/api/health", "")
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200", rec.Code)
 	}
@@ -65,14 +66,14 @@ func TestSPAFallback(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "index.html"), []byte("<p>tallyn</p>"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	rec := get(NewRouter(dir, nil, nil), "/accounts/123", "")
+	rec := get(NewRouter(Deps{WebDir: dir}), "/accounts/123", "")
 	if rec.Code != http.StatusOK || rec.Body.String() != "<p>tallyn</p>" {
 		t.Fatalf("got %d %q, want index.html", rec.Code, rec.Body.String())
 	}
 }
 
 func TestAPIRequiresAuth(t *testing.T) {
-	h := NewRouter(t.TempDir(), fakeAuth, &fakeStore{})
+	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: &fakeStore{}})
 	for _, path := range []string{"/api/me", "/api/nope", "/api/"} {
 		if rec := get(h, path, ""); rec.Code != http.StatusUnauthorized {
 			t.Fatalf("%s without a session: status = %d, want 401", path, rec.Code)
@@ -88,8 +89,8 @@ func TestAPIRequiresAuth(t *testing.T) {
 
 func TestAPIUnavailableWithoutConfig(t *testing.T) {
 	for name, h := range map[string]http.Handler{
-		"no auth":     NewRouter(t.TempDir(), nil, &fakeStore{}),
-		"no database": NewRouter(t.TempDir(), fakeAuth, nil),
+		"no auth":     NewRouter(Deps{WebDir: t.TempDir(), Store: &fakeStore{}}),
+		"no database": NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth}),
 	} {
 		if rec := get(h, "/api/me", "Bearer ok"); rec.Code != http.StatusServiceUnavailable {
 			t.Fatalf("%s: status = %d, want 503", name, rec.Code)
@@ -98,7 +99,7 @@ func TestAPIUnavailableWithoutConfig(t *testing.T) {
 }
 
 func TestUnknownAPIRoute(t *testing.T) {
-	rec := get(NewRouter(t.TempDir(), fakeAuth, &fakeStore{}), "/api/nope", "Bearer ok")
+	rec := get(NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: &fakeStore{}}), "/api/nope", "Bearer ok")
 	if rec.Code != http.StatusNotFound {
 		t.Fatalf("status = %d, want 404", rec.Code)
 	}
@@ -110,7 +111,7 @@ func TestMe(t *testing.T) {
 		DisplayName: "Test Person",
 		Households:  []db.MyHousehold{{ID: "hh-1", Name: "Test household", HomeCurrency: "USD", Role: "owner"}},
 	}}
-	rec := get(NewRouter(t.TempDir(), fakeAuth, store), "/api/me", "Bearer ok")
+	rec := get(NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: store}), "/api/me", "Bearer ok")
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200", rec.Code)
 	}
@@ -130,7 +131,7 @@ func TestMe(t *testing.T) {
 		errors.New("db is down"): http.StatusInternalServerError,
 	} {
 		store.err = err
-		if rec := get(NewRouter(t.TempDir(), fakeAuth, store), "/api/me", "Bearer ok"); rec.Code != want {
+		if rec := get(NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: store}), "/api/me", "Bearer ok"); rec.Code != want {
 			t.Fatalf("store error %v: status = %d, want %d", err, rec.Code, want)
 		}
 	}

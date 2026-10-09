@@ -14,6 +14,8 @@ import (
 	"github.com/Kolla1997/Tallyn/internal/api"
 	"github.com/Kolla1997/Tallyn/internal/auth"
 	"github.com/Kolla1997/Tallyn/internal/db"
+	"github.com/Kolla1997/Tallyn/internal/plaid"
+	"github.com/Kolla1997/Tallyn/internal/tokencrypt"
 )
 
 func main() {
@@ -49,9 +51,37 @@ func main() {
 		log.Printf("tallyn: DATABASE_URL not set, /api/ routes will answer 503")
 	}
 
+	// Bank linking needs both Plaid keys and the token encryption key (#8).
+	// A malformed key stops the server: better than failing on the first link.
+	var plaidClient api.Plaid
+	var tokens api.Tokens
+	if key := os.Getenv("TOKEN_ENCRYPTION_KEY"); key != "" && key != "replace-me" {
+		box, err := tokencrypt.New(key)
+		if err != nil {
+			log.Fatalf("tallyn: %v", err)
+		}
+		tokens = box
+	}
+	if id := os.Getenv("PLAID_CLIENT_ID"); id != "" && id != "replace-me" {
+		c, err := plaid.New(getenv("PLAID_ENV", "sandbox"), id, os.Getenv("PLAID_SECRET"), os.Getenv("PLAID_REDIRECT_URI"))
+		if err != nil {
+			log.Fatalf("tallyn: %v", err)
+		}
+		plaidClient = c
+	}
+	if plaidClient == nil || tokens == nil {
+		log.Printf("tallyn: PLAID_CLIENT_ID or TOKEN_ENCRYPTION_KEY not set, bank linking will answer 503")
+	}
+
 	srv := &http.Server{
-		Addr:              ":" + port,
-		Handler:           api.NewRouter(webDir, requireAuth, store),
+		Addr: ":" + port,
+		Handler: api.NewRouter(api.Deps{
+			WebDir:      webDir,
+			RequireAuth: requireAuth,
+			Store:       store,
+			Plaid:       plaidClient,
+			Tokens:      tokens,
+		}),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
