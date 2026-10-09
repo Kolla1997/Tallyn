@@ -3,7 +3,7 @@ type: guide
 status: draft
 owner: Dinesh
 updated: 2026-10-08
-issues: [6, 7, 8]
+issues: [6, 7, 8, 9]
 tags: [tech, architecture]
 ---
 
@@ -29,7 +29,7 @@ One Go service, one deployment: it serves the API and the built React app (`web/
 | plaid | Plaid client: Link tokens, token exchange, accounts, item removal | `internal/plaid` |
 | tokencrypt | Encrypts Plaid access tokens | `internal/tokencrypt` |
 | money | Exact conversion to minor units | `internal/money` |
-| sync | Scheduled account and transaction sync | `internal/sync` |
+| sync | Bank sync every 6 hours and after linking; the only user of the system database role | `internal/sync` |
 | db | Database access | `internal/db` |
 | auth | Verify Supabase sessions and require 2FA (roles are enforced by RLS) | `internal/auth` |
 | api | HTTP handlers | `internal/api` |
@@ -50,6 +50,7 @@ The React app signs in with `supabase-js` (publishable key only) and sends the a
 - **RLS on every Supabase table**
 - Only the backend connects to the database, and it runs user requests as the user (`internal/db` `AsUser`), not as the service role
 - Every `/api/` route needs a verified Supabase session with 2FA; new routes are protected by default
+- The bank sync writes through a narrow system role (`tallyn_sync`), never used by request handlers. Transaction time and location have their own, stricter visibility: [[0005-bank-sync-system-role]]
 - Secrets live in environment variables, never in the repo
 
 ## Environments

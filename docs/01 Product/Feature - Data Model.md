@@ -3,7 +3,7 @@ type: spec
 status: draft
 owner: Dinesh
 updated: 2026-10-08
-issues: [6, 8]
+issues: [6, 8, 9]
 tags: [spec, database]
 ---
 
@@ -62,6 +62,7 @@ erDiagram
 - Every household keeps at least one owner.
 - Users can read bank data but never write it. The Plaid access token column isn't readable by users at all.
 - Linking and unlinking a bank go through two checked functions instead (`0004_plaid_link.sql`): only owners and adults link, only for themselves. See [[Feature - Bank Linking]].
+- The bank sync writes through its own narrow role, `tallyn_sync` (`0005_bank_sync.sql`). Transaction time and location live in `transaction_details`, visible only to the person who made the transaction plus household owners for teens and children. See [[Feature - Bank Sync]].
 - Unlinking a bank or deleting a household removes everything under it.
 
 ## Tech notes

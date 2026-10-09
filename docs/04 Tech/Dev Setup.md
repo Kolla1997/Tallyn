@@ -3,7 +3,7 @@ type: guide
 status: draft
 owner: Dinesh
 updated: 2026-10-08
-issues: [5, 6, 7, 8]
+issues: [5, 6, 7, 8, 9]
 tags: [tech, onboarding]
 ---
 
@@ -38,6 +38,12 @@ Without `SUPABASE_URL` or `DATABASE_URL` the server still starts, but every `/ap
 
 > [!warning] Keep the token key safe
 > Losing `TOKEN_ENCRYPTION_KEY` means every linked bank has to be linked again. Keep the production key in a password manager and the host's secret store, never in git or chat. See [[0004-plaid-token-encryption-and-link-path]].
+
+## Bank sync (#9)
+1. Run `migrations/0005_bank_sync.sql` on the Supabase project, after 0001–0004
+2. Restart the backend. It prints `bank sync every 6h` and syncs every linked bank straight away
+3. For testing, `SYNC_EVERY=2m` in `.env` makes it sync more often (minimum 1m)
+4. A new link syncs within a minute or two; the log shows counts only (`sync: bank <id>: 16 added or changed, ...`)
 
 ## Supabase Auth settings (#7)
 In the Supabase dashboard, for each project (dev and prod). See [[Feature - Auth]].

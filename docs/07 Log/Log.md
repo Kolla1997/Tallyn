@@ -11,6 +11,14 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-09
+- #9 Bank sync on branch `9-bank-sync`: `internal/sync` every 6 hours (`SYNC_EVERY`) plus right after linking (retried while Plaid finishes its first pull); `/transactions/sync` with full-page collection and restart on mid-sync changes; balances; 90 days of history for new links.
+- #9 `0005_bank_sync.sql`: the `tallyn_sync` system role (no access to profiles, households, members, link creation or deletion) and `transaction_details` (time, address, coordinates) behind `can_see_whereabouts()`. `db.System.SaveSync` saves one sync in one transaction with a cursor check.
+- #9 `GET /api/transactions`, `GET /api/spending`; web: spending this month by category, recent transactions with time and place where visible, last-updated and "Reconnect needed" per bank.
+- #9 Added [[Feature - Bank Sync]] and ADR [[0005-bank-sync-system-role]] (Proposed). Updated Data Model, Architecture, Dev Setup, `.env.example`, migrations README.
+- Decision: sync every 6 hours; webhooks once hosted. Location and time visible only to the person, plus household owners for teens and children. Coordinates stored for a future map. No mortgage property address. Liabilities split to #27; sharing settings (partners seeing each other's everything, per-category choices) to #28.
+- Finding: Postgres checks `SET ROLE` against the login role, and Supabase's `postgres` login has `BYPASSRLS`, so RLS guards against logic bugs, not SQL injection (none exists: all queries are fixed and parameterised). Hardening proposed: separate API and sync logins (ADR 0005).
+- Open: run 0005 on `tallyn-dev` and test end-to-end; reconnect flow (update mode); webhooks; hardening ticket.
+
 - #8 Merged PR #26, so #8 is closed. Moved it to Done by hand (the board's close → Done workflow still doesn't fire). Ticked in [[Roadmap]].
 
 ## 2026-10-08
