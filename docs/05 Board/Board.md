@@ -14,6 +14,8 @@ kanban-plugin: board
 - [ ] [#12 Joint accounts: member roles and spending limits](https://github.com/Kolla1997/Tallyn/issues/12) #type/feature #area/backend #priority/p1
 - [ ] [#13 Shared budgets and spending categories](https://github.com/Kolla1997/Tallyn/issues/13) #type/feature #area/frontend #priority/p1
 - [ ] [#14 Savings goals](https://github.com/Kolla1997/Tallyn/issues/14) #type/feature #area/frontend #priority/p2
+- [ ] [#22 Password reset](https://github.com/Kolla1997/Tallyn/issues/22) #type/feature #area/frontend #priority/p1
+- [ ] [#23 Recovery when someone loses their authenticator app](https://github.com/Kolla1997/Tallyn/issues/23) #type/feature #area/frontend #priority/p1
 
 
 ## In Progress
