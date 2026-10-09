@@ -9,7 +9,6 @@ kanban-plugin: board
 ## Backlog
 
 - [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p1
-- [ ] [#12 Joint accounts: member roles and spending limits](https://github.com/Kolla1997/Tallyn/issues/12) #type/feature #area/backend #priority/p1
 - [ ] [#13 Shared budgets and spending categories](https://github.com/Kolla1997/Tallyn/issues/13) #type/feature #area/frontend #priority/p1
 - [ ] [#14 Savings goals](https://github.com/Kolla1997/Tallyn/issues/14) #type/feature #area/frontend #priority/p2
 - [ ] [#22 Password reset](https://github.com/Kolla1997/Tallyn/issues/22) #type/feature #area/frontend #priority/p1
@@ -23,6 +22,7 @@ kanban-plugin: board
 ## In Progress
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
+- [ ] [#12 Household members: invitations and roles](https://github.com/Kolla1997/Tallyn/issues/12) #type/feature #area/backend #priority/p1
 
 
 ## Review
