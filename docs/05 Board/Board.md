@@ -25,6 +25,7 @@ kanban-plugin: board
 ## In Progress
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
+- [ ] [#39 Build the app screens from the comps, for phone and web](https://github.com/Kolla1997/Tallyn/issues/39) #type/design #area/frontend #priority/p1
 
 
 ## Review
