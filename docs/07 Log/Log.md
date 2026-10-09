@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-09
+- #12 End-to-end on `tallyn-dev` passed: 0008 applied (`household_invites` RLS on; signed-in users can't read token hashes; anon can't accept). Owner removed the second account, invited it again as adult, the link was refused in the owner's own browser (wrong email), the second account joined, and the reused link was refused. One invite, accepted once, by the invited email. Dinesh noted #37 (show shared money separately) and #38 (stronger confirmation with re-verification). Created #36 (Terms of Service and Privacy Policy, incl. no child accounts under 13 pending COPPA).
 - #12 Invitations and members on branch `12-invitations`: `0008_invites.sql` (`household_invites` storing only a SHA-256 of the token; `create_`/`revoke_`/`accept_household_invite` checked functions). Links are `/join#<token>`, single use, 7 days, only for the invited confirmed email. API for invites, members, role changes, remove and leave. Web: Members screen, invite link shown once with Copy, Join card after sign-in, household switcher.
 - Decision (Dinesh, using Claude's suggestions): spending limits split to #34; link delivery (no email service yet); only owners invite; **no logins for children under 13 until a legal check on US COPPA parental consent**; invites single use, 7 days.
 - #12 Added [[Feature - Household Members]] and ADR [[0008-invitations]] (Proposed). Logged idea #33 (formulas to split available balance across goals).
