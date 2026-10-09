@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-08
+- #7 Merged PR #21, so #7 is closed. Moved it to Done by hand (the board's close → Done workflow still doesn't fire). Ticked in [[Roadmap]].
 - #7 End-to-end test passed on the `tallyn-dev` Supabase project: sign-up, email confirmation, authenticator-app 2FA (Microsoft Authenticator), `/api/me` through `AsUser` and RLS. The account was created before the migrations ran, so its profile row was added by hand (the sign-up trigger only covers new users). Fixed the home screen calling `/api/me` four times per load.
 - #7 Started auth on branch `7-supabase-auth`. `internal/auth` checks Supabase access tokens on every `/api/` route except `/api/health`: signature against the project's public keys (JWKS, ES256/RS256), expiry, issuer, audience, role, and 2FA (`aal2`). Fails closed: `401` for anything wrong, `503` if auth or the database isn't configured. New `/api/` routes are protected by default.
 - #7 `GET /api/me` returns the profile and households through `AsUser`. `main.go` now opens the database.
