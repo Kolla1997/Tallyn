@@ -5,7 +5,7 @@ import { formatMoney } from '../lib/money.js'
 
 // Linked banks and accounts for one household, plus Link and Unlink (#8).
 // Bank logins happen inside Plaid's own window; Tallyn never sees them.
-export default function Banks({ household, onChanged }) {
+export default function Banks({ household, onChanged, refreshKey }) {
   const [banks, setBanks] = useState(null)
   const [error, setError] = useState('')
   const [confirming, setConfirming] = useState(null) // bank id awaiting "Unlink?"
@@ -19,7 +19,7 @@ export default function Banks({ household, onChanged }) {
     )
   }, [household.id])
 
-  useEffect(load, [load])
+  useEffect(load, [load, refreshKey])
 
   // Confirmation is shown in the page, not with window.confirm, which some
   // embedded browsers block (it then silently answers "no").

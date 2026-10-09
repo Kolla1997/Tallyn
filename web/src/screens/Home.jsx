@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { api } from '../lib/api.js'
 import Banks from './Banks.jsx'
 import CreateHousehold from './CreateHousehold.jsx'
+import Sharing from './Sharing.jsx'
 import Spending from './Spending.jsx'
 import Transactions from './Transactions.jsx'
 
@@ -32,9 +33,10 @@ export default function Home({ email, onSignOut }) {
       {me && !household && <CreateHousehold onCreated={load} />}
       {household && (
         <>
-          <Banks household={household} onChanged={() => setRefreshKey((k) => k + 1)} />
+          <Banks household={household} refreshKey={refreshKey} onChanged={() => setRefreshKey((k) => k + 1)} />
           <Spending householdId={household.id} refreshKey={refreshKey} />
           <Transactions householdId={household.id} refreshKey={refreshKey} />
+          <Sharing householdId={household.id} onChanged={() => setRefreshKey((k) => k + 1)} />
         </>
       )}
       <button className="btn btn-secondary" onClick={onSignOut}>
