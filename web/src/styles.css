@@ -360,3 +360,43 @@ fieldset.share label {
 .saved {
   color: var(--color-success);
 }
+
+/* Members and invites (#12) */
+.home-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s4);
+}
+
+.members {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s3);
+}
+
+.members li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s1);
+}
+
+.member-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-s3);
+  flex-direction: row !important;
+}
+
+.member-row select {
+  padding: var(--space-s1) var(--space-s3);
+}
+
+.invite-form {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  padding: var(--space-s3) var(--space-s4);
+}
