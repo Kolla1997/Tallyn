@@ -32,6 +32,8 @@ func mapErr(err error) error {
 		return ErrInvalid
 	case "23505": // unique_violation
 		return ErrAlreadyLinked
+	case "23503": // foreign_key_violation, e.g. sharing with someone outside the household
+		return ErrInvalid
 	}
 	return err
 }
@@ -124,7 +126,7 @@ func (d *DB) Banks(ctx context.Context, userID, householdID string) ([]Bank, err
 		byID := map[string]int{}
 		rows, err := tx.Query(ctx, `
 			select i.id, i.institution_name, i.owner_user_id, i.status, i.last_synced_at,
-			       i.owner_user_id = auth.uid() or public.has_household_role(i.household_id, array['owner'])
+			       public.can_unlink(i.household_id, i.owner_user_id)
 			from public.plaid_items i
 			where i.household_id = $1
 			order by i.created_at, i.id`, householdID)

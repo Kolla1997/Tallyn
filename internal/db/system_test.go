@@ -219,7 +219,8 @@ func TestWhereaboutsVisibility(t *testing.T) {
 	}{
 		{"alice (owner) sees her own and her child's", alice, map[string]bool{"txn-alice": true, "txn-carl": true}, nil},
 		{"carl (child) sees only his own", carl, map[string]bool{"txn-carl": true}, []string{"txn-alice"}},
-		{"dave (adult) sees transactions but nobody's whereabouts", dave, map[string]bool{"txn-alice": false, "txn-carl": false}, nil},
+		// 0007: adults see kids' everything automatically, other adults' nothing unless shared.
+		{"dave (adult) sees his child's whereabouts, nothing of alice's", dave, map[string]bool{"txn-carl": true}, []string{"txn-alice"}},
 		{"bob (other household) sees nothing", bob, map[string]bool{}, []string{"txn-alice", "txn-carl"}},
 	}
 	for _, tc := range cases {
@@ -262,8 +263,8 @@ func TestWhereaboutsVisibility(t *testing.T) {
 		var n int
 		if err := f.db.AsUser(ctx, dave, func(tx pgx.Tx) error {
 			return tx.QueryRow(ctx, `select count(*) from transaction_details`).Scan(&n)
-		}); err != nil || n != 0 {
-			t.Fatalf("dave reads %d detail rows (%v)", n, err)
+		}); err != nil || n != 1 { // carl's only
+			t.Fatalf("dave reads %d detail rows (%v), want 1", n, err)
 		}
 	})
 }
