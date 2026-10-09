@@ -23,16 +23,25 @@ function AuthFlow() {
   const [aal, setAal] = useState(null)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session))
+    // Fires INITIAL_SESSION straight away, then on every sign-in, verified code and refresh.
     const { data } = supabase.auth.onAuthStateChange((_event, s) => setSession(s))
     return () => data.subscription.unsubscribe()
   }, [])
 
-  // Re-check the 2FA level whenever the session changes (sign-in, verified code, refresh).
+  // Re-check the 2FA level whenever the session changes. Keep the last result
+  // meanwhile, so a token refresh doesn't unmount the current screen.
   useEffect(() => {
-    setAal(null)
-    if (!session) return
-    supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({ data }) => setAal(data))
+    if (!session) {
+      setAal(null)
+      return
+    }
+    let current = true
+    supabase.auth.mfa.getAuthenticatorAssuranceLevel().then(({ data }) => {
+      if (current) setAal(data)
+    })
+    return () => {
+      current = false
+    }
   }, [session])
 
   const signOut = () => supabase.auth.signOut()
