@@ -12,15 +12,46 @@ import (
 	"time"
 
 	"github.com/Kolla1997/Tallyn/internal/api"
+	"github.com/Kolla1997/Tallyn/internal/auth"
+	"github.com/Kolla1997/Tallyn/internal/db"
 )
 
 func main() {
 	port := getenv("PORT", "8080")
 	webDir := getenv("WEB_DIR", "web/dist")
 
+	ctx, stopBackground := context.WithCancel(context.Background())
+	defer stopBackground()
+
+	// Without Supabase settings the server still starts (health check and web
+	// app), but every protected /api/ route answers 503. Nothing is served
+	// unauthenticated.
+	var requireAuth func(http.Handler) http.Handler
+	if u := os.Getenv("SUPABASE_URL"); u != "" {
+		v, err := auth.New(ctx, u)
+		if err != nil {
+			log.Fatalf("tallyn: %v", err)
+		}
+		requireAuth = v.Require
+	} else {
+		log.Printf("tallyn: SUPABASE_URL not set, /api/ routes will answer 503")
+	}
+
+	var store api.Store
+	if u := os.Getenv("DATABASE_URL"); u != "" {
+		d, err := db.Open(ctx, u)
+		if err != nil {
+			log.Fatalf("tallyn: %v", err)
+		}
+		defer d.Close()
+		store = d
+	} else {
+		log.Printf("tallyn: DATABASE_URL not set, /api/ routes will answer 503")
+	}
+
 	srv := &http.Server{
 		Addr:              ":" + port,
-		Handler:           api.NewRouter(webDir),
+		Handler:           api.NewRouter(webDir, requireAuth, store),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
@@ -37,9 +68,9 @@ func main() {
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 	<-stop
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	if err := srv.Shutdown(ctx); err != nil {
+	if err := srv.Shutdown(shutdownCtx); err != nil {
 		log.Printf("tallyn: shutdown: %v", err)
 	}
 }
