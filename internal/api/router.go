@@ -29,6 +29,13 @@ type Store interface {
 	Sharing(ctx context.Context, userID, householdID string) (db.Sharing, error)
 	SetSharing(ctx context.Context, userID, householdID, viewerID string, categories []string) error
 	SetDisplayName(ctx context.Context, userID, name string) error
+	Members(ctx context.Context, userID, householdID string) ([]db.Member, error)
+	SetMemberRole(ctx context.Context, userID, householdID, memberID, role string) error
+	RemoveMember(ctx context.Context, userID, householdID, memberID string) error
+	Invites(ctx context.Context, userID, householdID string) ([]db.Invite, error)
+	CreateInvite(ctx context.Context, userID, householdID, email, role string) (db.Invite, string, error)
+	RevokeInvite(ctx context.Context, userID, inviteID string) error
+	AcceptInvite(ctx context.Context, userID, token string) (string, error)
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -58,6 +65,13 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("PUT /api/me", setMe(d.Store))
 	api.HandleFunc("GET /api/sharing", sharing(d.Store))
 	api.HandleFunc("PUT /api/sharing", setSharing(d.Store))
+	api.HandleFunc("GET /api/households/{id}/members", members(d.Store))
+	api.HandleFunc("PUT /api/households/{id}/members/{user}", setMemberRole(d.Store))
+	api.HandleFunc("DELETE /api/households/{id}/members/{user}", removeMember(d.Store))
+	api.HandleFunc("GET /api/households/{id}/invites", invites(d.Store))
+	api.HandleFunc("POST /api/households/{id}/invites", createInvite(d.Store))
+	api.HandleFunc("DELETE /api/invites/{id}", revokeInvite(d.Store))
+	api.HandleFunc("POST /api/invites/accept", acceptInvite(d.Store))
 	api.HandleFunc("POST /api/households", createHousehold(d.Store))
 	b := banks{store: d.Store, plaid: d.Plaid, tokens: d.Tokens, syncNow: d.SyncNow}
 	api.HandleFunc("POST /api/plaid/link-token", b.needsPlaid(b.linkToken))
