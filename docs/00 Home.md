@@ -17,6 +17,7 @@ tags: [home]
 - [[Vision]]: what we're building and why
 - [[Roadmap]]: now / next / later
 - [[Feature - Data Model]]: tables, roles and RLS rules
+- [[Feature - Auth]]: sign-up, log-in and 2FA
 
 ## Brand
 - [[Brand Guide]]: positioning, personality, brand basics

@@ -1,0 +1,178 @@
+/* Bare-bones auth screens (#7). Values come from design-tokens.json via
+   src/lib/tokens.js. Flat: no shadows or gradients (Design System). */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-cream);
+  color: var(--color-cocoa);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-s7) var(--space-s4);
+  gap: var(--space-s5);
+}
+
+.logo {
+  width: 140px;
+  height: auto;
+  margin: var(--space-s2);
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-s6) var(--space-s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s4);
+}
+
+h1 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+.muted {
+  color: var(--color-text-secondary);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s4);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s1);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+input {
+  font: inherit;
+  color: inherit;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  padding: var(--space-s3) var(--space-s4);
+}
+
+input:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+.code-input {
+  font-family: var(--font-heading);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  letter-spacing: 0.3em;
+  text-align: center;
+}
+
+.btn {
+  font-family: var(--font-button);
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  border-radius: var(--radius-button);
+  padding: var(--space-s3) var(--space-s5);
+  background: var(--color-clay-deep);
+  color: var(--color-white);
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-cocoa);
+  border: 2px solid var(--color-cocoa);
+}
+
+.link {
+  font: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-clay-deep);
+  text-decoration: underline;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.error {
+  color: var(--color-error);
+  font-size: 14px;
+}
+
+.qr {
+  align-self: center;
+  width: 200px;
+  height: 200px;
+  background: var(--color-white);
+}
+
+.secret {
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  word-break: break-all;
+  background: var(--color-sand);
+  border-radius: var(--radius-input);
+  padding: var(--space-s2) var(--space-s3);
+}
+
+ol {
+  margin: 0;
+  padding-left: var(--space-s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s2);
+}
+
+.households {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s2);
+}
+
+.households li {
+  background: var(--color-sand);
+  border-radius: var(--radius-input);
+  padding: var(--space-s3) var(--space-s4);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-s3);
+}

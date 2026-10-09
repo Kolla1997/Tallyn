@@ -11,6 +11,14 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-08
+- #7 End-to-end test passed on the `tallyn-dev` Supabase project: sign-up, email confirmation, authenticator-app 2FA (Microsoft Authenticator), `/api/me` through `AsUser` and RLS. The account was created before the migrations ran, so its profile row was added by hand (the sign-up trigger only covers new users). Fixed the home screen calling `/api/me` four times per load.
+- #7 Started auth on branch `7-supabase-auth`. `internal/auth` checks Supabase access tokens on every `/api/` route except `/api/health`: signature against the project's public keys (JWKS, ES256/RS256), expiry, issuer, audience, role, and 2FA (`aal2`). Fails closed: `401` for anything wrong, `503` if auth or the database isn't configured. New `/api/` routes are protected by default.
+- #7 `GET /api/me` returns the profile and households through `AsUser`. `main.go` now opens the database.
+- #7 Web: `supabase-js` sign-in, email confirmation, authenticator-app 2FA set-up and code entry, and a placeholder home showing `/api/me`. Bare-bones screens that read `design-tokens.json` directly.
+- #7 Added [[Feature - Auth]] and ADR [[0003-browser-sign-in-with-supabase-js]] (Proposed). Updated Architecture, Dev Setup (Supabase Auth settings, Node version), `.env.example` (dropped `SUPABASE_JWT_SECRET`) and `web/.env.example`.
+- Decision: the browser signs in with `supabase-js` and sends a Bearer token; Go verifies it (option A over Go-held cookie sessions). 2FA is TOTP (any authenticator app, including Microsoft Authenticator; free on Supabase). SMS isn't used (paid add-on).
+- Decision (default, can change in #12): 2FA is required for everyone, kids' logins included.
+- Open: end-to-end test on a dev Supabase project; password reset and lost-authenticator recovery need tickets; Content-Security-Policy header; styled sign-in screens; brand fonts not loaded in `web/` yet. `keyfunc` pinned to v3.8.0 because newer versions need Go 1.25. Local `node` (20.11) is too old for Vite 8; nvm's 20.20 works.
 - #6 Schema and RLS on branch `6-schema-rls`: migrations `0001_households.sql` (profiles, households, members with roles owner/adult/teen/child/viewer, `create_household()`, at-least-one-owner rule), `0002_bank.sql` (plaid_items with encrypted token, accounts, transactions; money as bigint minor units) and `0003_fx_rates.sql`. RLS on every table.
 - #6 `internal/db`: pgx pool, `Ping`, and `AsUser` which runs each request as the `authenticated` role with the user's ID, so RLS applies. Integration tests cover cross-household isolation, kids seeing only their own accounts, the unreadable token column, blocked writes and no identity leaking between pooled connections.
 - #6 Added [[Feature - Data Model]] and ADR [[0002-backend-database-access]] (Proposed).

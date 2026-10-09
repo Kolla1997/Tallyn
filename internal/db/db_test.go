@@ -318,6 +318,34 @@ func TestWritesAreLimited(t *testing.T) {
 	})
 }
 
+func TestMe(t *testing.T) {
+	f := setup(t)
+	ctx := context.Background()
+
+	for _, tc := range []struct {
+		user, household, role string
+	}{
+		{alice, f.testHH, "owner"},
+		{carl, f.testHH, "child"},
+		{bob, f.otherHH, "owner"},
+	} {
+		me, err := f.db.Me(ctx, tc.user)
+		if err != nil {
+			t.Fatalf("Me(%s): %v", tc.user, err)
+		}
+		if me.UserID != tc.user || len(me.Households) != 1 {
+			t.Fatalf("Me(%s) = %+v, want one household", tc.user, me)
+		}
+		if h := me.Households[0]; h.ID != tc.household || h.Role != tc.role {
+			t.Fatalf("Me(%s) household = %+v, want %s as %s", tc.user, h, tc.household, tc.role)
+		}
+	}
+
+	if _, err := f.db.Me(ctx, "44444444-4444-4444-8444-444444444444"); !errors.Is(err, ErrNoProfile) {
+		t.Fatalf("unknown user: err = %v, want ErrNoProfile", err)
+	}
+}
+
 func TestAsUser(t *testing.T) {
 	f := setup(t)
 	ctx := context.Background()
