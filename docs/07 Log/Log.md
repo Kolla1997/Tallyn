@@ -11,6 +11,8 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-09
+- #9 End-to-end on `tallyn-dev` passed: 0005 applied (sync role can't log in, bypass RLS, read profiles or delete links; `authenticated`/`anon` don't hold it; 0 tables without RLS). Linked a sandbox bank → first sync 50 transactions (Jul–Oct), 14 accounts, all with category and payment channel, cursor saved; repeat sync on restart: 0 changes. Logs showed counts only. Sandbox `user_good` sends no times or addresses (3 store numbers only), so time/location display rests on the DB tests.
+- #28 Decided: members see nothing of another person's money until that person shares; teens see only their own data and aren't shown what a parent can see.
 - #9 Bank sync on branch `9-bank-sync`: `internal/sync` every 6 hours (`SYNC_EVERY`) plus right after linking (retried while Plaid finishes its first pull); `/transactions/sync` with full-page collection and restart on mid-sync changes; balances; 90 days of history for new links.
 - #9 `0005_bank_sync.sql`: the `tallyn_sync` system role (no access to profiles, households, members, link creation or deletion) and `transaction_details` (time, address, coordinates) behind `can_see_whereabouts()`. `db.System.SaveSync` saves one sync in one transaction with a cursor check.
 - #9 `GET /api/transactions`, `GET /api/spending`; web: spending this month by category, recent transactions with time and place where visible, last-updated and "Reconnect needed" per bank.
