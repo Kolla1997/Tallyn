@@ -92,5 +92,4 @@ func (d *DB) AsUser(ctx context.Context, userID string, fn func(pgx.Tx) error) e
 	})
 }
 
-// TODO(#8): add a system path for the bank sync (writing plaid_items, accounts,
-// transactions and fx_rates), with its own narrow role. See ADR 0002.
+// The bank sync's system path (its own narrow role) is System, in system.go.
