@@ -26,6 +26,9 @@ type Store interface {
 	DeleteBank(ctx context.Context, userID, bankID string) error
 	Transactions(ctx context.Context, userID, householdID string, limit int) ([]db.Transaction, error)
 	Spending(ctx context.Context, userID, householdID, month string) ([]db.Spend, error)
+	Sharing(ctx context.Context, userID, householdID string) (db.Sharing, error)
+	SetSharing(ctx context.Context, userID, householdID, viewerID string, categories []string) error
+	SetDisplayName(ctx context.Context, userID, name string) error
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -52,6 +55,9 @@ func NewRouter(d Deps) http.Handler {
 	}
 	api := http.NewServeMux()
 	api.HandleFunc("GET /api/me", me(d.Store))
+	api.HandleFunc("PUT /api/me", setMe(d.Store))
+	api.HandleFunc("GET /api/sharing", sharing(d.Store))
+	api.HandleFunc("PUT /api/sharing", setSharing(d.Store))
 	api.HandleFunc("POST /api/households", createHousehold(d.Store))
 	b := banks{store: d.Store, plaid: d.Plaid, tokens: d.Tokens, syncNow: d.SyncNow}
 	api.HandleFunc("POST /api/plaid/link-token", b.needsPlaid(b.linkToken))
