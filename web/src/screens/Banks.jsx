@@ -113,7 +113,7 @@ export default function Banks({ household, onChanged, refreshKey }) {
   )
 }
 
-function LinkBank({ householdId, onLinked, onError }) {
+export function LinkBank({ householdId, onLinked, onError, label = 'Link a bank', className = 'btn' }) {
   const [token, setToken] = useState(null)
   const [busy, setBusy] = useState(false)
 
@@ -149,8 +149,8 @@ function LinkBank({ householdId, onLinked, onError }) {
   const { open, ready } = usePlaidLink({ token, onSuccess })
 
   return (
-    <button className="btn" onClick={() => open()} disabled={!ready || busy}>
-      {busy ? 'Linking…' : 'Link a bank'}
+    <button className={className} onClick={() => open()} disabled={!ready || busy}>
+      {busy ? 'Linking…' : label}
     </button>
   )
 }
