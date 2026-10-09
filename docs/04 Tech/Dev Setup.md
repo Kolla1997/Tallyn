@@ -21,6 +21,9 @@ Go 1.24+, Node 22+ and npm, a Supabase project, Plaid sandbox keys. Docker is op
 6. Frontend: `cd web && npm install && npm run dev` (Vite forwards `/api` to the Go server)
 7. Open http://localhost:5173, create an account, confirm the email, set up 2FA with an authenticator app, and you should see your profile from `/api/me`
 
+> [!warning] Run the migrations before anyone signs up
+> Profiles are created by a trigger on sign-up (`0001_households.sql`). Accounts created before the migrations have no profile, and `/api/me` answers `no_profile`. Fix it in the SQL editor: `insert into public.profiles (id) select id from auth.users on conflict (id) do nothing;`
+
 Without `SUPABASE_URL` or `DATABASE_URL` the server still starts, but every `/api/` route except `/api/health` answers `503`.
 
 > [!warning] Node version
