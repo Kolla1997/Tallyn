@@ -259,20 +259,20 @@ function YourAccounts({ banks, me, canLink, home }) {
       ) : (
         <>
           <div className="have-owe">
-            <div className="tone-sage">
+            <Link to="/accounts#have" className="tone-sage">
               <span className="small">You have</span>
               <span className="amount">{formatMoney(sum(have), cur)}</span>
               <span className="small muted">
                 {have.length} {have.length === 1 ? 'account' : 'accounts'}
               </span>
-            </div>
-            <div className="tone-clay">
+            </Link>
+            <Link to="/accounts#owe" className="tone-clay">
               <span className="small">You owe</span>
               <span className="amount">{formatMoney(sum(owe), cur)}</span>
               <span className="small muted">
                 {owe.length} {owe.length === 1 ? 'account' : 'accounts'}
               </span>
-            </div>
+            </Link>
           </div>
           {top.length > 0 && (
             <>
