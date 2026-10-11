@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
+import { InviteIcon } from '../components/Icons.jsx'
 import { api } from '../lib/api.js'
 import { formatMoney } from '../lib/money.js'
 import { Avatar, nameOf } from '../lib/people.jsx'
@@ -108,6 +109,7 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
       <PageHead title="Family" sub="Nobody sees your money until you share it">
         {isOwner && (
           <button className="btn" onClick={() => setSelected('invite')}>
+            <InviteIcon />
             Invite someone
           </button>
         )}
@@ -149,7 +151,7 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
                     onClick={() => setSelected(`invite-${inv.id}`)}
                   >
                     <span className="avatar avatar-invite" aria-hidden="true">
-                      {inv.email.charAt(0).toUpperCase()}
+                      <InviteIcon width={16} height={16} />
                     </span>
                     <span className="grow">
                       <span className="name block">{inv.email}</span>
@@ -550,7 +552,7 @@ function PendingInvite({ invite, onCancelled }) {
     <section className="panel person" aria-labelledby="pending-h">
       <div className="person-head">
         <span className="avatar avatar-invite" aria-hidden="true">
-          {invite.email.charAt(0).toUpperCase()}
+          <InviteIcon width={16} height={16} />
         </span>
         <div className="grow">
           <h2 id="pending-h">{invite.email}</h2>

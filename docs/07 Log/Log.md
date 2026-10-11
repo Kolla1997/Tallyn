@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-11
+- #39 Invites use a chain-link icon everywhere (Dinesh): Home's Invite, Family's Invite someone, Create invite link, and pending invites in the Family list.
 - #39 #38 Family follow-up (Dinesh): role picker is now segmented buttons (Owner / Adult / Teen / Viewer); every role change asks in a confirmation window first, and changes to or from Owner also need the typed name and a fresh 2FA code. Your own entry now shows your role in words, what you have and owe with links, who you share what with (Change opens that person), and who shares with you. Fixed on phones: switch labels beside the switches, big amounts kept inside the have/owe tiles.
 - #51 Created: Reconnect a bank that needs sign-in (Plaid update mode), Backlog. #50 merged (Accounts page).
 - #39 #37 #38 Step 4 (Family) on branch `39-family-page`, draft C (Dinesh): people list (members and pending invites) with a person view: what you may see of their money (has / owes, links to their accounts and transactions), switches for what you share with them, what they share with you (or "you see this as a parent"), role and Remove for owners, Leave for yourself, Invite someone. Home's Shared with you rows open that person (`/family?member=`); Accounts reads `?person=` and Transactions `?owner=`. Old Sharing and Members screens replaced (invite form kept).

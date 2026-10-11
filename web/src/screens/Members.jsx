@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { InviteIcon } from '../components/Icons.jsx'
 import { api } from '../lib/api.js'
 import { inviteLink } from '../lib/invite.js'
 
@@ -67,6 +68,7 @@ export function Invite({ householdId, onCreated }) {
         </p>
       )}
       <button className="btn btn-secondary" type="submit">
+        <InviteIcon />
         Create invite link
       </button>
       {link && (

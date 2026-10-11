@@ -763,10 +763,15 @@ a.btn {
   text-decoration: none;
 }
 
-.page-actions .btn {
+.page-actions .btn,
+.invite-form .btn {
   display: inline-flex;
   align-items: center;
   gap: var(--space-s2);
+}
+
+.invite-form .btn {
+  align-self: flex-start;
 }
 
 @media (max-width: 1023px) {
