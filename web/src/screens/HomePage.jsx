@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { InviteIcon } from '../components/Icons.jsx'
+import AccountIcon from '../components/AccountIcon.jsx'
 import { categoryPath } from '../components/TxIcon.jsx'
 import TransactionRow from '../components/TransactionRow.jsx'
 import { api } from '../lib/api.js'
@@ -75,7 +76,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
         <div className="cols">
           <div className="col">
             <TotalCard banks={banks} txs={txs ?? []} me={me} roles={roles} home={household.home_currency} />
-            <YourAccounts banks={banks} me={me} canLink={canLink} />
+            <YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} />
             <SharedWithYou banks={banks} me={me} people={people} roles={roles} />
             <RecentTransactions txs={txs ?? []} me={me} people={people} />
           </div>
@@ -172,42 +173,76 @@ function TotalCard({ banks, txs, me, roles, home }) {
   )
 }
 
-function AccountRow({ a, bankName, extra }) {
-  const owed = isOwed(a)
-  return (
-    <li>
-      <span className={owed ? 'coin coin-clay' : 'coin coin-sage'} aria-hidden="true">
-        {owed ? '−' : '$'}
-      </span>
-      <div className="grow">
-        <p className="name">{a.name}</p>
-        <p className="small muted">
-          {[bankName, a.mask && `••${a.mask}`, owed && 'owed', extra].filter(Boolean).join(' · ')}
-        </p>
-      </div>
-      <span className={owed ? 'amount money-out' : 'amount'}>{formatMoney(a.current_balance_minor, a.currency)}</span>
-    </li>
-  )
-}
+// Your accounts (#39, option B): what you have and what you owe, then your
+// biggest balances (two of each). The full list is on the Accounts page.
+function YourAccounts({ banks, me, canLink, home }) {
+  const mine = banks
+    .filter((b) => b.owner_user_id === me.user_id)
+    .flatMap((b) => b.accounts.map((a) => ({ ...a, bankName: b.institution_name })))
+  const cur = currencies(summarize(banks.filter((b) => b.owner_user_id === me.user_id), me.user_id, {}), home)[0]
+  const inCur = mine.filter((a) => a.currency === cur && a.current_balance_minor != null)
+  const have = inCur.filter((a) => !isOwed(a))
+  const owe = inCur.filter((a) => isOwed(a))
+  const sum = (list) => list.reduce((t, a) => t + a.current_balance_minor, 0)
+  const biggest = (list) => [...list].sort((x, y) => y.current_balance_minor - x.current_balance_minor).slice(0, 2)
+  const top = [...biggest(have), ...biggest(owe)]
+  const others = mine.length - inCur.length
 
-function YourAccounts({ banks, me, canLink }) {
-  const mine = banks.filter((b) => b.owner_user_id === me.user_id)
   return (
     <section className="panel" aria-labelledby="yours-h">
       <div className="panel-head">
         <h2 id="yours-h">Your accounts</h2>
-        <Link to="/accounts" className="link small">
-          All accounts
-        </Link>
+        {mine.length > 0 && (
+          <Link to="/accounts" className="link small">
+            All {mine.length} {mine.length === 1 ? 'account' : 'accounts'}
+          </Link>
+        )}
       </div>
       {mine.length === 0 ? (
         <p className="small muted">
           {canLink ? 'You haven’t linked a bank yet. Use Link a bank above.' : 'You don’t have any banks linked.'}
         </p>
       ) : (
-        <ul className="rows">
-          {mine.flatMap((b) => b.accounts.map((a) => <AccountRow key={a.id} a={a} bankName={b.institution_name} />))}
-        </ul>
+        <>
+          <div className="have-owe">
+            <div className="tone-sage">
+              <span className="small">You have</span>
+              <span className="amount">{formatMoney(sum(have), cur)}</span>
+              <span className="small muted">
+                {have.length} {have.length === 1 ? 'account' : 'accounts'}
+              </span>
+            </div>
+            <div className="tone-clay">
+              <span className="small">You owe</span>
+              <span className="amount">{formatMoney(sum(owe), cur)}</span>
+              <span className="small muted">
+                {owe.length} {owe.length === 1 ? 'account' : 'accounts'}
+              </span>
+            </div>
+          </div>
+          {top.length > 0 && (
+            <>
+              <h3 className="sub-heading">Biggest balances</h3>
+              <ul className="rows">
+                {top.map((a) => (
+                  <li key={a.id}>
+                    <AccountIcon account={a} />
+                    <div className="grow">
+                      <p className="name">{a.name}</p>
+                      <p className="small muted">{[a.bankName, a.mask && `••${a.mask}`].filter(Boolean).join(' · ')}</p>
+                    </div>
+                    <span className={isOwed(a) ? 'amount money-out' : 'amount'}>{formatMoney(a.current_balance_minor, a.currency)}</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {others > 0 && (
+            <p className="small muted">
+              {others} {others === 1 ? 'account is' : 'accounts are'} in another currency or {others === 1 ? 'has' : 'have'} no balance yet. See All accounts.
+            </p>
+          )}
+        </>
       )}
     </section>
   )
