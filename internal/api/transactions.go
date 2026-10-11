@@ -12,7 +12,7 @@ import (
 
 // transactions returns one page of the household's transactions the caller
 // may see (#9, #42), optionally for one member (owner), matching a merchant
-// search (q) or a category. RLS decides what's visible; filters only narrow it.
+// search (q), a category or a month. RLS decides what's visible; filters only narrow it.
 func transactions(store Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		uid, ok := userID(w, r)
@@ -26,6 +26,7 @@ func transactions(store Store) http.HandlerFunc {
 			Owner:    q.Get("owner"),
 			Query:    q.Get("q"),
 			Category: q.Get("category"),
+			Month:    q.Get("month"),
 			Limit:    limit,
 			Offset:   offset,
 		})

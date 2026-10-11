@@ -74,8 +74,23 @@ func TestTransactionFilters(t *testing.T) {
 	if n := count(alice, TxFilter{Owner: alice, Query: "market", Category: "FOOD_AND_DRINK"}); n != 7 {
 		t.Fatalf("combined: %d, want 7", n)
 	}
+	// Setup's two Fake Grocer rows are in January; everything seeded here is October.
+	if n := count(alice, TxFilter{Month: "2026-10"}); n != 10 {
+		t.Fatalf("October: %d, want 10", n)
+	}
+	if n := count(alice, TxFilter{Month: "2026-01"}); n != 2 {
+		t.Fatalf("January: %d, want 2", n)
+	}
+	if n := count(alice, TxFilter{Month: "2026-11"}); n != 0 {
+		t.Fatalf("November: %d, want 0", n)
+	}
+	if n := count(alice, TxFilter{Month: "2026-10", Category: "FOOD_AND_DRINK"}); n != 8 {
+		t.Fatalf("October food: %d, want 8", n)
+	}
 	for name, flt := range map[string]TxFilter{
 		"owner not a UUID":   {Owner: "alice"},
+		"month not a month":  {Month: "2026-13"},
+		"month injection":    {Month: "2026-10' --"},
 		"category injection": {Category: "FOOD' OR 1=1 --"},
 		"query too long":     {Query: string(make([]rune, 101))},
 		"negative offset":    {Offset: -1},
