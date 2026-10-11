@@ -29,7 +29,7 @@ Option 2 plus the typed name (Dinesh, 2026-10-11):
 | Remove a member | Yes | Yes |
 | Leave a household | Household name | Yes |
 | Make someone an owner, or change an owner's role | Yes | Yes |
-| Other role changes (adult, teen, viewer) | No | No |
+| Other role changes (adult, teen, viewer) | No (a confirmation window still asks first) | No |
 | Unlink a bank | Bank name | No (your own data; you can link it again) |
 
 - `internal/auth` reads the token's `amr` list and keeps the newest `totp` time as `Session.TOTPAt`.

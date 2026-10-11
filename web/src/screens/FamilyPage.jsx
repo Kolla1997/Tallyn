@@ -27,6 +27,20 @@ const ROLES = [
   ['viewer', 'Viewer'],
 ]
 const ROLE_LABEL = { owner: 'Owner', adult: 'Adult', teen: 'Teen', child: 'Child', viewer: 'Viewer' }
+const ROLE_INFO = {
+  owner: 'manages people and roles, links banks and chooses what to share',
+  adult: 'links banks and chooses what to share',
+  teen: 'sees only their own money; owners and adults see theirs too',
+  child: 'sees only their own money; owners and adults see theirs too',
+  viewer: 'sees only what people share with them',
+}
+const YOUR_ROLE = {
+  owner: 'You manage people and roles, link banks and choose what to share',
+  adult: 'You link banks and choose what to share',
+  teen: 'You see only your own money; owners and adults see it too',
+  child: 'You see only your own money; owners and adults see it too',
+  viewer: 'You see only what people share with you',
+}
 const isKid = (role) => role === 'teen' || role === 'child'
 
 const fromAddress = () => new URLSearchParams(window.location.search).get('member') ?? ''
@@ -152,6 +166,8 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
               <Person
                 key={current.member.user_id}
                 person={current.member}
+                members={members}
+                onSelect={setSelected}
                 me={members.find((m) => m.is_you)}
                 household={household}
                 sharing={sharing}
@@ -178,7 +194,7 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
   )
 }
 
-function Person({ person, me, household, sharing, setSharing, banks, meId, onChanged, onLeft }) {
+function Person({ person, members, onSelect, me, household, sharing, setSharing, banks, meId, onChanged, onLeft }) {
   const [error, setError] = useState('')
   const [dialog, setDialog] = useState(null) // { kind: 'remove' | 'leave' | 'role', role? }
   const isOwner = household.role === 'owner'
@@ -225,15 +241,10 @@ function Person({ person, me, household, sharing, setSharing, banks, meId, onCha
     onChanged()
   }
 
+  // Every role change asks first. Owner changes are serious, so they also
+  // need a typed name and a fresh code (#38, ADR 0009).
   function chooseRole(role) {
-    if (role === person.role) return
-    // Owner changes are serious: they need a typed name and a fresh code.
-    if (role === 'owner' || person.role === 'owner') {
-      setDialog({ kind: 'role', role })
-      return
-    }
-    setError('')
-    setRole(role).catch((e) => setError(say(e, "We couldn't change that role.")))
+    if (role !== person.role) setDialog({ kind: 'role', role })
   }
 
   async function remove() {
@@ -258,16 +269,13 @@ function Person({ person, me, household, sharing, setSharing, banks, meId, onCha
           <span className="tag">{ROLE_LABEL[person.role] ?? person.role}</span>
         </div>
         {isOwner && !you && person.role !== 'child' && (
-          <label className="role-select">
-            <span className="sr-only">Role for {name}</span>
-            <select value={person.role} onChange={(e) => chooseRole(e.target.value)}>
-              {ROLES.map(([r, l]) => (
-                <option key={r} value={r}>
-                  {l}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="segmented" role="group" aria-label={`Role for ${name}`}>
+            {ROLES.map(([r, l]) => (
+              <button key={r} aria-pressed={person.role === r} onClick={() => chooseRole(r)}>
+                {l}
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
@@ -358,14 +366,7 @@ function Person({ person, me, household, sharing, setSharing, banks, meId, onCha
         </div>
       )}
 
-      {you && (
-        <div className="person-section">
-          <p className="small muted">
-            Pick someone on the left to choose what you share with them. You&apos;re {isOwner ? 'an owner' : `a ${ROLE_LABEL[person.role]?.toLowerCase() ?? person.role}`}{' '}
-            in {household.name}.
-          </p>
-        </div>
-      )}
+      {you && <YourSummary person={person} members={members} me={me} household={household} sharing={sharing} theirs={theirs} have={have} owe={owe} meId={meId} onSelect={onSelect} />}
 
       {(you || (isOwner && person.role !== 'child')) && (
         <div className="person-footer">
@@ -403,21 +404,134 @@ function Person({ person, me, household, sharing, setSharing, banks, meId, onCha
       )}
       {dialog?.kind === 'role' && (
         <ConfirmDialog
-          title={dialog.role === 'owner' ? `Make ${name} an owner?` : `Change ${name}'s role to ${ROLE_LABEL[dialog.role]}?`}
+          title={dialog.role === 'owner' ? `Make ${name} an owner?` : `Change ${name} to ${ROLE_LABEL[dialog.role]}?`}
           action={dialog.role === 'owner' ? 'Make owner' : 'Change role'}
-          typeToConfirm={name}
-          needsCode
+          typeToConfirm={dialog.role === 'owner' || person.role === 'owner' ? name : undefined}
+          needsCode={dialog.role === 'owner' || person.role === 'owner'}
           onConfirm={() => setRole(dialog.role).catch((e) => Promise.reject(new Error(say(e, "We couldn't change that role."))))}
           onClose={() => setDialog(null)}
         >
           <p>
-            {dialog.role === 'owner'
-              ? `Owners can invite and remove people and change roles, including yours.`
-              : `${name} will no longer be able to invite or remove people or change roles.`}
+            As {ROLE_LABEL[dialog.role].toLowerCase()}, {name} {ROLE_INFO[dialog.role]}.
           </p>
+          {dialog.role === 'owner' && <p>Owners can also remove people and change roles, including yours.</p>}
+          {person.role === 'owner' && <p>{name} will no longer be able to invite or remove people or change roles.</p>}
         </ConfirmDialog>
       )}
     </section>
+  )
+}
+
+// Your own entry: your money, what you share and with whom, what others
+// share with you, and your role. "Change" opens that person, where the
+// switches are.
+function YourSummary({ person, members, me, household, sharing, theirs, have, owe, meId, onSelect }) {
+  const others = members.filter((m) => !m.is_you)
+  const shareable = others.filter((m) => !isKid(m.role) && (!isKid(me.role) || m.role === 'viewer'))
+  const fromOthers = isKid(me.role) ? [] : others.filter((m) => (sharing.received[m.user_id] ?? []).length > 0)
+  const kids = isKid(me.role) || me.role === 'viewer' ? [] : others.filter((m) => isKid(m.role))
+  const labels = (list) => CATEGORIES.filter(([c]) => list.includes(c))
+
+  return (
+    <>
+      <p className="small muted your-role">
+        {YOUR_ROLE[person.role] ?? 'You'} in {household.name}.
+      </p>
+
+      <div className="person-section">
+        {theirs.length > 0 ? (
+          <>
+            <div className="have-owe">
+              <Link to="/accounts#have" className="tone-sage">
+                <span className="small">You have</span>
+                <span className="amount">{formatMoney(have, household.home_currency)}</span>
+              </Link>
+              <Link to="/accounts#owe" className="tone-clay">
+                <span className="small">You owe</span>
+                <span className="amount">{formatMoney(owe, household.home_currency)}</span>
+              </Link>
+            </div>
+            <p className="small person-links">
+              <Link to="/accounts" className="link">
+                Your {theirs.length} {theirs.length === 1 ? 'account' : 'accounts'}
+              </Link>
+              <Link to={`/transactions?owner=${meId}`} className="link">
+                Your transactions
+              </Link>
+            </p>
+          </>
+        ) : (
+          <p className="small muted">You haven&apos;t linked a bank yet.</p>
+        )}
+      </div>
+
+      <div className="person-section">
+        <h3 className="sub-heading">You share with</h3>
+        {shareable.length === 0 ? (
+          <p className="small muted">
+            {isKid(me.role) ? 'Your parents already see your money.' : 'There’s nobody to share with yet.'}
+          </p>
+        ) : (
+          <ul className="rows share-list">
+            {shareable.map((m) => {
+              const given = sharing.given[m.user_id] ?? []
+              return (
+                <li key={m.user_id}>
+                  <Avatar member={m} small />
+                  <span className="grow name">{nameOf(m)}</span>
+                  <span className="chips">
+                    {given.length === 0 ? (
+                      <span className="small muted">Nothing</span>
+                    ) : (
+                      labels(given).map(([c, label]) => (
+                        <span key={c} className="chip chip-on">
+                          {label}
+                        </span>
+                      ))
+                    )}
+                  </span>
+                  <button className="link small" onClick={() => onSelect(m.user_id)} aria-label={`Change what you share with ${nameOf(m)}`}>
+                    Change
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </div>
+
+      {!isKid(me.role) && (
+        <div className="person-section">
+          <h3 className="sub-heading">Shared with you</h3>
+          {fromOthers.length === 0 && kids.length === 0 ? (
+            <p className="small muted">Nobody has shared with you yet.</p>
+          ) : (
+            <ul className="rows share-list">
+              {fromOthers.map((m) => (
+                <li key={m.user_id}>
+                  <Avatar member={m} small />
+                  <span className="grow name">{nameOf(m)}</span>
+                  <span className="chips">
+                    {labels(sharing.received[m.user_id]).map(([c, label]) => (
+                      <span key={c} className="chip chip-on">
+                        {label}
+                      </span>
+                    ))}
+                  </span>
+                </li>
+              ))}
+              {kids.map((m) => (
+                <li key={m.user_id}>
+                  <Avatar member={m} small />
+                  <span className="grow name">{nameOf(m)}</span>
+                  <span className="small muted">You see their money as a parent</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </>
   )
 }
 
