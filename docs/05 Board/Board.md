@@ -26,7 +26,6 @@ kanban-plugin: board
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#39 Build the app screens from the comps, for phone and web](https://github.com/Kolla1997/Tallyn/issues/39) #type/design #area/frontend #priority/p1
-- [ ] [#42 Transactions page with person switcher, search and merchant logos](https://github.com/Kolla1997/Tallyn/issues/42) #type/feature #area/frontend #priority/p1
 
 
 ## Review
@@ -51,6 +50,7 @@ kanban-plugin: board
 - [x] [#16 Automate board sync with a GitHub Action](https://github.com/Kolla1997/Tallyn/issues/16) #type/feature #area/infra #priority/p2
 - [x] [#28 Sharing settings: choose what each household member can see](https://github.com/Kolla1997/Tallyn/issues/28) #type/feature #area/backend #priority/p1
 - [x] [#30 Separate database logins for the API and the bank sync](https://github.com/Kolla1997/Tallyn/issues/30) #type/tech-debt #area/backend #priority/p1
+- [x] [#42 Transactions page with person switcher, search and merchant logos](https://github.com/Kolla1997/Tallyn/issues/42) #type/feature #area/frontend #priority/p1
 
 
 %% kanban:settings
