@@ -30,10 +30,22 @@ const CATEGORIES = [
 ]
 const KID = new Set(['teen', 'child'])
 
-// A category from the address (Home's spending card links here), if it's one we know.
-function initialCategory() {
-  const c = new URLSearchParams(window.location.search).get('category')
-  return CATEGORIES.includes(c) ? c : ''
+// The last 12 months, newest first, as "2026-10".
+function recentMonths() {
+  const now = new Date()
+  return Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+  })
+}
+const monthLabel = (m) => new Date(`${m}-01T12:00:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+
+// Filters from the address (Home's spending card links here with
+// ?category=…&month=…), if they're ones we know.
+function fromAddress(key) {
+  const v = new URLSearchParams(window.location.search).get(key) ?? ''
+  if (key === 'category') return CATEGORIES.includes(v) ? v : ''
+  return /^\d{4}-(0[1-9]|1[0-2])$/.test(v) ? v : ''
 }
 
 export default function TransactionsPage({ me, household, refreshKey }) {
@@ -41,7 +53,8 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   const [who, setWho] = useState('') // '' everyone, else a user ID
   const [search, setSearch] = useState('')
   const [query, setQuery] = useState('') // search, applied after a short pause
-  const [category, setCategory] = useState(initialCategory)
+  const [category, setCategory] = useState(() => fromAddress('category'))
+  const [month, setMonth] = useState(() => fromAddress('month'))
   const [list, setList] = useState(null)
   const [more, setMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -55,11 +68,14 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     )
   }, [household.id])
 
-  // Keep ?category= in the address, so Home can link here and Back works.
+  // Keep the category and month in the address, so links and Back work.
   useEffect(() => {
-    const url = category ? `/transactions?category=${encodeURIComponent(category)}` : '/transactions'
+    const p = new URLSearchParams()
+    if (category) p.set('category', category)
+    if (month) p.set('month', month)
+    const url = p.size ? `/transactions?${p}` : '/transactions'
     if (window.location.pathname + window.location.search !== url) window.history.replaceState(null, '', url)
-  }, [category])
+  }, [category, month])
 
   useEffect(() => {
     const t = setTimeout(() => setQuery(search.trim()), 300)
@@ -71,6 +87,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     if (who) p.set('owner', who)
     if (query) p.set('q', query)
     if (category) p.set('category', category)
+    if (month) p.set('month', month)
     return `/api/transactions?${p}`
   }
 
@@ -88,7 +105,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
       () => id === request.current && setError("We couldn't load transactions. Try again in a moment."),
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [household.id, who, query, category, refreshKey])
+  }, [household.id, who, query, category, month, refreshKey])
 
   async function showMore() {
     setLoadingMore(true)
@@ -110,7 +127,8 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   // Teens and children only ever see their own, so they get no switcher.
   const others = iAmKid ? [] : members.filter((m) => !m.is_you)
   const groups = useMemo(() => groupByDay(list ?? []), [list])
-  const filtered = who || query || category
+  const filtered = who || query || category || month
+  const months = recentMonths()
 
   return (
     <>
@@ -142,6 +160,18 @@ export default function TransactionsPage({ me, household, refreshKey }) {
               ))}
             </select>
           </label>
+          <label>
+            <span className="sr-only">Month</span>
+            <select value={month} onChange={(e) => setMonth(e.target.value)}>
+              <option value="">All months</option>
+              {month && !months.includes(month) && <option value={month}>{monthLabel(month)}</option>}
+              {months.map((m) => (
+                <option key={m} value={m}>
+                  {monthLabel(m)}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </section>
 
@@ -157,7 +187,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
         <section className="panel empty-state">
           <p className="muted">
             {filtered
-              ? 'No transactions match. Try another person, search or category.'
+              ? 'No transactions match. Try another person, search, category or month.'
               : 'No transactions yet. A new bank can take a few minutes to show its history.'}
           </p>
         </section>

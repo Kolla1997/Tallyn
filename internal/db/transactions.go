@@ -50,6 +50,7 @@ type TxFilter struct {
 	Owner    string // a member's user ID: only their transactions
 	Query    string // part of the merchant name, any case
 	Category string // a Plaid primary category, e.g. FOOD_AND_DRINK
+	Month    string // "2026-10": posted that month, the same date Spending uses
 	Limit    int    // 1-100, default 50
 	Offset   int    // for "Show more"
 }
@@ -73,6 +74,18 @@ func (d *DB) Transactions(ctx context.Context, userID, householdID string, f TxF
 	}
 	if len([]rune(f.Query)) > 100 {
 		return list, false, ErrInvalid
+	}
+	var from, to *string
+	if f.Month != "" {
+		if !monthRE.MatchString(f.Month) {
+			return list, false, ErrInvalid
+		}
+		start, err := time.Parse("2006-01", f.Month)
+		if err != nil {
+			return list, false, ErrInvalid
+		}
+		a, b := start.Format(time.DateOnly), start.AddDate(0, 1, 0).Format(time.DateOnly)
+		from, to = &a, &b
 	}
 	if f.Limit <= 0 || f.Limit > 100 {
 		f.Limit = 50
@@ -101,8 +114,10 @@ func (d *DB) Transactions(ctx context.Context, userID, householdID string, f TxF
 			  and ($2 = '' or o.owner = nullif($2, '')::uuid)
 			  and ($3 = '%%' or coalesce(t.merchant_name, t.name) ilike $3)
 			  and ($4 = '' or t.category_primary = $4)
+			  and ($7::date is null or t.date >= $7::date)
+			  and ($8::date is null or t.date < $8::date)
 			order by t.date desc, t.created_at desc, t.id
-			limit $5 offset $6`, householdID, f.Owner, like, f.Category, f.Limit+1, f.Offset)
+			limit $5 offset $6`, householdID, f.Owner, like, f.Category, f.Limit+1, f.Offset, from, to)
 		if err != nil {
 			return err
 		}

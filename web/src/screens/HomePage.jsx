@@ -39,7 +39,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
         setBanks(b.banks)
         setMembers(m.members)
         setTxs(t.transactions)
-        setSpending(s.spending)
+        setSpending(s)
       },
       () => setError("We couldn't load your household's money. Try again in a moment."),
     )
@@ -80,7 +80,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
             <RecentTransactions txs={txs ?? []} me={me} people={people} />
           </div>
           <div className="col">
-            <SpendingCard spending={spending ?? []} home={household.home_currency} />
+            <SpendingCard spending={spending?.spending ?? []} month={spending?.month} home={household.home_currency} />
             <FamilyCard members={members} isOwner={household.role === 'owner'} />
             <section className="panel" aria-labelledby="goals-h">
               <div className="panel-head">
@@ -292,10 +292,10 @@ function RecentTransactions({ txs, me, people }) {
 // Spending this month (#39): one bar split by category, then a row per
 // category with its icon, share, number of purchases and amount. The top four
 // get their own colour; the rest are grouped as Other. Each row opens the
-// Transactions page filtered to that category.
+// Transactions page filtered to that category and month.
 const SPEND_COLORS = ['clay', 'sage', 'cocoa', 'sage-light']
 
-function SpendingCard({ spending, home }) {
+function SpendingCard({ spending, month, home }) {
   const rows = spending.filter((s) => s.currency === home).sort((a, b) => b.amount_minor - a.amount_minor)
   const total = rows.reduce((sum, r) => sum + r.amount_minor, 0)
   const top = rows.slice(0, SPEND_COLORS.length).map((r, i) => ({ ...r, color: SPEND_COLORS[i] }))
@@ -332,7 +332,11 @@ function SpendingCard({ spending, home }) {
           <ul className="rows spend-rows">
             {top.map((r) => {
               const label = r.label ?? categoryLabel(r.category)
-              const to = r.category === 'OTHER' ? '/transactions' : `/transactions?category=${encodeURIComponent(r.category)}`
+              // Same month as these totals, so the counts match what opens.
+              const p = new URLSearchParams()
+              if (r.category !== 'OTHER') p.set('category', r.category)
+              if (month) p.set('month', month)
+              const to = `/transactions?${p}`
               return (
                 <li key={r.category}>
                   <Link to={to} className="spend-row">
