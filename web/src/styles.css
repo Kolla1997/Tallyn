@@ -1209,3 +1209,116 @@ a.btn {
   margin-left: var(--space-s2);
   vertical-align: 2px;
 }
+
+/* Compact desktop scale (#39): from 1024px, smaller type and tighter cards so
+   more fits at a glance. Phones keep the comfortable sizes above. The scale
+   is recorded in docs/03 Design/Design System.md. */
+@media (min-width: 1024px) {
+  body {
+    font-size: 14px;
+  }
+
+  .content {
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--space-s5) var(--space-s6);
+  }
+
+  .page-head {
+    margin-bottom: var(--space-s4);
+  }
+
+  .page-head h1 {
+    font-size: 24px;
+  }
+
+  h2,
+  .panel-head h2 {
+    font-size: 16px;
+  }
+
+  .small,
+  .chip {
+    font-size: 12px;
+  }
+
+  .btn {
+    font-size: 14px;
+    padding: var(--space-s2) var(--space-s4);
+  }
+
+  .cols,
+  .col {
+    gap: var(--space-s4);
+  }
+
+  .panel {
+    padding: var(--space-s4);
+    gap: var(--space-s3);
+  }
+
+  .total-big {
+    font-size: 36px;
+  }
+
+  .total-networth .amount,
+  .have-owe .amount {
+    font-size: 18px;
+  }
+
+  .rows > li {
+    padding: var(--space-s2) 0;
+  }
+
+  .tx-icon,
+  .tx-logo img,
+  .avatar:not(.avatar-sm) {
+    width: 32px;
+    height: 32px;
+  }
+
+  .tx-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .spend-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .spend-icon svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .spend-row,
+  .person-row {
+    padding: var(--space-s2);
+  }
+
+  .have-owe {
+    margin-bottom: var(--space-s3);
+  }
+
+  .have-owe > div {
+    padding: var(--space-s2) var(--space-s3);
+  }
+
+  .chip {
+    padding: var(--space-s1) var(--space-s3);
+  }
+
+  .tx-filters,
+  .tx-days {
+    max-width: 1000px;
+  }
+}
+
+/* Three columns from 1440px (Home). */
+@media (min-width: 1440px) {
+  .cols-3 {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
