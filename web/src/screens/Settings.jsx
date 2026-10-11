@@ -140,23 +140,25 @@ function Profile({ me, email, onSaved }) {
             }}
           />
         </label>
-        {saved && (
-          <p className="saved small" role="status">
-            Saved. Your family now sees you as {name.trim() || 'your role'}.
-          </p>
-        )}
-        {error && (
-          <p className="error" role="alert">
-            {error}
-          </p>
-        )}
-        <button className="btn btn-secondary" type="submit">
-          Save
-        </button>
+        <ul className="rows">
+          <Row label="Email" note={email} />
+        </ul>
+        <div className="settings-actions">
+          {saved && (
+            <p className="saved small" role="status">
+              Saved. Your family now sees you as {name.trim() || 'your role'}.
+            </p>
+          )}
+          {error && (
+            <p className="error" role="alert">
+              {error}
+            </p>
+          )}
+          <button className="btn btn-secondary" type="submit">
+            Save
+          </button>
+        </div>
       </form>
-      <ul className="rows">
-        <Row label="Email" note={email} />
-      </ul>
     </Section>
   )
 }
