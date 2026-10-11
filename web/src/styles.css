@@ -1839,3 +1839,39 @@ a.btn {
     transition: none;
   }
 }
+
+/* Settings (#39 step 5): same list-and-detail layout as Family. */
+.settings-grid .family-person {
+  padding: var(--space-s2) var(--space-s3);
+}
+
+.family-person.settings-danger {
+  color: var(--color-clay-deep);
+}
+
+.settings-section .rows > li.settings-row {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s3);
+  max-width: 420px;
+}
+
+.settings-form .btn {
+  align-self: flex-start;
+}
+
+.tag a {
+  color: inherit;
+}
+
+/* Settings stays two columns at every desktop width (no third column). */
+@media (min-width: 1440px) {
+  .settings-grid {
+    grid-template-columns: minmax(220px, 280px) minmax(0, 800px);
+  }
+}
