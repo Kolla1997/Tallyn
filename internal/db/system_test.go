@@ -225,7 +225,7 @@ func TestWhereaboutsVisibility(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			list, err := f.db.Transactions(ctx, tc.user, f.testHH, 200)
+			list, _, err := f.db.Transactions(ctx, tc.user, f.testHH, TxFilter{Limit: 100})
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -14,14 +14,15 @@ import (
 
 type txStore struct {
 	stubStore
-	gotLimit int
+	got      db.TxFilter
 	gotMonth string
 	spendErr error
+	txErr    error
 }
 
-func (s *txStore) Transactions(_ context.Context, uid, hh string, limit int) ([]db.Transaction, error) {
-	s.gotLimit = limit
-	return []db.Transaction{{ID: "t1", Merchant: "Fake Grocer", AmountMinor: 1234, Currency: "USD", Date: "2026-10-01"}}, nil
+func (s *txStore) Transactions(_ context.Context, uid, hh string, f db.TxFilter) ([]db.Transaction, bool, error) {
+	s.got = f
+	return []db.Transaction{{ID: "t1", Merchant: "Fake Grocer", AmountMinor: 1234, Currency: "USD", Date: "2026-10-01"}}, true, s.txErr
 }
 func (s *txStore) Spending(_ context.Context, uid, hh, month string) ([]db.Spend, error) {
 	s.gotMonth = month
@@ -31,10 +32,18 @@ func (s *txStore) Spending(_ context.Context, uid, hh, month string) ([]db.Spend
 func TestTransactionsRoute(t *testing.T) {
 	s := &txStore{}
 	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s})
-	rec := send(h, "GET", "/api/transactions?household_id="+testHH+"&limit=20", "")
-	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "Fake Grocer") || s.gotLimit != 20 {
-		t.Fatalf("got %d %s (limit %d)", rec.Code, rec.Body, s.gotLimit)
+	rec := send(h, "GET", "/api/transactions?household_id="+testHH+"&limit=20&offset=40&owner=u1&q=fresh&category=FOOD_AND_DRINK", "")
+	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "Fake Grocer") || !strings.Contains(rec.Body.String(), `"more":true`) {
+		t.Fatalf("got %d %s", rec.Code, rec.Body)
 	}
+	if s.got != (db.TxFilter{Owner: "u1", Query: "fresh", Category: "FOOD_AND_DRINK", Limit: 20, Offset: 40}) {
+		t.Fatalf("filter = %+v", s.got)
+	}
+	s.txErr = db.ErrInvalid
+	if rec := send(h, "GET", "/api/transactions?household_id="+testHH+"&owner=bad", ""); rec.Code != http.StatusBadRequest {
+		t.Fatalf("invalid filter: %d", rec.Code)
+	}
+	s.txErr = nil
 	if rec := get(h, "/api/transactions?household_id="+testHH, ""); rec.Code != http.StatusUnauthorized {
 		t.Fatalf("without a session: %d", rec.Code)
 	}
