@@ -54,9 +54,9 @@ export const PlusIcon = (p) => (
     <path d="M12 5v14M5 12h14" />
   </svg>
 )
+// Invites are links, so they share a chain icon (#39).
 export const InviteIcon = (p) => (
   <svg {...base} {...p}>
-    <circle cx="10" cy="8" r="3.2" />
-    <path d="M3.8 19c.8-3.2 3.2-4.8 6.2-4.8 1.3 0 2.5.3 3.5.9M18 14v6M15 17h6" />
+    <path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1" />
   </svg>
 )

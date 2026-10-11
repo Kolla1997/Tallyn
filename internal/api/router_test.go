@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/Kolla1997/Tallyn/internal/auth"
 	"github.com/Kolla1997/Tallyn/internal/db"
@@ -17,14 +18,22 @@ import (
 const testUser = "11111111-1111-4111-8111-111111111111" // fake
 
 // fakeAuth stands in for auth.Verifier.Require: "Bearer ok" is a verified
-// session for testUser, anything else is a 401.
+// session for testUser whose 2FA code was entered at sign-in an hour ago;
+// "Bearer fresh" entered a new code just now (step-up, #38). Anything else
+// is a 401.
 func fakeAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Authorization") != "Bearer ok" {
+		s := auth.Session{UserID: testUser, AAL: "aal2"}
+		switch r.Header.Get("Authorization") {
+		case "Bearer ok":
+			s.TOTPAt = time.Now().Add(-time.Hour)
+		case "Bearer fresh":
+			s.TOTPAt = time.Now()
+		default:
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
-		next.ServeHTTP(w, r.WithContext(auth.WithSession(r.Context(), auth.Session{UserID: testUser, AAL: "aal2"})))
+		next.ServeHTTP(w, r.WithContext(auth.WithSession(r.Context(), s)))
 	})
 }
 

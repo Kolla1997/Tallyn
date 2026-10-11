@@ -4,7 +4,10 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"slices"
+	"time"
 
+	"github.com/Kolla1997/Tallyn/internal/auth"
 	"github.com/Kolla1997/Tallyn/internal/db"
 )
 
@@ -30,6 +33,22 @@ func memberError(w http.ResponseWriter, what string, err error) {
 		log.Printf("api: %s: %v", what, err)
 		writeError(w, http.StatusInternalServerError, "internal")
 	}
+}
+
+// StepUpWindow is how recently a 2FA code must have been entered for the
+// most serious member actions (#38): removing someone, leaving, and making or
+// unmaking an owner. The browser asks for a fresh code just before.
+const StepUpWindow = 5 * time.Minute
+
+// recentCode reports whether the caller entered a 2FA code within
+// StepUpWindow, or writes 403 reauth_required.
+func recentCode(w http.ResponseWriter, r *http.Request) bool {
+	s, _ := auth.FromContext(r.Context())
+	if s.TOTPAt.IsZero() || time.Since(s.TOTPAt) > StepUpWindow || s.TOTPAt.After(time.Now().Add(time.Minute)) {
+		writeError(w, http.StatusForbidden, "reauth_required")
+		return false
+	}
+	return true
 }
 
 func members(store Store) http.HandlerFunc {
@@ -59,6 +78,20 @@ func setMemberRole(store Store) http.HandlerFunc {
 		if !readJSON(w, r, &in) {
 			return
 		}
+		// Making someone an owner, or changing an owner's role, needs a fresh code.
+		list, err := store.Members(r.Context(), uid, r.PathValue("id"))
+		if err != nil {
+			memberError(w, "set role", err)
+			return
+		}
+		target := slices.IndexFunc(list, func(m db.Member) bool { return m.UserID == r.PathValue("user") })
+		if target < 0 {
+			writeError(w, http.StatusNotFound, "not_found")
+			return
+		}
+		if (in.Role == "owner" || list[target].Role == "owner") && !recentCode(w, r) {
+			return
+		}
 		if err := store.SetMemberRole(r.Context(), uid, r.PathValue("id"), r.PathValue("user"), in.Role); err != nil {
 			memberError(w, "set role", err)
 			return
@@ -67,11 +100,12 @@ func setMemberRole(store Store) http.HandlerFunc {
 	}
 }
 
-// removeMember removes a member, or the caller themselves (leaving).
+// removeMember removes a member, or the caller themselves (leaving). Both
+// need a fresh 2FA code (#38).
 func removeMember(store Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		uid, ok := userID(w, r)
-		if !ok {
+		if !ok || !recentCode(w, r) {
 			return
 		}
 		if err := store.RemoveMember(r.Context(), uid, r.PathValue("id"), r.PathValue("user")); err != nil {
