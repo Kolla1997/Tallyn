@@ -44,8 +44,8 @@ func (stubStore) UnlinkTarget(context.Context, string, string) (string, []byte, 
 	return "", nil, errors.New("stub")
 }
 func (stubStore) DeleteBank(context.Context, string, string) error { return errors.New("stub") }
-func (stubStore) Transactions(context.Context, string, string, int) ([]db.Transaction, error) {
-	return nil, errors.New("stub")
+func (stubStore) Transactions(context.Context, string, string, db.TxFilter) ([]db.Transaction, bool, error) {
+	return nil, false, errors.New("stub")
 }
 func (stubStore) Spending(context.Context, string, string, string) ([]db.Spend, error) {
 	return nil, errors.New("stub")

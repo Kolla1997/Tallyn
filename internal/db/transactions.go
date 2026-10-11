@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v5"
@@ -24,6 +25,7 @@ type Transaction struct {
 	CategoryDetailed *string      `json:"category_detailed"`
 	Pending          bool         `json:"pending"`
 	PaymentChannel   *string      `json:"payment_channel"`
+	LogoURL          *string      `json:"logo_url"`    // Plaid's logo hosts only (0009)
 	Whereabouts      *Whereabouts `json:"whereabouts"` // nil when unknown or not visible to this user
 }
 
@@ -43,21 +45,49 @@ type Whereabouts struct {
 	StoreNumber  *string    `json:"store_number"`
 }
 
-// Transactions lists the household's most recent transactions that userID may
-// see, newest first. RLS decides which rows, and which whereabouts, come back.
-func (d *DB) Transactions(ctx context.Context, userID, householdID string, limit int) ([]Transaction, error) {
-	list := []Transaction{}
+// TxFilter narrows a transactions list (#42). Empty fields don't filter.
+type TxFilter struct {
+	Owner    string // a member's user ID: only their transactions
+	Query    string // part of the merchant name, any case
+	Category string // a Plaid primary category, e.g. FOOD_AND_DRINK
+	Limit    int    // 1-100, default 50
+	Offset   int    // for "Show more"
+}
+
+var categoryRE = regexp.MustCompile(`^[A-Z_]{1,60}$`)
+
+// Transactions lists the household's transactions that userID may see,
+// newest first, one page at a time. RLS decides which rows and which
+// whereabouts come back; filters only narrow that. more reports whether
+// another page exists.
+func (d *DB) Transactions(ctx context.Context, userID, householdID string, f TxFilter) (list []Transaction, more bool, err error) {
+	list = []Transaction{}
 	if !uuidRE.MatchString(householdID) {
-		return list, nil
+		return list, false, nil
 	}
-	if limit <= 0 || limit > 200 {
-		limit = 50
+	if f.Owner != "" && !uuidRE.MatchString(f.Owner) {
+		return list, false, ErrInvalid
 	}
-	err := d.AsUser(ctx, userID, func(tx pgx.Tx) error {
+	if f.Category != "" && !categoryRE.MatchString(f.Category) {
+		return list, false, ErrInvalid
+	}
+	if len([]rune(f.Query)) > 100 {
+		return list, false, ErrInvalid
+	}
+	if f.Limit <= 0 || f.Limit > 100 {
+		f.Limit = 50
+	}
+	if f.Offset < 0 || f.Offset > 10000 {
+		return list, false, ErrInvalid
+	}
+	// The search text is a plain substring: escape LIKE's wildcards.
+	like := "%" + strings.NewReplacer(`\`, `\\`, "%", `\%`, "_", `\_`).Replace(strings.TrimSpace(f.Query)) + "%"
+
+	err = d.AsUser(ctx, userID, func(tx pgx.Tx) error {
 		rows, err := tx.Query(ctx, `
-			select t.id, t.account_id, coalesce(a.name, ''), coalesce(a.owner_user_id::text, ''), t.amount_minor, t.currency,
+			select t.id, t.account_id, coalesce(a.name, ''), coalesce(o.owner::text, ''), t.amount_minor, t.currency,
 			       t.date::text, t.authorized_date::text, coalesce(t.merchant_name, t.name),
-			       t.category_primary, t.category_detailed, t.pending, t.payment_channel,
+			       t.category_primary, t.category_detailed, t.pending, t.payment_channel, t.logo_url,
 			       d.transaction_id is not null,
 			       d.authorized_at, d.posted_at, d.address, d.city, d.region, d.postal_code, d.country,
 			       d.lat, d.lon, d.store_number
@@ -66,9 +96,13 @@ func (d *DB) Transactions(ctx context.Context, userID, householdID string, limit
 			-- account itself may be hidden (0007_sharing.sql)
 			left join public.accounts a on a.id = t.account_id
 			left join public.transaction_details d on d.transaction_id = t.id
+			cross join lateral (select public.transaction_owner(t.account_id) as owner) o
 			where t.household_id = $1
+			  and ($2 = '' or o.owner = nullif($2, '')::uuid)
+			  and ($3 = '%%' or coalesce(t.merchant_name, t.name) ilike $3)
+			  and ($4 = '' or t.category_primary = $4)
 			order by t.date desc, t.created_at desc, t.id
-			limit $2`, householdID, limit)
+			limit $5 offset $6`, householdID, f.Owner, like, f.Category, f.Limit+1, f.Offset)
 		if err != nil {
 			return err
 		}
@@ -78,7 +112,7 @@ func (d *DB) Transactions(ctx context.Context, userID, householdID string, limit
 			var w Whereabouts
 			if err := rows.Scan(&t.ID, &t.AccountID, &t.AccountName, &t.OwnerUserID, &t.AmountMinor, &t.Currency,
 				&t.Date, &t.AuthorizedDate, &t.Merchant, &t.CategoryPrimary, &t.CategoryDetailed, &t.Pending, &t.PaymentChannel,
-				&visible, &w.AuthorizedAt, &w.PostedAt, &w.Address, &w.City, &w.Region, &w.PostalCode, &w.Country,
+				&t.LogoURL, &visible, &w.AuthorizedAt, &w.PostedAt, &w.Address, &w.City, &w.Region, &w.PostalCode, &w.Country,
 				&w.Lat, &w.Lon, &w.StoreNumber); err != nil {
 				return err
 			}
@@ -89,7 +123,10 @@ func (d *DB) Transactions(ctx context.Context, userID, householdID string, limit
 		}
 		return rows.Err()
 	})
-	return list, err
+	if len(list) > f.Limit {
+		list, more = list[:f.Limit], true
+	}
+	return list, more, err
 }
 
 // Spend is money out in one category and currency.

@@ -7,6 +7,7 @@ import Banks from './Banks.jsx'
 import CreateHousehold from './CreateHousehold.jsx'
 import HomePage from './HomePage.jsx'
 import Join from './Join.jsx'
+import TransactionsPage from './TransactionsPage.jsx'
 import Members from './Members.jsx'
 import Settings from './Settings.jsx'
 import Sharing from './Sharing.jsx'
@@ -109,6 +110,9 @@ export default function Home({ email, onSignOut }) {
   switch (path) {
     case '/':
       page = <HomePage me={me} household={household} refreshKey={refreshKey} onChanged={refresh} />
+      break
+    case '/transactions':
+      page = <TransactionsPage me={me} household={household} refreshKey={refreshKey} />
       break
     case '/accounts':
       page = (

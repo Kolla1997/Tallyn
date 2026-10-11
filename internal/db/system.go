@@ -220,16 +220,16 @@ func queueTransaction(b *pgx.Batch, household, account string, t plaid.Transacti
 	// The WHERE keeps an existing transaction ID in its own account and household.
 	b.Queue(`insert into public.transactions
 		(household_id, account_id, plaid_transaction_id, amount_minor, currency, date, authorized_date,
-		 name, merchant_name, category_primary, category_detailed, pending, payment_channel)
-		values ($1, $2, $3, $4, $5, $6::date, nullif($7, '')::date, $8, nullif($9, ''), nullif($10, ''), nullif($11, ''), $12, nullif($13, ''))
+		 name, merchant_name, category_primary, category_detailed, pending, payment_channel, logo_url)
+		values ($1, $2, $3, $4, $5, $6::date, nullif($7, '')::date, $8, nullif($9, ''), nullif($10, ''), nullif($11, ''), $12, nullif($13, ''), nullif($14, ''))
 		on conflict (plaid_transaction_id) do update set
 		  amount_minor = excluded.amount_minor, currency = excluded.currency, date = excluded.date,
 		  authorized_date = excluded.authorized_date, name = excluded.name, merchant_name = excluded.merchant_name,
 		  category_primary = excluded.category_primary, category_detailed = excluded.category_detailed,
-		  pending = excluded.pending, payment_channel = excluded.payment_channel
+		  pending = excluded.pending, payment_channel = excluded.payment_channel, logo_url = excluded.logo_url
 		where transactions.account_id = excluded.account_id`,
 		household, account, t.PlaidTransactionID, t.AmountMinor, t.Currency, t.Date, t.AuthorizedDate,
-		t.Name, t.MerchantName, t.CategoryPrimary, t.CategoryDetailed, t.Pending, t.PaymentChannel)
+		t.Name, t.MerchantName, t.CategoryPrimary, t.CategoryDetailed, t.Pending, t.PaymentChannel, t.LogoURL)
 
 	// Time and location: replaced on every change, so stale details never linger.
 	b.Queue(`delete from public.transaction_details

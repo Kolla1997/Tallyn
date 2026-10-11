@@ -129,7 +129,7 @@ func TestSharingStepByStep(t *testing.T) {
 	// Transactions without balances: dave sees them, not the accounts.
 	set(ShareTransactions)
 	want(t, f, dave, alice, false, true, false)
-	list, err := f.db.Transactions(ctx, dave, f.testHH, 50)
+	list, _, err := f.db.Transactions(ctx, dave, f.testHH, TxFilter{})
 	if err != nil || !slices.ContainsFunc(list, func(tr Transaction) bool { return tr.Merchant == "Fake Grocer" && tr.AccountName == "" }) {
 		t.Fatalf("dave should see alice's transaction without its account: %+v, %v", list, err)
 	}

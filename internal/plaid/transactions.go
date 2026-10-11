@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -26,6 +27,7 @@ type Transaction struct {
 	CategoryDetailed   string
 	Pending            bool
 	PaymentChannel     string // online, in store, other
+	LogoURL            string // merchant logo on Plaid's logo hosts only; empty if none
 
 	// When and where. Only some banks and merchants provide these.
 	AuthorizedAt *time.Time
@@ -154,7 +156,11 @@ type rawTransaction struct {
 	MerchantName       *string     `json:"merchant_name"`
 	Pending            bool        `json:"pending"`
 	PaymentChannel     string      `json:"payment_channel"`
-	Category           *struct {
+	LogoURL            *string     `json:"logo_url"`
+	Counterparties     []struct {
+		LogoURL *string `json:"logo_url"`
+	} `json:"counterparties"`
+	Category *struct {
 		Primary  string `json:"primary"`
 		Detailed string `json:"detailed"`
 	} `json:"personal_finance_category"`
@@ -210,6 +216,17 @@ func (r rawTransaction) convert() (Transaction, bool, error) {
 	if r.Category != nil {
 		t.CategoryPrimary, t.CategoryDetailed = r.Category.Primary, r.Category.Detailed
 	}
+	// The transaction's own logo first, then a counterparty's.
+	candidates := []*string{r.LogoURL}
+	for _, c := range r.Counterparties {
+		candidates = append(candidates, c.LogoURL)
+	}
+	for _, c := range candidates {
+		if c != nil && logoRE.MatchString(*c) {
+			t.LogoURL = *c
+			break
+		}
+	}
 	switch t.PaymentChannel {
 	case "online", "in store", "other":
 	default:
@@ -217,6 +234,10 @@ func (r rawTransaction) convert() (Transaction, bool, error) {
 	}
 	return t, true, nil
 }
+
+// logoRE accepts only Plaid's logo hosts (0009_transaction_logos.sql checks
+// the same), so no other site's images can get into the app.
+var logoRE = regexp.MustCompile(`^https://plaid-(merchant|counterparty)-logos\.plaid\.com/[A-Za-z0-9._-]+\.png$`)
 
 // parseTime reads Plaid's ISO 8601 timestamps. Banks that don't really know
 // the time send midnight (00:00:00), which is treated as unknown.

@@ -24,7 +24,7 @@ type Store interface {
 	Banks(ctx context.Context, userID, householdID string) ([]db.Bank, error)
 	UnlinkTarget(ctx context.Context, userID, bankID string) (plaidItemID string, sealed []byte, err error)
 	DeleteBank(ctx context.Context, userID, bankID string) error
-	Transactions(ctx context.Context, userID, householdID string, limit int) ([]db.Transaction, error)
+	Transactions(ctx context.Context, userID, householdID string, f db.TxFilter) ([]db.Transaction, bool, error)
 	Spending(ctx context.Context, userID, householdID, month string) ([]db.Spend, error)
 	Sharing(ctx context.Context, userID, householdID string) (db.Sharing, error)
 	SetSharing(ctx context.Context, userID, householdID, viewerID string, categories []string) error

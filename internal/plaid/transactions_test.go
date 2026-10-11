@@ -162,3 +162,41 @@ func TestLinkTokenAsksFor90Days(t *testing.T) {
 		t.Fatalf("transactions = %v", f.lastBody["transactions"])
 	}
 }
+
+func TestLogos(t *testing.T) {
+	tx := func(logo, counterparty string) string {
+		q := func(s string) string {
+			if s == "" {
+				return "null"
+			}
+			return `"` + s + `"`
+		}
+		return `{"transaction_id":"t","account_id":"a1","amount":1,"iso_currency_code":"USD","date":"2026-10-01","name":"X",
+			"logo_url":` + q(logo) + `,"counterparties":[{"name":"C","logo_url":` + q(counterparty) + `}]}`
+	}
+	for name, tc := range map[string]struct{ logo, counterparty, want string }{
+		"merchant logo":              {"https://plaid-merchant-logos.plaid.com/burger_king_155.png", "", "https://plaid-merchant-logos.plaid.com/burger_king_155.png"},
+		"counterparty logo fallback": {"", "https://plaid-counterparty-logos.plaid.com/doordash_1.png", "https://plaid-counterparty-logos.plaid.com/doordash_1.png"},
+		"own logo wins":              {"https://plaid-merchant-logos.plaid.com/a_1.png", "https://plaid-counterparty-logos.plaid.com/b_2.png", "https://plaid-merchant-logos.plaid.com/a_1.png"},
+		"no logo":                    {"", "", ""},
+		"plain http":                 {"http://plaid-merchant-logos.plaid.com/a.png", "", ""},
+		"another site":               {"https://evil.example/a.png", "", ""},
+		"lookalike host":             {"https://plaid-merchant-logos.plaid.com.evil.example/a.png", "", ""},
+		"userinfo trick":             {"https://plaid-merchant-logos.plaid.com@evil.example/a.png", "", ""},
+		"path traversal":             {"https://plaid-merchant-logos.plaid.com/../x.png", "", ""},
+		"query string":               {"https://plaid-merchant-logos.plaid.com/a.png?track=1", "", ""},
+		"not a png":                  {"https://plaid-merchant-logos.plaid.com/a.svg", "", ""},
+		"bad own, good counterparty": {"https://evil.example/a.png", "https://plaid-counterparty-logos.plaid.com/c_3.png", "https://plaid-counterparty-logos.plaid.com/c_3.png"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			c, _ := syncServer(t, map[string]string{"": `{"added":[` + tx(tc.logo, tc.counterparty) + `],"modified":[],"removed":[],"next_cursor":"c","has_more":false}`})
+			r, err := c.SyncTransactions(context.Background(), fakeToken, "")
+			if err != nil || len(r.Added) != 1 {
+				t.Fatalf("err = %v", err)
+			}
+			if got := r.Added[0].LogoURL; got != tc.want {
+				t.Fatalf("logo = %q, want %q", got, tc.want)
+			}
+		})
+	}
+}
