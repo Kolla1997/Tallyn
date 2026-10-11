@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { applyTokens } from './lib/tokens.js'
 import { captureInviteFromURL } from './lib/invite.js'
+import './fonts.css'
 import './styles.css'
 import App from './App.jsx'
 

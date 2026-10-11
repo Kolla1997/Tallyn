@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tallyn · Home (draft, #39)</title>
+<link rel="stylesheet" href="draft.css" />
+</head>
+<body>
+<div class="draft-banner">Draft for <strong>#39</strong> · not production code · all names and amounts are made up</div>
+
+
+<div class="app">
+  <aside class="sidebar" aria-label="Main">
+    <img class="logo" src="../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg" alt="Tallyn" />
+    <nav class="nav">
+      <a href="web-app-draft.html" aria-current="page"><svg aria-hidden="true"><use href="draft-icons.svg#i-home"/></svg>Home</a>
+      <a href="web-accounts-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-accounts"/></svg>Accounts</a>
+      <a href="web-family-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-family"/></svg>Family</a>
+      <a href="web-goals-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-goals"/></svg>Goals</a>
+      <a href="web-settings-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-settings"/></svg>Settings</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="household">
+        <p class="small muted">Household</p>
+        <p><strong>The Rivera family</strong></p>
+      </div>
+      <div class="me"><span class="avatar maya">M</span><div><p><strong>Maya</strong></p><p class="small muted">Owner</p></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="mobile-head"><img src="../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg" alt="Tallyn" /><a href="web-settings-draft.html" aria-label="Settings" style="text-decoration:none"><span class="avatar maya">M</span></a></div>
+
+    <div class="top">
+      <div>
+        <p class="muted">Good morning, Maya</p>
+        <h1>The Rivera family</h1>
+      </div>
+      <div class="actions">
+        <button class="btn"><svg aria-hidden="true"><use href="draft-icons.svg#i-plus"/></svg>Link a bank</button>
+        <button class="btn secondary"><svg aria-hidden="true"><use href="draft-icons.svg#i-share"/></svg><span>Share<span class="long"> with family</span></span></button>
+        <button class="btn secondary"><svg aria-hidden="true"><use href="draft-icons.svg#i-invite"/></svg>Invite</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col">
+        <section class="card total" aria-label="Total balance">
+          <p class="label">Total balance · USD · everything you can see</p>
+          <div class="row">
+            <p class="amount big">$9,958.00</p>
+            <p class="small" style="color:var(--sage-light)">+$320.00 this month</p>
+          </div>
+          <div class="split">
+            <div><span>Yours</span><span class="amount">$8,180.00</span></div>
+            <div><span>Shared with you</span><span class="amount">$1,366.00</span></div>
+            <div><span>Leo (teen)</span><span class="amount">$412.00</span></div>
+          </div>
+          <div class="networth">
+            <div><span>Net worth</span><span class="amount">$9,545.60</span></div>
+            <p class="small">What you have, $9,958.00, minus what you owe, $412.40 on cards and loans</p>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="yours">
+          <div class="card-head"><h2 id="yours">Your accounts</h2><a href="#">All accounts</a></div>
+          <ul class="list">
+            <li><span class="coin sage">$</span><div class="grow"><p class="name">Everyday checking</p><p class="small muted">Platypus Bank ••0000 · updated 9:14 AM</p></div><span class="amount">$4,210.00</span></li>
+            <li><span class="coin sage">$</span><div class="grow"><p class="name">High-yield savings</p><p class="small muted">Platypus Bank ••1111</p></div><span class="amount">$3,970.00</span></li>
+          </ul>
+        </section>
+
+        <section class="card shared" aria-labelledby="shared">
+          <div class="card-head"><h2 id="shared">Shared with you</h2><span class="tag sage">You can't unlink these</span></div>
+          <ul class="list">
+            <li><span class="avatar james">J</span><div class="grow"><p class="name">James · Checking</p><p class="small muted">Shares balances and transactions</p></div><span class="amount">$1,366.00</span></li>
+            <li><span class="avatar leo">L</span><div class="grow"><p class="name">Leo · Teen savings</p><p class="small muted">You see Leo's money as a parent</p></div><span class="amount">$412.00</span></li>
+          </ul>
+        </section>
+
+        <section class="card" aria-labelledby="tx">
+          <div class="card-head"><h2 id="tx">Recent transactions</h2><a href="#">See all</a></div>
+          <div class="chips" role="group" aria-label="Whose transactions">
+            <button class="chip" aria-pressed="true">Everyone</button>
+            <button class="chip" aria-pressed="false">Yours</button>
+            <button class="chip" aria-pressed="false">James</button>
+            <button class="chip" aria-pressed="false">Leo</button>
+          </div>
+          <ul class="list">
+            <li><span class="coin clay">F</span><div class="grow"><p class="name">Fresh Market</p><p class="small muted">Today · 2:14 PM · Chicago, IL · in store · Groceries</p></div><span class="amount out">−$64.20</span></li>
+            <li><span class="coin sage">P</span><div class="grow"><p class="name">Payroll</p><p class="small muted">Today · Everyday checking · Income</p></div><span class="amount in">+$2,400.00</span></li>
+            <li><span class="avatar james sm" title="James">J</span><div class="grow"><p class="name">Corner Cafe</p><p class="small muted">Yesterday · James · Eating out</p></div><span class="amount out">−$5.40</span></li>
+            <li><span class="avatar leo sm" title="Leo">L</span><div class="grow"><p class="name">Page Turner Books</p><p class="small muted">Yesterday · 4:02 PM · Evanston, IL · Leo · Shopping</p></div><span class="amount out">−$18.99</span></li>
+            <li><span class="coin sand">M</span><div class="grow"><p class="name">Metro Transit</p><p class="small muted">Oct 7 · 8:31 AM · online · Transport</p></div><span class="amount out">−$2.50</span></li>
+          </ul>
+        </section>
+      </div>
+
+      <div class="col">
+        <section class="card spend" aria-labelledby="spend">
+          <div class="card-head"><h2 id="spend">Spending in October</h2><span class="amount">$2,991.43</span></div>
+          <ul class="list">
+            <li><div class="row"><span>Rent and utilities</span><span class="amount">$1,850.00</span></div><div class="bar"><div style="width:100%"></div></div></li>
+            <li><div class="row"><span>Groceries</span><span class="amount">$642.18</span></div><div class="bar"><div style="width:35%"></div></div></li>
+            <li><div class="row"><span>Transport</span><span class="amount">$214.60</span></div><div class="bar"><div style="width:12%"></div></div></li>
+            <li><div class="row"><span>Eating out</span><span class="amount">$188.25</span></div><div class="bar"><div style="width:10%"></div></div></li>
+            <li><div class="row"><span>Shopping</span><span class="amount">$96.40</span></div><div class="bar"><div style="width:5%"></div></div></li>
+          </ul>
+          <p class="small muted">Transfers and card payments aren't counted as spending.</p>
+        </section>
+
+        <section class="card" aria-labelledby="family">
+          <div class="card-head"><h2 id="family">Family</h2><a href="#">Manage</a></div>
+          <ul class="list">
+            <li><span class="avatar maya">M</span><div class="grow"><p class="name">Maya (you)</p><p class="small muted">Owner</p></div></li>
+            <li><span class="avatar james">J</span><div class="grow"><p class="name">James</p><p class="small muted">Adult · shares with you · you share balances</p></div></li>
+            <li><span class="avatar leo">L</span><div class="grow"><p class="name">Leo</p><p class="small muted">Teen</p></div></li>
+            <li><span class="avatar" style="background:var(--sage)">R</span><div class="grow"><p class="name">Grandma Rosa</p><p class="small muted">Viewer</p></div></li>
+          </ul>
+          <button class="btn secondary" style="align-self:flex-start"><svg aria-hidden="true"><use href="draft-icons.svg#i-invite"/></svg>Invite someone</button>
+        </section>
+
+        <section class="card" aria-labelledby="goals">
+          <div class="card-head"><h2 id="goals">Goals</h2><span class="tag">Coming soon</span></div>
+          <div class="goal-ring">
+            <svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" fill="none" stroke="#ECE5D6" stroke-width="8"/><circle cx="32" cy="32" r="26" fill="none" stroke="#C8553D" stroke-width="8" stroke-linecap="round" stroke-dasharray="111 163" transform="rotate(-90 32 32)"/></svg>
+            <div><p><strong>Beach trip</strong></p><p class="small muted">$3,400.00 of $5,000.00 · 68%</p></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Main">
+  <a href="web-app-draft.html" aria-current="page"><svg aria-hidden="true"><use href="draft-icons.svg#i-home"/></svg>Home</a>
+  <a href="web-accounts-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-accounts"/></svg>Accounts</a>
+  <a href="web-family-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-family"/></svg>Family</a>
+  <a href="web-goals-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-goals"/></svg>Goals</a>
+</nav>
+</body>
+</html>

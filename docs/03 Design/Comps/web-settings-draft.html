@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tallyn · Settings (draft, #39)</title>
+<link rel="stylesheet" href="draft.css" />
+</head>
+<body>
+<div class="draft-banner">Draft for <strong>#39</strong> · not production code · all names and amounts are made up</div>
+
+<div class="app">
+  <aside class="sidebar" aria-label="Main">
+    <img class="logo" src="../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg" alt="Tallyn" />
+    <nav class="nav">
+      <a href="web-app-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-home"/></svg>Home</a>
+      <a href="web-accounts-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-accounts"/></svg>Accounts</a>
+      <a href="web-family-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-family"/></svg>Family</a>
+      <a href="web-goals-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-goals"/></svg>Goals</a>
+      <a href="web-settings-draft.html" aria-current="page"><svg aria-hidden="true"><use href="draft-icons.svg#i-settings"/></svg>Settings</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="household"><p class="small muted">Household</p><p><strong>The Rivera family</strong></p></div>
+      <div class="me"><span class="avatar maya">M</span><div><p><strong>Maya</strong></p><p class="small muted">Owner</p></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="mobile-head"><img src="../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg" alt="Tallyn" /><span class="avatar maya">M</span></div>
+
+    <div class="top">
+      <div>
+        <h1>Settings</h1>
+        <p class="muted page-sub">Your profile, security, household and data</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col">
+        <section class="card" aria-labelledby="profile">
+          <h2 id="profile">Your profile</h2>
+          <div class="form">
+            <label class="field">Your name, as your family sees it<input value="Maya" /></label>
+            <button class="btn secondary" style="align-self:flex-start">Save</button>
+          </div>
+          <dl class="kv">
+            <dt>Email</dt><dd class="muted">maya@example.com</dd>
+          </dl>
+        </section>
+
+        <section class="card" aria-labelledby="security">
+          <h2 id="security">Sign-in and security</h2>
+          <dl class="kv">
+            <dt>Two-step sign-in</dt><dd><span class="status-on">On</span></dd>
+            <dd class="hint small muted">Codes from your authenticator app, such as Microsoft Authenticator.</dd>
+            <dt>Backup authenticator</dt><dd><button class="link">Add one</button></dd>
+            <dd class="hint small muted">So you can still sign in if you lose your phone. <span class="tag preview">#23</span></dd>
+            <dt>Password</dt><dd><button class="link">Change</button></dd>
+            <dd class="hint small muted"><span class="tag preview">#22</span></dd>
+            <dt>Signed in on other devices</dt><dd><button class="link">Sign out everywhere else</button></dd>
+          </dl>
+        </section>
+
+        <section class="card" aria-labelledby="household">
+          <h2 id="household">Household</h2>
+          <div class="form">
+            <label class="field">Household name<input value="The Rivera family" /></label>
+            <label class="field">Home currency
+              <select><option>USD · US dollar</option><option>EUR · Euro</option><option>GBP · British pound</option></select>
+            </label>
+            <p class="small muted">Totals are shown in this currency. Only owners can change these.</p>
+            <button class="btn secondary" style="align-self:flex-start">Save</button>
+          </div>
+          <dl class="kv">
+            <dt>Members and sharing</dt><dd><a class="link" href="web-family-draft.html">Open Family</a></dd>
+          </dl>
+        </section>
+      </div>
+
+      <div class="col">
+        <section class="card" aria-labelledby="data">
+          <h2 id="data">Your data</h2>
+          <dl class="kv">
+            <dt>Download your data</dt><dd><button class="link">Request</button></dd>
+            <dd class="hint small muted">Everything Tallyn holds about you, as a file. <span class="tag preview">#36</span></dd>
+            <dt>Terms of Service</dt><dd><a class="link" href="#">Read</a></dd>
+            <dt>Privacy Policy</dt><dd><a class="link" href="#">Read</a></dd>
+          </dl>
+          <p class="small muted">Tallyn doesn't sell your data. Bank connections go through Plaid; Tallyn can see your accounts but can't move money.</p>
+        </section>
+
+        <section class="card" aria-labelledby="notify">
+          <div class="card-head"><h2 id="notify">Notifications</h2><span class="tag">Coming later</span></div>
+          <div class="switches" style="flex-direction:column;gap:var(--s3)">
+            <span class="switch on"><span class="track"></span>A bank needs you to sign in again</span>
+            <span class="switch on"><span class="track"></span>Someone shares with you or stops</span>
+            <span class="switch"><span class="track"></span>Spending limit reached (#34)</span>
+            <span class="switch"><span class="track"></span>Card payment due soon (#27)</span>
+          </div>
+        </section>
+
+        <section class="card danger-zone" aria-labelledby="leave">
+          <h2 id="leave">Leave or close</h2>
+          <p class="small muted">Leaving the household keeps your account and your banks. Closing your account unlinks every bank and deletes your data. Both ask you to confirm with a code from your authenticator app.</p>
+          <div class="actions">
+            <button class="btn danger-outline">Leave household</button>
+            <button class="btn danger-outline">Close account</button>
+          </div>
+        </section>
+
+        <button class="btn secondary" style="align-self:flex-start">Sign out</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Main">
+  <a href="web-app-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-home"/></svg>Home</a>
+  <a href="web-accounts-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-accounts"/></svg>Accounts</a>
+  <a href="web-family-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-family"/></svg>Family</a>
+  <a href="web-goals-draft.html"><svg aria-hidden="true"><use href="draft-icons.svg#i-goals"/></svg>Goals</a>
+</nav>
+</body>
+</html>
