@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-11
+- #39 Family third column (Dinesh): from 1440px, people / person / a **cards and debts** stack (flat brand colours Clay Deep, Cocoa, Sage Deep, Sand for contrast; click or pick from the list to bring a card forward; last four digits only; credit cards then loans with subtotals) with **How sharing works** underneath. Shown only when you may see that person's balances; your own entry shows yours. Under 1440px it sits under the person view; phones stack. Credit limits, rates and due dates wait for #27.
 - #39 Invites use a chain-link icon everywhere (Dinesh): Home's Invite, Family's Invite someone, Create invite link, and pending invites in the Family list.
 - #39 #38 Family follow-up (Dinesh): role picker is now segmented buttons (Owner / Adult / Teen / Viewer); every role change asks in a confirmation window first, and changes to or from Owner also need the typed name and a fresh 2FA code. Your own entry now shows your role in words, what you have and owe with links, who you share what with (Change opens that person), and who shares with you. Fixed on phones: switch labels beside the switches, big amounts kept inside the have/owe tiles.
 - #51 Created: Reconnect a bank that needs sign-in (Plaid update mode), Backlog. #50 merged (Accounts page).

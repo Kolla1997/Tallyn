@@ -1618,6 +1618,21 @@ a.btn {
   .family-grid {
     grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
   }
+
+  .family-side {
+    grid-column: 2;
+  }
+}
+
+/* Three columns from 1440px: people, the person, their cards and debts. */
+@media (min-width: 1440px) {
+  .family-grid {
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1.5fr) minmax(300px, 1fr);
+  }
+
+  .family-side {
+    grid-column: 3;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1683,5 +1698,144 @@ a.btn {
 @media (max-width: 1023px) {
   .have-owe .amount {
     font-size: 17px;
+  }
+}
+
+/* Cards and debts stack, and How sharing works (#39). */
+.family-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s4);
+}
+
+.debt-count {
+  font-size: 11px;
+  vertical-align: super;
+  color: var(--color-text-secondary);
+  margin-left: 2px;
+}
+
+.debt-sub {
+  margin: calc(-1 * var(--space-s2)) 0 0;
+}
+
+.debt-cards {
+  position: relative;
+}
+
+.debt-card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 150px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-s3) var(--space-s4);
+  border: 2px solid var(--color-white);
+  border-radius: var(--radius-card);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: top 250ms ease-out;
+}
+
+.debt-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-s2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.debt-card-name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s2);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.debt-card-kind {
+  display: block;
+  font-size: 12px;
+}
+
+.debt-card-amount {
+  display: block;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.debt-clay {
+  background: var(--color-clay-deep);
+  color: var(--color-white);
+}
+
+.debt-cocoa {
+  background: var(--color-cocoa);
+  color: var(--color-cream);
+}
+
+.debt-sage {
+  background: var(--color-sage-deep);
+  color: var(--color-white);
+}
+
+.debt-sand {
+  background: var(--color-sand);
+  color: var(--color-cocoa);
+}
+
+.debt-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.debt-list-item {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-s3);
+  padding: var(--space-s1) var(--space-s2);
+  margin: 0 calc(-1 * var(--space-s2));
+  width: calc(100% + 2 * var(--space-s2));
+  border: none;
+  border-radius: var(--radius-input);
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.debt-list-item:hover,
+.debt-list-item[aria-pressed='true'] {
+  background: var(--color-cream);
+}
+
+.debt-list-item:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+.how-sharing ul {
+  margin: 0;
+  padding-left: var(--space-s4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .debt-card {
+    transition: none;
   }
 }

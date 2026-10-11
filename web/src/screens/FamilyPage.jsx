@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
+import DebtStack, { HowSharingWorks } from '../components/DebtStack.jsx'
 import { InviteIcon } from '../components/Icons.jsx'
 import { api } from '../lib/api.js'
 import { formatMoney } from '../lib/money.js'
@@ -99,6 +100,10 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
     if (window.location.pathname + window.location.search !== url) window.history.replaceState(null, '', url)
   }, [current])
 
+  // Their banks reach this page only if you may see their balances (the API
+  // filters), so "has any bank here" is the test; yourself always.
+  const sharedBalances = (m) => m.is_you || banks.some((b) => b.owner_user_id === m.user_id)
+
   const changed = () => {
     load()
     onChanged?.()
@@ -190,6 +195,23 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
             )}
             {current?.kind === 'pending' && <PendingInvite invite={current.invite} onCancelled={load} />}
           </div>
+
+          {current?.kind === 'member' && (
+            <aside className="family-side" aria-label="Cards, debts and how sharing works">
+              {sharedBalances(current.member) && (
+                <DebtStack
+                  key={current.member.user_id}
+                  title={current.member.is_you ? 'Your cards and debts' : `${nameOf(current.member)}'s cards and debts`}
+                  accounts={banks
+                    .filter((b) => b.owner_user_id === current.member.user_id)
+                    .flatMap((b) => b.accounts.map((a) => ({ ...a, bankName: b.institution_name })))
+                    .filter(isOwed)}
+                  home={household.home_currency}
+                />
+              )}
+              <HowSharingWorks />
+            </aside>
+          )}
         </div>
       )}
     </>
