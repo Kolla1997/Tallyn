@@ -779,32 +779,6 @@ fieldset.share label {
   overflow-wrap: break-word;
 }
 
-.coin {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  flex: none;
-}
-
-.coin-sage {
-  background: #e3ece3;
-  color: var(--color-sage-deep);
-}
-
-.coin-clay {
-  background: #f6e2dc;
-  color: var(--color-clay-deep);
-}
-
-.coin-sand {
-  background: var(--color-sand);
-  color: var(--color-cocoa);
-}
-
 .avatar-sm {
   width: 18px;
   height: 18px;
@@ -1158,4 +1132,37 @@ a.btn {
 .spend-sand {
   background: var(--color-sand);
   color: var(--color-cocoa);
+}
+
+/* Your accounts on Home (#39): what you have and owe, side by side. */
+.have-owe {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-s3);
+  margin-bottom: var(--space-s4);
+}
+
+.have-owe > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-s3) var(--space-s4);
+  border-radius: var(--radius-input);
+}
+
+.have-owe .amount {
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.have-owe .tone-sage .amount {
+  color: var(--color-cocoa);
+}
+
+.sub-heading {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-s2);
 }
