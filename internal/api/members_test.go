@@ -5,6 +5,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
@@ -37,6 +38,11 @@ func (s *memberStore) Invites(context.Context, string, string) ([]db.Invite, err
 func (s *memberStore) SetMemberRole(_ context.Context, uid, hh, member, role string) error {
 	s.gotUser, s.gotHH, s.gotMember, s.gotRole = uid, hh, member, role
 	return s.err
+}
+
+// Members: testUser is the owner, m1 an adult, o2 another owner.
+func (s *memberStore) Members(context.Context, string, string) ([]db.Member, error) {
+	return []db.Member{{UserID: testUser, Role: "owner", IsYou: true}, {UserID: "m1", Role: "adult"}, {UserID: "o2", Role: "owner"}}, nil
 }
 func (s *memberStore) RemoveMember(_ context.Context, uid, hh, member string) error {
 	s.gotUser, s.gotHH, s.gotMember = uid, hh, member
@@ -97,11 +103,47 @@ func TestMemberRoutes(t *testing.T) {
 	if rec := send(h, "PUT", "/api/households/"+testHH+"/members/m1", `{"role":"viewer"}`); rec.Code != http.StatusNoContent || s.gotMember != "m1" || s.gotRole != "viewer" {
 		t.Fatalf("set role: %d", rec.Code)
 	}
-	if rec := send(h, "DELETE", "/api/households/"+testHH+"/members/m1", ""); rec.Code != http.StatusNoContent || s.gotUser != testUser {
+	if rec := sendFresh(h, "DELETE", "/api/households/"+testHH+"/members/m1", ""); rec.Code != http.StatusNoContent || s.gotUser != testUser {
 		t.Fatalf("remove: %d", rec.Code)
 	}
+	if rec := send(h, "PUT", "/api/households/"+testHH+"/members/nobody", `{"role":"viewer"}`); rec.Code != http.StatusNotFound {
+		t.Fatalf("role for a non-member: %d, want 404", rec.Code)
+	}
 	s.err = db.ErrLastOwner
-	if rec := send(h, "DELETE", "/api/households/"+testHH+"/members/"+testUser, ""); rec.Code != http.StatusConflict || !strings.Contains(rec.Body.String(), "last_owner") {
+	if rec := sendFresh(h, "DELETE", "/api/households/"+testHH+"/members/"+testUser, ""); rec.Code != http.StatusConflict || !strings.Contains(rec.Body.String(), "last_owner") {
 		t.Fatalf("last owner: %d %s", rec.Code, rec.Body)
 	}
+}
+
+// The most serious member actions need a 2FA code entered in the last few
+// minutes (#38); a sign-in an hour ago isn't enough.
+func TestMemberStepUp(t *testing.T) {
+	for name, c := range map[string]struct{ method, path, body string }{
+		"remove a member": {"DELETE", "/members/m1", ""},
+		"leave":           {"DELETE", "/members/" + testUser, ""},
+		"make an owner":   {"PUT", "/members/m1", `{"role":"owner"}`},
+		"demote an owner": {"PUT", "/members/o2", `{"role":"adult"}`},
+	} {
+		s := &memberStore{}
+		h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s})
+		path := "/api/households/" + testHH + c.path
+		rec := send(h, c.method, path, c.body)
+		if rec.Code != http.StatusForbidden || !strings.Contains(rec.Body.String(), "reauth_required") {
+			t.Errorf("%s with an old code: %d %s, want 403 reauth_required", name, rec.Code, rec.Body)
+		}
+		if s.gotMember != "" {
+			t.Errorf("%s reached the store without a fresh code", name)
+		}
+		if rec := sendFresh(h, c.method, path, c.body); rec.Code != http.StatusNoContent {
+			t.Errorf("%s with a fresh code: %d, want 204", name, rec.Code)
+		}
+	}
+}
+
+func sendFresh(h http.Handler, method, path, body string) *httptest.ResponseRecorder {
+	req := httptest.NewRequest(method, path, strings.NewReader(body))
+	req.Header.Set("Authorization", "Bearer fresh")
+	rec := httptest.NewRecorder()
+	h.ServeHTTP(rec, req)
+	return rec
 }

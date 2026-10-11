@@ -338,7 +338,7 @@ function SharedWithYou({ banks, me, people, roles, home }) {
           const kid = ownerGroup(p.id, me.user_id, roles) === 'kids'
           return (
             <li key={p.id}>
-              <Link to="/family" className="person-row">
+              <Link to={`/family?member=${p.id}`} className="person-row">
                 <Avatar member={member} />
                 <span className="grow">
                   <span className="name block">

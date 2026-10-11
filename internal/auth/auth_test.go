@@ -90,6 +90,19 @@ func TestVerify(t *testing.T) {
 			t.Fatalf("err = %v, want ErrMFARequired", err)
 		}
 	})
+	t.Run("2FA time comes from amr", func(t *testing.T) {
+		at := time.Now().Add(-2 * time.Minute).Unix()
+		s, err := v.Verify(with(func(c jwt.MapClaims) {
+			c["amr"] = []map[string]any{{"method": "password", "timestamp": time.Now().Unix()}, {"method": "totp", "timestamp": at}}
+		}))
+		if err != nil || s.TOTPAt.Unix() != at {
+			t.Fatalf("TOTPAt = %v, err %v; want %v", s.TOTPAt, err, time.Unix(at, 0))
+		}
+		s, _ = v.Verify(with(func(c jwt.MapClaims) { delete(c, "amr") }))
+		if !s.TOTPAt.IsZero() {
+			t.Fatalf("no amr: TOTPAt = %v, want zero", s.TOTPAt)
+		}
+	})
 	t.Run("token without aal needs 2FA", func(t *testing.T) {
 		_, err := v.Verify(with(func(c jwt.MapClaims) { delete(c, "aal") }))
 		if !errors.Is(err, ErrMFARequired) {

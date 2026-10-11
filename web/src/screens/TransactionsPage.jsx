@@ -41,16 +41,17 @@ function recentMonths() {
 const monthLabel = (m) => new Date(`${m}-01T12:00:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
 // Filters from the address (Home's spending card links here with
-// ?category=…&month=…), if they're ones we know.
+// ?category=…&month=…, Family with ?owner=…), if they're ones we know.
 function fromAddress(key) {
   const v = new URLSearchParams(window.location.search).get(key) ?? ''
   if (key === 'category') return CATEGORIES.includes(v) ? v : ''
+  if (key === 'owner') return /^[0-9a-f-]{36}$/i.test(v) ? v : ''
   return /^\d{4}-(0[1-9]|1[0-2])$/.test(v) ? v : ''
 }
 
 export default function TransactionsPage({ me, household, refreshKey }) {
   const [members, setMembers] = useState([])
-  const [who, setWho] = useState('') // '' everyone, else a user ID
+  const [who, setWho] = useState(() => fromAddress('owner')) // '' everyone, else a user ID
   const [search, setSearch] = useState('')
   const [query, setQuery] = useState('') // search, applied after a short pause
   const [category, setCategory] = useState(() => fromAddress('category'))
@@ -71,11 +72,12 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   // Keep the category and month in the address, so links and Back work.
   useEffect(() => {
     const p = new URLSearchParams()
+    if (who) p.set('owner', who)
     if (category) p.set('category', category)
     if (month) p.set('month', month)
     const url = p.size ? `/transactions?${p}` : '/transactions'
     if (window.location.pathname + window.location.search !== url) window.history.replaceState(null, '', url)
-  }, [category, month])
+  }, [who, category, month])
 
   useEffect(() => {
     const t = setTimeout(() => setQuery(search.trim()), 300)

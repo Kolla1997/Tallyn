@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import AccountIcon, { accountKind } from '../components/AccountIcon.jsx'
+import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import { api } from '../lib/api.js'
 import { formatMoney } from '../lib/money.js'
 import { Avatar, nameOf } from '../lib/people.jsx'
@@ -30,7 +31,8 @@ const groupOf = (a) => (['home', 'student', 'auto', 'loan'].includes(accountKind
 export default function AccountsPage({ me, household, refreshKey, onChanged }) {
   const [banks, setBanks] = useState(null)
   const [members, setMembers] = useState([])
-  const [who, setWho] = useState('yours') // 'yours', 'everyone' or a user ID
+  // 'yours', 'everyone' or a user ID; Family links here with ?person=<id>.
+  const [who, setWho] = useState(() => new URLSearchParams(window.location.search).get('person') || 'yours')
   const [error, setError] = useState('')
   const home = household.home_currency
   const canLink = household.role === 'owner' || household.role === 'adult'
@@ -250,24 +252,18 @@ function AccountItem({ a, owner, meId }) {
   )
 }
 
-// Each bank's status and, where this person may, Unlink with a confirmation
-// in the page (window.confirm is blocked in some embedded browsers).
+// Each bank's status and, where this person may, Unlink. Unlinking asks you
+// to type the bank's name (#38); it's your own data, so no 2FA code.
 function ConnectedBanks({ banks, me, people, onUnlinked }) {
-  const [confirming, setConfirming] = useState(null)
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
+  const [unlinking, setUnlinking] = useState(null) // the bank being unlinked
 
   async function unlink(bank) {
-    setError('')
-    setBusy(true)
     try {
       await api(`/api/banks/${bank.id}`, { method: 'DELETE' })
-      setConfirming(null)
-      onUnlinked()
     } catch {
-      setError(`We couldn't unlink ${bank.institution_name || 'this bank'} just now. It's still connected, so try again in a moment.`)
+      throw new Error(`We couldn't unlink ${bank.institution_name || 'this bank'} just now. It's still connected, so try again in a moment.`)
     }
-    setBusy(false)
+    onUnlinked()
   }
 
   return (
@@ -275,11 +271,6 @@ function ConnectedBanks({ banks, me, people, onUnlinked }) {
       <div className="panel-head">
         <h2 id="banks-h">Connected banks</h2>
       </div>
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
       <ul className="rows">
         {banks.map((b) => {
           const name = b.institution_name || 'Bank'
@@ -305,29 +296,27 @@ function ConnectedBanks({ banks, me, people, onUnlinked }) {
                     : 'This bank was disconnected and isn’t updating.'}
                 </p>
               )}
-              {b.can_unlink &&
-                (confirming === b.id ? (
-                  <div className="confirm" role="group" aria-label={`Unlink ${name}?`}>
-                    <p className="small">Unlink {name}? Tallyn will disconnect it and remove its accounts and transactions.</p>
-                    <div className="confirm-actions">
-                      <button className="btn btn-small" onClick={() => unlink(b)} disabled={busy}>
-                        {busy ? 'Unlinking…' : 'Unlink'}
-                      </button>
-                      <button className="btn btn-secondary btn-small" onClick={() => setConfirming(null)} disabled={busy}>
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button className="chip chip-danger" onClick={() => setConfirming(b.id)}>
-                    Unlink
-                  </button>
-                ))}
+              {b.can_unlink && (
+                <button className="chip chip-danger" onClick={() => setUnlinking(b)}>
+                  Unlink
+                </button>
+              )}
             </li>
           )
         })}
       </ul>
       <p className="small muted">Tallyn reads balances and transactions. It can&apos;t move money.</p>
+      {unlinking && (
+        <ConfirmDialog
+          title={`Unlink ${unlinking.institution_name || 'this bank'}?`}
+          action="Unlink"
+          typeToConfirm={unlinking.institution_name || 'Bank'}
+          onConfirm={() => unlink(unlinking)}
+          onClose={() => setUnlinking(null)}
+        >
+          <p>Tallyn will disconnect it and remove its accounts and transactions. You can link it again later, but older history may not come back.</p>
+        </ConfirmDialog>
+      )}
     </section>
   )
 }

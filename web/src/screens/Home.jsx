@@ -8,9 +8,8 @@ import CreateHousehold from './CreateHousehold.jsx'
 import HomePage from './HomePage.jsx'
 import Join from './Join.jsx'
 import TransactionsPage from './TransactionsPage.jsx'
-import Members from './Members.jsx'
+import FamilyPage from './FamilyPage.jsx'
 import Settings from './Settings.jsx'
-import Sharing from './Sharing.jsx'
 import Shell, { PageHead } from './Shell.jsx'
 
 const HOUSEHOLD_KEY = 'tallyn.household'
@@ -119,31 +118,16 @@ export default function Home({ email, onSignOut }) {
       break
     case '/family':
       page = (
-        <>
-          <PageHead title="Family" sub="Nobody sees your money until you share it" />
-          <div className="cols">
-            <div className="col">
-              <section className="panel">
-                <Sharing householdId={household.id} onChanged={refresh} key={`s${refreshKey}`} />
-              </section>
-            </div>
-            <div className="col">
-              <section className="panel">
-                <Members
-                  household={household}
-                  onChanged={() => {
-                    refresh()
-                    load()
-                  }}
-                  onLeft={() => {
-                    choose('')
-                    load()
-                  }}
-                />
-              </section>
-            </div>
-          </div>
-        </>
+        <FamilyPage
+          me={me}
+          household={household}
+          refreshKey={refreshKey}
+          onChanged={refresh}
+          onLeft={() => {
+            choose('')
+            load()
+          }}
+        />
       )
       break
     case '/goals':

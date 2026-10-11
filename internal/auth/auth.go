@@ -37,7 +37,8 @@ var (
 type Session struct {
 	UserID    string // auth.users.id, a UUID
 	SessionID string
-	AAL       string // "aal2" for every session that reaches a handler
+	AAL       string    // "aal2" for every session that reaches a handler
+	TOTPAt    time.Time // when this session last entered a 2FA code; zero if never
 }
 
 type claims struct {
@@ -46,6 +47,13 @@ type claims struct {
 	AAL         string `json:"aal"`
 	SessionID   string `json:"session_id"`
 	IsAnonymous bool   `json:"is_anonymous"`
+	// AMR lists how and when the session authenticated. Supabase updates the
+	// TOTP entry's timestamp each time the user enters a new code, which is
+	// what step-up checks (#38) rely on.
+	AMR []struct {
+		Method    string `json:"method"`
+		Timestamp int64  `json:"timestamp"`
+	} `json:"amr"`
 }
 
 var uuidRE = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
@@ -104,7 +112,15 @@ func (v *Verifier) Verify(token string) (Session, error) {
 	if c.AAL != "aal2" {
 		return Session{}, ErrMFARequired
 	}
-	return Session{UserID: c.Subject, SessionID: c.SessionID, AAL: c.AAL}, nil
+	var totpAt time.Time
+	for _, a := range c.AMR {
+		if a.Method == "totp" || a.Method == "mfa/totp" {
+			if t := time.Unix(a.Timestamp, 0); t.After(totpAt) {
+				totpAt = t
+			}
+		}
+	}
+	return Session{UserID: c.Subject, SessionID: c.SessionID, AAL: c.AAL, TOTPAt: totpAt}, nil
 }
 
 // Require lets a request through only with a verified, 2FA-completed session,

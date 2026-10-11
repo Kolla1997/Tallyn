@@ -298,15 +298,6 @@ fieldset.share label {
   margin: 0;
 }
 
-.shared-with-you {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s1);
-}
-
 .saved {
   color: var(--color-success);
 }
@@ -318,37 +309,11 @@ fieldset.share label {
   gap: var(--space-s4);
 }
 
-.members {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s3);
-}
-
-.members li {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s1);
-}
-
-.member-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-s3);
-  flex-direction: row !important;
-}
-
-.member-row select {
-  padding: var(--space-s1) var(--space-s3);
-}
-
 .invite-form {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-  padding: var(--space-s3) var(--space-s4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s3);
+  max-width: 480px;
 }
 
 /* App layout (#39): sidebar on web, tab bar on phones.
@@ -1451,5 +1416,211 @@ a.btn {
 
   .connected-banks {
     grid-column: auto;
+  }
+}
+
+/* Family page (#39 step 4). */
+.family-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-s4);
+  align-items: start;
+}
+
+.family-list .rows > li {
+  padding: 0;
+  border-top: none;
+}
+
+.family-person {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+  width: 100%;
+  padding: var(--space-s2);
+  border: none;
+  border-radius: var(--radius-input);
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.family-person:hover {
+  background: var(--color-cream);
+}
+
+.family-person[aria-current] {
+  background: var(--color-sand);
+}
+
+.family-person:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+.avatar-invite {
+  background: var(--color-sage-light);
+  color: var(--color-cocoa);
+}
+
+.family-detail {
+  max-width: 760px;
+}
+
+.person-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+  flex-wrap: wrap;
+}
+
+.person-head h2 {
+  margin: 0 0 var(--space-s1);
+}
+
+.person-section {
+  border-top: 1px solid var(--color-sand);
+  padding-top: var(--space-s3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s2);
+}
+
+.person-section .have-owe {
+  margin-bottom: 0;
+}
+
+.person-links {
+  display: flex;
+  gap: var(--space-s4);
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.person-footer {
+  border-top: 1px solid var(--color-sand);
+  padding-top: var(--space-s3);
+}
+
+.link.danger-link {
+  color: var(--color-clay-deep);
+}
+
+.chip.chip-on {
+  background: #e3ece3;
+  border-color: var(--color-sage-light);
+  color: var(--color-sage-deep);
+}
+
+.switches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s2) var(--space-s5);
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s2);
+  cursor: pointer;
+}
+
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.switch-track {
+  width: 32px;
+  height: 18px;
+  border-radius: var(--radius-button);
+  background: var(--color-border);
+  position: relative;
+  flex: none;
+  transition: background 200ms ease-out;
+}
+
+.switch-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-white);
+  transition: left 200ms ease-out;
+}
+
+.switch input:checked + .switch-track {
+  background: var(--color-sage-deep);
+}
+
+.switch input:checked + .switch-track::after {
+  left: 16px;
+}
+
+.switch input:focus-visible + .switch-track {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+.switch input:disabled + .switch-track {
+  opacity: 0.5;
+}
+
+/* Confirmation dialog (#38). */
+.dialog {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-s5);
+  width: min(440px, calc(100vw - 2 * var(--space-s4)));
+  color: var(--color-cocoa);
+  background: var(--color-white);
+}
+
+.dialog::backdrop {
+  background: rgb(59 47 47 / 0.45);
+}
+
+.dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s3);
+}
+
+.dialog h2 {
+  margin: 0;
+}
+
+.dialog-body p {
+  margin: 0;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-s2);
+  flex-wrap: wrap;
+}
+
+.btn.btn-danger {
+  background: var(--color-error);
+}
+
+@media (min-width: 1024px) {
+  .family-grid {
+    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch-track,
+  .switch-track::after {
+    transition: none;
   }
 }
