@@ -2,7 +2,7 @@
 type: log
 status: active
 owner: Dinesh
-updated: 2026-10-08
+updated: 2026-10-11
 tags: [log]
 ---
 
@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-11
+- #39 Collapsible sidebar on branch `39-sidebar-collapse`: collapses to a 72px icon rail with tooltips (hover and keyboard focus); toggle button and the `[` shortcut (ignored while typing); choice remembered per device; without a saved choice, screens under 1280px start collapsed; household shows as an initial that expands the sidebar and focuses the switcher; 240ms animation, none under reduced motion; phones unchanged (caught and fixed a bug where the collapsed grid squashed the phone layout).
 - #42 Transactions page on branch `42-transactions`: `/transactions` with a person switcher (Everyone / Yours / each member; teens and children see only their own), merchant search, category filter, grouped by day, 50 at a time with Show more. Every transaction has an icon: the merchant's logo from Plaid, or a category icon (16, one per Plaid category). Tab bar now has 5 items.
 - #42 `0009_transaction_logos.sql`: `transactions.logo_url` (only `plaid-merchant-logos.plaid.com` and `plaid-counterparty-logos.plaid.com`, checked in Go and by the database) and `transaction_owner()` so transactions shared without balances still show whose they are. `/api/transactions` gets `owner`, `q`, `category`, `offset`, `limit` and returns `more`. Logos load with no referrer; #24 must allow the two hosts.
 - Decision (Dinesh): real merchant logos now with category icons as the fallback; 5-item tab bar; search and category filter included.

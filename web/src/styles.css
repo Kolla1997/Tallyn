@@ -1005,3 +1005,103 @@ a.btn {
     font-size: 11px;
   }
 }
+
+/* Collapsible sidebar (#39): a 72px icon rail when collapsed. */
+.app-shell {
+  transition: grid-template-columns 240ms ease-out;
+}
+
+@media (min-width: 1024px) {
+  .app-shell.is-collapsed {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+}
+
+.app-shell.is-collapsed .sidebar {
+  padding: var(--space-s5) var(--space-s2);
+  align-items: center;
+}
+
+.sidebar-mark {
+  width: 32px;
+  height: 32px;
+  margin: var(--space-s2) 0 var(--space-s3);
+}
+
+.app-shell.is-collapsed .nav a {
+  justify-content: center;
+  padding: var(--space-s3);
+  width: 48px;
+  height: 48px;
+}
+
+.app-shell.is-collapsed .sidebar-bottom {
+  align-items: center;
+}
+
+.household-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-cream);
+  color: var(--color-cocoa);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s2);
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: 14px;
+  padding: var(--space-s2) var(--space-s3);
+  border-radius: var(--radius-button);
+  cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+  background: var(--color-cream);
+  color: var(--color-cocoa);
+}
+
+.sidebar-toggle:focus-visible,
+.household-dot:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+/* Tooltips for the icon rail, on hover and keyboard focus. */
+[data-tip] {
+  position: relative;
+}
+
+.app-shell.is-collapsed [data-tip]:hover::after,
+.app-shell.is-collapsed [data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--color-cocoa);
+  color: var(--color-cream);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 13px;
+  white-space: nowrap;
+  padding: 4px 10px;
+  border-radius: var(--radius-input);
+  pointer-events: none;
+  z-index: 20;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell {
+    transition: none;
+  }
+}
