@@ -80,8 +80,8 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
             <RecentTransactions txs={txs ?? []} me={me} people={people} />
           </div>
           <div className="col">
-            <SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />
             <SpendingCard spending={spending?.spending ?? []} month={spending?.month} home={household.home_currency} />
+            <SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />
             <FamilyCard members={members} isOwner={household.role === 'owner'} />
             <section className="panel" aria-labelledby="goals-h">
               <div className="panel-head">

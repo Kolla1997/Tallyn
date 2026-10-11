@@ -672,8 +672,8 @@ fieldset.share label {
   margin: 0;
 }
 
+/* Others' money (#37): white like every card, the dashed border sets it apart. */
 .panel-shared {
-  background: var(--color-cream);
   border-style: dashed;
 }
 
