@@ -30,12 +30,18 @@ const CATEGORIES = [
 ]
 const KID = new Set(['teen', 'child'])
 
+// A category from the address (Home's spending card links here), if it's one we know.
+function initialCategory() {
+  const c = new URLSearchParams(window.location.search).get('category')
+  return CATEGORIES.includes(c) ? c : ''
+}
+
 export default function TransactionsPage({ me, household, refreshKey }) {
   const [members, setMembers] = useState([])
   const [who, setWho] = useState('') // '' everyone, else a user ID
   const [search, setSearch] = useState('')
   const [query, setQuery] = useState('') // search, applied after a short pause
-  const [category, setCategory] = useState('')
+  const [category, setCategory] = useState(initialCategory)
   const [list, setList] = useState(null)
   const [more, setMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -48,6 +54,12 @@ export default function TransactionsPage({ me, household, refreshKey }) {
       () => {},
     )
   }, [household.id])
+
+  // Keep ?category= in the address, so Home can link here and Back works.
+  useEffect(() => {
+    const url = category ? `/transactions?category=${encodeURIComponent(category)}` : '/transactions'
+    if (window.location.pathname + window.location.search !== url) window.history.replaceState(null, '', url)
+  }, [category])
 
   useEffect(() => {
     const t = setTimeout(() => setQuery(search.trim()), 300)

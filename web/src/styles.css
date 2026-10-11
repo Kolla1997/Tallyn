@@ -279,20 +279,6 @@ select:focus-visible {
   gap: var(--space-s3);
 }
 
-.bar {
-  height: 8px;
-  background: var(--color-sand);
-  border-radius: var(--radius-button);
-  overflow: hidden;
-  margin-top: var(--space-s1);
-}
-
-.bar > div {
-  height: 100%;
-  background: var(--color-clay);
-  border-radius: var(--radius-button);
-}
-
 .tx-merchant {
   overflow-wrap: anywhere;
 }
@@ -793,16 +779,6 @@ fieldset.share label {
   overflow-wrap: break-word;
 }
 
-.rows.bars > li {
-  display: block;
-}
-
-.bar-row {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-s3);
-}
-
 .coin {
   width: 40px;
   height: 40px;
@@ -1104,4 +1080,82 @@ a.btn {
   .app-shell {
     transition: none;
   }
+}
+
+/* Spending card (#39): one bar split by category, then a row per category. */
+.spend-bar {
+  display: flex;
+  gap: 2px;
+  height: 12px;
+  border-radius: var(--radius-button);
+  overflow: hidden;
+  margin-bottom: var(--space-s3);
+}
+
+.spend-bar > span {
+  flex-basis: 0;
+  min-width: 4px;
+}
+
+.spend-rows > li {
+  padding: 0;
+}
+
+.spend-rows > li:first-child {
+  padding-top: 0;
+}
+
+.spend-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+  width: calc(100% + 2 * var(--space-s2));
+  padding: var(--space-s3) var(--space-s2);
+  margin: 0 calc(-1 * var(--space-s2));
+  border-radius: var(--radius-input);
+  color: inherit;
+  text-decoration: none;
+}
+
+.spend-row:hover {
+  background: var(--color-cream);
+}
+
+.spend-row:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+.spend-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.spend-clay {
+  background: var(--color-clay);
+  color: var(--color-white);
+}
+
+.spend-sage {
+  background: var(--color-sage);
+  color: var(--color-white);
+}
+
+.spend-cocoa {
+  background: var(--color-cocoa);
+  color: var(--color-cream);
+}
+
+.spend-sage-light {
+  background: var(--color-sage-light);
+  color: var(--color-cocoa);
+}
+
+.spend-sand {
+  background: var(--color-sand);
+  color: var(--color-cocoa);
 }

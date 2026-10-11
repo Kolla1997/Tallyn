@@ -29,6 +29,9 @@ const CATEGORIES = {
 }
 const OTHER = { tone: 'sand', d: 'M6 12h.01M12 12h.01M18 12h.01' }
 
+// The stroke path for a category's icon, for other places that draw it.
+export const categoryPath = (category) => (CATEGORIES[category] ?? OTHER).d
+
 export function CategoryIcon({ category }) {
   const c = CATEGORIES[category] ?? OTHER
   return (

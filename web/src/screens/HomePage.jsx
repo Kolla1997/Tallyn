@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { InviteIcon } from '../components/Icons.jsx'
+import { categoryPath } from '../components/TxIcon.jsx'
 import TransactionRow from '../components/TransactionRow.jsx'
 import { api } from '../lib/api.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
@@ -288,10 +289,31 @@ function RecentTransactions({ txs, me, people }) {
   )
 }
 
+// Spending this month (#39): one bar split by category, then a row per
+// category with its icon, share, number of purchases and amount. The top four
+// get their own colour; the rest are grouped as Other. Each row opens the
+// Transactions page filtered to that category.
+const SPEND_COLORS = ['clay', 'sage', 'cocoa', 'sage-light']
+
 function SpendingCard({ spending, home }) {
-  const rows = spending.filter((s) => s.currency === home)
+  const rows = spending.filter((s) => s.currency === home).sort((a, b) => b.amount_minor - a.amount_minor)
   const total = rows.reduce((sum, r) => sum + r.amount_minor, 0)
-  const max = Math.max(1, ...rows.map((r) => r.amount_minor))
+  const top = rows.slice(0, SPEND_COLORS.length).map((r, i) => ({ ...r, color: SPEND_COLORS[i] }))
+  const rest = rows.slice(SPEND_COLORS.length)
+  if (rest.length > 0) {
+    top.push({
+      category: 'OTHER',
+      color: 'sand',
+      amount_minor: rest.reduce((sum, r) => sum + r.amount_minor, 0),
+      count: rest.reduce((sum, r) => sum + r.count, 0),
+      label: `Other (${rest.length} categories)`,
+    })
+  }
+  const share = (v) => {
+    const p = (v / total) * 100
+    return p < 1 ? '<1%' : `${Math.round(p)}%`
+  }
+
   return (
     <section className="panel" aria-labelledby="sp-h">
       <div className="panel-head">
@@ -301,19 +323,37 @@ function SpendingCard({ spending, home }) {
       {rows.length === 0 ? (
         <p className="small muted">No spending yet this month.</p>
       ) : (
-        <ul className="rows bars">
-          {rows.map((r) => (
-            <li key={r.category}>
-              <div className="bar-row">
-                <span>{categoryLabel(r.category)}</span>
-                <span className="amount">{formatMoney(r.amount_minor, home)}</span>
-              </div>
-              <div className="bar" aria-hidden="true">
-                <div style={{ width: `${Math.max(2, Math.round((r.amount_minor / max) * 100))}%` }} />
-              </div>
-            </li>
-          ))}
-        </ul>
+        <>
+          <div className="spend-bar" aria-hidden="true">
+            {top.map((r) => (
+              <span key={r.category} className={`spend-${r.color}`} style={{ flexGrow: r.amount_minor }} />
+            ))}
+          </div>
+          <ul className="rows spend-rows">
+            {top.map((r) => {
+              const label = r.label ?? categoryLabel(r.category)
+              const to = r.category === 'OTHER' ? '/transactions' : `/transactions?category=${encodeURIComponent(r.category)}`
+              return (
+                <li key={r.category}>
+                  <Link to={to} className="spend-row">
+                    <span className={`spend-icon spend-${r.color}`} aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                        <path d={categoryPath(r.category)} />
+                      </svg>
+                    </span>
+                    <span className="grow">
+                      <span className="name block">{label}</span>
+                      <span className="small muted block">
+                        {share(r.amount_minor)} · {r.count} {r.count === 1 ? 'purchase' : 'purchases'}
+                      </span>
+                    </span>
+                    <span className="amount">{formatMoney(r.amount_minor, home)}</span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </>
       )}
       <p className="small muted">Transfers and card payments aren&apos;t counted as spending.</p>
     </section>
