@@ -3,7 +3,7 @@ import AuthPage from '../components/AuthPage.jsx'
 import { api } from '../lib/api.js'
 import { pendingInvite } from '../lib/invite.js'
 import { Link, usePath } from '../lib/router.jsx'
-import Banks from './Banks.jsx'
+import AccountsPage from './AccountsPage.jsx'
 import CreateHousehold from './CreateHousehold.jsx'
 import HomePage from './HomePage.jsx'
 import Join from './Join.jsx'
@@ -115,14 +115,7 @@ export default function Home({ email, onSignOut }) {
       page = <TransactionsPage me={me} household={household} refreshKey={refreshKey} />
       break
     case '/accounts':
-      page = (
-        <>
-          <PageHead title="Accounts" sub="Your banks and the ones shared with you" />
-          <section className="panel">
-            <Banks household={household} refreshKey={refreshKey} onChanged={refresh} />
-          </section>
-        </>
-      )
+      page = <AccountsPage me={me} household={household} refreshKey={refreshKey} onChanged={refresh} />
       break
     case '/family':
       page = (
