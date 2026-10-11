@@ -20,6 +20,7 @@ kanban-plugin: board
 - [ ] [#36 Terms of Service and Privacy Policy pages, with consent at sign-up](https://github.com/Kolla1997/Tallyn/issues/36) #type/feature #area/frontend #priority/p0
 - [ ] [#37 Show shared money separately from your own](https://github.com/Kolla1997/Tallyn/issues/37) #type/design #area/frontend #priority/p1
 - [ ] [#38 Confirmation dialog before removing members, leaving or unlinking](https://github.com/Kolla1997/Tallyn/issues/38) #type/feature #area/frontend #priority/p1
+- [ ] [#51 Reconnect a bank that needs sign-in (Plaid update mode)](https://github.com/Kolla1997/Tallyn/issues/51) #type/feature #area/frontend #area/backend #priority/p1
 
 
 ## In Progress
