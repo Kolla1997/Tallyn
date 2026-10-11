@@ -77,11 +77,11 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
           <div className="col">
             <TotalCard banks={banks} txs={txs ?? []} me={me} roles={roles} home={household.home_currency} />
             <YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} />
-            <SharedWithYou banks={banks} me={me} people={people} roles={roles} />
             <RecentTransactions txs={txs ?? []} me={me} people={people} />
           </div>
           <div className="col">
             <SpendingCard spending={spending?.spending ?? []} month={spending?.month} home={household.home_currency} />
+            <SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />
             <FamilyCard members={members} isOwner={household.role === 'owner'} />
             <section className="panel" aria-labelledby="goals-h">
               <div className="panel-head">
@@ -248,38 +248,72 @@ function YourAccounts({ banks, me, canLink, home }) {
   )
 }
 
-function SharedWithYou({ banks, me, people, roles }) {
-  const others = banks.filter((b) => b.owner_user_id !== me.user_id)
-  if (others.length === 0) return null
+// Shared with you (#37, #39 option A): one row per person whose money you can
+// see, and why: they share balances with you, or you're their parent. Their
+// accounts open on the Family page. Kept apart from your own money.
+function SharedWithYou({ banks, me, people, roles, home }) {
+  const byOwner = new Map()
+  for (const b of banks) {
+    if (b.owner_user_id === me.user_id) continue
+    const p = byOwner.get(b.owner_user_id) ?? { id: b.owner_user_id, have: 0, owe: 0, owes: false, count: 0 }
+    for (const a of b.accounts) {
+      p.count++
+      if (a.currency !== home || a.current_balance_minor == null) continue
+      if (isOwed(a)) {
+        p.owe += a.current_balance_minor
+        p.owes = true
+      } else {
+        p.have += a.current_balance_minor
+      }
+    }
+    byOwner.set(b.owner_user_id, p)
+  }
+  if (byOwner.size === 0) return null
+
   return (
     <section className="panel panel-shared" aria-labelledby="shared-h">
       <div className="panel-head">
         <h2 id="shared-h">Shared with you</h2>
+        <Link to="/family" className="link small">
+          Sharing
+        </Link>
       </div>
       <ul className="rows">
-        {others.flatMap((b) =>
-          b.accounts.map((a) => {
-            const owner = people[b.owner_user_id]
-            const why =
-              ownerGroup(b.owner_user_id, me.user_id, roles) === 'kids'
-                ? `You see ${nameOf(owner)}'s money as a parent`
-                : `${nameOf(owner)} shares this with you`
-            return (
-              <li key={a.id}>
-                <Avatar member={owner ?? { user_id: b.owner_user_id }} />
-                <div className="grow">
-                  <p className="name">
-                    {nameOf(owner)} · {a.name}
-                  </p>
-                  <p className="small muted">{why}</p>
-                </div>
-                <span className={isOwed(a) ? 'amount money-out' : 'amount'}>
-                  {formatMoney(a.current_balance_minor, a.currency)}
+        {[...byOwner.values()].map((p) => {
+          const member = people[p.id] ?? { user_id: p.id }
+          const kid = ownerGroup(p.id, me.user_id, roles) === 'kids'
+          return (
+            <li key={p.id}>
+              <Link to="/family" className="person-row">
+                <Avatar member={member} />
+                <span className="grow">
+                  <span className="name block">
+                    {nameOf(member)}
+                    {kid && <span className="tag role-tag">{roles[p.id] === 'child' ? 'Child' : 'Teen'}</span>}
+                  </span>
+                  <span className="small muted block">
+                    {kid ? 'You see this as a parent' : 'Shares balances'} · {p.count} {p.count === 1 ? 'account' : 'accounts'}
+                  </span>
+                  <span className="person-money small">
+                    <span>
+                      Has <span className="amount">{formatMoney(p.have, home)}</span>
+                    </span>
+                    {p.owes ? (
+                      <span>
+                        owes <span className="amount money-out">{formatMoney(p.owe, home)}</span>
+                      </span>
+                    ) : (
+                      <span className="muted">owes nothing</span>
+                    )}
+                  </span>
                 </span>
-              </li>
-            )
-          }),
-        )}
+                <svg className="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+                  <path d="m9 6 6 6-6 6" />
+                </svg>
+              </Link>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )
