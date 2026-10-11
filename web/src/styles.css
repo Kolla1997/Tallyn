@@ -644,7 +644,7 @@ fieldset.share label {
 
   .tabbar {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     position: fixed;
     bottom: 0;
     left: 0;
@@ -830,10 +830,9 @@ fieldset.share label {
 }
 
 .avatar-sm {
-  width: 24px;
-  height: 24px;
-  font-size: 11px;
-  margin: 0 8px;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
 }
 
 .tag {
@@ -894,5 +893,115 @@ a.btn {
 @media (max-width: 1023px) {
   .total-big {
     font-size: 36px;
+  }
+}
+
+/* Transactions (#42) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.tx-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: none;
+  overflow: hidden;
+}
+
+.tx-logo {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+}
+
+.tx-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tone-clay {
+  background: #f6e2dc;
+  color: var(--color-clay-deep);
+}
+
+.tone-sage {
+  background: #e3ece3;
+  color: var(--color-sage-deep);
+}
+
+.tone-sand {
+  background: var(--color-sand);
+  color: var(--color-cocoa);
+}
+
+.tx-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+}
+
+.tx-owner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  color: var(--color-cocoa);
+}
+
+.tx-owner::after {
+  content: '·';
+  margin-left: 2px;
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+.tx-filters {
+  margin-bottom: var(--space-s4);
+}
+
+.filter-row {
+  display: flex;
+  gap: var(--space-s3);
+  flex-wrap: wrap;
+}
+
+.filter-row .grow {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-row input,
+.filter-row select {
+  width: 100%;
+}
+
+.tx-days {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s4);
+  max-width: 820px;
+}
+
+.day-heading {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+}
+
+.show-more {
+  align-self: center;
+}
+
+@media (max-width: 1023px) {
+  .tabbar a {
+    font-size: 11px;
   }
 }

@@ -1,5 +1,5 @@
 import logo from '../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg'
-import { AccountsIcon, FamilyIcon, GoalsIcon, HomeIcon, SettingsIcon } from '../components/Icons.jsx'
+import { AccountsIcon, FamilyIcon, GoalsIcon, HomeIcon, SettingsIcon, TransactionsIcon } from '../components/Icons.jsx'
 import { Link } from '../lib/router.jsx'
 
 // App layout (#39): sidebar on web (1024px and up), header and bottom tab bar
@@ -7,6 +7,7 @@ import { Link } from '../lib/router.jsx'
 const NAV = [
   ['/', 'Home', HomeIcon],
   ['/accounts', 'Accounts', AccountsIcon],
+  ['/transactions', 'Transactions', TransactionsIcon],
   ['/family', 'Family', FamilyIcon],
   ['/goals', 'Goals', GoalsIcon],
 ]

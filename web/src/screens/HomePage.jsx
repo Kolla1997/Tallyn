@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { InviteIcon } from '../components/Icons.jsx'
+import TransactionRow from '../components/TransactionRow.jsx'
 import { api } from '../lib/api.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { Avatar, nameOf } from '../lib/people.jsx'
@@ -253,12 +254,15 @@ function RecentTransactions({ txs, me, people }) {
   const owners = [...new Set(txs.map((t) => t.owner_user_id).filter((id) => id && id !== me.user_id))]
   const shown = txs
     .filter((t) => who === 'everyone' || (who === 'yours' ? t.owner_user_id === me.user_id : t.owner_user_id === who))
-    .slice(0, 12)
+    .slice(0, 8)
 
   return (
     <section className="panel" aria-labelledby="tx-h">
       <div className="panel-head">
         <h2 id="tx-h">Recent transactions</h2>
+        <Link to="/transactions" className="link small">
+          See all
+        </Link>
       </div>
       {owners.length > 0 && (
         <div className="chips" role="group" aria-label="Whose transactions">
@@ -275,50 +279,13 @@ function RecentTransactions({ txs, me, people }) {
         <p className="small muted">No transactions yet. A new bank can take a few minutes to show its history.</p>
       ) : (
         <ul className="rows">
-          {shown.map((t) => {
-            const mine = t.owner_user_id === me.user_id
-            const shownAmount = -t.amount_minor // Plaid: positive = money out
-            return (
-              <li key={t.id}>
-                {mine || !t.owner_user_id ? (
-                  <span className="coin coin-sand" aria-hidden="true">
-                    {t.merchant.charAt(0).toUpperCase()}
-                  </span>
-                ) : (
-                  <Avatar member={people[t.owner_user_id] ?? { user_id: t.owner_user_id }} small />
-                )}
-                <div className="grow">
-                  <p className="name">{t.merchant}</p>
-                  <p className="small muted">{describe(t, mine ? null : nameOf(people[t.owner_user_id]))}</p>
-                </div>
-                <span className={`amount ${shownAmount < 0 ? 'money-out' : 'money-in'}`}>
-                  {shownAmount > 0 ? '+' : shownAmount < 0 ? '−' : ''}
-                  {formatMoney(Math.abs(shownAmount), t.currency)}
-                </span>
-              </li>
-            )
-          })}
+          {shown.map((t) => (
+            <TransactionRow key={t.id} tx={t} meId={me.user_id} people={people} />
+          ))}
         </ul>
       )}
     </section>
   )
-}
-
-function describe(t, person) {
-  const w = t.whereabouts
-  const when = w?.authorized_at || w?.posted_at
-  const day = new Date(`${t.authorized_date || t.date}T12:00:00`)
-  return [
-    day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    when && new Date(when).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-    [w?.city, w?.region].filter(Boolean).join(', '),
-    t.payment_channel,
-    person,
-    t.category_primary && categoryLabel(t.category_primary),
-    t.pending && 'pending',
-  ]
-    .filter(Boolean)
-    .join(' · ')
 }
 
 function SpendingCard({ spending, home }) {

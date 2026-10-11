@@ -44,6 +44,11 @@ export const SettingsIcon = (p) => (
     <path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M5.6 18.4l1.6-1.6M16.8 7.2l1.6-1.6" />
   </svg>
 )
+export const TransactionsIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" />
+  </svg>
+)
 export const PlusIcon = (p) => (
   <svg {...base} strokeWidth={2} {...p}>
     <path d="M12 5v14M5 12h14" />
