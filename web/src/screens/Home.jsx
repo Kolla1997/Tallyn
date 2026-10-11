@@ -5,13 +5,12 @@ import { pendingInvite } from '../lib/invite.js'
 import { Link, usePath } from '../lib/router.jsx'
 import Banks from './Banks.jsx'
 import CreateHousehold from './CreateHousehold.jsx'
+import HomePage from './HomePage.jsx'
 import Join from './Join.jsx'
 import Members from './Members.jsx'
 import Settings from './Settings.jsx'
 import Sharing from './Sharing.jsx'
 import Shell, { PageHead } from './Shell.jsx'
-import Spending from './Spending.jsx'
-import Transactions from './Transactions.jsx'
 
 const HOUSEHOLD_KEY = 'tallyn.household'
 
@@ -106,30 +105,10 @@ export default function Home({ email, onSignOut }) {
     )
   }
 
-  const greeting = me.display_name ? `Hello, ${me.display_name}` : 'Hello'
   let page
   switch (path) {
     case '/':
-      page = (
-        <>
-          <PageHead title={household.name} sub={greeting} />
-          <div className="cols">
-            <div className="col">
-              <section className="panel">
-                <Banks household={household} refreshKey={refreshKey} onChanged={refresh} />
-              </section>
-              <section className="panel">
-                <Transactions householdId={household.id} refreshKey={refreshKey} />
-              </section>
-            </div>
-            <div className="col">
-              <section className="panel">
-                <Spending householdId={household.id} refreshKey={refreshKey} />
-              </section>
-            </div>
-          </div>
-        </>
-      )
+      page = <HomePage me={me} household={household} refreshKey={refreshKey} onChanged={refresh} />
       break
     case '/accounts':
       page = (
