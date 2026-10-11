@@ -52,6 +52,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
   const people = useMemo(() => Object.fromEntries(members.map((m) => [m.user_id, m])), [members])
   const roles = useMemo(() => Object.fromEntries(members.map((m) => [m.user_id, m.role])), [members])
   const canLink = household.role === 'owner' || household.role === 'adult'
+  const wide = useMinWidth(1440)
   const greeting = me.display_name ? `Hello, ${me.display_name}` : 'Hello'
 
   return (
@@ -76,16 +77,15 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
       {!banks ? (
         <p className="muted">Loading…</p>
       ) : (
-        <div className="cols">
-          <div className="col">
-            <TotalCard banks={banks} txs={txs ?? []} me={me} roles={roles} home={household.home_currency} />
-            <YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} />
-            <RecentTransactions txs={mine ?? []} me={me} people={people} />
-          </div>
-          <div className="col">
-            <SpendingCard spending={spending?.spending ?? []} month={spending?.month} home={household.home_currency} />
-            <SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />
-            <FamilyCard members={members} isOwner={household.role === 'owner'} />
+        <HomeColumns
+          wide={wide}
+          total={<TotalCard banks={banks} txs={txs ?? []} me={me} roles={roles} home={household.home_currency} />}
+          accounts={<YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} />}
+          recent={<RecentTransactions txs={mine ?? []} me={me} people={people} />}
+          spending={<SpendingCard spending={spending?.spending ?? []} month={spending?.month} home={household.home_currency} />}
+          shared={<SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />}
+          family={<FamilyCard members={members} isOwner={household.role === 'owner'} />}
+          goals={
             <section className="panel" aria-labelledby="goals-h">
               <div className="panel-head">
                 <h2 id="goals-h">Goals</h2>
@@ -93,11 +93,62 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
               </div>
               <p className="small muted">Save for a trip or a school fund, and let a savings account keep track for you.</p>
             </section>
-          </div>
-        </div>
+          }
+        />
       )}
     </>
   )
+}
+
+// Three columns on wide screens (1440px and up), two from 1280px, one below
+// (the one- and two-column cases share markup; CSS stacks them under 1280px).
+function HomeColumns({ wide, total, accounts, recent, spending, shared, family, goals }) {
+  if (wide) {
+    return (
+      <div className="cols cols-3">
+        <div className="col">
+          {total}
+          {accounts}
+        </div>
+        <div className="col">
+          {spending}
+          {recent}
+        </div>
+        <div className="col">
+          {shared}
+          {family}
+          {goals}
+        </div>
+      </div>
+    )
+  }
+  return (
+    <div className="cols">
+      <div className="col">
+        {total}
+        {accounts}
+        {recent}
+      </div>
+      <div className="col">
+        {spending}
+        {shared}
+        {family}
+        {goals}
+      </div>
+    </div>
+  )
+}
+
+function useMinWidth(px) {
+  const query = `(min-width: ${px}px)`
+  const [match, setMatch] = useState(() => window.matchMedia(query).matches)
+  useEffect(() => {
+    const mq = window.matchMedia(query)
+    const update = () => setMatch(mq.matches)
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [query])
+  return match
 }
 
 function TotalCard({ banks, txs, me, roles, home }) {
