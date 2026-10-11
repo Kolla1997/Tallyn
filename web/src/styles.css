@@ -1470,10 +1470,6 @@ a.btn {
   color: var(--color-cocoa);
 }
 
-.family-detail {
-  max-width: 760px;
-}
-
 .person-head {
   display: flex;
   align-items: center;
