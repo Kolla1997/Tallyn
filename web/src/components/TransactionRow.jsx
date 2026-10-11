@@ -13,7 +13,7 @@ export default function TransactionRow({ tx, meId, people, showDate = true }) {
     <li className="tx-row">
       <TxIcon tx={tx} />
       <div className="grow">
-        <p className="name">{tx.merchant}</p>
+        <p className="name">{cleanName(tx.merchant)}</p>
         <p className="small muted tx-meta">
           {!mine && owner && (
             <span className="tx-owner">
@@ -24,7 +24,8 @@ export default function TransactionRow({ tx, meId, people, showDate = true }) {
           <span>{details(tx, showDate)}</span>
         </p>
       </div>
-      <span className={`amount ${shown < 0 ? 'money-out' : 'money-in'}`}>
+      {/* Money out in plain text, money in green: spending isn't an alarm. */}
+      <span className={shown > 0 ? 'amount money-in' : 'amount'}>
         {shown > 0 ? '+' : shown < 0 ? '−' : ''}
         {formatMoney(Math.abs(shown), tx.currency)}
       </span>
@@ -39,7 +40,6 @@ function details(tx, showDate) {
     showDate && formatDay(tx),
     when && new Date(when).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
     [w?.city, w?.region].filter(Boolean).join(', '),
-    tx.payment_channel,
     tx.category_primary && categoryLabel(tx.category_primary),
     tx.pending && 'pending',
   ]
@@ -50,4 +50,21 @@ function details(tx, showDate) {
 function formatDay(tx) {
   const day = tx.authorized_date || tx.date // when you paid, if the bank says
   return new Date(`${day}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+// Bank descriptions often arrive in capitals with stray symbols
+// ("CREDIT CARD 3333 PAYMENT *//"). Show them in sentence case without the
+// clutter. Display only: the stored name is unchanged. Names that already
+// have lower case ("Uber") are left alone.
+const KEEP_CAPS = new Set(['ACH', 'ATM', 'CD', 'HSA', 'IRA', 'IRS', 'LLC', 'UPS', 'USA'])
+
+export function cleanName(name = '') {
+  if (/[a-z]/.test(name)) return name
+  const words = name
+    .replace(/[*/#\\|_]+/g, ' ')
+    .split(/\s+/)
+    .map((w) => w.replace(/^\.+|\.+$/g, ''))
+    .filter(Boolean)
+  const out = words.map((w) => (KEEP_CAPS.has(w) ? w : w.toLowerCase())).join(' ')
+  return out ? out.charAt(0).toUpperCase() + out.slice(1) : name
 }
