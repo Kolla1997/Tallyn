@@ -24,6 +24,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
   const [banks, setBanks] = useState(null)
   const [members, setMembers] = useState([])
   const [txs, setTxs] = useState(null)
+  const [mine, setMine] = useState(null)
   const [spending, setSpending] = useState(null)
   const [error, setError] = useState('')
 
@@ -35,16 +36,18 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
       api(`/api/households/${hh}/members`),
       api(`/api/transactions?household_id=${hh}&limit=200`),
       api(`/api/spending?household_id=${hh}`),
+      api(`/api/transactions?household_id=${hh}&owner=${encodeURIComponent(me.user_id)}&limit=100`),
     ]).then(
-      ([b, m, t, s]) => {
+      ([b, m, t, s, y]) => {
         setBanks(b.banks)
         setMembers(m.members)
         setTxs(t.transactions)
         setSpending(s)
+        setMine(y.transactions)
       },
       () => setError("We couldn't load your household's money. Try again in a moment."),
     )
-  }, [household.id, refreshKey])
+  }, [household.id, me.user_id, refreshKey])
 
   const people = useMemo(() => Object.fromEntries(members.map((m) => [m.user_id, m])), [members])
   const roles = useMemo(() => Object.fromEntries(members.map((m) => [m.user_id, m.role])), [members])
@@ -77,7 +80,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
           <div className="col">
             <TotalCard banks={banks} txs={txs ?? []} me={me} roles={roles} home={household.home_currency} />
             <YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} />
-            <RecentTransactions txs={txs ?? []} me={me} people={people} />
+            <RecentTransactions txs={mine ?? []} me={me} people={people} />
           </div>
           <div className="col">
             <SpendingCard spending={spending?.spending ?? []} month={spending?.month} home={household.home_currency} />
@@ -319,40 +322,56 @@ function SharedWithYou({ banks, me, people, roles, home }) {
   )
 }
 
+// Your recent transactions (#39, option C): only yours, since everyone's are
+// on the Transactions page. Spending, transfers and income are kept apart, so
+// card payments and moves between accounts don't look like spending. Same
+// rules as the spending card.
+const TRANSFER = new Set(['TRANSFER_IN', 'TRANSFER_OUT'])
+const RECENT_TABS = [
+  ['spending', 'Spending', 'No spending yet.'],
+  ['transfers', 'Transfers', 'No transfers yet.'],
+  ['income', 'Income', 'No income yet.'],
+]
+
+export function txKind(t) {
+  if (TRANSFER.has(t.category_primary) || t.category_detailed === 'LOAN_PAYMENTS_CREDIT_CARD_PAYMENT') return 'transfers'
+  if (t.category_primary === 'INCOME') return 'income'
+  return 'spending'
+}
+
 function RecentTransactions({ txs, me, people }) {
-  const [who, setWho] = useState('everyone')
-  const owners = [...new Set(txs.map((t) => t.owner_user_id).filter((id) => id && id !== me.user_id))]
-  const shown = txs
-    .filter((t) => who === 'everyone' || (who === 'yours' ? t.owner_user_id === me.user_id : t.owner_user_id === who))
-    .slice(0, 8)
+  const [tab, setTab] = useState('spending')
+  const shown = txs.filter((t) => txKind(t) === tab).slice(0, 5)
+  const empty = RECENT_TABS.find(([key]) => key === tab)[2]
 
   return (
     <section className="panel" aria-labelledby="tx-h">
       <div className="panel-head">
-        <h2 id="tx-h">Recent transactions</h2>
+        <h2 id="tx-h">Your recent transactions</h2>
         <Link to="/transactions" className="link small">
           See all
         </Link>
       </div>
-      {owners.length > 0 && (
-        <div className="chips" role="group" aria-label="Whose transactions">
-          {[['everyone', 'Everyone'], ['yours', 'Yours'], ...owners.map((id) => [id, nameOf(people[id])])].map(
-            ([key, label]) => (
-              <button key={key} className="chip" aria-pressed={who === key} onClick={() => setWho(key)}>
-                {label}
-              </button>
-            ),
-          )}
-        </div>
-      )}
-      {shown.length === 0 ? (
+      <div className="chips" role="group" aria-label="Kind of transaction">
+        {RECENT_TABS.map(([key, label]) => (
+          <button key={key} className="chip" aria-pressed={tab === key} onClick={() => setTab(key)}>
+            {label}
+          </button>
+        ))}
+      </div>
+      {txs.length === 0 ? (
         <p className="small muted">No transactions yet. A new bank can take a few minutes to show its history.</p>
+      ) : shown.length === 0 ? (
+        <p className="small muted">{empty}</p>
       ) : (
         <ul className="rows">
           {shown.map((t) => (
             <TransactionRow key={t.id} tx={t} meId={me.user_id} people={people} />
           ))}
         </ul>
+      )}
+      {tab === 'transfers' && (
+        <p className="small muted">Card payments and moves between your own accounts sit here, so they don&apos;t look like spending.</p>
       )}
     </section>
   )
