@@ -1166,3 +1166,46 @@ a.btn {
   color: var(--color-text-secondary);
   margin: 0 0 var(--space-s2);
 }
+
+/* Shared with you on Home (#39): one row per person. */
+.rows > li:has(> .person-row) {
+  padding: 0;
+}
+
+.person-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+  width: calc(100% + 2 * var(--space-s2));
+  padding: var(--space-s3) var(--space-s2);
+  margin: 0 calc(-1 * var(--space-s2));
+  border-radius: var(--radius-input);
+  color: inherit;
+  text-decoration: none;
+}
+
+.person-row:hover {
+  background: var(--color-cream);
+}
+
+.person-row:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+.person-money {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-s3);
+  margin-top: var(--space-s1);
+}
+
+.person-row .chevron {
+  color: var(--color-text-secondary);
+  flex: none;
+}
+
+.role-tag {
+  margin-left: var(--space-s2);
+  vertical-align: 2px;
+}
