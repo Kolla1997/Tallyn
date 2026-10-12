@@ -25,6 +25,8 @@ kanban-plugin: board
 - [ ] [#81 Transactions: filter by bank and show the bank on every transaction](https://github.com/Kolla1997/Tallyn/issues/81) #type/feature #area/frontend #area/backend
 - [ ] [#91 Sign out after 30 minutes of inactivity](https://github.com/Kolla1997/Tallyn/issues/91) #type/feature #area/frontend #priority/p1
 - [ ] [#92 Maximum session length: sign in again after a set time](https://github.com/Kolla1997/Tallyn/issues/92) #type/feature #area/frontend #priority/p2
+- [ ] [#96 Plaid Link is set up more than once on a page](https://github.com/Kolla1997/Tallyn/issues/96) #type/bug #area/frontend #priority/p1
+- [ ] [#97 Phone layout fixes from the audit](https://github.com/Kolla1997/Tallyn/issues/97) #type/design #area/frontend #priority/p1
 
 
 ## In Progress
