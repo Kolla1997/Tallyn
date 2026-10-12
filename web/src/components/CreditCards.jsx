@@ -3,6 +3,7 @@ import { useFadeOnChange } from '../lib/motion.js'
 import CountUp from './CountUp.jsx'
 import { ReconnectBank } from '../screens/Banks.jsx'
 import { canAddCardDetails } from '../lib/cards.js'
+import { Link } from '../lib/router.jsx'
 
 // Credit cards on Home (#27, Dinesh picked F): one bar for the total limit,
 // each card's balance a piece of it in a shade of clay, the rest available.
@@ -129,6 +130,10 @@ export default function CreditCards({ banks, me, home, everyone = false, onChang
           {others} {others === 1 ? 'card is' : 'cards are'} in another currency. See All accounts.
         </p>
       )}
+      {/* Everything owed, cards and loans, with more detail (#27). */}
+      <Link to="/debts" className="link small">
+        See all debts
+      </Link>
     </section>
   )
 }

@@ -4,6 +4,7 @@ import { api } from '../lib/api.js'
 import { pendingInvite } from '../lib/invite.js'
 import { Link, usePath } from '../lib/router.jsx'
 import AccountsPage from './AccountsPage.jsx'
+import DebtsPage from './DebtsPage.jsx'
 import CreateHousehold from './CreateHousehold.jsx'
 import HomePage from './HomePage.jsx'
 import Join from './Join.jsx'
@@ -116,6 +117,9 @@ export default function Home({ email, onSignOut }) {
       break
     case '/accounts':
       page = <AccountsPage me={me} household={household} refreshKey={refreshKey} onChanged={refresh} />
+      break
+    case '/debts':
+      page = <DebtsPage me={me} household={household} refreshKey={refreshKey} onChanged={refresh} />
       break
     case '/family':
       page = (

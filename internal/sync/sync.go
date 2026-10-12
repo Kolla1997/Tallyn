@@ -27,14 +27,14 @@ type Store interface {
 	Item(ctx context.Context, id string) (db.SyncItem, error)
 	SaveSync(ctx context.Context, item db.SyncItem, r plaid.SyncResult) (db.SyncStats, error)
 	SetStatus(ctx context.Context, id, status string) error
-	SaveCreditCards(ctx context.Context, item db.SyncItem, cards []plaid.CreditCard, state string) error
+	SaveLiabilities(ctx context.Context, item db.SyncItem, l plaid.Liabilities, state string) error
 	SaveAccounts(ctx context.Context, item db.SyncItem, accounts []plaid.Account) error
 }
 
 // Plaid fetches transaction changes and card details. *plaid.Client implements it.
 type Plaid interface {
 	SyncTransactions(ctx context.Context, accessToken, cursor string) (plaid.SyncResult, error)
-	Liabilities(ctx context.Context, accessToken string) ([]plaid.CreditCard, error)
+	Liabilities(ctx context.Context, accessToken string) (plaid.Liabilities, error)
 	Accounts(ctx context.Context, accessToken string) (plaid.Item, []plaid.Account, error)
 }
 
@@ -229,7 +229,7 @@ func (s *Syncer) syncCards(ctx context.Context, item db.SyncItem, token string) 
 	} else if err := s.store.SaveAccounts(ctx, item, accounts); err != nil && !errors.Is(err, db.ErrNotFound) {
 		log.Printf("sync: bank %s: save balances: %v", item.ID, err)
 	}
-	cards, err := s.plaid.Liabilities(ctx, token)
+	l, err := s.plaid.Liabilities(ctx, token)
 	state := "shared"
 	switch {
 	case err == nil:
@@ -240,16 +240,16 @@ func (s *Syncer) syncCards(ctx context.Context, item db.SyncItem, token string) 
 		var pe *plaid.Error
 		errors.As(err, &pe)
 		log.Printf("sync: bank %s: no card details (%s)", item.ID, pe.Code)
-		cards, state = nil, plaid.CardDetailsState(err) // clear, and remember why (#51)
+		l, state = plaid.Liabilities{}, plaid.CardDetailsState(err) // clear, and remember why (#51)
 	default:
 		log.Printf("sync: bank %s: card details: %v", item.ID, err)
 		return
 	}
-	if err := s.store.SaveCreditCards(ctx, item, cards, state); err != nil && !errors.Is(err, db.ErrNotFound) {
+	if err := s.store.SaveLiabilities(ctx, item, l, state); err != nil && !errors.Is(err, db.ErrNotFound) {
 		log.Printf("sync: bank %s: save card details: %v", item.ID, err)
 		return
 	}
-	log.Printf("sync: bank %s: %d credit cards", item.ID, len(cards))
+	log.Printf("sync: bank %s: %d credit cards, %d loans", item.ID, len(l.Cards), len(l.Loans))
 }
 
 func (s *Syncer) setStatus(ctx context.Context, id, status string) {

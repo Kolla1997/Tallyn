@@ -65,10 +65,10 @@ func (s *fakeStore) SaveSync(_ context.Context, it db.SyncItem, r plaid.SyncResu
 	s.saved = append(s.saved, it.ID+"@"+r.NextCursor)
 	return db.SyncStats{Upserted: len(r.Added)}, nil
 }
-func (s *fakeStore) SaveCreditCards(_ context.Context, it db.SyncItem, cards []plaid.CreditCard, state string) error {
+func (s *fakeStore) SaveLiabilities(_ context.Context, it db.SyncItem, l plaid.Liabilities, state string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.cards[it.ID] = len(cards)
+	s.cards[it.ID] = len(l.Cards)
 	s.cardState[it.ID] = state
 	return nil
 }
@@ -98,11 +98,11 @@ func (p *fakePlaid) Accounts(context.Context, string) (plaid.Item, []plaid.Accou
 	return plaid.Item{}, []plaid.Account{{PlaidAccountID: "card-1"}}, nil
 }
 
-func (p *fakePlaid) Liabilities(_ context.Context, token string) ([]plaid.CreditCard, error) {
+func (p *fakePlaid) Liabilities(_ context.Context, token string) (plaid.Liabilities, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.cardCalls++
-	return p.cards[token], p.cardsErr
+	return plaid.Liabilities{Cards: p.cards[token]}, p.cardsErr
 }
 
 type result struct {
