@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #75 Merged PR #76 (spending dots as twelve months in their own card, day filter); closed and moved to Done.
 - #75 Split the Transactions filter box in two, lined up with the list and summary below: filters on the left, the year of dots in its own card on the right. Dots are now twelve little months (Dinesh picked C from three drafts): each month a 7-day-wide calendar block, six months across on web, four on phones, so no sideways scrolling.
 - #75 Year of spending dots in the Transactions filter box (Dinesh picked only dots, week grid beside the filters): one dot per day this year, five shades from Sand to Clay Deep by quartile of your spending days, days ahead hollow. Hover or focus shows the full date, total, purchases and top 3; clicking a spending day filters the list and summary to it (`?day=`). New API `GET /api/transactions/daily` and a `day` filter on the list and summary.
 - #72 Merged PR #73 (profile card, Collapse by the logo, sign-in lands on Home, dashed Family and Goals); closed and moved to Done.
