@@ -6,11 +6,23 @@ import SetUp2FA from './screens/SetUp2FA.jsx'
 import Verify2FA from './screens/Verify2FA.jsx'
 import Home from './screens/Home.jsx'
 import TallynLoader from './components/TallynLoader.jsx'
+import ConsentGate from './components/ConsentGate.jsx'
+import { usePath } from './lib/router.jsx'
+import LegalPage from './screens/LegalPage.jsx'
 
 // Sign-in flow (#7, ADR 0003): email + password, then 2FA with an
 // authenticator app. Only a 2FA-completed (aal2) session reaches Home, and the
 // Go API checks the same thing on every request.
 export default function App() {
+  const path = usePath()
+  // The legal pages are public: no sign-in needed (#36).
+  if (path === '/terms' || path === '/privacy') {
+    return (
+      <AuthPage wide>
+        <LegalPage doc={path.slice(1)} />
+      </AuthPage>
+    )
+  }
   return configured ? (
     <AuthFlow />
   ) : (
@@ -50,7 +62,13 @@ function AuthFlow() {
 
   // The signed-in app has its own layout (#39); everything before it uses
   // the centered sign-in layout.
-  if (session && aal?.currentLevel === 'aal2') return <Home email={session.user.email} onSignOut={signOut} />
+  if (session && aal?.currentLevel === 'aal2') {
+    return (
+      <ConsentGate onSignOut={signOut}>
+        <Home email={session.user.email} onSignOut={signOut} />
+      </ConsentGate>
+    )
+  }
   let screen
   if (session === undefined || (session && !aal)) screen = <TallynLoader />
   else if (!session) screen = <SignIn />
