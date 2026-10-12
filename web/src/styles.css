@@ -2463,3 +2463,7 @@ label.agree input {
   flex: none;
   accent-color: var(--color-cocoa);
 }
+
+.card a {
+  color: var(--color-clay-deep);
+}
