@@ -5,6 +5,7 @@ import SignIn from './screens/SignIn.jsx'
 import SetUp2FA from './screens/SetUp2FA.jsx'
 import Verify2FA from './screens/Verify2FA.jsx'
 import Home from './screens/Home.jsx'
+import TallynLoader from './components/TallynLoader.jsx'
 
 // Sign-in flow (#7, ADR 0003): email + password, then 2FA with an
 // authenticator app. Only a 2FA-completed (aal2) session reaches Home, and the
@@ -51,7 +52,7 @@ function AuthFlow() {
   // the centered sign-in layout.
   if (session && aal?.currentLevel === 'aal2') return <Home email={session.user.email} onSignOut={signOut} />
   let screen
-  if (session === undefined || (session && !aal)) screen = <p className="muted">Loading…</p>
+  if (session === undefined || (session && !aal)) screen = <TallynLoader />
   else if (!session) screen = <SignIn />
   else if (aal.nextLevel === 'aal2') screen = <Verify2FA onSignOut={signOut} />
   else screen = <SetUp2FA onSignOut={signOut} />

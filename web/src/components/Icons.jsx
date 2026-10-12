@@ -38,10 +38,11 @@ export const GoalsIcon = (p) => (
     <circle cx="12" cy="12" r="1" fill="currentColor" />
   </svg>
 )
+// A gear (#66), so Settings reads as settings, not a sun.
 export const SettingsIcon = (p) => (
   <svg {...base} {...p}>
-    <circle cx="12" cy="12" r="3" />
-    <path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M5.6 18.4l1.6-1.6M16.8 7.2l1.6-1.6" />
+    <path d="M10.3 3.2h3.4l.5 2.4a7 7 0 0 1 1.7 1l2.3-.8 1.7 3-1.8 1.6a7 7 0 0 1 0 2l1.8 1.6-1.7 3-2.3-.8a7 7 0 0 1-1.7 1l-.5 2.4h-3.4l-.5-2.4a7 7 0 0 1-1.7-1l-2.3.8-1.7-3 1.8-1.6a7 7 0 0 1 0-2L3.8 8.8l1.7-3 2.3.8a7 7 0 0 1 1.7-1z" />
+    <circle cx="12" cy="12" r="2.8" />
   </svg>
 )
 export const TransactionsIcon = (p) => (

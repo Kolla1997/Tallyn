@@ -7,6 +7,7 @@ import { Avatar, nameOf } from '../lib/people.jsx'
 import { isOwed } from '../lib/summary.js'
 import { LinkBank } from './Banks.jsx'
 import { PageHead } from './Shell.jsx'
+import TallynLoader from '../components/TallynLoader.jsx'
 
 // Accounts (#39 step 3): net worth with a have-vs-owe bar, then every account
 // in two columns, You have and You owe, grouped by type, and the connected
@@ -103,7 +104,7 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
       )}
 
       {!banks ? (
-        <p className="muted">Loading…</p>
+        <TallynLoader />
       ) : accounts.length === 0 ? (
         <section className="panel empty-state">
           <p className="muted">

@@ -5,6 +5,7 @@ import { api } from '../lib/api.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { PageHead } from './Shell.jsx'
+import TallynLoader from '../components/TallynLoader.jsx'
 
 // All transactions (#42): switch between household members, search by
 // merchant, filter by category, grouped by day, 50 at a time. The API only
@@ -214,7 +215,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
       <div className="tx-layout">
         <div className="tx-main">
           {!list ? (
-            <p className="muted">Loading…</p>
+            <TallynLoader />
           ) : list.length === 0 ? (
             <section className="panel empty-state">
               <p className="muted">
