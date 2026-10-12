@@ -25,12 +25,14 @@ kanban-plugin: board
 - [ ] [#55 Notifications](https://github.com/Kolla1997/Tallyn/issues/55) #type/feature #area/frontend #area/backend #priority/p2
 - [ ] [#56 Close your Tallyn account](https://github.com/Kolla1997/Tallyn/issues/56) #type/feature #area/frontend #area/backend #priority/p1
 - [ ] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
+- [ ] [#64 Floating rounded sidebar, darker secondary text and a soft shade under cards](https://github.com/Kolla1997/Tallyn/issues/64) #type/design #area/design #area/frontend #priority/p2
 
 
 ## In Progress
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
+- [ ] [#66 Gear settings icon and Tallyn loading animation](https://github.com/Kolla1997/Tallyn/issues/66) #type/design #area/design #area/frontend #priority/p2
 
 
 ## Review
