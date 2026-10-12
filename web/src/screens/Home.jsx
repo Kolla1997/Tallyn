@@ -1,18 +1,21 @@
-import { useCallback, useEffect, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useState } from 'react'
 import AuthPage from '../components/AuthPage.jsx'
 import { api } from '../lib/api.js'
 import { pendingInvite } from '../lib/invite.js'
 import { Link, usePath } from '../lib/router.jsx'
-import AccountsPage from './AccountsPage.jsx'
-import DebtsPage from './DebtsPage.jsx'
 import CreateHousehold from './CreateHousehold.jsx'
 import HomePage from './HomePage.jsx'
 import Join from './Join.jsx'
-import TransactionsPage from './TransactionsPage.jsx'
-import FamilyPage from './FamilyPage.jsx'
-import Settings from './Settings.jsx'
 import Shell, { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+
+// Faster first load (#99): Home comes with the app; the other pages load the
+// first time they're opened, with the Tallyn loader meanwhile.
+const AccountsPage = lazy(() => import('./AccountsPage.jsx'))
+const DebtsPage = lazy(() => import('./DebtsPage.jsx'))
+const TransactionsPage = lazy(() => import('./TransactionsPage.jsx'))
+const FamilyPage = lazy(() => import('./FamilyPage.jsx'))
+const Settings = lazy(() => import('./Settings.jsx'))
 
 const HOUSEHOLD_KEY = 'tallyn.household'
 
@@ -167,7 +170,9 @@ export default function Home({ email, onSignOut }) {
 
   return (
     <Shell me={me} household={household} households={households} onChooseHousehold={choose} onSignOut={onSignOut}>
-      <div key={household.id}>{page}</div>
+      <div key={household.id}>
+        <Suspense fallback={<TallynLoader />}>{page}</Suspense>
+      </div>
     </Shell>
   )
 }

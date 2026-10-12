@@ -47,6 +47,20 @@ export default defineConfig(({ mode }) => {
         allow: ['..'],
       },
     },
+    // Faster loading (#99): React and Supabase in their own files. They change
+    // rarely, so browsers keep them cached when the app is updated.
+    build: {
+      rolldownOptions: {
+        output: {
+          codeSplitting: {
+            groups: [
+              { name: 'react', test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/ },
+              { name: 'supabase', test: /node_modules[\\/]@supabase[\\/]/ },
+            ],
+          },
+        },
+      },
+    },
     // Web tests (#100): npm test.
     test: {
       environment: 'jsdom',

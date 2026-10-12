@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-08
+updated: 2026-10-12
 issue: 10
 tags: [brand]
 ---
@@ -42,7 +42,7 @@ Rough balance: 60% cream or white, 30% cocoa and sand, 10% clay and sage.
 | Buttons, navigation | Bricolage Grotesque 700 |
 | Wordmark | Jedira, outlined (see [[Logo Guide]]) |
 
-Currency amounts always use tabular figures. Font files are in `brand/fonts/` (SIL OFL).
+Currency amounts always use tabular figures. Font files are in `brand/fonts/` (SIL OFL). The app uses WOFF2 copies in `brand/fonts/web/`, made from those masters by `scripts/build_fonts.py`; they look the same (#99).
 
 ## Communications checklist
 Before anything goes out (site, social, deck, email, app store):
