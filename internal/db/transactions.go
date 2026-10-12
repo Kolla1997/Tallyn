@@ -52,11 +52,17 @@ type TxFilter struct {
 	Query    string // part of the merchant name, any case
 	Category string // a Plaid primary category, e.g. FOOD_AND_DRINK
 	Month    string // "2026-10": posted that month, the same date Spending uses
+	Day      string // "2026-10-08": posted that day; wins over Month (#75)
+	Year     string // "2026": posted that year; only when Month and Day are empty (#75)
 	Limit    int    // 1-100, default 50
 	Offset   int    // for "Show more"
 }
 
-var categoryRE = regexp.MustCompile(`^[A-Z_]{1,60}$`)
+var (
+	categoryRE = regexp.MustCompile(`^[A-Z_]{1,60}$`)
+	dayRE      = regexp.MustCompile(`^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$`)
+	yearRE     = regexp.MustCompile(`^20\d{2}$`)
+)
 
 // filterSQL is the WHERE clause shared by Transactions and Summary, so the
 // list and its totals always agree: $1 is the household, then the filter's
@@ -81,16 +87,37 @@ func (f TxFilter) args() ([]any, error) {
 		return nil, ErrInvalid
 	}
 	var from, to *string
-	if f.Month != "" {
+	span := func(layout, value string, next func(time.Time) time.Time) error {
+		start, err := time.Parse(layout, value)
+		if err != nil {
+			return ErrInvalid
+		}
+		a, b := start.Format(time.DateOnly), next(start).Format(time.DateOnly)
+		from, to = &a, &b
+		return nil
+	}
+	switch {
+	case f.Day != "":
+		if !dayRE.MatchString(f.Day) {
+			return nil, ErrInvalid
+		}
+		if err := span(time.DateOnly, f.Day, func(t time.Time) time.Time { return t.AddDate(0, 0, 1) }); err != nil {
+			return nil, err
+		}
+	case f.Month != "":
 		if !monthRE.MatchString(f.Month) {
 			return nil, ErrInvalid
 		}
-		start, err := time.Parse("2006-01", f.Month)
-		if err != nil {
+		if err := span("2006-01", f.Month, func(t time.Time) time.Time { return t.AddDate(0, 1, 0) }); err != nil {
+			return nil, err
+		}
+	case f.Year != "":
+		if !yearRE.MatchString(f.Year) {
 			return nil, ErrInvalid
 		}
-		a, b := start.Format(time.DateOnly), start.AddDate(0, 1, 0).Format(time.DateOnly)
-		from, to = &a, &b
+		if err := span("2006", f.Year, func(t time.Time) time.Time { return t.AddDate(1, 0, 0) }); err != nil {
+			return nil, err
+		}
 	}
 	// The search text is a plain substring: escape LIKE's wildcards.
 	like := "%" + strings.NewReplacer(`\`, `\\`, "%", `\%`, "_", `\_`).Replace(strings.TrimSpace(f.Query)) + "%"
@@ -348,6 +375,90 @@ func (d *DB) Summary(ctx context.Context, userID, householdID string, f TxFilter
 		}
 		slices.SortFunc(out, func(a, b TxSummary) int { return strings.Compare(a.Currency, b.Currency) })
 		return nil
+	})
+	return out, err
+}
+
+// DaySpend is one day's spending for the year of dots (#75): the total, how
+// many purchases, and the three biggest.
+type DaySpend struct {
+	Date        string      `json:"date"`
+	Currency    string      `json:"currency"`
+	AmountMinor int64       `json:"amount_minor"`
+	Count       int         `json:"count"`
+	Top         []DayTopBuy `json:"top"`
+}
+
+// DayTopBuy is one of a day's biggest purchases.
+type DayTopBuy struct {
+	Merchant    string  `json:"merchant"`
+	AmountMinor int64   `json:"amount_minor"`
+	Category    *string `json:"category"`
+}
+
+// Daily returns spending per day for a year, over every transaction userID
+// may see that matches f (person, search, category). Same rules as Summary:
+// transfers, card payments and income aren't spending. Days with no spending
+// are left out.
+func (d *DB) Daily(ctx context.Context, userID, householdID string, f TxFilter) ([]DaySpend, error) {
+	out := []DaySpend{}
+	if !uuidRE.MatchString(householdID) {
+		return out, nil
+	}
+	if f.Year == "" || f.Month != "" || f.Day != "" {
+		return out, ErrInvalid
+	}
+	fargs, err := f.args()
+	if err != nil {
+		return out, err
+	}
+	args := append([]any{householdID}, fargs...)
+	err = d.AsUser(ctx, userID, func(tx pgx.Tx) error {
+		rows, err := tx.Query(ctx, `
+			select t.date::text, t.currency, sum(t.amount_minor)::bigint, count(*)::int
+			from public.transactions t
+			where `+filterSQL+` and (`+kindSQL+`) = 'spent'
+			group by 1, 2
+			order by 1, 2`, args...)
+		if err != nil {
+			return err
+		}
+		index := map[string]int{}
+		for rows.Next() {
+			var s DaySpend
+			if err := rows.Scan(&s.Date, &s.Currency, &s.AmountMinor, &s.Count); err != nil {
+				return err
+			}
+			s.Top = []DayTopBuy{}
+			index[s.Date+"|"+s.Currency] = len(out)
+			out = append(out, s)
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		rows, err = tx.Query(ctx, `
+			select date, currency, merchant, amount, category from (
+			  select t.date::text as date, t.currency, coalesce(t.merchant_name, t.name) as merchant,
+			         t.amount_minor as amount, t.category_primary as category,
+			         row_number() over (partition by t.date, t.currency order by t.amount_minor desc, t.id) as rank
+			  from public.transactions t
+			  where `+filterSQL+` and (`+kindSQL+`) = 'spent'
+			) x where rank <= 3
+			order by date, currency, amount desc`, args...)
+		if err != nil {
+			return err
+		}
+		for rows.Next() {
+			var date, cur string
+			var b DayTopBuy
+			if err := rows.Scan(&date, &cur, &b.Merchant, &b.AmountMinor, &b.Category); err != nil {
+				return err
+			}
+			if i, ok := index[date+"|"+cur]; ok {
+				out[i].Top = append(out[i].Top, b)
+			}
+		}
+		return rows.Err()
 	})
 	return out, err
 }

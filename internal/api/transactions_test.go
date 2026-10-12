@@ -34,6 +34,31 @@ func (s *txStore) Summary(_ context.Context, uid, hh string, f db.TxFilter) ([]d
 	return []db.TxSummary{{Currency: "USD", SpentMinor: 1234, Categories: []db.Spend{}, Merchants: []db.MerchantSpend{{Merchant: "Fake Grocer", AmountMinor: 1234, Count: 1}}}}, s.txErr
 }
 
+func (s *txStore) Daily(_ context.Context, uid, hh string, f db.TxFilter) ([]db.DaySpend, error) {
+	s.got = f
+	return []db.DaySpend{{Date: "2026-10-08", Currency: "USD", AmountMinor: 1633, Count: 2, Top: []db.DayTopBuy{{Merchant: "Fake Grocer", AmountMinor: 1200}}}}, s.txErr
+}
+
+func TestDailyRoute(t *testing.T) {
+	s := &txStore{}
+	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s})
+	rec := send(h, "GET", "/api/transactions/daily?household_id="+testHH+"&year=2026&owner=u1&category=FOOD_AND_DRINK&month=2026-10&day=2026-10-08", "")
+	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"date":"2026-10-08"`) || !strings.Contains(rec.Body.String(), "Fake Grocer") {
+		t.Fatalf("got %d %s", rec.Code, rec.Body)
+	}
+	if s.got != (db.TxFilter{Owner: "u1", Category: "FOOD_AND_DRINK", Year: "2026"}) {
+		t.Fatalf("filter = %+v (month and day ignored, year used)", s.got)
+	}
+	send(h, "GET", "/api/transactions/daily?household_id="+testHH, "")
+	if s.got.Year != time.Now().UTC().Format("2006") {
+		t.Fatalf("default year = %q", s.got.Year)
+	}
+	s.txErr = db.ErrInvalid
+	if rec := send(h, "GET", "/api/transactions/daily?household_id="+testHH+"&year=x", ""); rec.Code != http.StatusBadRequest {
+		t.Fatalf("invalid: %d", rec.Code)
+	}
+}
+
 func TestSummaryRoute(t *testing.T) {
 	s := &txStore{}
 	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s})
@@ -56,11 +81,11 @@ func TestSummaryRoute(t *testing.T) {
 func TestTransactionsRoute(t *testing.T) {
 	s := &txStore{}
 	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s})
-	rec := send(h, "GET", "/api/transactions?household_id="+testHH+"&limit=20&offset=40&owner=u1&q=fresh&category=FOOD_AND_DRINK&month=2026-10", "")
+	rec := send(h, "GET", "/api/transactions?household_id="+testHH+"&limit=20&offset=40&owner=u1&q=fresh&category=FOOD_AND_DRINK&month=2026-10&day=2026-10-08", "")
 	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "Fake Grocer") || !strings.Contains(rec.Body.String(), `"more":true`) {
 		t.Fatalf("got %d %s", rec.Code, rec.Body)
 	}
-	if s.got != (db.TxFilter{Owner: "u1", Query: "fresh", Category: "FOOD_AND_DRINK", Month: "2026-10", Limit: 20, Offset: 40}) {
+	if s.got != (db.TxFilter{Owner: "u1", Query: "fresh", Category: "FOOD_AND_DRINK", Month: "2026-10", Day: "2026-10-08", Limit: 20, Offset: 40}) {
 		t.Fatalf("filter = %+v", s.got)
 	}
 	s.txErr = db.ErrInvalid

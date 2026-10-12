@@ -254,3 +254,67 @@ func TestTransactionSummary(t *testing.T) {
 		t.Errorf("bad month: %v, want ErrInvalid", err)
 	}
 }
+
+// Year of dots (#75): spending per day with the top purchases, the same
+// filters and visibility as the list, and a day filter.
+func TestDailyAndDayFilter(t *testing.T) {
+	f := setup(t)
+	seedTxns(t, f)
+	ctx := context.Background()
+
+	got, err := f.db.Daily(ctx, alice, f.testHH, TxFilter{Year: "2026"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	byDay := map[string]DaySpend{}
+	for _, d := range got {
+		byDay[d.Date] = d
+	}
+	// Setup's two Fake Grocer rows (alice's and carl's, 1999 each) are on Jan 2.
+	if d := byDay["2026-01-02"]; d.AmountMinor != 3998 || d.Count != 2 || len(d.Top) != 2 {
+		t.Errorf("Jan 2 = %+v, want 3998 over 2 purchases", d)
+	}
+	// Oct 3: alice's Fresh Market (1003) and carl's Book Barn (1003), seen as a parent.
+	if d := byDay["2026-10-03"]; d.AmountMinor != 2006 || d.Count != 2 {
+		t.Errorf("Oct 3 = %+v, want 2006 over 2", d)
+	}
+	if d := byDay["2026-10-08"]; d.AmountMinor != 1008 || len(d.Top) != 1 || d.Top[0].Merchant != "Uber" {
+		t.Errorf("Oct 8 = %+v, want Uber 1008", d)
+	}
+	if _, ok := byDay["2026-10-10"]; ok {
+		t.Error("a day with no spending should be left out")
+	}
+
+	// Filters narrow it like the list: only carl's.
+	carls, _ := f.db.Daily(ctx, alice, f.testHH, TxFilter{Year: "2026", Owner: carl})
+	for _, d := range carls {
+		if d.Date != "2026-01-02" && d.Date != "2026-10-03" {
+			t.Errorf("carl only: unexpected day %s", d.Date)
+		}
+	}
+	// Visibility: carl (a child) sees only his own.
+	own, _ := f.db.Daily(ctx, carl, f.testHH, TxFilter{Year: "2026"})
+	for _, d := range own {
+		if d.AmountMinor != 1999 && d.AmountMinor != 1003 {
+			t.Errorf("carl sees %+v, want only his own", d)
+		}
+	}
+	for name, flt := range map[string]TxFilter{
+		"no year":        {},
+		"bad year":       {Year: "1999"},
+		"year and month": {Year: "2026", Month: "2026-10"},
+	} {
+		if _, err := f.db.Daily(ctx, alice, f.testHH, flt); !errors.Is(err, ErrInvalid) {
+			t.Errorf("%s: err = %v, want ErrInvalid", name, err)
+		}
+	}
+
+	// Day filter on the list: Oct 3 has 2 rows; Day wins over Month.
+	list, _, err := f.db.Transactions(ctx, alice, f.testHH, TxFilter{Day: "2026-10-03", Month: "2026-01"})
+	if err != nil || len(list) != 2 {
+		t.Errorf("day Oct 3: %d rows, %v; want 2", len(list), err)
+	}
+	if _, _, err := f.db.Transactions(ctx, alice, f.testHH, TxFilter{Day: "2026-13-01"}); !errors.Is(err, ErrInvalid) {
+		t.Errorf("bad day: %v, want ErrInvalid", err)
+	}
+}
