@@ -11,7 +11,7 @@ tags: [design]
 Token values live in `design-tokens.json` (colour, type, radius, spacing, motion). If this note and the JSON disagree, the JSON wins: fix this note. Ready-made versions are in `brand/colors/` and `brand/typography/`: `tokens.css`, `tailwind.colors.js`, `Colors.swift`, `colors.xml`, `Color.kt`, `type-scale.css`.
 
 ## Shape
-Soft, friendly, frosted. Cards are frosted glass over a soft glow (see [[#Glass finish]]); everything else stays flat, with no drop shadows.
+Soft, friendly, frosted. Cards and the sidebar are frosted glass over a soft glow, with a soft shade underneath (see [[#Glass finish]]).
 
 | Item | Value |
 |---|---|
@@ -26,7 +26,9 @@ Every card in Tallyn ([#61](https://github.com/Kolla1997/Tallyn/issues/61)): `.p
 
 | Part | Rule |
 |---|---|
-| Card | `glass-surface` (white at 70%), `glass-blur` behind it, a 1px `glass-border` edge and the `glass-highlight` top edge. No drop shadows |
+| Card | `glass-surface` (white at 70%), `glass-blur` behind it, a 1px `glass-border` edge, the `glass-highlight` top edge and the soft `card-shade` underneath (#64) |
+| Sidebar (web) | Floats 12px in from the edges as a rounded glass panel (card radius), same surface and shade as cards (#64). Phones keep the bottom tab bar |
+| Secondary text | `text-secondary` #55494A (was #6B5F5C), small labels at weight 500, for easier reading on glass (#64) |
 | Page | Cream, with soft glows behind the cards: Sage Light top left, Clay (mixed 45% with Cream) top right, Sand at the bottom, at `glow-opacity` |
 | Total balance card | Dark glass: `glass-surface-dark` (Cocoa at 86%) |
 | Tiles and chips on cards | Slightly see-through (tiles at 80%); the selected chip stays solid Cocoa |
@@ -78,6 +80,7 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 |---|---|---|
 | 2026-10-08 | Clay Deep (#B04A34) for buttons and small text | Passes AA with white (5.4:1) |
 | 2026-10-08 | No shadows, 22px cards, pill buttons | Soft, family-friendly, not bank-like |
+| 2026-10-11 | Floating rounded glass sidebar, darker secondary text (#55494A) and a soft shade under cards | Dinesh chose option 2: text easier to read on glass (about 6.8:1 at the strongest glow) and more depth (#64) |
 | 2026-10-11 | **Cards are frosted glass** over a soft sage, clay and sand glow (replaces "flat white cards" from 2026-10-08; still no drop shadows) | Dinesh chose option B: more depth and a modern feel. Kept readable with a 70% surface, solid dialogs and fallbacks (#61) |
 | 2026-10-11 | Compact density on web (1024px+), comfortable on phones; up to 1600px wide; Home in three columns from 1440px | Dinesh: use the screen and show more at a glance; phones keep sizes that are easy to read and tap |
 | 2026-10-11 | Spending isn't shown in red; red is only for what you owe | Calm, not alarming: ordinary purchases aren't a warning |
