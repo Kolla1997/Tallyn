@@ -14,7 +14,6 @@ kanban-plugin: board
 - [ ] [#22 Password reset](https://github.com/Kolla1997/Tallyn/issues/22) #type/feature #area/frontend #priority/p1
 - [ ] [#23 Recovery when someone loses their authenticator app](https://github.com/Kolla1997/Tallyn/issues/23) #type/feature #area/frontend #priority/p1
 - [ ] [#24 Content-Security-Policy and security headers](https://github.com/Kolla1997/Tallyn/issues/24) #type/feature #area/backend #priority/p1
-- [ ] [#27 Debt details: interest rates, due dates and minimum payments (Plaid Liabilities)](https://github.com/Kolla1997/Tallyn/issues/27) #type/feature #area/backend #priority/p0
 - [ ] [#34 Spending limits per member, with progress and alerts](https://github.com/Kolla1997/Tallyn/issues/34) #type/feature #area/backend #priority/p1
 - [ ] [#37 Show shared money separately from your own](https://github.com/Kolla1997/Tallyn/issues/37) #type/design #area/frontend #priority/p1
 - [ ] [#51 Reconnect a bank that needs sign-in (Plaid update mode)](https://github.com/Kolla1997/Tallyn/issues/51) #type/feature #area/frontend #area/backend #priority/p1
@@ -30,12 +29,13 @@ kanban-plugin: board
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
-- [ ] [#77 Count loan payments as transfers, not spending](https://github.com/Kolla1997/Tallyn/issues/77) #type/feature #area/frontend #area/backend
 
 
 ## Review
 
 - [ ] [#10 Brand: logo and design tokens](https://github.com/Kolla1997/Tallyn/issues/10) #type/design #area/brand #priority/p0
+- [ ] [#27 Debt details: interest rates, due dates and minimum payments (Plaid Liabilities)](https://github.com/Kolla1997/Tallyn/issues/27) #type/feature #area/backend #priority/p0
+- [ ] [#77 Count loan payments as transfers, not spending](https://github.com/Kolla1997/Tallyn/issues/77) #type/feature #area/frontend #area/backend
 
 
 ## Blocked
