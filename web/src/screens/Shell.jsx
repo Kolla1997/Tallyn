@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import logo from '../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg'
 import mark from '../../../brand/logo/svg/tallyn-mark-light.svg'
 import { AccountsIcon, FamilyIcon, GoalsIcon, HomeIcon, SettingsIcon, TransactionsIcon } from '../components/Icons.jsx'
-import { LegalLinks } from '../components/AuthPage.jsx'
+import { SiteFooter } from '../components/AuthPage.jsx'
 import { Link } from '../lib/router.jsx'
 
 // App layout (#39): sidebar on web (1024px and up), header and bottom tab bar
@@ -153,8 +153,8 @@ export default function Shell({ me, household, households, onChooseHousehold, ch
         </header>
         <main id="main" className="content">
           {children}
-          <LegalLinks />
         </main>
+        <SiteFooter />
       </div>
 
       <nav className="tabbar" aria-label="Main">

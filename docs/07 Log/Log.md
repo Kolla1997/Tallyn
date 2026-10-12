@@ -10,6 +10,9 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-10-12
+- #25 Page footer (Dinesh picked B) on branch `25-signin-switch`: a thin line with "Tallyn · It all adds up." on the left and Terms of Service · Privacy Policy on the right, at the very bottom of every screen (sign-in screens and app pages), lined up with the content edges; on phones it wraps above the tab bar. Replaces the centred links under the card.
+
 ## 2026-10-11
 - #36 Merged PR #70 (Terms, Privacy, consent); closed and moved to Done. Open before launch: lawyer review, the 11 `[TO CONFIRM]` spots, GLBA question.
 - #25 Sign-in / sign-up switch restyled (Dinesh picked C) on branch `25-signin-switch`: an "or" divider, then a bold centred link ("Create a new account →" / "Sign in to your account →").

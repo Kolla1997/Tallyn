@@ -8,18 +8,24 @@ export default function AuthPage({ children, wide = false }) {
     <main className={wide ? 'page page-wide' : 'page'}>
       <img className="logo" src={logo} alt="Tallyn" />
       {children}
-      <LegalLinks />
+      <SiteFooter />
     </main>
   )
 }
 
-// Links to the Terms of Service and Privacy Policy (#36), on every screen.
-export function LegalLinks() {
+// The page footer (#25, option B): Tallyn and the tagline, then the Terms of
+// Service and Privacy Policy (#36). At the very bottom of every screen.
+export function SiteFooter() {
   return (
-    <p className="small muted legal-links">
-      <Link to="/terms">Terms of Service</Link>
-      <span aria-hidden="true"> · </span>
-      <Link to="/privacy">Privacy Policy</Link>
-    </p>
+    <footer className="site-footer">
+      <span>
+        <strong>Tallyn</strong> · It all adds up.
+      </span>
+      <nav aria-label="Legal">
+        <Link to="/terms">Terms of Service</Link>
+        <span aria-hidden="true"> · </span>
+        <Link to="/privacy">Privacy Policy</Link>
+      </nav>
+    </footer>
   )
 }

@@ -2413,8 +2413,7 @@ body::before {
 }
 
 .legal-nav a,
-.legal a,
-.legal-links a {
+.legal a {
   color: var(--color-clay-deep);
 }
 
@@ -2444,10 +2443,6 @@ body::before {
   border-bottom: 1px solid var(--color-sand);
 }
 
-.legal-links {
-  text-align: center;
-  margin: var(--space-s5) 0 var(--space-s2);
-}
 
 label.agree {
   flex-direction: row;
@@ -2505,4 +2500,75 @@ label.agree input {
 .switch-link:focus-visible {
   outline: 2px solid var(--color-clay-deep);
   outline-offset: 2px;
+}
+
+/* Page footer (#25, option B): a thin line, Tallyn and the tagline on the
+   left, the legal links on the right, at the very bottom of every screen. */
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-s2) var(--space-s4);
+  flex-wrap: wrap;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-s3);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.site-footer strong {
+  font-family: var(--font-heading);
+  color: var(--color-cocoa);
+}
+
+.site-footer a {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--color-clay-deep);
+  text-decoration: underline;
+}
+
+.site-footer a:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Sign-in screens: pushed to the bottom of the screen. */
+.page > .site-footer {
+  margin-top: auto;
+  width: 100%;
+  max-width: 760px;
+}
+
+/* App: the footer sits below the page content, at the bottom of the screen. */
+.app-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main > .content {
+  flex: 1;
+}
+
+.app-main > .site-footer {
+  /* Same left and right edges as the page content (max 1600px, centred). */
+  margin: 0 max(var(--space-s6), calc((100% - 1600px) / 2 + var(--space-s6))) var(--space-s5);
+}
+
+/* Phones: keep the footer clear of the bottom tab bar. */
+@media (max-width: 1023px) {
+  .content {
+    padding-bottom: var(--space-s5);
+  }
+
+  .app-main > .site-footer {
+    margin: 0 var(--space-s4);
+    padding-bottom: 112px;
+  }
 }
