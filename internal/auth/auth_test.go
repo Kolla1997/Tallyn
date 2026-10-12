@@ -46,6 +46,18 @@ func goodClaims() jwt.MapClaims {
 		"aal":          "aal2",
 		"session_id":   "22222222-2222-4222-8222-222222222222",
 		"is_anonymous": false,
+		"amr": []map[string]any{
+			{"method": "totp", "timestamp": now.Add(-time.Minute).Unix()},
+			{"method": "password", "timestamp": now.Add(-2 * time.Minute).Unix()},
+		},
+	}
+}
+
+// signedIn sets when the session began (#92), with a 2FA code a minute later.
+func signedIn(c jwt.MapClaims, at time.Time) {
+	c["amr"] = []map[string]any{
+		{"method": "password", "timestamp": at.Unix()},
+		{"method": "totp", "timestamp": at.Add(time.Minute).Unix()},
 	}
 }
 
@@ -98,9 +110,51 @@ func TestVerify(t *testing.T) {
 		if err != nil || s.TOTPAt.Unix() != at {
 			t.Fatalf("TOTPAt = %v, err %v; want %v", s.TOTPAt, err, time.Unix(at, 0))
 		}
-		s, _ = v.Verify(with(func(c jwt.MapClaims) { delete(c, "amr") }))
+		s, _ = v.Verify(with(func(c jwt.MapClaims) {
+			c["amr"] = []map[string]any{{"method": "password", "timestamp": time.Now().Unix()}}
+		}))
 		if !s.TOTPAt.IsZero() {
-			t.Fatalf("no amr: TOTPAt = %v, want zero", s.TOTPAt)
+			t.Fatalf("no totp in amr: TOTPAt = %v, want zero", s.TOTPAt)
+		}
+	})
+
+	// Maximum session length (#92): 12 hours from sign-in, however active.
+	t.Run("signed in 11h59m ago is accepted", func(t *testing.T) {
+		at := time.Now().Add(-MaxSession + time.Minute)
+		s, err := v.Verify(with(func(c jwt.MapClaims) { signedIn(c, at) }))
+		if err != nil || s.SignedInAt.Unix() != at.Unix() {
+			t.Fatalf("SignedInAt = %v, err %v; want %v", s.SignedInAt, err, at)
+		}
+	})
+	t.Run("signed in over 12 hours ago is expired", func(t *testing.T) {
+		at := time.Now().Add(-MaxSession - sessionLeeway - time.Second)
+		if _, err := v.Verify(with(func(c jwt.MapClaims) { signedIn(c, at) })); !errors.Is(err, ErrSessionExpired) {
+			t.Fatalf("err = %v, want ErrSessionExpired", err)
+		}
+	})
+	t.Run("a fresh 2FA step-up doesn't restart the 12 hours", func(t *testing.T) {
+		_, err := v.Verify(with(func(c jwt.MapClaims) {
+			c["amr"] = []map[string]any{
+				{"method": "totp", "timestamp": time.Now().Unix()},
+				{"method": "password", "timestamp": time.Now().Add(-13 * time.Hour).Unix()},
+			}
+		}))
+		if !errors.Is(err, ErrSessionExpired) {
+			t.Fatalf("err = %v, want ErrSessionExpired", err)
+		}
+	})
+	t.Run("no sign-in time is refused", func(t *testing.T) {
+		for name, amr := range map[string]any{"missing": nil, "empty": []map[string]any{}, "no timestamp": []map[string]any{{"method": "password"}}} {
+			_, err := v.Verify(with(func(c jwt.MapClaims) {
+				if amr == nil {
+					delete(c, "amr")
+				} else {
+					c["amr"] = amr
+				}
+			}))
+			if !errors.Is(err, ErrSessionExpired) {
+				t.Fatalf("%s amr: err = %v, want ErrSessionExpired", name, err)
+			}
 		}
 	})
 	t.Run("token without aal needs 2FA", func(t *testing.T) {
@@ -177,6 +231,8 @@ func TestRequire(t *testing.T) {
 
 	aal1 := goodClaims()
 	aal1["aal"] = "aal1"
+	old := goodClaims()
+	signedIn(old, time.Now().Add(-13*time.Hour))
 	cases := []struct {
 		name, header string
 		status       int
@@ -188,6 +244,7 @@ func TestRequire(t *testing.T) {
 		{"not bearer", "Basic dXNlcjpwYXNz", http.StatusUnauthorized, "unauthorized"},
 		{"bad token", "Bearer nope", http.StatusUnauthorized, "unauthorized"},
 		{"no 2FA", "Bearer " + sign(t, jwt.SigningMethodES256, key, aal1), http.StatusUnauthorized, "mfa_required"},
+		{"signed in 13h ago", "Bearer " + sign(t, jwt.SigningMethodES256, key, old), http.StatusUnauthorized, "session_expired"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

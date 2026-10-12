@@ -7,7 +7,6 @@ export const IDLE_MS = 30 * 60 * 1000
 export const WARN_MS = 60 * 1000 // the warning shows for the last minute
 
 const LAST = 'tallyn.lastActive'
-const NOTE = 'tallyn.signedOutIdle'
 
 // 'active', 'warn' (with seconds left) or 'out', from how long it's been.
 export function idleState(now, last) {
@@ -56,24 +55,5 @@ export function clearActive() {
     localStorage.removeItem(LAST)
   } catch {
     // nothing kept
-  }
-}
-
-// The sign-in page's note ("You were signed out after 30 minutes…").
-export function rememberIdleSignOut() {
-  try {
-    localStorage.setItem(NOTE, '1')
-  } catch {
-    // the note is a nicety
-  }
-}
-
-export function takeIdleSignOut() {
-  try {
-    const v = localStorage.getItem(NOTE) === '1'
-    localStorage.removeItem(NOTE)
-    return v
-  } catch {
-    return false
   }
 }

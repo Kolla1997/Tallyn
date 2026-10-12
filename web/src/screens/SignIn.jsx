@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { clearActive, takeIdleSignOut } from '../lib/idle.js'
+import { clearActive } from '../lib/idle.js'
+import { NOTES, takeSignOutNote } from '../lib/session.js'
 import { LEGAL, rememberAgreement } from '../lib/legal.js'
 import { Link } from '../lib/router.jsx'
 import { supabase } from '../lib/supabase.js'
@@ -13,10 +14,11 @@ export default function SignIn() {
   const [busy, setBusy] = useState(false)
   const [sentTo, setSentTo] = useState('')
   const [agreed, setAgreed] = useState(false) // sign-up only (#36)
-  // Signed out for inactivity (#91, Dinesh picked note 1): say so, once. Being
-  // here also ends the old activity clock, so the next sign-in starts fresh.
-  const [idleNote] = useState(() => {
-    const shown = takeIdleSignOut()
+  // Signed out automatically, after 30 minutes idle (#91, Dinesh picked note 1)
+  // or 12 hours (#92): say why, once. Being here also ends the old activity
+  // clock, so the next sign-in starts fresh.
+  const [note] = useState(() => {
+    const shown = takeSignOutNote()
     clearActive()
     return shown
   })
@@ -71,7 +73,7 @@ export default function SignIn() {
   return (
     <section className="card">
       <h1>{signup ? 'Create your account' : 'Welcome back'}</h1>
-      {idleNote && !signup && (
+      {note && !signup && (
         <p className="info-note" role="status">
           <svg
             width="16"
@@ -88,7 +90,7 @@ export default function SignIn() {
             <rect x="5" y="10.5" width="14" height="10" rx="2.5" />
             <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" />
           </svg>
-          <span>You were signed out after 30 minutes without activity, to keep your money private.</span>
+          <span>{NOTES[note]}</span>
         </p>
       )}
       <form onSubmit={submit}>
