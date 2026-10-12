@@ -397,17 +397,6 @@ fieldset.share label {
   gap: var(--space-s3);
 }
 
-.household-box {
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-  padding: var(--space-s3) var(--space-s4);
-}
-
-.household-box select {
-  width: 100%;
-  margin-top: var(--space-s1);
-}
-
 .me-chip {
   display: flex;
   align-items: center;
@@ -933,18 +922,6 @@ a.btn {
   align-items: center;
 }
 
-.household-dot {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid var(--color-border);
-  background: var(--color-cream);
-  color: var(--color-cocoa);
-  font-family: var(--font-heading);
-  font-weight: 700;
-  cursor: pointer;
-}
-
 .sidebar-toggle {
   display: flex;
   align-items: center;
@@ -964,8 +941,7 @@ a.btn {
   color: var(--color-cocoa);
 }
 
-.sidebar-toggle:focus-visible,
-.household-dot:focus-visible {
+.sidebar-toggle:focus-visible {
   outline: 2px solid var(--color-clay-deep);
   outline-offset: 2px;
 }
@@ -2577,4 +2553,136 @@ label.agree input {
     margin: 0 var(--space-s4);
     padding-bottom: 112px;
   }
+}
+
+/* Sidebar top and profile card (#72, option A). */
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s2);
+}
+
+.sidebar-top .sidebar-toggle {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  flex: none;
+}
+
+.app-shell.is-collapsed .sidebar-top {
+  flex-direction: column;
+  gap: var(--space-s3);
+}
+
+.app-shell.is-collapsed .sidebar-top .sidebar-mark {
+  margin-bottom: 0;
+}
+
+.profile {
+  position: relative;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+  width: 100%;
+  padding: var(--space-s2) var(--space-s3);
+  font: inherit;
+  text-align: left;
+  color: var(--color-cocoa);
+  background: color-mix(in srgb, var(--color-white) 65%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  cursor: pointer;
+}
+
+.profile-card:hover {
+  background: var(--color-white);
+}
+
+.profile-card:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+.profile-card .avatar {
+  width: 32px;
+  height: 32px;
+}
+
+.profile-text {
+  min-width: 0;
+}
+
+.profile-text strong,
+.profile-text span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile.is-collapsed .profile-card {
+  width: auto;
+  padding: 3px;
+  border-radius: 50%;
+}
+
+/* The menu: opens upward from the card, or beside the collapsed rail. */
+.profile-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + var(--space-s2));
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-s1);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  box-shadow: var(--card-shade);
+}
+
+.profile.is-collapsed .profile-menu {
+  left: calc(100% + var(--space-s3));
+  right: auto;
+  bottom: 0;
+  width: 220px;
+}
+
+.profile-menu hr {
+  border: none;
+  border-top: 1px solid var(--color-sand);
+  margin: var(--space-s1) 0;
+}
+
+.profile-menu-label {
+  margin: var(--space-s1) var(--space-s3) 0;
+}
+
+.profile-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s2);
+  padding: var(--space-s2) var(--space-s3);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  color: var(--color-cocoa);
+  background: none;
+  border: none;
+  border-radius: var(--space-s2);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.profile-item:hover,
+.profile-item:focus-visible {
+  background: var(--color-cream);
+  outline: none;
 }

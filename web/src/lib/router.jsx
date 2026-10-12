@@ -23,19 +23,22 @@ export function navigate(to) {
 
 // Link behaves like a normal link (open in new tab, copy address) but moves
 // within the app without a page load.
-export function Link({ to, children, ...rest }) {
+// An onClick passed in runs first (e.g. to close a menu); it can't replace
+// the in-app navigation.
+export function Link({ to, children, onClick, ...rest }) {
   const path = usePath()
   return (
     <a
       href={to}
       aria-current={path === to ? 'page' : undefined}
+      {...rest}
       onClick={(e) => {
+        onClick?.(e)
         // Let the browser handle new tabs (Cmd-click, or target="_blank").
         if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || rest.target === '_blank') return
         e.preventDefault()
         navigate(to)
       }}
-      {...rest}
     >
       {children}
     </a>

@@ -33,11 +33,10 @@ function isTyping(el) {
   return el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName))
 }
 
-export default function Shell({ me, household, households, onChooseHousehold, children }) {
+export default function Shell({ me, household, households, onChooseHousehold, onSignOut, children }) {
   const name = me?.display_name || 'You'
   const initial = name.trim().charAt(0).toUpperCase() || '·'
   const [collapsed, setCollapsed] = useState(initialCollapsed)
-  const householdSelect = useRef(null)
 
   const toggle = (next = !collapsed) => {
     setCollapsed(next)
@@ -66,23 +65,33 @@ export default function Shell({ me, household, households, onChooseHousehold, ch
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  // From the collapsed household circle: expand, then focus the switcher.
-  const openHousehold = () => {
-    toggle(false)
-    setTimeout(() => householdSelect.current?.focus(), 250)
-  }
-
   return (
     <div className={collapsed ? 'app-shell is-collapsed' : 'app-shell'}>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
       <aside id="sidebar" className="sidebar" aria-label="Main">
-        {collapsed ? (
-          <img className="sidebar-mark" src={mark} alt="Tallyn" />
-        ) : (
-          <img className="sidebar-logo" src={logo} alt="Tallyn" />
-        )}
+        {/* Logo, with Collapse beside it (#72). */}
+        <div className="sidebar-top">
+          {collapsed ? (
+            <img className="sidebar-mark" src={mark} alt="Tallyn" />
+          ) : (
+            <img className="sidebar-logo" src={logo} alt="Tallyn" />
+          )}
+          <button
+            className="sidebar-toggle"
+            onClick={() => toggle()}
+            aria-expanded={!collapsed}
+            aria-controls="sidebar"
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            data-tip={collapsed ? 'Expand sidebar' : undefined}
+            title={collapsed ? undefined : 'Collapse sidebar  ['}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+              {collapsed ? <path d="m9 6 6 6-6 6M4 6v12" /> : <path d="m15 6-6 6 6 6M20 6v12" />}
+            </svg>
+          </button>
+        </div>
         <nav className="nav">
           {[...NAV, ['/settings', 'Settings', SettingsIcon]].map(([to, label, Icon]) => (
             <Link key={to} to={to} data-tip={collapsed ? label : undefined}>
@@ -92,53 +101,15 @@ export default function Shell({ me, household, households, onChooseHousehold, ch
           ))}
         </nav>
         <div className="sidebar-bottom">
-          {household && collapsed && (
-            <button className="household-dot" data-tip={household.name} onClick={openHousehold} aria-label={`Household: ${household.name}`}>
-              {household.name.trim().charAt(0).toUpperCase()}
-            </button>
-          )}
-          {household && !collapsed && (
-            <div className="household-box">
-              <p className="small muted">Household</p>
-              {households.length > 1 ? (
-                <select ref={householdSelect} aria-label="Household" value={household.id} onChange={(e) => onChooseHousehold(e.target.value)}>
-                  {households.map((h) => (
-                    <option key={h.id} value={h.id}>
-                      {h.name}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <p>
-                  <strong>{household.name}</strong>
-                </p>
-              )}
-            </div>
-          )}
-          <Link to="/settings" className="me-chip" data-tip={collapsed ? name : undefined} aria-label={collapsed ? `Settings for ${name}` : undefined}>
-            <span className="avatar" aria-hidden="true">
-              {initial}
-            </span>
-            {!collapsed && (
-              <span>
-                <strong>{name}</strong>
-                {household && <span className="small muted block">{household.role}</span>}
-              </span>
-            )}
-          </Link>
-          <button
-            className="sidebar-toggle"
-            onClick={() => toggle()}
-            aria-expanded={!collapsed}
-            aria-controls="sidebar"
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            title={collapsed ? 'Expand sidebar  [' : 'Collapse sidebar  ['}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-              {collapsed ? <path d="m9 6 6 6-6 6M4 6v12" /> : <path d="m15 6-6 6 6 6M20 6v12" />}
-            </svg>
-            {!collapsed && <span>Collapse</span>}
-          </button>
+          <ProfileMenu
+            name={name}
+            initial={initial}
+            household={household}
+            households={households}
+            onChooseHousehold={onChooseHousehold}
+            onSignOut={onSignOut}
+            collapsed={collapsed}
+          />
         </div>
       </aside>
 
@@ -165,6 +136,113 @@ export default function Shell({ me, household, households, onChooseHousehold, ch
           </Link>
         ))}
       </nav>
+    </div>
+  )
+}
+
+// The profile card at the bottom of the sidebar (#72, option A): you, your
+// role and household. It opens a menu to switch household (when you're in
+// more than one), go to Settings, or sign out. Esc or a click outside closes
+// it, and focus goes back to the card.
+function ProfileMenu({ name, initial, household, households, onChooseHousehold, onSignOut, collapsed }) {
+  const [open, setOpen] = useState(false)
+  const box = useRef(null)
+  const button = useRef(null)
+  const ROLE = { owner: 'Owner', adult: 'Adult', teen: 'Teen', child: 'Child', viewer: 'Viewer' }
+  const role = household ? ROLE[household.role] ?? household.role : ''
+  const summary = household ? `${role} · ${household.name}` : 'No household yet'
+
+  const close = (refocus = true) => {
+    setOpen(false)
+    if (refocus) button.current?.focus()
+  }
+
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e) => box.current && !box.current.contains(e.target) && close(false)
+    const onKey = (e) => e.key === 'Escape' && close()
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    // Move focus into the menu so keyboard users land on the first choice.
+    box.current?.querySelector('[role="menuitem"], [role="menuitemradio"]')?.focus()
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  // Up and Down move between choices.
+  const onMenuKey = (e) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+    e.preventDefault()
+    const items = [...box.current.querySelectorAll('[role="menuitem"], [role="menuitemradio"]')]
+    const i = items.indexOf(document.activeElement)
+    items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length]?.focus()
+  }
+
+  return (
+    <div className={collapsed ? 'profile is-collapsed' : 'profile'} ref={box}>
+      <button
+        ref={button}
+        className="profile-card"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={collapsed ? `${name}, ${summary}. Open menu` : undefined}
+        data-tip={collapsed && !open ? name : undefined}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span className="avatar" aria-hidden="true">
+          {initial}
+        </span>
+        {!collapsed && (
+          <>
+            <span className="grow profile-text">
+              <strong className="block">{name}</strong>
+              <span className="small muted block">{summary}</span>
+            </span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+              <path d={open ? 'm6 15 6-6 6 6' : 'm6 9 6 6 6-6'} />
+            </svg>
+          </>
+        )}
+      </button>
+      {open && (
+        <div className="profile-menu" role="menu" aria-label="Your account" onKeyDown={onMenuKey}>
+          {households?.length > 1 && (
+            <>
+              <p className="profile-menu-label small muted" aria-hidden="true">
+                Household
+              </p>
+              {households.map((h) => (
+                <button
+                  key={h.id}
+                  role="menuitemradio"
+                  aria-checked={h.id === household?.id}
+                  className="profile-item"
+                  onClick={() => {
+                    onChooseHousehold(h.id)
+                    close()
+                  }}
+                >
+                  <span className="grow">{h.name}</span>
+                  {h.id === household?.id && <span aria-hidden="true">✓</span>}
+                </button>
+              ))}
+              <hr />
+            </>
+          )}
+          <Link to="/settings" role="menuitem" className="profile-item" onClick={() => close(false)}>
+            <SettingsIcon width={16} height={16} />
+            Settings
+          </Link>
+          <button role="menuitem" className="profile-item" onClick={onSignOut}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+              <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10" />
+            </svg>
+            Sign out
+          </button>
+        </div>
+      )}
     </div>
   )
 }

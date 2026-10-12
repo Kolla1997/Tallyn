@@ -163,7 +163,7 @@ export default function Home({ email, onSignOut }) {
   }
 
   return (
-    <Shell me={me} household={household} households={households} onChooseHousehold={choose}>
+    <Shell me={me} household={household} households={households} onChooseHousehold={choose} onSignOut={onSignOut}>
       <div key={household.id}>{page}</div>
     </Shell>
   )
