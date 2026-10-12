@@ -30,7 +30,6 @@ kanban-plugin: board
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
-- [ ] [#75 Transactions: a year of spending as dots, with a day overview on hover](https://github.com/Kolla1997/Tallyn/issues/75) #type/feature #area/frontend #area/backend #priority/p2
 
 
 ## Review
@@ -65,6 +64,7 @@ kanban-plugin: board
 - [x] [#66 Gear settings icon and Tallyn loading animation](https://github.com/Kolla1997/Tallyn/issues/66) #type/design #area/design #area/frontend #priority/p2
 - [x] [#68 Home shows your own money first, with a Yours / Everyone switch](https://github.com/Kolla1997/Tallyn/issues/68) #type/feature #area/frontend #priority/p1
 - [x] [#72 Sidebar: one profile card with a menu, Collapse by the logo](https://github.com/Kolla1997/Tallyn/issues/72) #type/design #area/frontend #priority/p2
+- [x] [#75 Transactions: a year of spending as dots, with a day overview on hover](https://github.com/Kolla1997/Tallyn/issues/75) #type/feature #area/frontend #area/backend #priority/p2
 
 
 %% kanban:settings
