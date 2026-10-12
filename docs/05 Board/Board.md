@@ -17,7 +17,6 @@ kanban-plugin: board
 - [ ] [#27 Debt details: interest rates, due dates and minimum payments (Plaid Liabilities)](https://github.com/Kolla1997/Tallyn/issues/27) #type/feature #area/backend #priority/p0
 - [ ] [#34 Spending limits per member, with progress and alerts](https://github.com/Kolla1997/Tallyn/issues/34) #type/feature #area/backend #priority/p1
 - [ ] [#37 Show shared money separately from your own](https://github.com/Kolla1997/Tallyn/issues/37) #type/design #area/frontend #priority/p1
-- [ ] [#51 Reconnect a bank that needs sign-in (Plaid update mode)](https://github.com/Kolla1997/Tallyn/issues/51) #type/feature #area/frontend #area/backend #priority/p1
 - [ ] [#53 Rename a household](https://github.com/Kolla1997/Tallyn/issues/53) #type/feature #area/frontend #area/backend #priority/p2
 - [ ] [#54 Download your data](https://github.com/Kolla1997/Tallyn/issues/54) #type/feature #area/frontend #area/backend #priority/p1
 - [ ] [#55 Notifications](https://github.com/Kolla1997/Tallyn/issues/55) #type/feature #area/frontend #area/backend #priority/p2
@@ -37,6 +36,7 @@ kanban-plugin: board
 ## Review
 
 - [ ] [#10 Brand: logo and design tokens](https://github.com/Kolla1997/Tallyn/issues/10) #type/design #area/brand #priority/p0
+- [ ] [#51 Reconnect a bank that needs sign-in (Plaid update mode)](https://github.com/Kolla1997/Tallyn/issues/51) #type/feature #area/frontend #area/backend #priority/p1
 
 
 ## Blocked
