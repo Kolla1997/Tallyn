@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #25 Footer uses the wordmark file (`brand/logo/svg/tallyn-wordmark-light.svg`, 20px tall, Dinesh picked A) instead of retyped text, so it matches the logo. Logo Guide: wordmark minimum 20px tall (about 49px wide), decision recorded.
 - #25 Page footer (Dinesh picked B) on branch `25-signin-switch`: a thin line with "Tallyn · It all adds up." on the left and Terms of Service · Privacy Policy on the right, at the very bottom of every screen (sign-in screens and app pages), lined up with the content edges; on phones it wraps above the tab bar. Replaces the centred links under the card.
 
 ## 2026-10-11

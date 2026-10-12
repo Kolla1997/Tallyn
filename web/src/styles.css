@@ -2516,9 +2516,15 @@ label.agree input {
   color: var(--color-text-secondary);
 }
 
-.site-footer strong {
-  font-family: var(--font-heading);
-  color: var(--color-cocoa);
+.site-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s2);
+}
+
+.site-footer-brand img {
+  height: 20px;
+  width: auto;
 }
 
 .site-footer a {

@@ -2,8 +2,8 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-08
-issue: 10
+updated: 2026-10-12
+issues: [10, 25]
 tags: [brand, logo]
 ---
 # Logo Guide
@@ -33,6 +33,7 @@ App icons are in `brand/icons/`, social images and splash screens in `brand/soci
 ## Rules
 * Clear space: the width of the dot on every side.
 * Minimum width: mark 16px, horizontal lockup 96px, stacked lockup 72px. Below that, use the mark only.
+* Wordmark on its own: at least 20px tall (about 49px wide), as in the page footer (#25).
 * Mono Cream goes on Clay, Sage and photos.
 * Do not stretch, rotate, recolour, outline or add shadows and effects.
 
@@ -40,6 +41,7 @@ App icons are in `brand/icons/`, social images and splash screens in `brand/soci
 | Date | Decision | Why |
 |---|---|---|
 | 2026-10-08 | Wordmark set in Jedira with a Clay "y" | Elegant and premium, a swash "a" gives it character |
+| 2026-10-12 | Wordmark minimum 20px tall; the page footer uses the wordmark file, not retyped text | Dinesh chose it for the footer (#25); keeps the logo exact at small sizes |
 | 2026-10-08 | Tagline in Montserrat Medium, +6% tracking | Matches body text |
 | 2026-10-08 | Primary app icon is the dark one | Strongest at small sizes |
 
