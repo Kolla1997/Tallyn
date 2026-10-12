@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #97 Merged PR #101 (phone layout fixes); closed and moved to Done.
 - #97 Phone layout fixes (Dinesh picked A for all four): Home credit cards show name and amount on one line with details below (no more 90px columns); on phones Transactions shows the bank beside the category (web keeps it under the amount); tap areas grow to ~44px for text links and 40px for the Yours / Everyone switch and Family role buttons, dots fill their gaps, and the day card gets ‹ › to step days; Home's Share with family and Invite became one "Family and sharing" button.
 - #96 Closed, not a bug: the "Plaid Link embedded more than once" warning comes from React StrictMode mounting twice in development (checked with StrictMode off locally: no warning). Production is unaffected; StrictMode stays.
 - #97 #98 #99 #100 Created from the audit (phone layout fixes, keyboard access for the dots, faster loading, lint/tests/PR checks); #24 extended with timeouts, rate limits and cache headers.
