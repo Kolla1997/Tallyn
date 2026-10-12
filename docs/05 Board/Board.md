@@ -30,6 +30,7 @@ kanban-plugin: board
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
+- [ ] [#75 Transactions: a year of spending as dots, with a day overview on hover](https://github.com/Kolla1997/Tallyn/issues/75) #type/feature #area/frontend #area/backend #priority/p2
 
 
 ## Review
