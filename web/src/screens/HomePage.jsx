@@ -92,7 +92,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
           shared={<SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />}
           family={<FamilyCard members={members} isOwner={household.role === 'owner'} />}
           goals={
-            <section className="panel" aria-labelledby="goals-h">
+            <section className="panel panel-dashed" aria-labelledby="goals-h">
               <div className="panel-head">
                 <h2 id="goals-h">Goals</h2>
                 <span className="tag">Coming soon</span>
@@ -541,7 +541,7 @@ function SpendingCard({ spending, month, home, everyone = false }) {
 
 function FamilyCard({ members, isOwner }) {
   return (
-    <section className="panel" aria-labelledby="fam-h">
+    <section className="panel panel-dashed" aria-labelledby="fam-h">
       <div className="panel-head">
         <h2 id="fam-h">Family</h2>
         <Link to="/family" className="link small">

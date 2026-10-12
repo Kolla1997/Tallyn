@@ -32,7 +32,7 @@ Every card in Tallyn ([#61](https://github.com/Kolla1997/Tallyn/issues/61)): `.p
 | Page | Cream, with soft glows behind the cards: Sage Light top left, Clay (mixed 45% with Cream) top right, Sand at the bottom, at `glow-opacity` |
 | Total balance card | Dark glass: `glass-surface-dark` (Cocoa at 86%) |
 | Tiles and chips on cards | Slightly see-through (tiles at 80%); the selected chip stays solid Cocoa |
-| Others' money (#37) | Keeps its dashed edge, in Border colour so it shows on glass |
+| Dashed edge | The household and other people: Shared with you (#37), Family and Goals on Home (#72). Your own money keeps the solid edge. Border colour so it shows on glass |
 | Stays solid | Confirmation dialogs, inputs, buttons, the debt cards stack. Anything people must read or act on carefully |
 
 **Readability first.** Every text colour must keep AA contrast where the glow is strongest. The 70% card surface was chosen for that: money-in green measures about 4.7:1 there (it was about 4.4:1 at 55%). Check contrast before changing `glass-surface` or the glow.
@@ -80,6 +80,7 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 |---|---|---|
 | 2026-10-08 | Clay Deep (#B04A34) for buttons and small text | Passes AA with white (5.4:1) |
 | 2026-10-08 | No shadows, 22px cards, pill buttons | Soft, family-friendly, not bank-like |
+| 2026-10-12 | Dashed edge also on Family and Goals on Home, not only Shared with you; your own money stays solid | Dinesh chose option A: groups the household cards together (#72) |
 | 2026-10-11 | Floating rounded glass sidebar, darker secondary text (#55494A) and a soft shade under cards | Dinesh chose option 2: text easier to read on glass (about 6.8:1 at the strongest glow) and more depth (#64) |
 | 2026-10-11 | **Cards are frosted glass** over a soft sage, clay and sand glow (replaces "flat white cards" from 2026-10-08; still no drop shadows) | Dinesh chose option B: more depth and a modern feel. Kept readable with a 70% surface, solid dialogs and fallbacks (#61) |
 | 2026-10-11 | Compact density on web (1024px+), comfortable on phones; up to 1600px wide; Home in three columns from 1440px | Dinesh: use the screen and show more at a glance; phones keep sizes that are easy to read and tap |

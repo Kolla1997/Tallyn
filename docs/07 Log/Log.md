@@ -11,6 +11,11 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #72 Family and Goals on Home get the dashed edge like Shared with you (Dinesh picked A); your own money stays solid. Design System: dashed edge now means the household and other people; decision recorded.
+- #72 Signing in always lands on Home (Dinesh): when signed out, the address resets to `/`, so you no longer come back to the page you signed out from (e.g. Settings). Invite links are unaffected (`/join` is captured and reset at load); `/terms` and `/privacy` keep their address.
+- #72 Removed Settings from the profile menu (Dinesh): it's already in the main menu. The menu now has Sign out, plus the household switcher when in more than one.
+- #72 Created and built on branch `72-sidebar-profile` (Dinesh picked A): the bottom of the sidebar is one profile card (avatar, name, "Owner · Dkolla") that opens a menu: switch household (when in more than one), Settings, Sign out; opens upward, or beside the collapsed rail; Esc and outside clicks close it and focus returns to the card; arrow keys move through it. Collapse moved to a round icon next to the logo. Fixed: `Link` let a passed `onClick` replace its in-app navigation (Settings from the menu reloaded the page). Old household box and household dot removed.
+- #25 Merged PR #71 (sign-in switch, page footer with the wordmark); #25 stays open for the remaining sign-in and 2FA screens.
 - #25 Footer uses the wordmark file (`brand/logo/svg/tallyn-wordmark-light.svg`, 20px tall, Dinesh picked A) instead of retyped text, so it matches the logo. Logo Guide: wordmark minimum 20px tall (about 49px wide), decision recorded.
 - #25 Page footer (Dinesh picked B) on branch `25-signin-switch`: a thin line with "Tallyn · It all adds up." on the left and Terms of Service · Privacy Policy on the right, at the very bottom of every screen (sign-in screens and app pages), lined up with the content edges; on phones it wraps above the tab bar. Replaces the centred links under the card.
 
