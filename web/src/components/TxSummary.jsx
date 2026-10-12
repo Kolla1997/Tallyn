@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { cleanName } from './TransactionRow.jsx'
@@ -68,12 +69,23 @@ export function TxSummary({ totals, scope, month }) {
 
 // Spending by category as a ring: total in the middle, a legend with each
 // category's share. Top four get their own colour; the rest are Other.
+// Hover a colour or its legend entry (or tap, or focus it) to see that
+// category in the middle; the others fade back.
 function CategoryRing({ categories, spent, cur, month }) {
-  const top = categories.slice(0, RING.length).map((c, i) => ({ label: categoryLabel(c.category), amount: c.amount_minor, color: RING[i] }))
+  const [active, setActive] = useState(null) // label of the highlighted category
+  const top = categories
+    .slice(0, RING.length)
+    .map((c, i) => ({ label: categoryLabel(c.category), amount: c.amount_minor, count: c.count, color: RING[i] }))
   const rest = categories.slice(RING.length)
   if (rest.length > 0) {
-    top.push({ label: 'Other', amount: rest.reduce((t, c) => t + c.amount_minor, 0), color: OTHER })
+    top.push({
+      label: 'Other',
+      amount: rest.reduce((t, c) => t + c.amount_minor, 0),
+      count: rest.reduce((t, c) => t + c.count, 0),
+      color: OTHER,
+    })
   }
+  const shown = top.find((c) => c.label === active)
   const tag = month ? new Date(`${month}-01T12:00:00`).toLocaleDateString('en-US', { month: 'short' }) : 'All time'
   const R = 52
   const C = 2 * Math.PI * R
@@ -101,6 +113,10 @@ function CategoryRing({ categories, spent, cur, month }) {
               const seg = (
                 <circle
                   key={c.label}
+                  className={active && active !== c.label ? 'ring-seg ring-dim' : 'ring-seg'}
+                  onMouseEnter={() => setActive(c.label)}
+                  onMouseLeave={() => setActive(null)}
+                  onClick={() => setActive(active === c.label ? null : c.label)}
                   cx="70"
                   cy="70"
                   r={R}
@@ -116,21 +132,47 @@ function CategoryRing({ categories, spent, cur, month }) {
               offset += share
               return seg
             })}
-            <text x="70" y="64" textAnchor="middle" className="ring-label">
-              Total spent
-            </text>
-            <text x="70" y="84" textAnchor="middle" className="ring-total">
-              {formatMoney(spent, cur)}
-            </text>
+            {shown ? (
+              <>
+                <text x="70" y="56" textAnchor="middle" className="ring-label">
+                  {shown.label.length > 18 ? `${shown.label.slice(0, 17)}…` : shown.label}
+                </text>
+                <text x="70" y="76" textAnchor="middle" className="ring-total">
+                  {formatMoney(shown.amount, cur)}
+                </text>
+                <text x="70" y="93" textAnchor="middle" className="ring-label">
+                  {pct(shown.amount)} · {shown.count} {shown.count === 1 ? 'purchase' : 'purchases'}
+                </text>
+              </>
+            ) : (
+              <>
+                <text x="70" y="64" textAnchor="middle" className="ring-label">
+                  Total spent
+                </text>
+                <text x="70" y="84" textAnchor="middle" className="ring-total">
+                  {formatMoney(spent, cur)}
+                </text>
+              </>
+            )}
           </svg>
           <ul className="ring-legend">
             {top.map((c) => (
               <li key={c.label}>
-                <span className="small muted block">{c.label}</span>
-                <span className="ring-pct">
-                  <span className="ring-tick" style={{ background: c.color }} aria-hidden="true" />
-                  {pct(c.amount)}
-                </span>
+                <button
+                  type="button"
+                  className={active && active !== c.label ? 'ring-key ring-dim' : 'ring-key'}
+                  aria-label={`${c.label}: ${formatMoney(c.amount, cur)}, ${pct(c.amount)}, ${c.count} ${c.count === 1 ? 'purchase' : 'purchases'}`}
+                  onMouseEnter={() => setActive(c.label)}
+                  onMouseLeave={() => setActive(null)}
+                  onFocus={() => setActive(c.label)}
+                  onBlur={() => setActive(null)}
+                >
+                  <span className="small muted block">{c.label}</span>
+                  <span className="ring-pct">
+                    <span className="ring-tick" style={{ background: c.color }} aria-hidden="true" />
+                    {pct(c.amount)}
+                  </span>
+                </button>
               </li>
             ))}
           </ul>

@@ -2023,3 +2023,38 @@ button.tx-row-inner:focus-visible {
     overflow-y: auto;
   }
 }
+
+/* Ring hover (#58): the hovered category stays, the others fade back. */
+.ring-seg {
+  cursor: pointer;
+  transition: opacity 200ms ease-out;
+}
+
+.ring-dim {
+  opacity: 0.3;
+}
+
+.ring-key {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: var(--space-s1);
+  margin: calc(-1 * var(--space-s1));
+  border-radius: var(--radius-input);
+  cursor: default;
+  transition: opacity 200ms ease-out;
+}
+
+.ring-key:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-seg,
+  .ring-key {
+    transition: none;
+  }
+}
