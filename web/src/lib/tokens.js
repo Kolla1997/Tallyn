@@ -2,7 +2,7 @@ import tokens from '../../../design-tokens.json'
 
 // design-tokens.json is the source of truth for token values, so the app reads
 // it directly and exposes each value as a CSS variable:
-// --color-clay-deep, --font-body, --radius-card, --space-s4, ...
+// --color-clay-deep, --font-body, --radius-card, --space-s4, --glass-surface, ...
 const fallback = {
   heading: 'system-ui, sans-serif',
   body: 'system-ui, sans-serif',
@@ -21,5 +21,9 @@ export function applyTokens(root = document.documentElement) {
   }
   for (const [name, { value }] of Object.entries(tokens.spacing)) {
     root.style.setProperty(`--space-${name}`, `${value}px`)
+  }
+  // Glass finish (#61): --glass-surface, --glass-blur, --glow-opacity, ...
+  for (const [name, { value }] of Object.entries(tokens.effect ?? {})) {
+    root.style.setProperty(`--${name}`, value)
   }
 }

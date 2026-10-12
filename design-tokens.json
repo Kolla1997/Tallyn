@@ -102,5 +102,31 @@
       "value": "200-300ms ease-out"
     }
   },
-  "$description": "Tallyn design tokens. Source of truth for colour, type, radius, spacing and motion values."
+  "$description": "Tallyn design tokens. Source of truth for colour, type, radius, spacing and motion values.",
+  "effect": {
+    "glass-surface": {
+      "value": "rgba(255, 255, 255, 0.7)",
+      "$description": "Card background: translucent white over the page glow (#61). 70% keeps text AA where the glow is strongest"
+    },
+    "glass-surface-dark": {
+      "value": "rgba(59, 47, 47, 0.86)",
+      "$description": "Dark glass for the total balance card: Cocoa, slightly see-through"
+    },
+    "glass-border": {
+      "value": "rgba(255, 255, 255, 0.8)",
+      "$description": "Thin white edge on glass cards"
+    },
+    "glass-highlight": {
+      "value": "inset 0 1px 0 rgba(255, 255, 255, 0.9)",
+      "$description": "Light top edge, the only shadow allowed"
+    },
+    "glass-blur": {
+      "value": "blur(18px) saturate(1.2)",
+      "$description": "Background blur behind glass cards"
+    },
+    "glow-opacity": {
+      "value": "0.55",
+      "$description": "Strength of the sage, clay and sand glows behind the cards"
+    }
+  }
 }

@@ -11,15 +11,31 @@ tags: [design]
 Token values live in `design-tokens.json` (colour, type, radius, spacing, motion). If this note and the JSON disagree, the JSON wins: fix this note. Ready-made versions are in `brand/colors/` and `brand/typography/`: `tokens.css`, `tailwind.colors.js`, `Colors.swift`, `colors.xml`, `Color.kt`, `type-scale.css`.
 
 ## Shape
-Flat, soft, friendly. No gradients or shadows.
+Soft, friendly, frosted. Cards are frosted glass over a soft glow (see [[#Glass finish]]); everything else stays flat, with no drop shadows.
 
 | Item | Value |
 |---|---|
-| Card radius | 22px, white, 1px border |
+| Card | 22px radius, frosted glass (see Glass finish) |
 | Button radius | pill |
 | Input radius | 14px |
 | Spacing | 4, 8, 12, 16, 24, 32, 48, 64px |
 | Breakpoints | 640 / 768 / 1024 / 1280 / 1440 |
+
+## Glass finish
+Every card in Tallyn ([#61](https://github.com/Kolla1997/Tallyn/issues/61)): `.panel` in the app and `.card` on the sign-in screens. Values live in `design-tokens.json` under `effect`.
+
+| Part | Rule |
+|---|---|
+| Card | `glass-surface` (white at 70%), `glass-blur` behind it, a 1px `glass-border` edge and the `glass-highlight` top edge. No drop shadows |
+| Page | Cream, with soft glows behind the cards: Sage Light top left, Clay (mixed 45% with Cream) top right, Sand at the bottom, at `glow-opacity` |
+| Total balance card | Dark glass: `glass-surface-dark` (Cocoa at 86%) |
+| Tiles and chips on cards | Slightly see-through (tiles at 80%); the selected chip stays solid Cocoa |
+| Others' money (#37) | Keeps its dashed edge, in Border colour so it shows on glass |
+| Stays solid | Confirmation dialogs, inputs, buttons, the debt cards stack. Anything people must read or act on carefully |
+
+**Readability first.** Every text colour must keep AA contrast where the glow is strongest. The 70% card surface was chosen for that: money-in green measures about 4.7:1 there (it was about 4.4:1 at 55%). Check contrast before changing `glass-surface` or the glow.
+
+**Fallbacks.** Cards turn solid white and the glow is hidden when the browser can't blur (`@supports`) or the person asks for reduced transparency (`prefers-reduced-transparency`).
 
 ## App type and density
 The web app uses two densities ([#39](https://github.com/Kolla1997/Tallyn/issues/39)). Phones (under 1024px) stay **comfortable** for reading and tapping. From 1024px the app is **compact**, so more fits at a glance. `brand/typography/type-scale.css` is the brand and marketing scale; this table is for app screens.
@@ -62,5 +78,6 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 |---|---|---|
 | 2026-10-08 | Clay Deep (#B04A34) for buttons and small text | Passes AA with white (5.4:1) |
 | 2026-10-08 | No shadows, 22px cards, pill buttons | Soft, family-friendly, not bank-like |
+| 2026-10-11 | **Cards are frosted glass** over a soft sage, clay and sand glow (replaces "flat white cards" from 2026-10-08; still no drop shadows) | Dinesh chose option B: more depth and a modern feel. Kept readable with a 70% surface, solid dialogs and fallbacks (#61) |
 | 2026-10-11 | Compact density on web (1024px+), comfortable on phones; up to 1600px wide; Home in three columns from 1440px | Dinesh: use the screen and show more at a glance; phones keep sizes that are easy to read and tap |
 | 2026-10-11 | Spending isn't shown in red; red is only for what you owe | Calm, not alarming: ordinary purchases aren't a warning |

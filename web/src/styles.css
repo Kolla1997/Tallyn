@@ -2083,3 +2083,98 @@ button.tx-row-inner:focus-visible {
     transition: none;
   }
 }
+
+/* Frosted glass finish (#61, Dinesh 2026-10-11; Design System "Glass finish").
+   Every card is translucent white over a soft sage, clay and sand glow, with
+   a thin white edge and a light top highlight. Values from design-tokens.json
+   (effect). Dialogs stay solid so confirmations are always easy to read. */
+body {
+  background-color: var(--color-cream);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: var(--glow-opacity);
+  background:
+    radial-gradient(40vw 40vw at 8% 12%, var(--color-sage-light), transparent 70%),
+    radial-gradient(38vw 38vw at 92% 30%, color-mix(in srgb, var(--color-clay) 45%, var(--color-cream)), transparent 70%),
+    radial-gradient(45vw 35vw at 55% 100%, var(--color-sand), transparent 70%);
+}
+
+.panel,
+.card {
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+
+/* Others' money keeps its dashed edge (#37), in a colour you can see on glass. */
+.panel.panel-shared {
+  border: 1px dashed var(--color-border);
+}
+
+/* The total balance card: dark glass. */
+.panel.total-card {
+  background: var(--glass-surface-dark);
+  border: 1px solid rgb(255 255 255 / 0.18);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+
+/* Tinted tiles and chips sit on glass, so they let a little of it through. */
+.tone-sage {
+  background: color-mix(in srgb, #e3ece3 80%, transparent);
+}
+
+.tone-clay {
+  background: color-mix(in srgb, #f6e2dc 80%, transparent);
+}
+
+.chip {
+  background: var(--glass-surface);
+  border-color: var(--glass-border);
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--color-cocoa);
+  border-color: var(--color-cocoa);
+}
+
+/* Fallbacks: solid cards and no glow when the browser can't blur, or when
+   the person has asked their device for less transparency. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .panel,
+  .card,
+  .chip {
+    background: var(--color-white);
+    border-color: var(--color-border);
+  }
+
+  body::before {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .panel,
+  .card,
+  .chip {
+    background: var(--color-white);
+    border-color: var(--color-border);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .panel.total-card {
+    background: var(--color-cocoa);
+  }
+
+  body::before {
+    display: none;
+  }
+}
