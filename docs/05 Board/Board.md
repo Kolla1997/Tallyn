@@ -31,7 +31,7 @@ kanban-plugin: board
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
-- [ ] [#66 Gear settings icon and Tallyn loading animation](https://github.com/Kolla1997/Tallyn/issues/66) #type/design #area/design #area/frontend #priority/p2
+- [ ] [#68 Home shows your own money first, with a Yours / Everyone switch](https://github.com/Kolla1997/Tallyn/issues/68) #type/feature #area/frontend #priority/p1
 
 
 ## Review
@@ -62,6 +62,7 @@ kanban-plugin: board
 - [x] [#58 Transactions: summary and details panel](https://github.com/Kolla1997/Tallyn/issues/58) #type/feature #area/frontend #area/backend #priority/p1
 - [x] [#61 Frosted glass finish on every card](https://github.com/Kolla1997/Tallyn/issues/61) #type/design #area/design #area/frontend #priority/p2
 - [x] [#64 Floating rounded sidebar, darker secondary text and a soft shade under cards](https://github.com/Kolla1997/Tallyn/issues/64) #type/design #area/design #area/frontend #priority/p2
+- [x] [#66 Gear settings icon and Tallyn loading animation](https://github.com/Kolla1997/Tallyn/issues/66) #type/design #area/design #area/frontend #priority/p2
 
 
 %% kanban:settings
