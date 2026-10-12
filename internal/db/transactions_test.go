@@ -185,3 +185,72 @@ func accountID(t *testing.T, f *fixture, plaidAccount string) string {
 	}
 	return id
 }
+
+// Summary (#58): totals over every matching transaction, same rules as the
+// spending card, same filters and visibility as the list.
+func TestTransactionSummary(t *testing.T) {
+	f := setup(t)
+	seedTxns(t, f)
+	ctx := context.Background()
+	extra := []plaid.Transaction{
+		{PlaidTransactionID: "a-save", PlaidAccountID: "acct-a", AmountMinor: 5000, Currency: "USD", Date: "2026-10-10", Name: "Move to savings", CategoryPrimary: "TRANSFER_OUT"},
+		{PlaidTransactionID: "a-card", PlaidAccountID: "acct-a", AmountMinor: 2500, Currency: "USD", Date: "2026-10-10", Name: "Card payment", CategoryPrimary: "LOAN_PAYMENTS", CategoryDetailed: "LOAN_PAYMENTS_CREDIT_CARD_PAYMENT"},
+		{PlaidTransactionID: "a-pay", PlaidAccountID: "acct-a", AmountMinor: -100000, Currency: "USD", Date: "2026-10-11", Name: "Payroll", CategoryPrimary: "INCOME"},
+		{PlaidTransactionID: "a-refund", PlaidAccountID: "acct-a", AmountMinor: -500, Currency: "USD", Date: "2026-10-12", Name: "Fresh Market", MerchantName: "Fresh Market", CategoryPrimary: "FOOD_AND_DRINK"},
+	}
+	if _, err := f.sys.SaveSync(ctx, syncItem(t, f, f.aliceItem), plaid.SyncResult{Added: extra, NextCursor: "c2"}); err != nil {
+		t.Fatal(err)
+	}
+	sum := func(user string, flt TxFilter) TxSummary {
+		t.Helper()
+		got, err := f.db.Summary(ctx, user, f.testHH, flt)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(got) != 1 || got[0].Currency != "USD" {
+			t.Fatalf("summary = %+v, want one USD summary", got)
+		}
+		return got[0]
+	}
+
+	// October for alice: her nine seeded purchases (1001..1009 cents) and
+	// carl's Book Barn (1003), as a parent.
+	oct := sum(alice, TxFilter{Month: "2026-10"})
+	if oct.SpentMinor != 9045+1003 {
+		t.Errorf("spent = %d, want %d", oct.SpentMinor, 9045+1003)
+	}
+	if oct.MoneyInMinor != 100000+500 {
+		t.Errorf("money in = %d, want payroll plus the refund", oct.MoneyInMinor)
+	}
+	if oct.TransfersMinor != 5000+2500 {
+		t.Errorf("transfers = %d, want the savings move and the card payment", oct.TransfersMinor)
+	}
+	if len(oct.Categories) != 3 || oct.Categories[0].Category != "FOOD_AND_DRINK" || oct.Categories[0].AmountMinor != 7028+1009 || oct.Categories[0].Count != 8 {
+		t.Errorf("categories = %+v", oct.Categories)
+	}
+	if len(oct.Merchants) == 0 || oct.Merchants[0].Merchant != "Fresh Market" || oct.Merchants[0].AmountMinor != 7028 || oct.Merchants[0].Count != 7 {
+		t.Errorf("top merchant = %+v, want Fresh Market 7028 x7 (the refund isn't spending)", oct.Merchants)
+	}
+
+	// Filters narrow the totals exactly as they narrow the list.
+	if s := sum(alice, TxFilter{Month: "2026-10", Owner: carl}); s.SpentMinor != 1003 || s.MoneyInMinor != 0 {
+		t.Errorf("carl only: %+v", s)
+	}
+	if s := sum(alice, TxFilter{Month: "2026-10", Category: "TRANSPORTATION"}); s.SpentMinor != 1008 || len(s.Merchants) != 1 || s.Merchants[0].Merchant != "Uber" {
+		t.Errorf("transportation: %+v", s)
+	}
+	if s := sum(alice, TxFilter{Query: "fresh"}); s.SpentMinor != 7028 || s.MoneyInMinor != 500 {
+		t.Errorf("search fresh: %+v", s)
+	}
+
+	// Visibility: carl (a child) sees only his own; bob, in another household, nothing.
+	if s := sum(carl, TxFilter{Month: "2026-10"}); s.SpentMinor != 1003 {
+		t.Errorf("carl sees spent %d, want only his own 1003", s.SpentMinor)
+	}
+	if got, err := f.db.Summary(ctx, bob, f.testHH, TxFilter{}); err != nil || len(got) != 0 {
+		t.Errorf("bob: %+v %v, want nothing", got, err)
+	}
+	if _, err := f.db.Summary(ctx, alice, f.testHH, TxFilter{Month: "2026-13"}); !errors.Is(err, ErrInvalid) {
+		t.Errorf("bad month: %v, want ErrInvalid", err)
+	}
+}

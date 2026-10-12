@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -20,16 +21,10 @@ func transactions(store Store) http.HandlerFunc {
 			return
 		}
 		q := r.URL.Query()
-		limit, _ := strconv.Atoi(q.Get("limit"))
-		offset, _ := strconv.Atoi(q.Get("offset"))
-		list, more, err := store.Transactions(r.Context(), uid, q.Get("household_id"), db.TxFilter{
-			Owner:    q.Get("owner"),
-			Query:    q.Get("q"),
-			Category: q.Get("category"),
-			Month:    q.Get("month"),
-			Limit:    limit,
-			Offset:   offset,
-		})
+		f := txFilter(q)
+		f.Limit, _ = strconv.Atoi(q.Get("limit"))
+		f.Offset, _ = strconv.Atoi(q.Get("offset"))
+		list, more, err := store.Transactions(r.Context(), uid, q.Get("household_id"), f)
 		if errors.Is(err, db.ErrInvalid) {
 			writeError(w, http.StatusBadRequest, "bad_request")
 			return
@@ -40,6 +35,39 @@ func transactions(store Store) http.HandlerFunc {
 			return
 		}
 		writeJSON(w, http.StatusOK, map[string]any{"transactions": list, "more": more})
+	}
+}
+
+// txFilter reads the filters shared by the list and its summary.
+func txFilter(q url.Values) db.TxFilter {
+	return db.TxFilter{
+		Owner:    q.Get("owner"),
+		Query:    q.Get("q"),
+		Category: q.Get("category"),
+		Month:    q.Get("month"),
+	}
+}
+
+// txSummary totals every transaction matching the same filters as the list
+// (#58): money in, spent, transfers, by category and top merchants.
+func txSummary(store Store) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		uid, ok := userID(w, r)
+		if !ok {
+			return
+		}
+		q := r.URL.Query()
+		list, err := store.Summary(r.Context(), uid, q.Get("household_id"), txFilter(q))
+		if errors.Is(err, db.ErrInvalid) {
+			writeError(w, http.StatusBadRequest, "bad_request")
+			return
+		}
+		if err != nil {
+			log.Printf("api: transactions summary: %v", err)
+			writeError(w, http.StatusInternalServerError, "internal")
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{"summary": list})
 	}
 }
 

@@ -803,12 +803,17 @@ a.btn {
 .tx-logo {
   background: var(--color-white);
   border: 1px solid var(--color-border);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
+/* The logo fills its circle exactly, whatever size the circle is. */
 .tx-logo img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
 .tone-clay {
@@ -878,6 +883,11 @@ a.btn {
 .day-heading {
   font-size: 15px;
   color: var(--color-text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-s3);
+  margin: 0 0 var(--space-s1);
 }
 
 .show-more {
@@ -1076,7 +1086,9 @@ a.btn {
   margin-bottom: var(--space-s4);
 }
 
-.have-owe > a {
+.have-owe > a,
+
+.have-owe > div {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -1206,7 +1218,6 @@ a.btn {
   }
 
   .tx-icon,
-  .tx-logo img,
   .avatar:not(.avatar-sm) {
     width: 32px;
     height: 32px;
@@ -1236,7 +1247,9 @@ a.btn {
     margin-bottom: var(--space-s3);
   }
 
-  .have-owe > a {
+  .have-owe > a,
+
+  .have-owe > div {
     padding: var(--space-s2) var(--space-s3);
   }
 
@@ -1244,10 +1257,6 @@ a.btn {
     padding: var(--space-s1) var(--space-s3);
   }
 
-  .tx-filters,
-  .tx-days {
-    max-width: 1000px;
-  }
 }
 
 /* Three columns from 1440px (Home). */
@@ -1390,7 +1399,9 @@ a.btn {
   padding: var(--space-s1) var(--space-s4);
 }
 
-.have-owe > a {
+.have-owe > a,
+
+.have-owe > div {
   color: inherit;
   text-decoration: none;
 }
@@ -1691,7 +1702,8 @@ a.btn {
 }
 
 /* Have / owe tiles on phones: keep big amounts inside the tile. */
-.have-owe > a {
+.have-owe > a,
+.have-owe > div {
   min-width: 0;
 }
 
@@ -1839,6 +1851,236 @@ a.btn {
     transition: none;
   }
 }
+
+/* Transactions: list with summary or details beside it (#58). */
+.tx-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-s4);
+  align-items: start;
+  margin-top: var(--space-s4);
+}
+
+.tx-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s3);
+  min-width: 0;
+}
+
+.tx-list {
+  gap: var(--space-s4);
+}
+
+.tx-row-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+  width: 100%;
+  min-width: 0;
+}
+
+.rows > li.tx-row-pick {
+  padding: 0;
+}
+
+button.tx-row-inner {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: var(--space-s2);
+  margin: 0 calc(-1 * var(--space-s2));
+  width: calc(100% + 2 * var(--space-s2));
+  border-radius: var(--radius-input);
+  cursor: pointer;
+}
+
+button.tx-row-inner:hover {
+  background: var(--color-cream);
+}
+
+button.tx-row-inner[aria-pressed='true'] {
+  background: var(--color-sand);
+}
+
+button.tx-row-inner:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+.tx-hint {
+  text-align: center;
+  margin: 0;
+}
+
+.tx-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s4);
+}
+
+.tx-summary .have-owe {
+  margin-bottom: 0;
+}
+
+.ring-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s4);
+  flex-wrap: wrap;
+}
+
+.ring-label {
+  font-family: var(--font-body);
+  fill: var(--color-text-secondary);
+}
+
+.ring-total {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  fill: var(--color-cocoa);
+}
+
+.ring-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-width: 160px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-s3);
+}
+
+.ring-pct {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s2);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.ring-tick {
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+}
+
+.tx-details {
+  gap: var(--space-s3);
+}
+
+.tx-back {
+  align-self: flex-start;
+}
+
+.tx-details-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+}
+
+.tx-details-head h2 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Where a purchase happened: address and Open in Maps (#58; in-app map is #60). */
+.tx-place {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s2);
+}
+
+.tx-place p {
+  margin: 0;
+}
+
+.tx-address {
+  display: flex;
+  gap: var(--space-s3);
+  align-items: flex-start;
+  background: var(--color-cream);
+  border-radius: var(--radius-input);
+  padding: var(--space-s3);
+}
+
+.tx-address svg {
+  color: var(--color-clay-deep);
+  flex: none;
+  margin-top: 2px;
+}
+
+.tx-maps {
+  align-self: flex-start;
+  text-decoration: none;
+}
+
+.tx-details .link {
+  align-self: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .tx-layout {
+    grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
+  }
+
+  .tx-side {
+    position: sticky;
+    top: var(--space-s4);
+  }
+}
+
+/* Phones: summary above the list; details open over the page. */
+@media (max-width: 1023px) {
+  .tx-side {
+    order: -1;
+  }
+
+  .tx-details {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    border-radius: 0;
+    overflow-y: auto;
+  }
+}
+
+/* Ring hover (#58): the hovered category stays, the others fade back. */
+.ring-seg {
+  cursor: pointer;
+  transition: opacity 200ms ease-out;
+}
+
+.ring-dim {
+  opacity: 0.3;
+}
+
+.ring-key {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: var(--space-s1);
+  margin: calc(-1 * var(--space-s1));
+  border-radius: var(--radius-input);
+  cursor: default;
+  transition: opacity 200ms ease-out;
+}
+
+.ring-key:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-seg,
+  .ring-key {
+    transition: none;
 
 /* Settings (#39 step 5): same list-and-detail layout as Family. */
 .settings-grid .family-person {

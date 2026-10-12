@@ -472,7 +472,8 @@ function SpendingCard({ spending, month, home }) {
             {top.map((r) => {
               const label = r.label ?? categoryLabel(r.category)
               // Same month as these totals, so the counts match what opens.
-              const p = new URLSearchParams()
+              // Everyone's, like these totals; Transactions starts on yours otherwise.
+              const p = new URLSearchParams({ owner: 'all' })
               if (r.category !== 'OTHER') p.set('category', r.category)
               if (month) p.set('month', month)
               const to = `/transactions?${p}`
