@@ -11,6 +11,8 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #77 Merged PR #78 (loan payments count as transfers); closed and moved to Done.
+- #27 Merged PR #79 (credit cards on Home, Liabilities, migration 0011). #27 stays open for loans and mortgages; card moved back to Backlog.
 - #1 Home's Transfers tab note now says "Loan and card payments", following #77.
 - #27 Credit cards on Home (Dinesh picked F from six drafts): total limit bar with each card's balance in shades of Clay, then each card with APR, minimum and due date, soonest first. Migration `0011_credit_cards.sql` run on dev at Dinesh's OK. Plaid Link now asks for Liabilities as an optional product (ADR 0010, supersedes 0004's "Transactions only"). The sync refreshes balances, limits and card details about once a day. New spec [[Feature - Credit Cards]].
 - #27 Found: Plaid's transaction sync only sends balances with new transactions, so balances could go stale on quiet days. The daily `/accounts/get` fixes that too.
