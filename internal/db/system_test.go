@@ -331,7 +331,7 @@ func TestSaveCreditCards(t *testing.T) {
 		{PlaidAccountID: "card-b", APRs: []plaid.APR{}},
 		{PlaidAccountID: "acct-b", APRs: []plaid.APR{}}, // bob's account, another bank: skipped
 	}
-	if err := f.sys.SaveCreditCards(ctx, item, cards, "shared"); err != nil {
+	if err := f.sys.SaveLiabilities(ctx, item, plaid.Liabilities{Cards: cards}, "shared"); err != nil {
 		t.Fatal(err)
 	}
 	if syncItem(t, f, f.aliceItem).LiabilitiesSyncedAt == nil {
@@ -392,13 +392,13 @@ func TestSaveCreditCards(t *testing.T) {
 	}
 
 	// The bank stops reporting card-b: it goes; an empty answer clears all.
-	if err := f.sys.SaveCreditCards(ctx, item, cards[:1], "shared"); err != nil {
+	if err := f.sys.SaveLiabilities(ctx, item, plaid.Liabilities{Cards: cards[:1]}, "shared"); err != nil {
 		t.Fatal(err)
 	}
 	if n := f.count(t, alice, `select count(*) from credit_cards`); n != 1 {
 		t.Fatalf("after card-b dropped: %d cards", n)
 	}
-	if err := f.sys.SaveCreditCards(ctx, item, nil, "consent_needed"); err != nil {
+	if err := f.sys.SaveLiabilities(ctx, item, plaid.Liabilities{Cards: nil}, "consent_needed"); err != nil {
 		t.Fatal(err)
 	}
 	if n := f.count(t, alice, `select count(*) from credit_cards`); n != 0 {
@@ -414,7 +414,71 @@ func TestSaveCreditCards(t *testing.T) {
 			t.Fatalf("card details state = %v", b.CardDetails)
 		}
 	}
-	if err := f.sys.SaveCreditCards(ctx, item, nil, "made_up"); !errors.Is(err, ErrInvalid) {
+	if err := f.sys.SaveLiabilities(ctx, item, plaid.Liabilities{Cards: nil}, "made_up"); !errors.Is(err, ErrInvalid) {
 		t.Fatalf("unknown state: %v", err)
+	}
+}
+
+// Loans (#27): saved with the cards, read back with the account, same
+// visibility as the balance; loans the bank stops reporting are removed.
+func TestSaveLoans(t *testing.T) {
+	f := setup(t)
+	ctx := context.Background()
+	res := plaid.SyncResult{Accounts: []plaid.Account{
+		{PlaidAccountID: "loan-a", Name: "Fake Student Loan", Type: "loan", Subtype: "student", Currency: "USD", CurrentMinor: ptr(int64(6526200))},
+		{PlaidAccountID: "home-a", Name: "Fake Mortgage", Type: "loan", Subtype: "mortgage", Currency: "USD", CurrentMinor: ptr(int64(5630206))},
+	}, NextCursor: "c"}
+	if _, err := f.sys.SaveSync(ctx, syncItem(t, f, f.aliceItem), res); err != nil {
+		t.Fatal(err)
+	}
+	item := syncItem(t, f, f.aliceItem)
+	no, yes := false, true
+	loans := []plaid.Loan{
+		{PlaidAccountID: "loan-a", Kind: "student", RatePercent: "5.25", NextPaymentMinor: ptr(int64(2500)), NextDueDate: "2026-11-01",
+			PayoffDate: "2032-07-28", OriginalMinor: ptr(int64(10500000)), Overdue: &no, YTDInterestMinor: ptr(int64(28055)), RepaymentPlan: "Standard"},
+		{PlaidAccountID: "home-a", Kind: "mortgage", RatePercent: "3.99", RateType: "fixed", NextPaymentMinor: ptr(int64(314154)),
+			PastDueMinor: ptr(int64(230400)), Overdue: &yes, Term: "30 year"},
+		{PlaidAccountID: "home-a", Kind: "car"}, // unknown kind: skipped
+	}
+	if err := f.sys.SaveLiabilities(ctx, item, plaid.Liabilities{Loans: loans}, "shared"); err != nil {
+		t.Fatal(err)
+	}
+	banks, err := f.db.Banks(ctx, alice, f.testHH)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := map[string]*Loan{}
+	for _, b := range banks {
+		for _, a := range b.Accounts {
+			got[a.Name] = a.Loan
+		}
+	}
+	st, m := got["Fake Student Loan"], got["Fake Mortgage"]
+	if st == nil || st.Kind != "student" || *st.RatePercent != "5.25" || *st.NextPaymentMinor != 2500 || *st.PayoffDate != "2032-07-28" ||
+		*st.OriginalMinor != 10500000 || *st.RepaymentPlan != "Standard" || *st.Overdue {
+		t.Fatalf("student = %+v", st)
+	}
+	if m == nil || m.Kind != "mortgage" || *m.RateType != "fixed" || *m.PastDueMinor != 230400 || !*m.Overdue || *m.Term != "30 year" {
+		t.Fatalf("mortgage = %+v", m)
+	}
+	if got["Checking"] != nil {
+		t.Fatal("a checking account got loan details")
+	}
+	// Same visibility as the balance: carl (child) and bob see none; nobody but the sync writes.
+	if n := f.count(t, carl, `select count(*) from loans`); n != 0 {
+		t.Fatalf("carl sees %d of alice's loans", n)
+	}
+	if n := f.count(t, bob, `select count(*) from loans`); n != 0 {
+		t.Fatalf("bob sees %d loans", n)
+	}
+	if _, err := f.execAs(alice, `update loans set rate_percent = 0`); err == nil {
+		t.Fatal("alice could change loan details")
+	}
+	// The bank stops reporting the mortgage: it goes.
+	if err := f.sys.SaveLiabilities(ctx, item, plaid.Liabilities{Loans: loans[:1]}, "shared"); err != nil {
+		t.Fatal(err)
+	}
+	if n := f.count(t, alice, `select count(*) from loans`); n != 1 {
+		t.Fatalf("after the mortgage dropped: %d loans", n)
 	}
 }

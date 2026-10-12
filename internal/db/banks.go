@@ -116,6 +116,28 @@ type BankAccount struct {
 	AvailableMinor *int64  `json:"available_balance_minor"`
 	LimitMinor     *int64  `json:"credit_limit_minor"`
 	Card           *Card   `json:"card"` // credit cards only, once the bank has sent details (#27)
+	Loan           *Loan   `json:"loan"` // student loans and mortgages, once the bank has sent details (#27)
+}
+
+// Loan is what the bank says about a student loan or mortgage (#27). Amounts
+// are minor units of the account's currency; dates are YYYY-MM-DD.
+type Loan struct {
+	Kind              string  `json:"kind"` // student, mortgage
+	RatePercent       *string `json:"rate_percent"`
+	RateType          *string `json:"rate_type"` // fixed, variable
+	NextPaymentMinor  *int64  `json:"next_payment_minor"`
+	NextDueDate       *string `json:"next_payment_due_date"`
+	LastPaymentMinor  *int64  `json:"last_payment_minor"`
+	LastPaymentDate   *string `json:"last_payment_date"`
+	PayoffDate        *string `json:"payoff_date"`
+	OriginalMinor     *int64  `json:"original_minor"`
+	OriginationDate   *string `json:"origination_date"`
+	PastDueMinor      *int64  `json:"past_due_minor"`
+	Overdue           *bool   `json:"is_overdue"`
+	YTDInterestMinor  *int64  `json:"ytd_interest_minor"`
+	YTDPrincipalMinor *int64  `json:"ytd_principal_minor"`
+	RepaymentPlan     *string `json:"repayment_plan"`
+	Term              *string `json:"term"`
 }
 
 // Card is what the bank says about a credit card (#27). Amounts are minor
@@ -179,9 +201,19 @@ func (d *DB) Banks(ctx context.Context, userID, householdID string) ([]Bank, err
 			         'last_statement_date', c.last_statement_date,
 			         'last_payment_minor', c.last_payment_minor,
 			         'last_payment_date', c.last_payment_date,
-			         'is_overdue', c.is_overdue) end
+			         'is_overdue', c.is_overdue) end,
+			       case when l.account_id is not null then jsonb_build_object(
+			         'kind', l.kind, 'rate_percent', trim_scale(l.rate_percent)::text, 'rate_type', l.rate_type,
+			         'next_payment_minor', l.next_payment_minor, 'next_payment_due_date', l.next_payment_due_date,
+			         'last_payment_minor', l.last_payment_minor, 'last_payment_date', l.last_payment_date,
+			         'payoff_date', l.payoff_date, 'original_minor', l.original_minor,
+			         'origination_date', l.origination_date, 'past_due_minor', l.past_due_minor,
+			         'is_overdue', l.is_overdue, 'ytd_interest_minor', l.ytd_interest_minor,
+			         'ytd_principal_minor', l.ytd_principal_minor, 'repayment_plan', l.repayment_plan,
+			         'term', l.term) end
 			from public.accounts a
 			left join public.credit_cards c on c.account_id = a.id
+			left join public.loans l on l.account_id = a.id
 			where a.household_id = $1
 			order by a.name, a.id`, householdID)
 		if err != nil {

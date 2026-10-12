@@ -37,3 +37,12 @@ Dinesh picked option A with count-up numbers. Code: `web/src/lib/motion.js`, `we
 
 Reduced motion: no sliding bar, rise or counting; a plain 200ms fade only.
 
+## Debts page (#27)
+| What | Effect |
+|---|---|
+| Rings, on first show | Tracks grow in one after another (80ms apart), arcs fill (1.1s, slight overshoot), the total counts up from 0, the legend slides in and its bars fill |
+| Pointing at a ring or legend row | That ring glows, the others fade to 28%; the middle shows its amount and share |
+| Notched gauges | Filled notches light up one by one (28ms apart) when shown |
+
+Reduced motion: everything appears at once.
+

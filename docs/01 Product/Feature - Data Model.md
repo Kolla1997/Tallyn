@@ -64,6 +64,7 @@ erDiagram
 - Linking and unlinking a bank go through two checked functions instead (`0004_plaid_link.sql`): only owners and adults link, only for themselves. See [[Feature - Bank Linking]].
 - The bank sync writes through its own narrow role, `tallyn_sync` (`0005_bank_sync.sql`). Transaction time and location live in `transaction_details`, visible only to the person who made the transaction plus household owners for teens and children. See [[Feature - Bank Sync]].
 - Credit cards (#27, `0011_credit_cards.sql`): `accounts.credit_limit_minor`, and `credit_cards` (one row per card: APRs, minimum, due date, last statement and payment, overdue), visible to whoever may see the card's balance, written only by the sync. See [[Feature - Credit Cards]].
+- Loans (#27, `0013_loans.sql`): `loans` (one row per student loan or mortgage: rate, next payment and due date, payoff date, amount borrowed, past due, overdue, interest this year, plan, term), same visibility and writer as `credit_cards`; never account numbers or addresses. See [[Feature - Debts]].
 - Unlinking a bank or deleting a household removes everything under it.
 
 ## Tech notes

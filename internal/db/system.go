@@ -252,12 +252,13 @@ func nonNegative(v *int64) *int64 {
 	return v
 }
 
-// SaveCreditCards replaces a bank's credit card details (#27) with cards, and
+// SaveLiabilities replaces a bank's credit card and loan details (#27), and
 // records that they were fetched now and what the bank said (#51): "shared",
 // "consent_needed" or "not_offered". Cards whose account isn't in this bank
 // are skipped; cards the bank no longer reports are removed. An empty list
 // (the bank has no cards, or doesn't support it) clears them.
-func (s *System) SaveCreditCards(ctx context.Context, item SyncItem, cards []plaid.CreditCard, state string) error {
+func (s *System) SaveLiabilities(ctx context.Context, item SyncItem, l plaid.Liabilities, state string) error {
+	cards := l.Cards
 	switch state {
 	case "shared", "consent_needed", "not_offered":
 	default:
@@ -298,6 +299,37 @@ func (s *System) SaveCreditCards(ctx context.Context, item SyncItem, cards []pla
 		b.Queue(`delete from public.credit_cards
 			where account_id in (select id from public.accounts where plaid_item_id = $1 and not (plaid_account_id = any($2)))`,
 			item.ID, keep)
+		// Student loans and mortgages (#27): same rules as the cards.
+		keepLoans := []string{}
+		for _, ln := range l.Loans {
+			if ln.Kind != "student" && ln.Kind != "mortgage" {
+				continue
+			}
+			keepLoans = append(keepLoans, ln.PlaidAccountID)
+			b.Queue(`insert into public.loans
+				(account_id, household_id, kind, rate_percent, rate_type, next_payment_minor, next_payment_due_date,
+				 last_payment_minor, last_payment_date, payoff_date, original_minor, origination_date, past_due_minor,
+				 is_overdue, ytd_interest_minor, ytd_principal_minor, repayment_plan, term, updated_at)
+				select a.id, a.household_id, $3, nullif($4, '')::numeric, nullif($5, ''), $6, nullif($7, '')::date,
+				       $8, nullif($9, '')::date, nullif($10, '')::date, $11, nullif($12, '')::date, $13,
+				       $14, $15, $16, nullif($17, ''), nullif($18, ''), now()
+				from public.accounts a where a.plaid_account_id = $1 and a.plaid_item_id = $2
+				on conflict (account_id) do update set
+				  kind = excluded.kind, rate_percent = excluded.rate_percent, rate_type = excluded.rate_type,
+				  next_payment_minor = excluded.next_payment_minor, next_payment_due_date = excluded.next_payment_due_date,
+				  last_payment_minor = excluded.last_payment_minor, last_payment_date = excluded.last_payment_date,
+				  payoff_date = excluded.payoff_date, original_minor = excluded.original_minor,
+				  origination_date = excluded.origination_date, past_due_minor = excluded.past_due_minor,
+				  is_overdue = excluded.is_overdue, ytd_interest_minor = excluded.ytd_interest_minor,
+				  ytd_principal_minor = excluded.ytd_principal_minor, repayment_plan = excluded.repayment_plan,
+				  term = excluded.term, updated_at = now()`,
+				ln.PlaidAccountID, item.ID, ln.Kind, ln.RatePercent, ln.RateType, nonNegative(ln.NextPaymentMinor), ln.NextDueDate,
+				ln.LastPaymentMinor, ln.LastPaymentDate, ln.PayoffDate, nonNegative(ln.OriginalMinor), ln.OriginationDate,
+				nonNegative(ln.PastDueMinor), ln.Overdue, ln.YTDInterestMinor, ln.YTDPrincipalMinor, ln.RepaymentPlan, ln.Term)
+		}
+		b.Queue(`delete from public.loans
+			where account_id in (select id from public.accounts where plaid_item_id = $1 and not (plaid_account_id = any($2)))`,
+			item.ID, keepLoans)
 		b.Queue(`update public.plaid_items set liabilities_synced_at = now(), card_details = $2 where id = $1`, item.ID, state)
 		return mapErr(tx.SendBatch(ctx, b).Close())
 	})

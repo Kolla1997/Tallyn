@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import logo from '../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg'
 import mark from '../../../brand/logo/svg/tallyn-mark-light.svg'
-import { AccountsIcon, FamilyIcon, GoalsIcon, HomeIcon, SettingsIcon, TransactionsIcon } from '../components/Icons.jsx'
+import { AccountsIcon, DebtsIcon, FamilyIcon, GoalsIcon, HomeIcon, MenuIcon, SettingsIcon, TransactionsIcon } from '../components/Icons.jsx'
 import { SiteFooter } from '../components/AuthPage.jsx'
 import { Link } from '../lib/router.jsx'
 
 // App layout (#39): sidebar on web (1024px and up), header and bottom tab bar
 // on phones. Matches docs/03 Design/Comps/web-*-draft.html.
+// The phone tab bar keeps these five; Debts (#27) is in the sidebar on web
+// and in the ☰ menu on phones (Dinesh's choice).
 const NAV = [
   ['/', 'Home', HomeIcon],
   ['/accounts', 'Accounts', AccountsIcon],
@@ -14,6 +16,7 @@ const NAV = [
   ['/family', 'Family', FamilyIcon],
   ['/goals', 'Goals', GoalsIcon],
 ]
+const SIDEBAR = [...NAV.slice(0, 3), ['/debts', 'Debts', DebtsIcon], ...NAV.slice(3), ['/settings', 'Settings', SettingsIcon]]
 
 const SIDEBAR_KEY = 'tallyn.sidebar'
 
@@ -93,7 +96,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
           </button>
         </div>
         <nav className="nav">
-          {[...NAV, ['/settings', 'Settings', SettingsIcon]].map(([to, label, Icon]) => (
+          {SIDEBAR.map(([to, label, Icon]) => (
             <Link key={to} to={to} data-tip={collapsed ? label : undefined}>
               <Icon />
               <span className={collapsed ? 'sr-only' : undefined}>{label}</span>
@@ -116,11 +119,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
       <div className="app-main">
         <header className="mobile-header">
           <img src={logo} alt="Tallyn" />
-          <Link to="/settings" className="me-chip" aria-label="Settings">
-            <span className="avatar" aria-hidden="true">
-              {initial}
-            </span>
-          </Link>
+          <MobileMenu name={name} initial={initial} household={household} onSignOut={onSignOut} />
         </header>
         <main id="main" className="content">
           {children}
@@ -231,6 +230,76 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
               <hr />
             </>
           )}
+          <button role="menuitem" className="profile-item" onClick={onSignOut}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+              <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10" />
+            </svg>
+            Sign out
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Phones (#27): a ☰ button in the header opening Debts, Settings, who you
+// are, and Sign out. Esc or a tap outside closes it; focus returns to ☰.
+function MobileMenu({ name, initial, household, onSignOut }) {
+  const [open, setOpen] = useState(false)
+  const box = useRef(null)
+  const button = useRef(null)
+  const ROLE = { owner: 'Owner', adult: 'Adult', teen: 'Teen', child: 'Child', viewer: 'Viewer' }
+  const close = (refocus = true) => {
+    setOpen(false)
+    if (refocus) button.current?.focus()
+  }
+
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e) => box.current && !box.current.contains(e.target) && close(false)
+    const onKey = (e) => e.key === 'Escape' && close()
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    box.current?.querySelector('[role="menuitem"]')?.focus()
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  const onMenuKey = (e) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return
+    e.preventDefault()
+    const items = [...box.current.querySelectorAll('[role="menuitem"]')]
+    const i = items.indexOf(document.activeElement)
+    items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length]?.focus()
+  }
+
+  return (
+    <div className="mobile-menu" ref={box}>
+      <button ref={button} className="menu-button" aria-haspopup="menu" aria-expanded={open} aria-label="Menu" onClick={() => setOpen((o) => !o)}>
+        <MenuIcon />
+      </button>
+      {open && (
+        <div className="mobile-menu-list" role="menu" aria-label="More" onKeyDown={onMenuKey}>
+          <Link to="/debts" role="menuitem" className="profile-item" onClick={() => close(false)}>
+            <DebtsIcon width={18} height={18} />
+            Debts
+          </Link>
+          <Link to="/settings" role="menuitem" className="profile-item" onClick={() => close(false)}>
+            <SettingsIcon width={18} height={18} />
+            Settings
+          </Link>
+          <hr />
+          <p className="mobile-menu-me">
+            <span className="avatar" aria-hidden="true">
+              {initial}
+            </span>
+            <span className="grow">
+              <strong className="block">{name}</strong>
+              <span className="small muted block">{household ? `${ROLE[household.role] ?? household.role} · ${household.name}` : 'No household yet'}</span>
+            </span>
+          </p>
           <button role="menuitem" className="profile-item" onClick={onSignOut}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10" />

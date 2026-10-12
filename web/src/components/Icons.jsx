@@ -24,6 +24,18 @@ export const AccountsIcon = (p) => (
     <path d="M3 10h18M7 15h3" />
   </svg>
 )
+// Debts (#27, Dinesh picked A): a bill with a torn edge, "bills I owe".
+export const DebtsIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M6 3.5h12v17l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4z" />
+    <path d="M9 8.5h6M9 12h6M9 15.5h3" />
+  </svg>
+)
+export const MenuIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M4 7h16M4 12h16M4 17h16" />
+  </svg>
+)
 export const FamilyIcon = (p) => (
   <svg {...base} {...p}>
     <circle cx="9" cy="8" r="3" />
