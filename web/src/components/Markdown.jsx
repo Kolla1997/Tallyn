@@ -80,7 +80,11 @@ export default function Markdown({ text }) {
     if (line.startsWith('|')) {
       const rows = []
       while (i < lines.length && lines[i].startsWith('|')) rows.push(lines[i++])
-      const cells = (r) => r.replace(/^\||\|$/g, '').split('|').map((c) => c.trim())
+      const cells = (r) =>
+        r
+          .replace(/^\||\|$/g, '')
+          .split('|')
+          .map((c) => c.trim())
       const [head, , ...body] = rows
       blocks.push(
         <div key={i} className="legal-table">

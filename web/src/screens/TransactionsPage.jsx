@@ -46,7 +46,7 @@ const monthLabel = (m) => new Date(`${m}-01T12:00:00`).toLocaleDateString('en-US
 
 // Filters from the address (Home's spending card links here with
 // ?category=…&month=…, Family with ?owner=…), if they're ones we know.
-function fromAddress(key) {
+export function fromAddress(key) {
   const v = new URLSearchParams(window.location.search).get(key) ?? ''
   if (key === 'category') return CATEGORIES.includes(v) ? v : ''
   if (key === 'owner') return v === 'all' || /^[0-9a-f-]{36}$/i.test(v) ? v : ''
@@ -98,7 +98,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     if (picked) p.set('tx', picked)
     const url = p.size ? `/transactions?${p}` : '/transactions'
     if (window.location.pathname + window.location.search !== url) window.history.replaceState(null, '', url)
-  }, [who, category, bank, month, day, picked])
+  }, [who, category, bank, month, day, picked, me.user_id])
 
   useEffect(() => {
     const t = setTimeout(() => setQuery(search.trim()), 300)
@@ -227,7 +227,13 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   const home = household.home_currency
   const totals = summary?.find((s) => s.currency === home) ?? summary?.[0] ?? null
   const dayLabelLong = day ? new Date(`${day}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : ''
-  const scope = [day ? dayLabelLong : month ? monthLabel(month) : 'All time', who === 'all' ? 'everyone' : who === me.user_id ? 'yours' : nameOf(people[who] ?? { user_id: who }), bankChoices.find(([id]) => id === bank)?.[1]].filter(Boolean).join(' · ')
+  const scope = [
+    day ? dayLabelLong : month ? monthLabel(month) : 'All time',
+    who === 'all' ? 'everyone' : who === me.user_id ? 'yours' : nameOf(people[who] ?? { user_id: who }),
+    bankChoices.find(([id]) => id === bank)?.[1],
+  ]
+    .filter(Boolean)
+    .join(' · ')
 
   // Esc closes the details.
   useEffect(() => {

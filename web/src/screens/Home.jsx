@@ -142,8 +142,7 @@ export default function Home({ email, onSignOut }) {
           <section className="panel empty-state">
             <h2>Savings goals are on the way</h2>
             <p className="muted">
-              Soon you&apos;ll set goals like a family trip or a school fund, and follow a savings account so progress
-              updates on its own.
+              Soon you&apos;ll set goals like a family trip or a school fund, and follow a savings account so progress updates on its own.
             </p>
           </section>
         </>
@@ -172,4 +171,3 @@ export default function Home({ email, onSignOut }) {
     </Shell>
   )
 }
-

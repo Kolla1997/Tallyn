@@ -16,9 +16,7 @@ export default function Join({ token, onJoined, onDismiss }) {
       onJoined(d.household_id)
     } catch {
       clearInvite()
-      setError(
-        "This invite isn't valid for your account. It may have expired or been used already, or it was sent to a different email. Ask for a new one.",
-      )
+      setError("This invite isn't valid for your account. It may have expired or been used already, or it was sent to a different email. Ask for a new one.")
     }
     setBusy(false)
   }
@@ -26,10 +24,7 @@ export default function Join({ token, onJoined, onDismiss }) {
   return (
     <section className="card">
       <h1>You&apos;ve been invited</h1>
-      <p className="muted">
-        Someone invited you to their household on Tallyn. Joining doesn&apos;t share any of your money: you choose that later
-        in Sharing.
-      </p>
+      <p className="muted">Someone invited you to their household on Tallyn. Joining doesn&apos;t share any of your money: you choose that later in Sharing.</p>
       {error && (
         <p className="error" role="alert">
           {error}

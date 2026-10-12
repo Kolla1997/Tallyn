@@ -19,7 +19,10 @@ const CATEGORIES = {
   ENTERTAINMENT: { tone: 'clay', d: 'M4 6h16v12H4zM10 9.5v5l4-2.5z' },
   PERSONAL_CARE: { tone: 'sage', d: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z' },
   MEDICAL: { tone: 'sage', d: 'M10 4h4v6h6v4h-6v6h-4v-6H4v-4h6z' },
-  GENERAL_SERVICES: { tone: 'sand', d: 'M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7ZM12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4' },
+  GENERAL_SERVICES: {
+    tone: 'sand',
+    d: 'M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7ZM12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4',
+  },
   GOVERNMENT_AND_NON_PROFIT: { tone: 'sand', d: 'M3 9 12 4l9 5M5 9v9M10 9v9M14 9v9M19 9v9M3 20h18' },
   BANK_FEES: { tone: 'sand', d: 'M3 8h18v10H3zM3 12h18M7 16h3' },
   LOAN_PAYMENTS: { tone: 'sand', d: 'M3 6h18v12H3zM3 10h18M7 15h4' },
@@ -36,7 +39,17 @@ export function CategoryIcon({ category }) {
   const c = CATEGORIES[category] ?? OTHER
   return (
     <span className={`tx-icon tone-${c.tone}`} aria-hidden="true">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        focusable="false"
+      >
         <path d={c.d} />
       </svg>
     </span>

@@ -69,9 +69,7 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
   const owners = [...new Set((banks ?? []).map((b) => b.owner_user_id))].filter((id) => id !== me.user_id)
   const showSwitch = !KID.has(household.role) && owners.length > 0
 
-  const shown = (banks ?? []).filter(
-    (b) => who === 'everyone' || b.owner_user_id === (who === 'yours' ? me.user_id : who),
-  )
+  const shown = (banks ?? []).filter((b) => who === 'everyone' || b.owner_user_id === (who === 'yours' ? me.user_id : who))
   const accounts = shown.flatMap((b) => b.accounts.map((a) => ({ ...a, bank: b })))
   const counted = accounts.filter((a) => a.currency === home && a.current_balance_minor != null)
   const sum = (list) => list.reduce((t, a) => t + a.current_balance_minor, 0)
@@ -114,13 +112,11 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
 
       {showSwitch && (
         <div className="chips page-chips" role="group" aria-label="Whose accounts">
-          {[['yours', 'Yours'], ...owners.map((id) => [id, nameOf(people[id] ?? { user_id: id })]), ['everyone', 'Everyone']].map(
-            ([key, label]) => (
-              <button key={key} className="chip" aria-pressed={who === key} onClick={() => setWho(key)}>
-                {label}
-              </button>
-            ),
-          )}
+          {[['yours', 'Yours'], ...owners.map((id) => [id, nameOf(people[id] ?? { user_id: id })]), ['everyone', 'Everyone']].map(([key, label]) => (
+            <button key={key} className="chip" aria-pressed={who === key} onClick={() => setWho(key)}>
+              {label}
+            </button>
+          ))}
         </div>
       )}
 
@@ -191,8 +187,8 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
           </div>
           {uncounted > 0 && (
             <p className="small muted">
-              {uncounted} {uncounted === 1 ? 'account isn’t' : 'accounts aren’t'} in the totals: another currency or no
-              balance yet. Totals in one currency come later.
+              {uncounted} {uncounted === 1 ? 'account isn’t' : 'accounts aren’t'} in the totals: another currency or no balance yet. Totals in one currency come
+              later.
             </p>
           )}
         </>
@@ -252,13 +248,9 @@ function AccountColumn({ id, title, total, bankName, groups, accounts, home, peo
       </p>
       {accounts.length === 0 && <p className="small muted">{owed ? 'Nothing owed here.' : 'Nothing here yet.'}</p>}
       {groups.map(([key, label]) => {
-        const list = accounts
-          .filter((a) => groupOf(a) === key)
-          .sort((x, y) => (y.current_balance_minor ?? 0) - (x.current_balance_minor ?? 0))
+        const list = accounts.filter((a) => groupOf(a) === key).sort((x, y) => (y.current_balance_minor ?? 0) - (x.current_balance_minor ?? 0))
         if (list.length === 0) return null
-        const subtotal = list
-          .filter((a) => a.currency === home && a.current_balance_minor != null)
-          .reduce((t, a) => t + a.current_balance_minor, 0)
+        const subtotal = list.filter((a) => a.currency === home && a.current_balance_minor != null).reduce((t, a) => t + a.current_balance_minor, 0)
         return (
           <div key={key} className="account-group">
             <h3 className="account-group-head">
@@ -267,7 +259,7 @@ function AccountColumn({ id, title, total, bankName, groups, accounts, home, peo
             </h3>
             <ul className="rows">
               {list.map((a) => (
-                <AccountItem key={a.id} a={a} meId={meId} owner={showOwner ? people[a.bank.owner_user_id] ?? { user_id: a.bank.owner_user_id } : null} />
+                <AccountItem key={a.id} a={a} meId={meId} owner={showOwner ? (people[a.bank.owner_user_id] ?? { user_id: a.bank.owner_user_id }) : null} />
               ))}
             </ul>
           </div>
@@ -299,9 +291,7 @@ function AccountItem({ a, owner, meId }) {
           <span>{[a.bank.institution_name, a.mask && `••${a.mask}`, available].filter(Boolean).join(' · ')}</span>
         </p>
       </div>
-      <span className={owed ? 'amount money-out' : 'amount'}>
-        {a.current_balance_minor == null ? '—' : formatMoney(a.current_balance_minor, a.currency)}
-      </span>
+      <span className={owed ? 'amount money-out' : 'amount'}>{a.current_balance_minor == null ? '—' : formatMoney(a.current_balance_minor, a.currency)}</span>
     </li>
   )
 }
@@ -358,9 +348,7 @@ function ConnectedBanks({ banks, me, people, onUnlinked, onReconnected, onError 
               {b.can_unlink && (
                 <div className="bank-actions">
                   {/* Reconnect (#51): sign in again, or share card details (#27). */}
-                  {b.status === 'needs_reauth' && (
-                    <ReconnectBank bankId={b.id} label="Reconnect" onDone={onReconnected} onError={onError} />
-                  )}
+                  {b.status === 'needs_reauth' && <ReconnectBank bankId={b.id} label="Reconnect" onDone={onReconnected} onError={onError} />}
                   {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
                     <ReconnectBank bankId={b.id} label="Add APR and due dates" className="chip" onDone={onReconnected} onError={onError} />
                   )}

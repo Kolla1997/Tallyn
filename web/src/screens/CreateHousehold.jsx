@@ -25,9 +25,7 @@ export default function CreateHousehold({ onCreated }) {
 
   return (
     <form onSubmit={submit}>
-      <p className="muted">
-        A household is where your family&apos;s money comes together. You can invite others later.
-      </p>
+      <p className="muted">A household is where your family&apos;s money comes together. You can invite others later.</p>
       <label>
         Household name
         <input required maxLength={80} value={name} onChange={(e) => setName(e.target.value)} placeholder="The Rivera family" />

@@ -84,7 +84,9 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
       ) : (
         <HomeColumns
           wide={wide}
-          total={<TotalCard banks={banks} txs={txs ?? []} mine={mine ?? []} me={me} roles={roles} home={household.home_currency} scope={scope} onScope={setScope} />}
+          total={
+            <TotalCard banks={banks} txs={txs ?? []} mine={mine ?? []} me={me} roles={roles} home={household.home_currency} scope={scope} onScope={setScope} />
+          }
           accounts={<YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} everyone={scope === 'everyone'} />}
           cards={<CreditCards banks={banks} me={me} home={household.home_currency} everyone={scope === 'everyone'} onChanged={onChanged} onError={setError} />}
           recent={<RecentTransactions txs={(scope === 'yours' ? mine : txs) ?? []} me={me} people={people} everyone={scope === 'everyone'} />}
@@ -164,7 +166,11 @@ function useMinWidth(px) {
 function TotalCard({ banks, txs, mine, me, roles, home, scope, onScope }) {
   const fading = useFadeOnChange(scope) // #87: Yours / Everyone fades and counts
   const totals = summarize(banks, me.user_id, roles)
-  const yoursOnly = summarize(banks.filter((b) => b.owner_user_id === me.user_id), me.user_id, roles)
+  const yoursOnly = summarize(
+    banks.filter((b) => b.owner_user_id === me.user_id),
+    me.user_id,
+    roles,
+  )
   const list = currencies(totals, home)
   if (list.length === 0) {
     return (
@@ -248,8 +254,8 @@ function TotalCard({ banks, txs, mine, me, roles, home, scope, onScope }) {
           </span>
         </div>
         <p className="small">
-          What {yours ? 'you have' : 'everyone has'}, {formatMoney(big.have, cur)}, minus what {yours ? 'you owe' : 'they owe'},{' '}
-          {formatMoney(big.owe, cur)} on cards and loans
+          What {yours ? 'you have' : 'everyone has'}, {formatMoney(big.have, cur)}, minus what {yours ? 'you owe' : 'they owe'}, {formatMoney(big.owe, cur)} on
+          cards and loans
         </p>
       </div>
       {list.length > 1 && (
@@ -292,9 +298,7 @@ function YourAccounts({ banks, me, canLink, home, everyone = false }) {
         )}
       </div>
       {mine.length === 0 ? (
-        <p className="small muted">
-          {canLink ? 'You haven’t linked a bank yet. Use Link a bank above.' : 'You don’t have any banks linked.'}
-        </p>
+        <p className="small muted">{canLink ? 'You haven’t linked a bank yet. Use Link a bank above.' : 'You don’t have any banks linked.'}</p>
       ) : (
         <>
           <div className="have-owe">
@@ -404,7 +408,19 @@ function SharedWithYou({ banks, me, people, roles, home }) {
                     )}
                   </span>
                 </span>
-                <svg className="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+                <svg
+                  className="chevron"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
                   <path d="m9 6 6 6-6 6" />
                 </svg>
               </Link>
@@ -533,7 +549,17 @@ function SpendingCard({ spending, month, home, everyone = false }) {
                 <li key={r.category}>
                   <Link to={to} className="spend-row">
                     <span className={`spend-icon spend-${r.color}`} aria-hidden="true">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        focusable="false"
+                      >
                         <path d={categoryPath(r.category)} />
                       </svg>
                     </span>

@@ -76,11 +76,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
       <aside id="sidebar" className="sidebar" aria-label="Main">
         {/* Logo, with Collapse beside it (#72). */}
         <div className="sidebar-top">
-          {collapsed ? (
-            <img className="sidebar-mark" src={mark} alt="Tallyn" />
-          ) : (
-            <img className="sidebar-logo" src={logo} alt="Tallyn" />
-          )}
+          {collapsed ? <img className="sidebar-mark" src={mark} alt="Tallyn" /> : <img className="sidebar-logo" src={logo} alt="Tallyn" />}
           <button
             className="sidebar-toggle"
             onClick={() => toggle()}
@@ -90,7 +86,18 @@ export default function Shell({ me, household, households, onChooseHousehold, on
             data-tip={collapsed ? 'Expand sidebar' : undefined}
             title={collapsed ? undefined : 'Collapse sidebar  ['}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
               {collapsed ? <path d="m9 6 6 6-6 6M4 6v12" /> : <path d="m15 6-6 6 6 6M20 6v12" />}
             </svg>
           </button>
@@ -148,7 +155,7 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
   const box = useRef(null)
   const button = useRef(null)
   const ROLE = { owner: 'Owner', adult: 'Adult', teen: 'Teen', child: 'Child', viewer: 'Viewer' }
-  const role = household ? ROLE[household.role] ?? household.role : ''
+  const role = household ? (ROLE[household.role] ?? household.role) : ''
   const summary = household ? `${role} · ${household.name}` : 'No household yet'
 
   const close = (refocus = true) => {
@@ -199,7 +206,18 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
               <strong className="block">{name}</strong>
               <span className="small muted block">{summary}</span>
             </span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
               <path d={open ? 'm6 15 6-6 6 6' : 'm6 9 6 6 6-6'} />
             </svg>
           </>
@@ -231,7 +249,18 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
             </>
           )}
           <button role="menuitem" className="profile-item" onClick={onSignOut}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
               <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10" />
             </svg>
             Sign out
@@ -301,7 +330,18 @@ function MobileMenu({ name, initial, household, onSignOut }) {
             </span>
           </p>
           <button role="menuitem" className="profile-item" onClick={onSignOut}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
               <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10" />
             </svg>
             Sign out

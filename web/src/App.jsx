@@ -92,8 +92,7 @@ function NotConfigured() {
     <section className="card">
       <h1>Almost there</h1>
       <p className="muted">
-        Sign-in isn&apos;t set up yet. Copy <code>web/.env.example</code> to <code>web/.env.local</code>{' '}
-        and add your Supabase project URL and publishable key.
+        Sign-in isn&apos;t set up yet. Copy <code>web/.env.example</code> to <code>web/.env.local</code> and add your Supabase project URL and publishable key.
       </p>
     </section>
   )
