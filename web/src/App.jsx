@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import AuthPage from './components/AuthPage.jsx'
 import { configured, supabase } from './lib/supabase.js'
 import SignIn from './screens/SignIn.jsx'
 import IdleGuard from './components/IdleGuard.jsx'
 import SessionLimit from './components/SessionLimit.jsx'
-import SetUp2FA from './screens/SetUp2FA.jsx'
 import Verify2FA from './screens/Verify2FA.jsx'
 import Home from './screens/Home.jsx'
 import TallynLoader from './components/TallynLoader.jsx'
 import ConsentGate from './components/ConsentGate.jsx'
 import { usePath } from './lib/router.jsx'
-import LegalPage from './screens/LegalPage.jsx'
+
+// Loaded only when needed (#99): the legal pages and first-time 2FA setup.
+const LegalPage = lazy(() => import('./screens/LegalPage.jsx'))
+const SetUp2FA = lazy(() => import('./screens/SetUp2FA.jsx'))
 
 // Sign-in flow (#7, ADR 0003): email + password, then 2FA with an
 // authenticator app. Only a 2FA-completed (aal2) session reaches Home, and the
@@ -21,7 +23,9 @@ export default function App() {
   if (path === '/terms' || path === '/privacy') {
     return (
       <AuthPage wide>
-        <LegalPage doc={path.slice(1)} />
+        <Suspense fallback={<TallynLoader />}>
+          <LegalPage doc={path.slice(1)} />
+        </Suspense>
       </AuthPage>
     )
   }
@@ -95,7 +99,11 @@ function AuthFlow() {
   else if (!session) screen = <SignIn />
   else if (aal.nextLevel === 'aal2') screen = <Verify2FA onSignOut={signOut} />
   else screen = <SetUp2FA onSignOut={signOut} />
-  return <AuthPage>{screen}</AuthPage>
+  return (
+    <AuthPage>
+      <Suspense fallback={<TallynLoader />}>{screen}</Suspense>
+    </AuthPage>
+  )
 }
 
 function NotConfigured() {
