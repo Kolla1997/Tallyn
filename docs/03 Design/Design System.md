@@ -27,7 +27,7 @@ Every card in Tallyn ([#61](https://github.com/Kolla1997/Tallyn/issues/61)): `.p
 | Part | Rule |
 |---|---|
 | Card | `glass-surface` (white at 70%), `glass-blur` behind it, a 1px `glass-border` edge, the `glass-highlight` top edge and the soft `card-shade` underneath (#64) |
-| Sidebar (web) | Floats 12px in from the edges as a rounded glass panel (card radius), same surface and shade as cards (#64). Phones keep the bottom tab bar |
+| Sidebar (web) | Floats 12px in from the edges as a rounded glass panel (card radius), same surface and shade as cards (#64). 220px expanded, 60px collapsed with 42px icon buttons. Phones keep the bottom tab bar |
 | Secondary text | `text-secondary` #55494A (was #6B5F5C), small labels at weight 500, for easier reading on glass (#64) |
 | Page | Cream, with soft glows behind the cards: Sage Light top left, Clay (mixed 45% with Cream) top right, Sand at the bottom, at `glow-opacity` |
 | Total balance card | Dark glass: `glass-surface-dark` (Cocoa at 86%) |

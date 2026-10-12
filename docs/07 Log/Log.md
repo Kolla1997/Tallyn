@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-11
+- #64 Sidebar narrower (Dinesh): 220px expanded (was 246), 60px collapsed (was 70) with 42px icon buttons; labels, household and name still fit on one line.
 - #64 Created and built on branch `64-sidebar-shade` (Dinesh option 2): sidebar floats as a rounded glass panel 12px in from the edges (collapsed and expanded), secondary text darker (`text-secondary` #6B5F5C → #55494A) with small labels at weight 500, and a soft shade under cards (`card-shade` token). Design System updated. #1 CLAUDE.md now says every visual change needs a draft Dinesh picks from first (§0, §6).
 - #61 Fix on `main`: resolving the #59 merge dropped two closing braces in `styles.css` (end of the ring reduced-motion block), so the browser ignored every style after it (Settings layout and the glass finish). Braces restored; file checked balanced; Settings and glass confirmed in the browser. Lesson: after resolving a CSS conflict, check the braces balance before committing.
 - #39 #58 #61 Merged into `main` in order: PR #57 (Settings, closes #39), PR #59 (Transactions summary and details, closes #58), PR #62 (glass finish, closes #61). Resolved the expected overlaps in `styles.css` and the Log by keeping both sides; build and tests pass. Cards moved to Done; branches deleted. #39 (app screens) is finished.
