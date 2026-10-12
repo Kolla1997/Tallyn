@@ -29,12 +29,12 @@ kanban-plugin: board
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
-- [ ] [#92 Maximum session length: sign in again after a set time](https://github.com/Kolla1997/Tallyn/issues/92) #type/feature #area/frontend #priority/p2
 
 
 ## Review
 
 - [ ] [#10 Brand: logo and design tokens](https://github.com/Kolla1997/Tallyn/issues/10) #type/design #area/brand #priority/p0
+- [ ] [#92 Maximum session length: sign in again after a set time](https://github.com/Kolla1997/Tallyn/issues/92) #type/feature #area/frontend #priority/p2
 - [ ] [#98 Keyboard access for the spending dots](https://github.com/Kolla1997/Tallyn/issues/98) #type/feature #area/frontend #priority/p2
 - [ ] [#99 Faster loading: compressed fonts and a split bundle](https://github.com/Kolla1997/Tallyn/issues/99) #type/tech-debt #area/frontend #priority/p2
 
