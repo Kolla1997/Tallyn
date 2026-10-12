@@ -164,7 +164,7 @@ function CategoryRing({ categories, spent, cur, month, day }) {
               </>
             )}
           </svg>
-          <ul className="ring-legend">
+          <ul className="ring-legend" aria-label="Categories">
             {top.map((c) => (
               <li key={c.label}>
                 <button

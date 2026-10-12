@@ -47,5 +47,10 @@ export default defineConfig(({ mode }) => {
         allow: ['..'],
       },
     },
+    // Web tests (#100): npm test.
+    test: {
+      environment: 'jsdom',
+      setupFiles: ['./src/test-setup.js'],
+    },
   }
 })

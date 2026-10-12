@@ -25,7 +25,7 @@ const GROUPS = [
 ]
 const KID = new Set(['teen', 'child'])
 
-function groupOf(a) {
+export function groupOf(a) {
   if (a.type === 'credit') return 'card'
   const sub = (a.subtype ?? '').toLowerCase()
   if (sub === 'student') return 'student'
@@ -34,7 +34,7 @@ function groupOf(a) {
 }
 
 // What a debt's gauge (and its ring) measures against, if the bank says.
-function measure(a) {
+export function measure(a) {
   const owed = Math.max(0, a.current_balance_minor ?? 0)
   if (a.type === 'credit' || (!a.loan?.original_minor && a.credit_limit_minor > 0)) {
     if (!(a.credit_limit_minor > 0)) return null

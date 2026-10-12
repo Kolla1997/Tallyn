@@ -46,7 +46,7 @@ const monthLabel = (m) => new Date(`${m}-01T12:00:00`).toLocaleDateString('en-US
 
 // Filters from the address (Home's spending card links here with
 // ?category=…&month=…, Family with ?owner=…), if they're ones we know.
-function fromAddress(key) {
+export function fromAddress(key) {
   const v = new URLSearchParams(window.location.search).get(key) ?? ''
   if (key === 'category') return CATEGORIES.includes(v) ? v : ''
   if (key === 'owner') return v === 'all' || /^[0-9a-f-]{36}$/i.test(v) ? v : ''

@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-09
+updated: 2026-10-12
 issues: [5, 6, 7, 8, 9, 30]
 tags: [tech, onboarding]
 ---
@@ -75,6 +75,9 @@ To try the single-deployment setup: `cd web && npm run build`, then `go run ./cm
 | Sync board into docs | Automatic (hourly GitHub Action, `git pull` to get it). By hand: `python3 scripts/sync_board.py` |
 | Test | `go test ./...` (database tests skip unless `TALLYN_TEST_DATABASE_URL` is set) |
 | Test the schema and RLS | Start a throwaway Postgres: `docker run --rm -d -p 5433:5432 -e POSTGRES_PASSWORD=postgres postgres:16`, then `TALLYN_TEST_DATABASE_URL=postgres://postgres:postgres@localhost:5433/postgres go test ./internal/db`. Without Docker, Homebrew `postgresql@16` works too (steps in [PR #20](https://github.com/Kolla1997/Tallyn/pull/20)) |
-| Lint | `go vet ./...` (frontend lint: > [!todo]) |
+| Lint | `go vet ./...` and `gofmt -l cmd internal`; web: `cd web && npm run lint` (ESLint, #100) |
+| Format the web app | `cd web && npm run format` (Prettier: single quotes, no semicolons; check with `npm run format:check`) |
+| Test the web app | `cd web && npm test` (Vitest; tests sit next to the code as `*.test.js(x)`) |
+| Checks on every PR | Automatic: `.github/workflows/checks.yml` runs Go format, vet and tests (with Postgres 16) and the web lint, format check, tests and build. A PR shows ✓ or ✗ before merging (#100) |
 | Build the web app | `cd web && npm run build` |
 | Build the Docker image | `docker build -t tallyn .` then `docker run -p 8080:8080 --env-file .env tallyn` |
