@@ -55,7 +55,7 @@ See [[Animation Guide]]. UI transitions are 200 to 300ms, ease-out. Respect redu
 Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy alongside). Screens: [[Design Comps]]. Patterns: [[UI Patterns]].
 
 > [!todo] Missing screens
-> Sign in, add bank, transactions, budgets, settings, empty and error states, and dark mode.
+> Sign in (#25), add bank, budgets, empty and error states, and dark mode. Transactions, Accounts, Family and Settings are built (#39, #42).
 
 ## Decisions
 | Date | Decision | Why |
