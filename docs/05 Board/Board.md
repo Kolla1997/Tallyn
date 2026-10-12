@@ -34,7 +34,6 @@ kanban-plugin: board
 ## Review
 
 - [ ] [#10 Brand: logo and design tokens](https://github.com/Kolla1997/Tallyn/issues/10) #type/design #area/brand #priority/p0
-- [ ] [#92 Maximum session length: sign in again after a set time](https://github.com/Kolla1997/Tallyn/issues/92) #type/feature #area/frontend #priority/p2
 
 
 ## Blocked
@@ -73,6 +72,7 @@ kanban-plugin: board
 - [x] [#84 Accounts: filter by bank](https://github.com/Kolla1997/Tallyn/issues/84) #type/feature #area/frontend
 - [x] [#87 Smooth loading effect when filters change](https://github.com/Kolla1997/Tallyn/issues/87) #type/feature #area/design #area/frontend
 - [x] [#91 Sign out after 30 minutes of inactivity](https://github.com/Kolla1997/Tallyn/issues/91) #type/feature #area/frontend #priority/p1
+- [x] [#92 Maximum session length: sign in again after a set time](https://github.com/Kolla1997/Tallyn/issues/92) #type/feature #area/frontend #priority/p2
 - [x] [#96 Plaid Link is set up more than once on a page](https://github.com/Kolla1997/Tallyn/issues/96) #type/bug #area/frontend #priority/p1
 - [x] [#97 Phone layout fixes from the audit](https://github.com/Kolla1997/Tallyn/issues/97) #type/design #area/frontend #priority/p1
 - [x] [#98 Keyboard access for the spending dots](https://github.com/Kolla1997/Tallyn/issues/98) #type/feature #area/frontend #priority/p2
