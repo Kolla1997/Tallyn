@@ -2900,19 +2900,6 @@ label.agree input {
   box-shadow: inset 0 0 0 1px var(--color-border);
 }
 
-.cc-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-s1);
-  text-align: right;
-  white-space: nowrap;
-}
-
-.cc-right p {
-  margin: 0;
-}
-
 .cc-due-soon {
   background: color-mix(in srgb, var(--color-warning) 18%, var(--color-white));
 }
@@ -3413,4 +3400,127 @@ label.agree input {
 .settings-link:focus-visible {
   outline: 2px solid var(--color-clay-deep);
   outline-offset: 2px;
+}
+
+/* Phone layout fixes (#97, Dinesh picked A for all four). */
+
+/* Home credit cards: name and amount on one line, details full width. */
+.cc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-s3);
+  margin: 0;
+}
+
+.cc-top .amount {
+  white-space: nowrap;
+}
+
+.cc-rows .grow > p {
+  margin: 0;
+}
+
+.cc-rows .grow > p + p {
+  margin-top: 2px;
+}
+
+@media (max-width: 600px) {
+  /* The total goes under the heading instead of squeezing it. */
+  [aria-labelledby='cards-h'] > .panel-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}
+
+/* Transactions: the bank under the amount on web, beside the category on
+   phones (#83 B on web, #97 A on phones). */
+.tx-bank-inline {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .tx-amount .tx-bank {
+    display: none;
+  }
+
+  .tx-bank-inline {
+    display: inline;
+  }
+
+  .tx-row .tx-meta {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tx-row .tx-meta .tx-owner {
+    display: inline-flex;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+}
+
+/* Tap targets on phones and tablets (#97, A): same look, bigger areas. */
+@media (max-width: 1023px) {
+  .scope-switch button,
+  .segmented button {
+    min-height: 40px;
+  }
+
+  /* Text links keep their look; an invisible area makes them ~44px tall. */
+  a.link,
+  button.link {
+    position: relative;
+  }
+
+  a.link::after,
+  button.link::after {
+    content: '';
+    position: absolute;
+    inset: -12px -8px;
+  }
+
+  /* Dots can't reach 44px: each one's area grows into the gaps around it. */
+  .day-dot {
+    position: relative;
+  }
+
+  .day-dot::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+  }
+}
+
+/* Day card arrows (#97): phones and tablets only. */
+.dots-card-step {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .dots-card {
+    pointer-events: auto;
+  }
+
+  .dots-card-step {
+    display: flex;
+    justify-content: space-between;
+    margin: -4px -4px 4px;
+  }
+
+  .dots-card-step button {
+    width: 44px;
+    height: 36px;
+    font: inherit;
+    font-size: 22px;
+    line-height: 1;
+    color: var(--color-cocoa);
+    background: var(--color-cream);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-input);
+    cursor: pointer;
+  }
 }

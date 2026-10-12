@@ -28,6 +28,15 @@ export default function TransactionRow({ tx, meId, people, showDate = true, show
               </span>
             )}
             <span>{details(tx, showDate)}</span>
+            {/* Phones (#97, A): the bank sits next to the category, so the
+                merchant name keeps its room; web shows it under the amount. */}
+            {showBank && tx.bank_name && (
+              <span className="tx-bank-inline">
+                {' · '}
+                {tx.bank_name}
+                {tx.account_mask && ` ••${tx.account_mask}`}
+              </span>
+            )}
           </p>
         </div>
         <span className="tx-amount">

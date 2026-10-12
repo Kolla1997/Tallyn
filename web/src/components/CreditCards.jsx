@@ -95,30 +95,38 @@ export default function CreditCards({ banks, me, home, everyone = false, onChang
           const min = a.card?.minimum_payment_minor
           const due = a.card?.next_payment_due_date
           const state = dueState(a.card, today)
-          const details = [a.bankName, apr && `APR ${apr}%`, min != null && `Min ${formatMoney(min, cur)}`].filter(Boolean).join(' · ')
+          const terms = [apr && `APR ${apr}%`, min != null && `Min ${formatMoney(min, cur)}`].filter(Boolean).join(' · ')
+          // #97 (Dinesh picked A): name and amount on the top line, details
+          // under them at full width, so nothing squeezes on a phone.
           return (
             <li key={a.id}>
               <span className={i >= 0 ? `cc-swatch cc-shade-${i % SHADES}` : 'cc-swatch cc-swatch-none'} aria-hidden="true" />
               <div className="grow">
-                <p className="name">
-                  {a.name} {a.mask && <span className="small muted">••{a.mask}</span>}
-                </p>
-                <p className="small muted">{details}</p>
-                {!a.card && <NoDetails bank={a.bank} name={a.bankName} onChanged={onChanged} onError={onError} />}
-              </div>
-              <div className="cc-right">
-                <p>
+                <p className="cc-top">
+                  <span className="name">
+                    {a.name} {a.mask && <span className="small muted">••{a.mask}</span>}
+                  </span>
                   <span className="amount">{formatMoney(used(a), cur)}</span>
-                  {a.credit_limit_minor > 0 && <span className="small muted"> of {formatMoney(a.credit_limit_minor, cur)}</span>}
                 </p>
-                {state === 'late' ? (
-                  <span className="tag cc-due-late">Overdue</span>
+                <p className="small muted">
+                  {[a.bankName, a.credit_limit_minor > 0 && `of ${formatMoney(a.credit_limit_minor, cur)} limit`].filter(Boolean).join(' · ')}
+                </p>
+                {a.card ? (
+                  <p className="small muted">
+                    {terms}
+                    {terms && (state === 'late' || due) && ' · '}
+                    {state === 'late' ? (
+                      <span className="tag cc-due-late">Overdue</span>
+                    ) : (
+                      due && (
+                        <span className={state === 'soon' ? 'tag cc-due-soon' : undefined}>
+                          {state === 'past' ? 'Last due' : 'Due'} {shortDate(due)}
+                        </span>
+                      )
+                    )}
+                  </p>
                 ) : (
-                  due && (
-                    <span className={state === 'soon' ? 'tag cc-due-soon' : 'small muted'}>
-                      {state === 'past' ? 'Last due' : 'Due'} {shortDate(due)}
-                    </span>
-                  )
+                  <NoDetails bank={a.bank} name={a.bankName} onChanged={onChanged} onError={onError} />
                 )}
               </div>
             </li>

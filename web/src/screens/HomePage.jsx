@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { InviteIcon } from '../components/Icons.jsx'
 import AccountIcon from '../components/AccountIcon.jsx'
 import { categoryPath } from '../components/TxIcon.jsx'
 import TransactionRow from '../components/TransactionRow.jsx'
@@ -69,15 +68,11 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
     <>
       <PageHead title={household.name} sub={greeting}>
         {canLink && <LinkBank householdId={household.id} onLinked={onChanged} onError={setError} />}
+        {/* One button for the Family page, where inviting and sharing both
+            live (#97, A: Share with family and Invite went to the same page). */}
         <Link to="/family" className="btn btn-secondary">
-          Share with family
+          Family and sharing
         </Link>
-        {household.role === 'owner' && (
-          <Link to="/family" className="btn btn-secondary">
-            <InviteIcon />
-            Invite
-          </Link>
-        )}
       </PageHead>
       {error && (
         <p className="error" role="alert">

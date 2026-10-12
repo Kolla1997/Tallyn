@@ -50,6 +50,21 @@ export default function SpendingDots({ year, days, home, selected, onPick }) {
     setShown({ key, left, top: r.bottom - b.top + 8 })
   }
 
+  // Phones (#97): ‹ › on the day card step to the day before or after, so a
+  // missed tap on a small dot is easy to correct. Stays within the year.
+  const step = (delta) => {
+    const d = new Date(`${shown.key}T12:00:00`)
+    d.setDate(d.getDate() + delta)
+    const el = box.current?.querySelector(`[data-key="${iso(d)}"]`)
+    if (!el) return
+    show(iso(d), el)
+    el.focus({ preventScroll: true })
+  }
+  // Keep the card while focus moves onto its own buttons.
+  const blur = (e) => {
+    if (!e.relatedTarget?.closest?.('.dots-card')) setShown(null)
+  }
+
   const card = shown && cardFor(shown.key, byDay[shown.key], shown.key > today)
 
   function cardFor(key, day, ahead) {
@@ -87,8 +102,9 @@ export default function SpendingDots({ year, days, home, selected, onPick }) {
                   aria-label={label}
                   aria-pressed={selected === key}
                   onMouseEnter={(e) => show(key, e.currentTarget)}
+                  data-key={key}
                   onFocus={(e) => show(key, e.currentTarget)}
-                  onBlur={() => setShown(null)}
+                  onBlur={blur}
                   onClick={(e) => (ahead || !day ? show(key, e.currentTarget) : onPick(selected === key ? '' : key))}
                 />
               )
@@ -98,6 +114,14 @@ export default function SpendingDots({ year, days, home, selected, onPick }) {
       </div>
       {card && (
         <div className="dots-card" style={{ left: shown.left, top: shown.top }} role="tooltip">
+          <div className="dots-card-step">
+            <button type="button" aria-label="Day before" onClick={() => step(-1)} onBlur={blur}>
+              ‹
+            </button>
+            <button type="button" aria-label="Day after" onClick={() => step(1)} onBlur={blur}>
+              ›
+            </button>
+          </div>
           <p className="dots-card-date">{card.date}</p>
           <p className="small muted">{card.line}</p>
           {card.top.map((t, i) => (
