@@ -2,13 +2,16 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-09
-issues: [10, 39]
+updated: 2026-10-11
+issues: [10, 39, 61]
 tags: [design, comps]
 ---
 # Design Comps
 
 Visual comps, not production code. Amounts and rates are placeholders.
+
+> [!warning] Card finish rule (#61, 2026-10-11)
+> Every card is **frosted glass** over a soft sage, clay and sand glow, not flat white. New comps must follow it; the older comps below still show flat cards. Rule, values and fallbacks: [[Design System#Glass finish]].
 
 ![[app-screens-overview.png]]
 
