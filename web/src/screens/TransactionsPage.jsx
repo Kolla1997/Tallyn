@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import TransactionRow from '../components/TransactionRow.jsx'
+import SpendingDots from '../components/SpendingDots.jsx'
 import { TxDetails, TxSummary } from '../components/TxSummary.jsx'
 import { api } from '../lib/api.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
@@ -48,6 +49,7 @@ function fromAddress(key) {
   const v = new URLSearchParams(window.location.search).get(key) ?? ''
   if (key === 'category') return CATEGORIES.includes(v) ? v : ''
   if (key === 'owner') return v === 'all' || /^[0-9a-f-]{36}$/i.test(v) ? v : ''
+  if (key === 'day') return /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(v) ? v : ''
   return /^\d{4}-(0[1-9]|1[0-2])$/.test(v) ? v : ''
 }
 
@@ -59,6 +61,8 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   const [query, setQuery] = useState('') // search, applied after a short pause
   const [category, setCategory] = useState(() => fromAddress('category'))
   const [month, setMonth] = useState(() => fromAddress('month'))
+  const [day, setDay] = useState(() => fromAddress('day')) // a dot clicked in the year of dots (#75)
+  const [daily, setDaily] = useState(null)
   const [list, setList] = useState(null)
   const [summary, setSummary] = useState(null)
   const [picked, setPicked] = useState(() => new URLSearchParams(window.location.search).get('tx') ?? '')
@@ -79,11 +83,12 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     const p = new URLSearchParams()
     if (who !== me.user_id) p.set('owner', who)
     if (category) p.set('category', category)
-    if (month) p.set('month', month)
+    if (day) p.set('day', day)
+    else if (month) p.set('month', month)
     if (picked) p.set('tx', picked)
     const url = p.size ? `/transactions?${p}` : '/transactions'
     if (window.location.pathname + window.location.search !== url) window.history.replaceState(null, '', url)
-  }, [who, category, month, picked])
+  }, [who, category, month, day, picked])
 
   useEffect(() => {
     const t = setTimeout(() => setQuery(search.trim()), 300)
@@ -95,7 +100,8 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     if (who !== 'all') p.set('owner', who)
     if (query) p.set('q', query)
     if (category) p.set('category', category)
-    if (month) p.set('month', month)
+    if (day) p.set('day', day)
+    else if (month) p.set('month', month)
     return p
   }
   const url = (offset) => {
@@ -124,7 +130,25 @@ export default function TransactionsPage({ me, household, refreshKey }) {
       () => id === request.current && setSummary([]),
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [household.id, who, query, category, month, refreshKey])
+  }, [household.id, who, query, category, month, day, refreshKey])
+
+  // The year of dots: this year's spending per day, for the same person,
+  // search and category (not the month or day, which it's for choosing).
+  const year = String(new Date().getFullYear())
+  useEffect(() => {
+    const p = new URLSearchParams({ household_id: household.id, year })
+    if (who !== 'all') p.set('owner', who)
+    if (query) p.set('q', query)
+    if (category) p.set('category', category)
+    let live = true
+    api(`/api/transactions/daily?${p}`).then(
+      (d) => live && setDaily(d.days),
+      () => live && setDaily([]),
+    )
+    return () => {
+      live = false
+    }
+  }, [household.id, who, query, category, year, refreshKey])
 
   async function showMore() {
     setLoadingMore(true)
@@ -146,12 +170,13 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   // Teens and children only ever see their own, so they get no switcher.
   const others = iAmKid ? [] : members.filter((m) => !m.is_you)
   const groups = useMemo(() => groupByDay(list ?? []), [list])
-  const filtered = who !== me.user_id || query || category || month
+  const filtered = who !== me.user_id || query || category || month || day
   const months = recentMonths()
   const pickedTx = list?.find((t) => t.id === picked) ?? null
   const home = household.home_currency
   const totals = summary?.find((s) => s.currency === home) ?? summary?.[0] ?? null
-  const scope = [month ? monthLabel(month) : 'All time', who === 'all' ? 'everyone' : who === me.user_id ? 'yours' : nameOf(people[who] ?? { user_id: who })].join(' · ')
+  const dayLabelLong = day ? new Date(`${day}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : ''
+  const scope = [day ? dayLabelLong : month ? monthLabel(month) : 'All time', who === 'all' ? 'everyone' : who === me.user_id ? 'yours' : nameOf(people[who] ?? { user_id: who })].join(' · ')
 
   // Esc closes the details.
   useEffect(() => {
@@ -165,46 +190,77 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     <>
       <PageHead title="Transactions" sub={iAmKid ? 'Your transactions' : 'Everything you can see in your household'} />
 
-      <section className="panel tx-filters" aria-label="Filter transactions">
-        {others.length > 0 && (
-          <div className="chips" role="group" aria-label="Whose transactions">
-            {[[me.user_id, 'Yours'], ...others.map((m) => [m.user_id, nameOf(m)]), ['all', 'Everyone']].map(([id, label]) => (
-              <button key={id} className="chip" aria-pressed={who === id} onClick={() => setWho(id)}>
-                {label}
-              </button>
-            ))}
+      <div className="tx-top">
+        <section className="panel tx-filters" aria-label="Filter transactions">
+          {others.length > 0 && (
+            <div className="chips" role="group" aria-label="Whose transactions">
+              {[[me.user_id, 'Yours'], ...others.map((m) => [m.user_id, nameOf(m)]), ['all', 'Everyone']].map(([id, label]) => (
+                <button key={id} className="chip" aria-pressed={who === id} onClick={() => setWho(id)}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="tx-filter-fields">
+            <label>
+              <span className="sr-only">Search merchants</span>
+              <input type="search" placeholder="Search merchants" value={search} maxLength={100} onChange={(e) => setSearch(e.target.value)} />
+            </label>
+            <div className="filter-row">
+              <label className="grow">
+                <span className="sr-only">Category</span>
+                <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                  <option value="">All categories</option>
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {categoryLabel(c)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="grow">
+                <span className="sr-only">Month</span>
+                <select
+                  value={day ? '' : month}
+                  onChange={(e) => {
+                    setDay('')
+                    setMonth(e.target.value)
+                  }}
+                >
+                  <option value="">All months</option>
+                  {month && !months.includes(month) && <option value={month}>{monthLabel(month)}</option>}
+                  {months.map((m) => (
+                    <option key={m} value={m}>
+                      {monthLabel(m)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            {day && (
+              <p className="small tx-day-filter">
+                Showing {dayLabelLong}{' '}
+                <button className="link small" onClick={() => setDay('')}>
+                  Clear
+                </button>
+              </p>
+            )}
           </div>
-        )}
-        <div className="filter-row">
-          <label className="grow">
-            <span className="sr-only">Search merchants</span>
-            <input type="search" placeholder="Search merchants" value={search} maxLength={100} onChange={(e) => setSearch(e.target.value)} />
-          </label>
-          <label>
-            <span className="sr-only">Category</span>
-            <select value={category} onChange={(e) => setCategory(e.target.value)}>
-              <option value="">All categories</option>
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {categoryLabel(c)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span className="sr-only">Month</span>
-            <select value={month} onChange={(e) => setMonth(e.target.value)}>
-              <option value="">All months</option>
-              {month && !months.includes(month) && <option value={month}>{monthLabel(month)}</option>}
-              {months.map((m) => (
-                <option key={m} value={m}>
-                  {monthLabel(m)}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      </section>
+        </section>
+        {/* The year of dots (#75): its own card, over the summary on web. */}
+        <section className="panel tx-dots-card" aria-label="Spending by day">
+          <SpendingDots
+            year={year}
+            days={daily}
+            home={home}
+            selected={day}
+            onPick={(d) => {
+              setPicked('')
+              setDay(d)
+            }}
+          />
+        </section>
+      </div>
 
       {error && (
         <p className="error" role="alert">
@@ -272,7 +328,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
               }}
             />
           ) : (
-            <TxSummary totals={totals} scope={scope} month={month} />
+            <TxSummary totals={totals} scope={scope} month={day ? '' : month} day={day} />
           )}
         </aside>
       </div>

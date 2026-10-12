@@ -49,6 +49,9 @@ func (stubStore) Transactions(context.Context, string, string, db.TxFilter) ([]d
 }
 func (stubStore) Consents(context.Context, string) ([]db.Consent, error)  { return nil, nil }
 func (stubStore) Accept(context.Context, string, map[string]string) error { return nil }
+func (stubStore) Daily(context.Context, string, string, db.TxFilter) ([]db.DaySpend, error) {
+	return nil, nil
+}
 func (stubStore) Summary(context.Context, string, string, db.TxFilter) ([]db.TxSummary, error) {
 	return nil, nil
 }

@@ -843,7 +843,7 @@ a.btn {
 }
 
 .tx-filters {
-  margin-bottom: var(--space-s4);
+  min-width: 0;
 }
 
 .filter-row {
@@ -2687,4 +2687,146 @@ label.agree input {
 .profile-item:focus-visible {
   background: var(--color-cream);
   outline: none;
+}
+
+/* Transactions top (#75): filters card and the year-of-dots card, split
+   like the list and summary below; stacked on phones. */
+.tx-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-s4);
+  margin-bottom: var(--space-s4);
+  /* Above the cards below, so a dot's day card isn't covered. */
+  position: relative;
+  z-index: 5;
+}
+
+@media (min-width: 1024px) {
+  .tx-top {
+    grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
+  }
+}
+
+.tx-filter-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s3);
+  min-width: 0;
+}
+
+.tx-filter-fields input[type='search'] {
+  width: 100%;
+}
+
+.tx-day-filter {
+  margin: 0;
+}
+
+.tx-dots-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.dots {
+  position: relative;
+}
+
+/* Twelve little months: six across on web, four across on phones. */
+.dots-months {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-s3) 10px;
+}
+
+@media (min-width: 1024px) {
+  .dots-months {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.dots-month {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  align-content: start;
+}
+
+.day-dot {
+  width: 100%;
+  max-width: 10px;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.day-dot:focus-visible,
+.day-dot-selected {
+  outline: 2px solid var(--color-cocoa);
+  outline-offset: 1px;
+}
+
+.day-dot-0 {
+  background: var(--color-sand);
+}
+
+.day-dot-1 {
+  background: color-mix(in srgb, var(--color-clay) 25%, var(--color-white));
+}
+
+.day-dot-2 {
+  background: color-mix(in srgb, var(--color-clay) 50%, var(--color-white));
+}
+
+.day-dot-3 {
+  background: color-mix(in srgb, var(--color-clay) 75%, var(--color-white));
+}
+
+.day-dot-4 {
+  background: var(--color-clay-deep);
+}
+
+.day-dot-ahead {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  cursor: default;
+}
+
+.day-dot-blank {
+  visibility: hidden;
+}
+
+.dots-card {
+  position: absolute;
+  z-index: 20;
+  width: 240px;
+  padding: var(--space-s3);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  box-shadow: var(--card-shade);
+  pointer-events: none;
+}
+
+.dots-card p {
+  margin: 0;
+}
+
+.dots-card-date {
+  font-weight: 600;
+}
+
+.dots-card-row {
+  display: flex;
+  gap: var(--space-s2);
+  align-items: flex-start;
+  margin-top: var(--space-s2);
+}
+
+.dots-card-link {
+  margin-top: var(--space-s2) !important;
+  color: var(--color-clay-deep);
 }

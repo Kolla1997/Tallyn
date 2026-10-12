@@ -17,7 +17,7 @@ const OTHER = 'var(--color-sand)'
 const INSIDE = 76
 const fit = (text, max) => Math.min(max, INSIDE / (String(text).length * 0.6))
 
-export function TxSummary({ totals, scope, month }) {
+export function TxSummary({ totals, scope, month, day }) {
   if (!totals) {
     return (
       <section className="panel">
@@ -47,7 +47,7 @@ export function TxSummary({ totals, scope, month }) {
         )}
       </section>
 
-      <CategoryRing categories={totals.categories} spent={totals.spent_minor} cur={cur} month={month} />
+      <CategoryRing categories={totals.categories} spent={totals.spent_minor} cur={cur} month={month} day={day} />
 
       {totals.merchants.length > 0 && (
         <section className="panel" aria-labelledby="merch-h">
@@ -77,7 +77,7 @@ export function TxSummary({ totals, scope, month }) {
 // category's share. Top four get their own colour; the rest are Other.
 // Hover a colour or its legend entry (or tap, or focus it) to see that
 // category in the middle; the others fade back.
-function CategoryRing({ categories, spent, cur, month }) {
+function CategoryRing({ categories, spent, cur, month, day }) {
   const [active, setActive] = useState(null) // label of the highlighted category
   const top = categories
     .slice(0, RING.length)
@@ -92,7 +92,9 @@ function CategoryRing({ categories, spent, cur, month }) {
     })
   }
   const shown = top.find((c) => c.label === active)
-  const tag = month ? new Date(`${month}-01T12:00:00`).toLocaleDateString('en-US', { month: 'short' }) : 'All time'
+  const tag = day
+    ? new Date(`${day}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    : month ? new Date(`${month}-01T12:00:00`).toLocaleDateString('en-US', { month: 'short' }) : 'All time'
   const R = 52
   const C = 2 * Math.PI * R
   const GAP = top.length > 1 ? 6 : 0

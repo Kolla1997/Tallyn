@@ -45,6 +45,7 @@ func txFilter(q url.Values) db.TxFilter {
 		Query:    q.Get("q"),
 		Category: q.Get("category"),
 		Month:    q.Get("month"),
+		Day:      q.Get("day"),
 	}
 }
 
@@ -68,6 +69,35 @@ func txSummary(store Store) http.HandlerFunc {
 			return
 		}
 		writeJSON(w, http.StatusOK, map[string]any{"summary": list})
+	}
+}
+
+// txDaily returns spending per day for a year (#75): totals, counts and the
+// top three purchases, with the same person, search and category filters.
+func txDaily(store Store) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		uid, ok := userID(w, r)
+		if !ok {
+			return
+		}
+		q := r.URL.Query()
+		f := txFilter(q)
+		f.Month, f.Day = "", ""
+		f.Year = q.Get("year")
+		if f.Year == "" {
+			f.Year = time.Now().UTC().Format("2006")
+		}
+		list, err := store.Daily(r.Context(), uid, q.Get("household_id"), f)
+		if errors.Is(err, db.ErrInvalid) {
+			writeError(w, http.StatusBadRequest, "bad_request")
+			return
+		}
+		if err != nil {
+			log.Printf("api: transactions daily: %v", err)
+			writeError(w, http.StatusInternalServerError, "internal")
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{"year": f.Year, "days": list})
 	}
 }
 
