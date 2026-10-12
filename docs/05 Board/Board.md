@@ -25,7 +25,6 @@ kanban-plugin: board
 - [ ] [#81 Transactions: filter by bank and show the bank on every transaction](https://github.com/Kolla1997/Tallyn/issues/81) #type/feature #area/frontend #area/backend
 - [ ] [#91 Sign out after 30 minutes of inactivity](https://github.com/Kolla1997/Tallyn/issues/91) #type/feature #area/frontend #priority/p1
 - [ ] [#92 Maximum session length: sign in again after a set time](https://github.com/Kolla1997/Tallyn/issues/92) #type/feature #area/frontend #priority/p2
-- [ ] [#96 Plaid Link is set up more than once on a page](https://github.com/Kolla1997/Tallyn/issues/96) #type/bug #area/frontend #priority/p1
 - [ ] [#97 Phone layout fixes from the audit](https://github.com/Kolla1997/Tallyn/issues/97) #type/design #area/frontend #priority/p1
 - [ ] [#98 Keyboard access for the spending dots](https://github.com/Kolla1997/Tallyn/issues/98) #type/feature #area/frontend #priority/p2
 - [ ] [#99 Faster loading: compressed fonts and a split bundle](https://github.com/Kolla1997/Tallyn/issues/99) #type/tech-debt #area/frontend #priority/p2
@@ -78,6 +77,7 @@ kanban-plugin: board
 - [x] [#83 Transactions: filter by bank and show the bank on each transaction](https://github.com/Kolla1997/Tallyn/issues/83) #type/feature #area/frontend #area/backend
 - [x] [#84 Accounts: filter by bank](https://github.com/Kolla1997/Tallyn/issues/84) #type/feature #area/frontend
 - [x] [#87 Smooth loading effect when filters change](https://github.com/Kolla1997/Tallyn/issues/87) #type/feature #area/design #area/frontend
+- [x] [#96 Plaid Link is set up more than once on a page](https://github.com/Kolla1997/Tallyn/issues/96) #type/bug #area/frontend #priority/p1
 
 
 %% kanban:settings
