@@ -98,7 +98,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     if (picked) p.set('tx', picked)
     const url = p.size ? `/transactions?${p}` : '/transactions'
     if (window.location.pathname + window.location.search !== url) window.history.replaceState(null, '', url)
-  }, [who, category, bank, month, day, picked])
+  }, [who, category, bank, month, day, picked, me.user_id])
 
   useEffect(() => {
     const t = setTimeout(() => setQuery(search.trim()), 300)

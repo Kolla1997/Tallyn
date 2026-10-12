@@ -103,7 +103,8 @@ function CategoryRing({ categories, spent, cur, month, day }) {
   const R = 52
   const C = 2 * Math.PI * R
   const GAP = top.length > 1 ? 6 : 0
-  let offset = 0
+  // Where each segment starts: the shares before it, worked out up front.
+  const starts = top.map((_, i) => top.slice(0, i).reduce((t, c) => t + (c.amount / spent) * C, 0))
   const pct = (v) => {
     const p = (v / spent) * 100
     return p < 1 ? '<1%' : `${Math.round(p)}%`
@@ -120,7 +121,7 @@ function CategoryRing({ categories, spent, cur, month, day }) {
       ) : (
         <div className="ring-wrap">
           <svg width="180" height="180" viewBox="0 0 140 140" role="img" aria-label={`Spending by category, ${formatMoney(spent, cur)} in total`}>
-            {top.map((c) => {
+            {top.map((c, i) => {
               const share = (c.amount / spent) * C
               const len = Math.max(share - GAP, 1)
               const seg = (
@@ -138,11 +139,10 @@ function CategoryRing({ categories, spent, cur, month, day }) {
                   strokeWidth="16"
                   strokeLinecap={top.length > 1 ? 'round' : 'butt'}
                   strokeDasharray={`${len} ${C - len}`}
-                  strokeDashoffset={-offset}
+                  strokeDashoffset={-starts[i]}
                   transform="rotate(-90 70 70)"
                 />
               )
-              offset += share
               return seg
             })}
             {shown ? (
