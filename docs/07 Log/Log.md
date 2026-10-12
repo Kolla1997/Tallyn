@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #83 Transactions: bank filter (third dropdown, banks of the person picked; list, totals, ring, top merchants and dots follow it; `?bank=`), and each transaction shows its bank and last digits under the amount (Dinesh picked B). Banks shared without balances stay hidden: no bank on those rows, and filtering by them matches nothing.
 - #1 CLAUDE.md: talk through a new ticket (understanding, suggestions, scope, questions) before creating it; `/i` stays instant.
 - #77 Merged PR #78 (loan payments count as transfers); closed and moved to Done.
 - #27 Merged PR #79 (credit cards on Home, Liabilities, migration 0011). #27 stays open for loans and mortgages; card moved back to Backlog.

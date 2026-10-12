@@ -49,6 +49,7 @@ function fromAddress(key) {
   const v = new URLSearchParams(window.location.search).get(key) ?? ''
   if (key === 'category') return CATEGORIES.includes(v) ? v : ''
   if (key === 'owner') return v === 'all' || /^[0-9a-f-]{36}$/i.test(v) ? v : ''
+  if (key === 'bank') return /^[0-9a-f-]{36}$/i.test(v) ? v : ''
   if (key === 'day') return /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(v) ? v : ''
   return /^\d{4}-(0[1-9]|1[0-2])$/.test(v) ? v : ''
 }
@@ -62,6 +63,8 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   const [category, setCategory] = useState(() => fromAddress('category'))
   const [month, setMonth] = useState(() => fromAddress('month'))
   const [day, setDay] = useState(() => fromAddress('day')) // a dot clicked in the year of dots (#75)
+  const [bank, setBank] = useState(() => fromAddress('bank')) // a linked bank's ID (#83)
+  const [banks, setBanks] = useState([])
   const [daily, setDaily] = useState(null)
   const [list, setList] = useState(null)
   const [summary, setSummary] = useState(null)
@@ -83,12 +86,13 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     const p = new URLSearchParams()
     if (who !== me.user_id) p.set('owner', who)
     if (category) p.set('category', category)
+    if (bank) p.set('bank', bank)
     if (day) p.set('day', day)
     else if (month) p.set('month', month)
     if (picked) p.set('tx', picked)
     const url = p.size ? `/transactions?${p}` : '/transactions'
     if (window.location.pathname + window.location.search !== url) window.history.replaceState(null, '', url)
-  }, [who, category, month, day, picked])
+  }, [who, category, bank, month, day, picked])
 
   useEffect(() => {
     const t = setTimeout(() => setQuery(search.trim()), 300)
@@ -100,6 +104,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     if (who !== 'all') p.set('owner', who)
     if (query) p.set('q', query)
     if (category) p.set('category', category)
+    if (bank) p.set('bank', bank)
     if (day) p.set('day', day)
     else if (month) p.set('month', month)
     return p
@@ -130,7 +135,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
       () => id === request.current && setSummary([]),
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [household.id, who, query, category, month, day, refreshKey])
+  }, [household.id, who, query, category, bank, month, day, refreshKey])
 
   // The year of dots: this year's spending per day, for the same person,
   // search and category (not the month or day, which it's for choosing).
@@ -140,6 +145,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     if (who !== 'all') p.set('owner', who)
     if (query) p.set('q', query)
     if (category) p.set('category', category)
+    if (bank) p.set('bank', bank)
     let live = true
     api(`/api/transactions/daily?${p}`).then(
       (d) => live && setDaily(d.days),
@@ -148,7 +154,28 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     return () => {
       live = false
     }
-  }, [household.id, who, query, category, year, refreshKey])
+  }, [household.id, who, query, category, bank, year, refreshKey])
+
+  // Banks for the filter (#83): the ones whose balances you may see, for
+  // the person picked above. Banks shared without balances stay hidden.
+  useEffect(() => {
+    api(`/api/banks?household_id=${encodeURIComponent(household.id)}`).then(
+      (d) => setBanks(d.banks ?? []),
+      () => setBanks([]),
+    )
+  }, [household.id, refreshKey])
+  const bankChoices = useMemo(() => {
+    const seen = new Map()
+    for (const b of banks) {
+      if (who !== 'all' && b.owner_user_id !== who) continue
+      seen.set(b.id, b.institution_name || 'Bank')
+    }
+    return [...seen].sort((x, y) => x[1].localeCompare(y[1]))
+  }, [banks, who])
+  // Switching person drops a bank that isn't theirs.
+  useEffect(() => {
+    if (bank && banks.length > 0 && !bankChoices.some(([id]) => id === bank)) setBank('')
+  }, [bank, banks, bankChoices])
 
   async function showMore() {
     setLoadingMore(true)
@@ -170,13 +197,13 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   // Teens and children only ever see their own, so they get no switcher.
   const others = iAmKid ? [] : members.filter((m) => !m.is_you)
   const groups = useMemo(() => groupByDay(list ?? []), [list])
-  const filtered = who !== me.user_id || query || category || month || day
+  const filtered = who !== me.user_id || query || category || bank || month || day
   const months = recentMonths()
   const pickedTx = list?.find((t) => t.id === picked) ?? null
   const home = household.home_currency
   const totals = summary?.find((s) => s.currency === home) ?? summary?.[0] ?? null
   const dayLabelLong = day ? new Date(`${day}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : ''
-  const scope = [day ? dayLabelLong : month ? monthLabel(month) : 'All time', who === 'all' ? 'everyone' : who === me.user_id ? 'yours' : nameOf(people[who] ?? { user_id: who })].join(' · ')
+  const scope = [day ? dayLabelLong : month ? monthLabel(month) : 'All time', who === 'all' ? 'everyone' : who === me.user_id ? 'yours' : nameOf(people[who] ?? { user_id: who }), bankChoices.find(([id]) => id === bank)?.[1]].filter(Boolean).join(' · ')
 
   // Esc closes the details.
   useEffect(() => {
@@ -232,6 +259,17 @@ export default function TransactionsPage({ me, household, refreshKey }) {
                   {months.map((m) => (
                     <option key={m} value={m}>
                       {monthLabel(m)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="grow">
+                <span className="sr-only">Bank</span>
+                <select value={bank} onChange={(e) => setBank(e.target.value)}>
+                  <option value="">All banks</option>
+                  {bankChoices.map(([id, name]) => (
+                    <option key={id} value={id}>
+                      {name}
                     </option>
                   ))}
                 </select>
@@ -297,6 +335,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
                           meId={me.user_id}
                           people={people}
                           showDate={false}
+                          showBank
                           onSelect={(id) => setPicked(id === picked ? '' : id)}
                           selected={tx.id === picked}
                         />
