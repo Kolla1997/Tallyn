@@ -331,7 +331,7 @@ func TestSaveCreditCards(t *testing.T) {
 		{PlaidAccountID: "card-b", APRs: []plaid.APR{}},
 		{PlaidAccountID: "acct-b", APRs: []plaid.APR{}}, // bob's account, another bank: skipped
 	}
-	if err := f.sys.SaveCreditCards(ctx, item, cards); err != nil {
+	if err := f.sys.SaveCreditCards(ctx, item, cards, "shared"); err != nil {
 		t.Fatal(err)
 	}
 	if syncItem(t, f, f.aliceItem).LiabilitiesSyncedAt == nil {
@@ -392,16 +392,29 @@ func TestSaveCreditCards(t *testing.T) {
 	}
 
 	// The bank stops reporting card-b: it goes; an empty answer clears all.
-	if err := f.sys.SaveCreditCards(ctx, item, cards[:1]); err != nil {
+	if err := f.sys.SaveCreditCards(ctx, item, cards[:1], "shared"); err != nil {
 		t.Fatal(err)
 	}
 	if n := f.count(t, alice, `select count(*) from credit_cards`); n != 1 {
 		t.Fatalf("after card-b dropped: %d cards", n)
 	}
-	if err := f.sys.SaveCreditCards(ctx, item, nil); err != nil {
+	if err := f.sys.SaveCreditCards(ctx, item, nil, "consent_needed"); err != nil {
 		t.Fatal(err)
 	}
 	if n := f.count(t, alice, `select count(*) from credit_cards`); n != 0 {
 		t.Fatalf("after empty answer: %d cards", n)
+	}
+	// What the bank said is kept, and shown to whoever sees the bank (#51).
+	banks, err = f.db.Banks(ctx, alice, f.testHH)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, b := range banks {
+		if b.ID == f.aliceItem && (b.CardDetails == nil || *b.CardDetails != "consent_needed") {
+			t.Fatalf("card details state = %v", b.CardDetails)
+		}
+	}
+	if err := f.sys.SaveCreditCards(ctx, item, nil, "made_up"); !errors.Is(err, ErrInvalid) {
+		t.Fatalf("unknown state: %v", err)
 	}
 }

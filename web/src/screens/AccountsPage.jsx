@@ -6,6 +6,7 @@ import { formatMoney } from '../lib/money.js'
 import { Avatar, nameOf } from '../lib/people.jsx'
 import { isOwed } from '../lib/summary.js'
 import { LinkBank, ReconnectBank } from './Banks.jsx'
+import { canAddCardDetails, cardsWithoutDetails } from '../lib/cards.js'
 import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
 import CountUp from '../components/CountUp.jsx'
@@ -349,9 +350,9 @@ function ConnectedBanks({ banks, me, people, onUnlinked, onReconnected, onError 
                     : 'This bank was disconnected and isn’t updating.'}
                 </p>
               )}
-              {b.status === 'active' && noDetails(b) > 0 && (
+              {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
                 <p className="small muted">
-                  {noDetails(b)} {noDetails(b) === 1 ? 'credit card doesn’t' : 'credit cards don’t'} have APR or due dates yet.
+                  {cardsWithoutDetails(b)} {cardsWithoutDetails(b) === 1 ? 'credit card doesn’t' : 'credit cards don’t'} have APR or due dates yet.
                 </p>
               )}
               {b.can_unlink && (
@@ -360,7 +361,7 @@ function ConnectedBanks({ banks, me, people, onUnlinked, onReconnected, onError 
                   {b.status === 'needs_reauth' && (
                     <ReconnectBank bankId={b.id} label="Reconnect" onDone={onReconnected} onError={onError} />
                   )}
-                  {b.status === 'active' && noDetails(b) > 0 && (
+                  {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
                     <ReconnectBank bankId={b.id} label="Add APR and due dates" className="chip" onDone={onReconnected} onError={onError} />
                   )}
                   <button className="chip chip-danger" onClick={() => setUnlinking(b)}>
@@ -386,11 +387,6 @@ function ConnectedBanks({ banks, me, people, onUnlinked, onReconnected, onError 
       )}
     </section>
   )
-}
-
-// Credit cards at this bank that have no APR or due date yet (#51).
-export function noDetails(bank) {
-  return bank.accounts.filter((a) => a.type === 'credit' && !a.card).length
 }
 
 function BankStatus({ bank }) {

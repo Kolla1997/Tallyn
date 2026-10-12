@@ -27,7 +27,7 @@ type Store interface {
 	Item(ctx context.Context, id string) (db.SyncItem, error)
 	SaveSync(ctx context.Context, item db.SyncItem, r plaid.SyncResult) (db.SyncStats, error)
 	SetStatus(ctx context.Context, id, status string) error
-	SaveCreditCards(ctx context.Context, item db.SyncItem, cards []plaid.CreditCard) error
+	SaveCreditCards(ctx context.Context, item db.SyncItem, cards []plaid.CreditCard, state string) error
 	SaveAccounts(ctx context.Context, item db.SyncItem, accounts []plaid.Account) error
 }
 
@@ -230,17 +230,22 @@ func (s *Syncer) syncCards(ctx context.Context, item db.SyncItem, token string) 
 		log.Printf("sync: bank %s: save balances: %v", item.ID, err)
 	}
 	cards, err := s.plaid.Liabilities(ctx, token)
+	state := "shared"
 	switch {
+	case err == nil:
+	case plaid.CardDetailsState(err) == plaid.CardsNotReady:
+		log.Printf("sync: bank %s: card details not ready yet", item.ID)
+		return // keep what we have; the next run asks again
 	case plaid.NoLiabilities(err):
 		var pe *plaid.Error
 		errors.As(err, &pe)
 		log.Printf("sync: bank %s: no card details (%s)", item.ID, pe.Code)
-		cards = nil // no cards, or not shared: clear and wait a day
-	case err != nil:
+		cards, state = nil, plaid.CardDetailsState(err) // clear, and remember why (#51)
+	default:
 		log.Printf("sync: bank %s: card details: %v", item.ID, err)
 		return
 	}
-	if err := s.store.SaveCreditCards(ctx, item, cards); err != nil && !errors.Is(err, db.ErrNotFound) {
+	if err := s.store.SaveCreditCards(ctx, item, cards, state); err != nil && !errors.Is(err, db.ErrNotFound) {
 		log.Printf("sync: bank %s: save card details: %v", item.ID, err)
 		return
 	}

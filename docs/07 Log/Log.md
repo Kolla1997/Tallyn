@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #51 Found while testing (Dinesh): after consenting, the Business Credit Card still showed "Add APR and due dates" forever, because Plaid shares no details for it; and a stale due date (May 28, 2020) read as "Due May 28". Fixed: migration `0012_card_details_state.sql` (run on dev at Dinesh's OK) records what the bank said (shared, consent_needed, not_offered); the button only shows when it can help, other cards say "Your bank doesn't share APR or due dates for this card."; past dates read "Last due May 28, 2020" and sort after upcoming ones; the year shows when it isn't this year.
 - #51 Reconnect a bank (Dinesh picked A): **Reconnect** on a bank that needs sign-in, and **Add APR and due dates** (Dinesh picked the wording) on banks whose cards have no details, in Accounts → Connected banks and on Home's credit cards. Plaid Link update mode with Liabilities consent; same people as Unlink; afterwards the bank syncs straight away and card details are fetched now. Closed duplicates #80, #81 (of #84, #83) and #63 (of #64).
 - #87 Design Comps: loading rule added (dim and a thin bar, then fade in), next to the card finish rule.
 - #83 #84 #87 Merged PRs #85 (Transactions bank filter), #86 (Accounts bank chips) and #88 (loading effect), in that order; Log and styles conflicts kept both sides; the bank chips fade the lists. Closed and moved to Done.

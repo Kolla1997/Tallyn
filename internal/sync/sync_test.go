@@ -18,17 +18,18 @@ import (
 // All tokens, IDs and merchants here are fake.
 
 type fakeStore struct {
-	mu       gosync.Mutex
-	items    map[string]db.SyncItem
-	saved    []string
-	status   map[string]string
-	saveErr  error
-	cards    map[string]int // bank ID -> cards saved, last time
-	accounts []string       // banks whose balances were refreshed
+	mu        gosync.Mutex
+	items     map[string]db.SyncItem
+	saved     []string
+	status    map[string]string
+	saveErr   error
+	cards     map[string]int    // bank ID -> cards saved, last time
+	accounts  []string          // banks whose balances were refreshed
+	cardState map[string]string // bank ID -> what the bank said about card details
 }
 
 func newStore(items ...db.SyncItem) *fakeStore {
-	s := &fakeStore{items: map[string]db.SyncItem{}, status: map[string]string{}, cards: map[string]int{}}
+	s := &fakeStore{items: map[string]db.SyncItem{}, status: map[string]string{}, cards: map[string]int{}, cardState: map[string]string{}}
 	for _, it := range items {
 		s.items[it.ID] = it
 	}
@@ -64,10 +65,11 @@ func (s *fakeStore) SaveSync(_ context.Context, it db.SyncItem, r plaid.SyncResu
 	s.saved = append(s.saved, it.ID+"@"+r.NextCursor)
 	return db.SyncStats{Upserted: len(r.Added)}, nil
 }
-func (s *fakeStore) SaveCreditCards(_ context.Context, it db.SyncItem, cards []plaid.CreditCard) error {
+func (s *fakeStore) SaveCreditCards(_ context.Context, it db.SyncItem, cards []plaid.CreditCard, state string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.cards[it.ID] = len(cards)
+	s.cardState[it.ID] = state
 	return nil
 }
 func (s *fakeStore) SaveAccounts(_ context.Context, it db.SyncItem, accounts []plaid.Account) error {
@@ -343,5 +345,27 @@ func TestReconnected(t *testing.T) {
 	New(store, p, fakeTokens{}, time.Hour).syncRequested(ctx, request{bankID: "bank-1", reconnect: true})
 	if len(store.saved) != 0 || store.status["bank-1"] != "needs_reauth" {
 		t.Fatalf("saved %v, status %q", store.saved, store.status["bank-1"])
+	}
+}
+
+// What the bank said about card details is saved (#51); not ready keeps
+// what we have and asks again next run.
+func TestCardDetailsState(t *testing.T) {
+	captureLog(t)
+	ctx := context.Background()
+	for code, want := range map[string]string{
+		"": "shared", "ADDITIONAL_CONSENT_REQUIRED": "consent_needed",
+		"PRODUCTS_NOT_SUPPORTED": "not_offered", "NO_LIABILITY_ACCOUNTS": "not_offered",
+		"PRODUCT_NOT_READY": "", "INTERNAL_SERVER_ERROR": "",
+	} {
+		store := newStore(bank("bank-1"))
+		p := &fakePlaid{results: map[string][]result{}}
+		if code != "" {
+			p.cardsErr = &plaid.Error{Code: code}
+		}
+		New(store, p, fakeTokens{}, time.Hour).SyncOne(ctx, bank("bank-1"))
+		if got := store.cardState["bank-1"]; got != want {
+			t.Errorf("%q: state = %q, want %q", code, got, want)
+		}
 	}
 }
