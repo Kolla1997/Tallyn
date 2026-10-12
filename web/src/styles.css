@@ -3387,3 +3387,30 @@ label.agree input {
     transition: none;
   }
 }
+
+/* Settings → Legal (#36, option A): the whole row opens the page. */
+.settings-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+  width: 100%;
+  margin: calc(-1 * var(--space-s2)) calc(-1 * var(--space-s3));
+  padding: var(--space-s2) var(--space-s3);
+  border-radius: var(--radius-input);
+  color: var(--color-cocoa);
+  text-decoration: none;
+}
+
+.settings-link svg {
+  color: var(--color-text-secondary);
+  flex: none;
+}
+
+.settings-link:hover {
+  background: color-mix(in srgb, var(--color-clay) 6%, var(--color-white));
+}
+
+.settings-link:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
