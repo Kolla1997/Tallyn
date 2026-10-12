@@ -45,3 +45,55 @@ export function LinkBank({ householdId, onLinked, onError, label = 'Link a bank'
     </button>
   )
 }
+
+// Reconnect a bank (#51): opens Plaid Link in update mode for a bank that
+// needs sign-in, or that hasn't shared card details yet (#27). The token is
+// fetched on click, so pages with several banks don't ask Plaid up front.
+// Afterwards the bank syncs straight away; onDone refreshes the page, again a
+// few seconds later once the sync has had time to finish.
+export function ReconnectBank({ bankId, label, className = 'btn btn-small', onDone, onError }) {
+  const [token, setToken] = useState(null)
+  const [busy, setBusy] = useState(false)
+
+  const onSuccess = useCallback(async () => {
+    try {
+      await api(`/api/banks/${encodeURIComponent(bankId)}/reconnected`, { method: 'POST' })
+      onDone?.()
+      setTimeout(() => onDone?.(), 5000)
+    } catch {
+      onError?.("We couldn't finish reconnecting that bank. Try again in a moment.")
+    }
+    setToken(null)
+    setBusy(false)
+  }, [bankId, onDone, onError])
+
+  const onExit = useCallback(() => {
+    setToken(null)
+    setBusy(false)
+  }, [])
+
+  const { open, ready } = usePlaidLink({ token, onSuccess, onExit })
+
+  // Open Plaid as soon as the token is ready.
+  useEffect(() => {
+    if (token && ready) open()
+  }, [token, ready, open])
+
+  async function start() {
+    setBusy(true)
+    onError?.('')
+    try {
+      const d = await api(`/api/banks/${encodeURIComponent(bankId)}/reconnect-token`, { method: 'POST' })
+      setToken(d.link_token)
+    } catch {
+      setBusy(false)
+      onError?.("Reconnecting isn't available right now. Try again in a moment.")
+    }
+  }
+
+  return (
+    <button type="button" className={className} onClick={start} disabled={busy}>
+      {busy ? 'Opening…' : label}
+    </button>
+  )
+}

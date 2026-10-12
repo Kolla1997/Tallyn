@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #51 Reconnect a bank (Dinesh picked A): **Reconnect** on a bank that needs sign-in, and **Add APR and due dates** (Dinesh picked the wording) on banks whose cards have no details, in Accounts → Connected banks and on Home's credit cards. Plaid Link update mode with Liabilities consent; same people as Unlink; afterwards the bank syncs straight away and card details are fetched now. Closed duplicates #80, #81 (of #84, #83) and #63 (of #64).
 - #87 Design Comps: loading rule added (dim and a thin bar, then fade in), next to the card finish rule.
 - #83 #84 #87 Merged PRs #85 (Transactions bank filter), #86 (Accounts bank chips) and #88 (loading effect), in that order; Log and styles conflicts kept both sides; the bank chips fade the lists. Closed and moved to Done.
 - #87 Loading effect when filters change (Dinesh picked A with count-up): Transactions dims its cards with a sliding Clay bar while loading (only after 150ms), then fades the new content in; totals count to their new values; Accounts and Home fade the cards that change on their switches; bars slide. Reduced motion gets a plain fade. Animation Guide and Design System updated.

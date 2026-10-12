@@ -165,6 +165,34 @@ func (c *Client) CreateLinkToken(ctx context.Context, userID string) (string, er
 	return out.LinkToken, nil
 }
 
+// CreateUpdateLinkToken opens Plaid Link in update mode for an existing item
+// (#51): the person signs in to their bank again, and agrees to share card
+// and loan details if they hadn't (#27). No new item or token comes back;
+// the access token stays the same.
+func (c *Client) CreateUpdateLinkToken(ctx context.Context, userID, accessToken string) (string, error) {
+	body := map[string]any{
+		"client_name":                   "Tallyn",
+		"language":                      "en",
+		"country_codes":                 []string{"US"},
+		"user":                          map[string]string{"client_user_id": userID},
+		"access_token":                  accessToken,
+		"additional_consented_products": []string{"liabilities"},
+	}
+	if c.redirectURI != "" {
+		body["redirect_uri"] = c.redirectURI
+	}
+	var out struct {
+		LinkToken string `json:"link_token"`
+	}
+	if err := c.post(ctx, "/link/token/create", body, &out); err != nil {
+		return "", err
+	}
+	if out.LinkToken == "" {
+		return "", errors.New("plaid: empty link token")
+	}
+	return out.LinkToken, nil
+}
+
 // ExchangePublicToken swaps Link's one-time public token for the item's
 // long-lived access token. Encrypt the access token before storing it.
 func (c *Client) ExchangePublicToken(ctx context.Context, publicToken string) (accessToken, itemID string, err error) {

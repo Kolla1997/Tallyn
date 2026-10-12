@@ -45,9 +45,8 @@ Option F (Dinesh picked from six drafts): header "$10,860 used of $24,000 total 
 
 ## Rollout
 1. Run `0011_credit_cards.sql` on dev (done 2026-10-12).
-2. Sandbox banks linked before this show limits but not card details (`ADDITIONAL_CONSENT_REQUIRED`). Link a new sandbox bank to see APRs and due dates.
+2. Banks linked before this show limits but not card details (`ADDITIONAL_CONSENT_REQUIRED`). **Add APR and due dates** (#51) on the bank in Accounts, or on the card on Home, asks for consent in Plaid and fetches them straight away.
 3. Production: confirm the Liabilities price first.
 
 ## Open questions
 > [!todo] Liabilities price per bank in Production: ask Plaid (Dinesh).
-> [!todo] Reconnect flow for banks linked before Liabilities (#51).

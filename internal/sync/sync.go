@@ -72,6 +72,10 @@ type Syncer struct {
 type request struct {
 	bankID  string
 	attempt int
+	// reconnect: the person just signed in again or agreed to share card
+	// details (Plaid Link update mode, #51). Sync even if marked
+	// needs_reauth, and fetch card details now.
+	reconnect bool
 }
 
 // New returns a Syncer that syncs every bank each `every` (6 hours, decided 2026-10-09).
@@ -113,6 +117,12 @@ func (s *Syncer) SyncNow(bankID string) {
 	s.enqueue(request{bankID: bankID})
 }
 
+// Reconnected asks for a bank to be synced right after Plaid Link update mode
+// (#51). A good sync sets it back to active. Never blocks.
+func (s *Syncer) Reconnected(bankID string) {
+	s.enqueue(request{bankID: bankID, reconnect: true})
+}
+
 func (s *Syncer) enqueue(r request) {
 	select {
 	case s.now <- r:
@@ -130,11 +140,17 @@ func (s *Syncer) syncRequested(ctx context.Context, r request) {
 		log.Printf("sync: bank %s: load: %v", r.bankID, err)
 		return
 	}
-	if item.Status != "active" {
+	switch {
+	case r.reconnect && item.Status == "needs_reauth":
+		// the person just signed in again: try it
+	case item.Status != "active":
 		return
 	}
+	if r.reconnect {
+		item.LiabilitiesSyncedAt = nil // they may have just shared card details
+	}
 	if s.SyncOne(ctx, item) == NotReady && r.attempt < len(s.retries) {
-		next := request{bankID: r.bankID, attempt: r.attempt + 1}
+		next := request{bankID: r.bankID, attempt: r.attempt + 1, reconnect: r.reconnect}
 		time.AfterFunc(s.retries[r.attempt], func() { s.enqueue(next) })
 	}
 }

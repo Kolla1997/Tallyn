@@ -91,7 +91,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
           wide={wide}
           total={<TotalCard banks={banks} txs={txs ?? []} mine={mine ?? []} me={me} roles={roles} home={household.home_currency} scope={scope} onScope={setScope} />}
           accounts={<YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} everyone={scope === 'everyone'} />}
-          cards={<CreditCards banks={banks} me={me} home={household.home_currency} everyone={scope === 'everyone'} />}
+          cards={<CreditCards banks={banks} me={me} home={household.home_currency} everyone={scope === 'everyone'} onChanged={onChanged} onError={setError} />}
           recent={<RecentTransactions txs={(scope === 'yours' ? mine : txs) ?? []} me={me} people={people} everyone={scope === 'everyone'} />}
           spending={<SpendingCard spending={spending?.[scope] ?? []} month={MONTH} home={household.home_currency} everyone={scope === 'everyone'} />}
           shared={<SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />}

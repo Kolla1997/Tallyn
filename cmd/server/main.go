@@ -88,7 +88,7 @@ func main() {
 	// Bank sync (#9): every 6 hours, plus right after a bank is linked. It has
 	// its own login, DATABASE_URL_SYNC as tallyn_sync (#30), and is the only
 	// code that gets the system database access (db.System).
-	var syncNow func(string)
+	var syncNow, reconnected func(string)
 	syncURL := os.Getenv("DATABASE_URL_SYNC")
 	switch {
 	case syncURL == "":
@@ -107,6 +107,7 @@ func main() {
 		defer system.Close()
 		syncer := banksync.New(system, plaidClient, box, every)
 		syncNow = syncer.SyncNow
+		reconnected = syncer.Reconnected
 		go syncer.Run(ctx)
 		log.Printf("tallyn: bank sync every %s", every)
 	}
@@ -120,6 +121,7 @@ func main() {
 			Plaid:       bankAPI,
 			Tokens:      tokens,
 			SyncNow:     syncNow,
+			Reconnected: reconnected,
 		}),
 		ReadHeaderTimeout: 10 * time.Second,
 	}

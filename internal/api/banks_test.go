@@ -122,6 +122,12 @@ func (s *bankStore) CreateHousehold(_ context.Context, _, name, cur string) (db.
 type fakePlaidAPI struct {
 	linkErr, exchangeErr, accountsErr, removeErr error
 	exchanged, removed                           []string
+	updateTokens                                 []string // access tokens update mode was opened for
+}
+
+func (p *fakePlaidAPI) CreateUpdateLinkToken(_ context.Context, _, accessToken string) (string, error) {
+	p.updateTokens = append(p.updateTokens, accessToken)
+	return "link-sandbox-update", p.linkErr
 }
 
 func (p *fakePlaidAPI) CreateLinkToken(context.Context, string) (string, error) {
@@ -329,5 +335,52 @@ func TestCreateHousehold(t *testing.T) {
 	}
 	if rec := send(h, "POST", "/api/households", `not json`); rec.Code != http.StatusBadRequest {
 		t.Fatalf("bad JSON: status = %d, want 400", rec.Code)
+	}
+}
+
+// Reconnect (#51): update mode for whoever may unlink the bank; the access
+// token is only used for the Plaid call and never sent back; after Link, the
+// bank is synced right away.
+func TestReconnect(t *testing.T) {
+	path := "/api/banks/" + fakeBankID
+	box := newTestBox(t)
+	sealed, err := box.Seal([]byte(fakeAccess), []byte(fakeItemID))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var synced []string
+	router := func(s *bankStore, p *fakePlaidAPI) http.Handler {
+		return NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s, Plaid: p, Tokens: box,
+			Reconnected: func(id string) { synced = append(synced, id) }})
+	}
+
+	s, p := &bankStore{sealed: sealed}, &fakePlaidAPI{}
+	rec := send(router(s, p), "POST", path+"/reconnect-token", "")
+	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "link-sandbox-update") {
+		t.Fatalf("token: %d %s", rec.Code, rec.Body)
+	}
+	if strings.Contains(rec.Body.String(), fakeAccess) {
+		t.Fatal("the access token was sent to the browser")
+	}
+	if len(p.updateTokens) != 1 || p.updateTokens[0] != fakeAccess {
+		t.Fatalf("update mode opened for %v", p.updateTokens)
+	}
+	if rec := send(router(s, p), "POST", path+"/reconnected", ""); rec.Code != http.StatusAccepted || len(synced) != 1 || synced[0] != fakeBankID {
+		t.Fatalf("reconnected: %d, synced %v", rec.Code, synced)
+	}
+
+	// Someone who may not unlink it (or an unknown bank): 404, nothing done.
+	s, p = &bankStore{targetErr: db.ErrNotFound}, &fakePlaidAPI{}
+	if rec := send(router(s, p), "POST", path+"/reconnect-token", ""); rec.Code != http.StatusNotFound || len(p.updateTokens) != 0 {
+		t.Fatalf("not allowed token: %d, %v", rec.Code, p.updateTokens)
+	}
+	if rec := send(router(s, p), "POST", path+"/reconnected", ""); rec.Code != http.StatusNotFound || len(synced) != 1 {
+		t.Fatalf("not allowed reconnected: %d, synced %v", rec.Code, synced)
+	}
+
+	// Plaid fails: a 502, and no token.
+	s, p = &bankStore{sealed: sealed}, &fakePlaidAPI{linkErr: &plaid.Error{Code: "INTERNAL_SERVER_ERROR"}}
+	if rec := send(router(s, p), "POST", path+"/reconnect-token", ""); rec.Code != http.StatusBadGateway {
+		t.Fatalf("plaid error: %d", rec.Code)
 	}
 }

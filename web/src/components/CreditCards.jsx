@@ -1,6 +1,7 @@
 import { formatMoney } from '../lib/money.js'
 import { useFadeOnChange } from '../lib/motion.js'
 import CountUp from './CountUp.jsx'
+import { ReconnectBank } from '../screens/Banks.jsx'
 
 // Credit cards on Home (#27, Dinesh picked F): one bar for the total limit,
 // each card's balance a piece of it in a shade of clay, the rest available.
@@ -28,10 +29,10 @@ function dueState(card, today) {
   return days >= 0 && days <= SOON_DAYS ? 'soon' : ''
 }
 
-export default function CreditCards({ banks, me, home, everyone = false }) {
+export default function CreditCards({ banks, me, home, everyone = false, onChanged, onError }) {
   const fading = useFadeOnChange(everyone) // #87
   const shown = everyone ? banks : banks.filter((b) => b.owner_user_id === me.user_id)
-  const all = shown.flatMap((b) => b.accounts.filter((a) => a.type === 'credit').map((a) => ({ ...a, bankName: b.institution_name })))
+  const all = shown.flatMap((b) => b.accounts.filter((a) => a.type === 'credit').map((a) => ({ ...a, bankName: b.institution_name, bank: b })))
   if (all.length === 0) return null
 
   // One currency at a time, like Your accounts: home first.
@@ -91,7 +92,24 @@ export default function CreditCards({ banks, me, home, everyone = false }) {
                   {a.name} {a.mask && <span className="small muted">••{a.mask}</span>}
                 </p>
                 <p className="small muted">{details}</p>
-                {!a.card && <p className="small muted">No APR or due date from the bank yet.</p>}
+                {!a.card && (
+                  <p className="small muted">
+                    No APR or due date yet
+                    {/* #51: whoever may reconnect the bank can fetch them from here. */}
+                    {a.bank.can_unlink && (
+                      <>
+                        {' · '}
+                        <ReconnectBank
+                          bankId={a.bank.id}
+                          label={a.bank.status === 'needs_reauth' ? `Reconnect ${a.bankName || 'bank'}` : 'Add APR and due dates'}
+                          className="link small"
+                          onDone={onChanged}
+                          onError={onError}
+                        />
+                      </>
+                    )}
+                  </p>
+                )}
               </div>
               <div className="cc-right">
                 <p>

@@ -315,3 +315,33 @@ func TestSyncCards(t *testing.T) {
 		t.Fatal("saved after a failure")
 	}
 }
+
+// Reconnect (#51): a bank marked needs_reauth is synced when the person just
+// signed in again, with card details fetched now; a plain request isn't.
+func TestReconnected(t *testing.T) {
+	captureLog(t)
+	ctx := context.Background()
+	recent := time.Now().Add(-time.Hour)
+	b := bank("bank-1")
+	b.Status, b.LiabilitiesSyncedAt = "needs_reauth", &recent
+	store := newStore(b)
+	p := &fakePlaid{results: map[string][]result{}}
+	s := New(store, p, fakeTokens{}, time.Hour)
+
+	s.syncRequested(ctx, request{bankID: "bank-1"})
+	if len(store.saved) != 0 {
+		t.Fatalf("plain request synced a needs_reauth bank: %v", store.saved)
+	}
+	s.syncRequested(ctx, request{bankID: "bank-1", reconnect: true})
+	if len(store.saved) != 1 || p.cardCalls != 1 {
+		t.Fatalf("reconnect: saved %v, card calls %d", store.saved, p.cardCalls)
+	}
+
+	// Still needs sign-in at Plaid: stays marked, nothing saved.
+	store = newStore(b)
+	p = &fakePlaid{results: map[string][]result{"access-bank-1": {{err: &plaid.Error{Code: "ITEM_LOGIN_REQUIRED"}}}}}
+	New(store, p, fakeTokens{}, time.Hour).syncRequested(ctx, request{bankID: "bank-1", reconnect: true})
+	if len(store.saved) != 0 || store.status["bank-1"] != "needs_reauth" {
+		t.Fatalf("saved %v, status %q", store.saved, store.status["bank-1"])
+	}
+}
