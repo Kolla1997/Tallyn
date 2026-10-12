@@ -24,6 +24,7 @@ kanban-plugin: board
 - [ ] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
 - [ ] [#80 Accounts: filter by bank](https://github.com/Kolla1997/Tallyn/issues/80) #type/feature #area/frontend
 - [ ] [#81 Transactions: filter by bank and show the bank on every transaction](https://github.com/Kolla1997/Tallyn/issues/81) #type/feature #area/frontend #area/backend
+- [ ] [#91 Sign out after 30 minutes of inactivity](https://github.com/Kolla1997/Tallyn/issues/91) #type/feature #area/frontend #priority/p1
 
 
 ## In Progress
