@@ -30,6 +30,7 @@ kanban-plugin: board
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
+- [ ] [#77 Count loan payments as transfers, not spending](https://github.com/Kolla1997/Tallyn/issues/77) #type/feature #area/frontend #area/backend
 
 
 ## Review

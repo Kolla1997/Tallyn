@@ -43,7 +43,7 @@ export function TxSummary({ totals, scope, month, day }) {
           </div>
         </div>
         {totals.transfers_minor > 0 && (
-          <p className="small muted">Transfers and card payments ({formatMoney(totals.transfers_minor, cur)}) aren&apos;t counted as spending.</p>
+          <p className="small muted">Transfers and loan payments ({formatMoney(totals.transfers_minor, cur)}) aren&apos;t counted as spending.</p>
         )}
       </section>
 
