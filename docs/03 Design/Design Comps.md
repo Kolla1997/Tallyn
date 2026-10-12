@@ -2,8 +2,8 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-11
-issues: [10, 39, 61]
+updated: 2026-10-12
+issues: [10, 39, 61, 87]
 tags: [design, comps]
 ---
 # Design Comps
@@ -12,6 +12,14 @@ Visual comps, not production code. Amounts and rates are placeholders.
 
 > [!warning] Card finish rule (#61, 2026-10-11)
 > Every card is **frosted glass** over a soft sage, clay and sand glow, not flat white. New comps must follow it; the older comps below still show flat cards. Rule, values and fallbacks: [[Design System#Glass finish]].
+
+> [!warning] Loading rule (#87, 2026-10-12)
+> When a filter or switch changes what a card shows, use **dim and a thin bar** (Dinesh picked option A):
+> - The current list and totals fade to about half strength, and a thin Clay bar slides along the top of each card.
+> - Then the new content fades in.
+> - Nothing jumps, and it feels calm.
+>
+> New comps showing a loading or filter state must follow it. Timing, count-up numbers and reduced motion: [[Animation Guide#When filters change (#87)]].
 
 ![[app-screens-overview.png]]
 

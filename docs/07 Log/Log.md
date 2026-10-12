@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #87 Design Comps: loading rule added (dim and a thin bar, then fade in), next to the card finish rule.
 - #83 #84 #87 Merged PRs #85 (Transactions bank filter), #86 (Accounts bank chips) and #88 (loading effect), in that order; Log and styles conflicts kept both sides; the bank chips fade the lists. Closed and moved to Done.
 - #87 Loading effect when filters change (Dinesh picked A with count-up): Transactions dims its cards with a sliding Clay bar while loading (only after 150ms), then fades the new content in; totals count to their new values; Accounts and Home fade the cards that change on their switches; bars slide. Reduced motion gets a plain fade. Animation Guide and Design System updated.
 - #84 Accounts: bank chips (All · First Gingham Credit Union · PNC, with account counts) between net worth and the lists (Dinesh picked A). Picking one narrows You have and You owe with their totals and groups; net worth stays whole; `?bank=`. Hidden when the person shown has only one bank.
