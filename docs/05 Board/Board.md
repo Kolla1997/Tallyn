@@ -30,9 +30,7 @@ kanban-plugin: board
 ## In Progress
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
-- [ ] [#39 Build the app screens from the comps, for phone and web](https://github.com/Kolla1997/Tallyn/issues/39) #type/design #area/frontend #priority/p1
-- [ ] [#58 Transactions: summary and details panel](https://github.com/Kolla1997/Tallyn/issues/58) #type/feature #area/frontend #area/backend #priority/p1
-- [ ] [#61 Frosted glass finish on every card](https://github.com/Kolla1997/Tallyn/issues/61) #type/design #area/design #area/frontend #priority/p2
+- [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
 
 
 ## Review
@@ -58,7 +56,10 @@ kanban-plugin: board
 - [x] [#28 Sharing settings: choose what each household member can see](https://github.com/Kolla1997/Tallyn/issues/28) #type/feature #area/backend #priority/p1
 - [x] [#30 Separate database logins for the API and the bank sync](https://github.com/Kolla1997/Tallyn/issues/30) #type/tech-debt #area/backend #priority/p1
 - [x] [#38 Confirmation dialog before removing members, leaving or unlinking](https://github.com/Kolla1997/Tallyn/issues/38) #type/feature #area/frontend #priority/p1
+- [x] [#39 Build the app screens from the comps, for phone and web](https://github.com/Kolla1997/Tallyn/issues/39) #type/design #area/frontend #priority/p1
 - [x] [#42 Transactions page with person switcher, search and merchant logos](https://github.com/Kolla1997/Tallyn/issues/42) #type/feature #area/frontend #priority/p1
+- [x] [#58 Transactions: summary and details panel](https://github.com/Kolla1997/Tallyn/issues/58) #type/feature #area/frontend #area/backend #priority/p1
+- [x] [#61 Frosted glass finish on every card](https://github.com/Kolla1997/Tallyn/issues/61) #type/design #area/design #area/frontend #priority/p2
 
 
 %% kanban:settings
