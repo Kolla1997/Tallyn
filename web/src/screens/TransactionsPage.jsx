@@ -46,13 +46,14 @@ const monthLabel = (m) => new Date(`${m}-01T12:00:00`).toLocaleDateString('en-US
 function fromAddress(key) {
   const v = new URLSearchParams(window.location.search).get(key) ?? ''
   if (key === 'category') return CATEGORIES.includes(v) ? v : ''
-  if (key === 'owner') return /^[0-9a-f-]{36}$/i.test(v) ? v : ''
+  if (key === 'owner') return v === 'all' || /^[0-9a-f-]{36}$/i.test(v) ? v : ''
   return /^\d{4}-(0[1-9]|1[0-2])$/.test(v) ? v : ''
 }
 
 export default function TransactionsPage({ me, household, refreshKey }) {
   const [members, setMembers] = useState([])
-  const [who, setWho] = useState(() => fromAddress('owner')) // '' everyone, else a user ID
+  // Whose: your own by default (Dinesh), 'all' for everyone, else a member's ID.
+  const [who, setWho] = useState(() => fromAddress('owner') || me.user_id)
   const [search, setSearch] = useState('')
   const [query, setQuery] = useState('') // search, applied after a short pause
   const [category, setCategory] = useState(() => fromAddress('category'))
@@ -75,7 +76,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   // Keep the category and month in the address, so links and Back work.
   useEffect(() => {
     const p = new URLSearchParams()
-    if (who) p.set('owner', who)
+    if (who !== me.user_id) p.set('owner', who)
     if (category) p.set('category', category)
     if (month) p.set('month', month)
     if (picked) p.set('tx', picked)
@@ -90,7 +91,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
 
   const filters = () => {
     const p = new URLSearchParams({ household_id: household.id })
-    if (who) p.set('owner', who)
+    if (who !== 'all') p.set('owner', who)
     if (query) p.set('q', query)
     if (category) p.set('category', category)
     if (month) p.set('month', month)
@@ -144,12 +145,12 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   // Teens and children only ever see their own, so they get no switcher.
   const others = iAmKid ? [] : members.filter((m) => !m.is_you)
   const groups = useMemo(() => groupByDay(list ?? []), [list])
-  const filtered = who || query || category || month
+  const filtered = who !== me.user_id || query || category || month
   const months = recentMonths()
   const pickedTx = list?.find((t) => t.id === picked) ?? null
   const home = household.home_currency
   const totals = summary?.find((s) => s.currency === home) ?? summary?.[0] ?? null
-  const scope = [month ? monthLabel(month) : 'All time', who ? (who === me.user_id ? 'yours' : nameOf(people[who] ?? { user_id: who })) : 'everyone'].join(' · ')
+  const scope = [month ? monthLabel(month) : 'All time', who === 'all' ? 'everyone' : who === me.user_id ? 'yours' : nameOf(people[who] ?? { user_id: who })].join(' · ')
 
   // Esc closes the details.
   useEffect(() => {
@@ -166,8 +167,8 @@ export default function TransactionsPage({ me, household, refreshKey }) {
       <section className="panel tx-filters" aria-label="Filter transactions">
         {others.length > 0 && (
           <div className="chips" role="group" aria-label="Whose transactions">
-            {[['', 'Everyone'], [me.user_id, 'Yours'], ...others.map((m) => [m.user_id, nameOf(m)])].map(([id, label]) => (
-              <button key={id || 'all'} className="chip" aria-pressed={who === id} onClick={() => setWho(id)}>
+            {[[me.user_id, 'Yours'], ...others.map((m) => [m.user_id, nameOf(m)]), ['all', 'Everyone']].map(([id, label]) => (
+              <button key={id} className="chip" aria-pressed={who === id} onClick={() => setWho(id)}>
                 {label}
               </button>
             ))}
