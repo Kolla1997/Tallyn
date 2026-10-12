@@ -47,6 +47,8 @@ func (stubStore) DeleteBank(context.Context, string, string) error { return erro
 func (stubStore) Transactions(context.Context, string, string, db.TxFilter) ([]db.Transaction, bool, error) {
 	return nil, false, errors.New("stub")
 }
+func (stubStore) Consents(context.Context, string) ([]db.Consent, error)  { return nil, nil }
+func (stubStore) Accept(context.Context, string, map[string]string) error { return nil }
 func (stubStore) Summary(context.Context, string, string, db.TxFilter) ([]db.TxSummary, error) {
 	return nil, nil
 }
