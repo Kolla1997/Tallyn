@@ -7,6 +7,7 @@ import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import { useBusy, useFadeOnChange } from '../lib/motion.js'
 
 // All transactions (#42): switch between household members, search by
 // merchant, filter by category, grouped by day, 50 at a time. The API only
@@ -71,6 +72,11 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   const [picked, setPicked] = useState(() => new URLSearchParams(window.location.search).get('tx') ?? '')
   const [more, setMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
+  // A filter change is loading (#87): the list and summary dim until both
+  // arrive, then fade in; the dots card does the same for its own data.
+  const [loading, setLoading] = useState(false)
+  const [loaded, setLoaded] = useState(0)
+  const [dailyLoading, setDailyLoading] = useState(false)
   const [error, setError] = useState('')
   const request = useRef(0)
 
@@ -121,19 +127,30 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   useEffect(() => {
     const id = ++request.current
     setError('')
-    api(url(0)).then(
-      (d) => {
-        if (id !== request.current) return
-        setList(d.transactions)
-        setMore(d.more)
-      },
-      () => id === request.current && setError("We couldn't load transactions. Try again in a moment."),
-    )
+    setLoading(true)
+    let left = 2
+    const done = () => {
+      if (id !== request.current || --left > 0) return
+      setLoading(false)
+      setLoaded((n) => n + 1)
+    }
+    api(url(0))
+      .then(
+        (d) => {
+          if (id !== request.current) return
+          setList(d.transactions)
+          setMore(d.more)
+        },
+        () => id === request.current && setError("We couldn't load transactions. Try again in a moment."),
+      )
+      .finally(done)
     // Totals over every matching transaction, not just this page (#58).
-    api(`/api/transactions/summary?${filters()}`).then(
-      (d) => id === request.current && setSummary(d.summary),
-      () => id === request.current && setSummary([]),
-    )
+    api(`/api/transactions/summary?${filters()}`)
+      .then(
+        (d) => id === request.current && setSummary(d.summary),
+        () => id === request.current && setSummary([]),
+      )
+      .finally(done)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [household.id, who, query, category, bank, month, day, refreshKey])
 
@@ -147,10 +164,13 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     if (category) p.set('category', category)
     if (bank) p.set('bank', bank)
     let live = true
-    api(`/api/transactions/daily?${p}`).then(
-      (d) => live && setDaily(d.days),
-      () => live && setDaily([]),
-    )
+    setDailyLoading(true)
+    api(`/api/transactions/daily?${p}`)
+      .then(
+        (d) => live && setDaily(d.days),
+        () => live && setDaily([]),
+      )
+      .finally(() => live && setDailyLoading(false))
     return () => {
       live = false
     }
@@ -198,6 +218,10 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   const others = iAmKid ? [] : members.filter((m) => !m.is_you)
   const groups = useMemo(() => groupByDay(list ?? []), [list])
   const filtered = who !== me.user_id || query || category || bank || month || day
+  const busy = useBusy(loading)
+  const fading = useFadeOnChange(loaded)
+  const dotsBusy = useBusy(dailyLoading)
+  const zone = (b, f) => ['busy-zone', b && 'is-busy', f && 'is-fading'].filter(Boolean).join(' ')
   const months = recentMonths()
   const pickedTx = list?.find((t) => t.id === picked) ?? null
   const home = household.home_currency
@@ -286,7 +310,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
           </div>
         </section>
         {/* The year of dots (#75): its own card, over the summary on web. */}
-        <section className="panel tx-dots-card" aria-label="Spending by day">
+        <section className={`panel tx-dots-card ${zone(dotsBusy, false)}`} aria-label="Spending by day" aria-busy={dotsBusy}>
           <SpendingDots
             year={year}
             days={daily}
@@ -306,7 +330,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
         </p>
       )}
 
-      <div className="tx-layout">
+      <div className={`tx-layout ${zone(busy, fading)}`} aria-busy={busy}>
         <div className="tx-main">
           {!list ? (
             <TallynLoader />

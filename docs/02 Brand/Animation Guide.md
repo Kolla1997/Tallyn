@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-11
+updated: 2026-10-12
 issues: [10, 66]
 tags: [brand, motion]
 ---
@@ -24,3 +24,16 @@ Files exist in `light` and `dark`. The Lottie files animate the mark only.
 > The Lottie files were loaded and rendered with python-lottie, not on a phone. Test in your target players.
 
 Always show the last frame instead of animating when the user prefers reduced motion. See [[Brand Guide]].
+
+## When filters change (#87)
+Dinesh picked option A with count-up numbers. Code: `web/src/lib/motion.js`, `web/src/components/CountUp.jsx`.
+
+| What | Effect |
+|---|---|
+| Data loading from the server (Transactions filters) | After 150ms (never for fast answers): card content dims to 45% and a thin Clay bar slides along each card's top; `aria-busy` on the area. New content fades in (250ms, ease-out, 3px rise) |
+| Instant switches (Accounts person and bank chips, Home Yours / Everyone and its tabs) | The cards that change fade in (250ms) |
+| Totals (Spent, Money in, net worth, have / owe, balances) | Count to the new value in 600ms, easing out. Screen readers get only the final value |
+| Bars (net worth, credit cards) | Slide to their new sizes (300ms) |
+
+Reduced motion: no sliding bar, rise or counting; a plain 200ms fade only.
+

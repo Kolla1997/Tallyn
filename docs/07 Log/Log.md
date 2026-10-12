@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #87 Loading effect when filters change (Dinesh picked A with count-up): Transactions dims its cards with a sliding Clay bar while loading (only after 150ms), then fades the new content in; totals count to their new values; Accounts and Home fade the cards that change on their switches; bars slide. Reduced motion gets a plain fade. Animation Guide and Design System updated.
 - #84 Accounts: bank chips (All · First Gingham Credit Union · PNC, with account counts) between net worth and the lists (Dinesh picked A). Picking one narrows You have and You owe with their totals and groups; net worth stays whole; `?bank=`. Hidden when the person shown has only one bank.
 - #83 Transactions: bank filter (third dropdown, banks of the person picked; list, totals, ring, top merchants and dots follow it; `?bank=`), and each transaction shows its bank and last digits under the amount (Dinesh picked B). Banks shared without balances stay hidden: no bank on those rows, and filtering by them matches nothing.
 - #1 CLAUDE.md: talk through a new ticket (understanding, suggestions, scope, questions) before creating it; `/i` stays instant.

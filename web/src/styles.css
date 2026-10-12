@@ -1276,6 +1276,7 @@ a.btn {
 .net-worth-bar > span {
   flex-basis: 0;
   min-width: 4px;
+  transition: flex-grow 300ms ease-out; /* #87 */
 }
 
 .dot {
@@ -2849,6 +2850,7 @@ label.agree input {
 
 .cc-piece {
   height: 100%;
+  transition: width 300ms ease-out; /* #87 */
 }
 
 .cc-piece + .cc-piece {
@@ -2918,6 +2920,82 @@ label.agree input {
 .cc-due-late {
   background: var(--color-error);
   color: var(--color-white);
+}
+
+/* Loading effect (#87, option A): while a busy zone loads for more than
+   150ms, its cards' content dims and a thin clay bar slides along their top;
+   new content fades in. Cards that switch instantly only fade. */
+/* :where() keeps this at zero weight, so a card's own position (the
+   transaction details sheet is fixed on phones) always wins. */
+:where(.busy-zone .panel, .panel.busy-zone) {
+  position: relative;
+}
+
+:is(.busy-zone .panel, .panel.busy-zone) > * {
+  transition: opacity 250ms ease-out;
+}
+
+:is(.busy-zone.is-busy .panel, .panel.busy-zone.is-busy) > * {
+  opacity: 0.45;
+}
+
+:is(.busy-zone.is-busy .panel, .panel.busy-zone.is-busy)::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: var(--space-s5);
+  right: var(--space-s5);
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(var(--color-clay), var(--color-clay)) no-repeat;
+  background-size: 35% 100%;
+  animation: busy-slide 1.1s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes busy-slide {
+  from {
+    background-position: -60% 0;
+  }
+  to {
+    background-position: 160% 0;
+  }
+}
+
+:is(.busy-zone.is-fading .panel, .panel.is-fading) > * {
+  animation: fade-in-up 250ms ease-out;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0.3;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.busy-zone.is-busy .panel, .panel.busy-zone.is-busy)::after {
+    animation: none;
+    background-size: 100% 100%;
+    opacity: 0.5;
+  }
+
+  :is(.busy-zone.is-fading .panel, .panel.is-fading) > * {
+    animation: fade-in-plain 200ms ease-out;
+  }
+
+  @keyframes fade-in-plain {
+    from {
+      opacity: 0.3;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
 
 /* Bank chips on Accounts (#84, option A): between net worth and the lists. */
