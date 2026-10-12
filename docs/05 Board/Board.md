@@ -32,7 +32,6 @@ kanban-plugin: board
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
-- [ ] [#87 Smooth loading effect when filters change](https://github.com/Kolla1997/Tallyn/issues/87) #type/feature #area/design #area/frontend
 
 
 ## Review
@@ -40,6 +39,7 @@ kanban-plugin: board
 - [ ] [#10 Brand: logo and design tokens](https://github.com/Kolla1997/Tallyn/issues/10) #type/design #area/brand #priority/p0
 - [ ] [#83 Transactions: filter by bank and show the bank on each transaction](https://github.com/Kolla1997/Tallyn/issues/83) #type/feature #area/frontend #area/backend
 - [ ] [#84 Accounts: filter by bank](https://github.com/Kolla1997/Tallyn/issues/84) #type/feature #area/frontend
+- [ ] [#87 Smooth loading effect when filters change](https://github.com/Kolla1997/Tallyn/issues/87) #type/feature #area/design #area/frontend
 
 
 ## Blocked

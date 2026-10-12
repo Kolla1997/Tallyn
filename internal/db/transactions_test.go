@@ -319,3 +319,70 @@ func TestDailyAndDayFilter(t *testing.T) {
 		t.Errorf("bad day: %v, want ErrInvalid", err)
 	}
 }
+
+// Bank filter (#83): only that bank's transactions, with the same totals; the
+// bank name comes with each row. A bank you can't see matches nothing, and
+// a row whose account is hidden carries no bank.
+func TestBankFilter(t *testing.T) {
+	f := setup(t)
+	seedTxns(t, f)
+	ctx := context.Background()
+	list := func(user string, flt TxFilter) []Transaction {
+		t.Helper()
+		got, _, err := f.db.Transactions(ctx, user, f.testHH, flt)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return got
+	}
+
+	// alice's bank: her nine seeded purchases and the fixture's grocery run.
+	mine := list(alice, TxFilter{Bank: f.aliceItem})
+	if len(mine) != 10 {
+		t.Fatalf("alice's bank: %d rows, want 10", len(mine))
+	}
+	for _, tx := range mine {
+		if tx.OwnerUserID != alice || tx.BankName == nil || *tx.BankName != "Fake Bank" {
+			t.Fatalf("row = %+v", tx)
+		}
+	}
+	// carl's bank, seen by alice as a parent; combines with other filters.
+	if n := len(list(alice, TxFilter{Bank: f.carlItem})); n != 2 {
+		t.Fatalf("carl's bank: %d rows, want 2", n)
+	}
+	if n := len(list(alice, TxFilter{Bank: f.aliceItem, Query: "uber"})); n != 1 {
+		t.Fatalf("alice's bank + uber: %d rows", n)
+	}
+	// The summary follows the filter.
+	sum, err := f.db.Summary(ctx, alice, f.testHH, TxFilter{Bank: f.carlItem, Month: "2026-10"})
+	if err != nil || len(sum) != 1 || sum[0].SpentMinor != 1003 {
+		t.Fatalf("summary = %+v, %v", sum, err)
+	}
+	// carl (child) can't see alice's bank: nothing, not an error.
+	if n := len(list(carl, TxFilter{Bank: f.aliceItem})); n != 0 {
+		t.Fatalf("carl filtered by alice's bank: %d rows", n)
+	}
+	if _, _, err := f.db.Transactions(ctx, alice, f.testHH, TxFilter{Bank: "not-a-bank"}); !errors.Is(err, ErrInvalid) {
+		t.Fatalf("bad bank: %v", err)
+	}
+}
+
+// Shared transactions without balances (#83): dave sees alice's rows, but not
+// her bank, and can't filter by it.
+func TestBankHiddenWithoutBalances(t *testing.T) {
+	f := sharingFamily(t)
+	ctx := context.Background()
+	mustExec(t, f.admin, `insert into shares (household_id, owner_user_id, viewer_user_id, category) values ($1, $2, $3, 'transactions')`, f.testHH, alice, dave)
+	got, _, err := f.db.Transactions(ctx, dave, f.testHH, TxFilter{Owner: alice})
+	if err != nil || len(got) == 0 {
+		t.Fatalf("dave sees %d of alice's transactions, %v", len(got), err)
+	}
+	for _, tx := range got {
+		if tx.BankName != nil || tx.AccountMask != nil {
+			t.Fatalf("bank shown without balances: %+v", tx)
+		}
+	}
+	if byBank, _, _ := f.db.Transactions(ctx, dave, f.testHH, TxFilter{Bank: f.aliceItem}); len(byBank) != 0 {
+		t.Fatalf("dave filtered by alice's hidden bank: %d rows", len(byBank))
+	}
+}

@@ -6,7 +6,9 @@ import TxIcon from './TxIcon.jsx'
 // (merchant logo or category), merchant, details, and whose it is when it
 // isn't yours. Time and place only appear when this person may see them.
 // With onSelect, the row is a button that picks this transaction (#58).
-export default function TransactionRow({ tx, meId, people, showDate = true, onSelect, selected = false }) {
+// With showBank, the bank and the account's last digits sit under the amount
+// (#83, option B); hidden when the account is (shared without balances).
+export default function TransactionRow({ tx, meId, people, showDate = true, showBank = false, onSelect, selected = false }) {
   const mine = tx.owner_user_id === meId
   const owner = tx.owner_user_id ? people[tx.owner_user_id] ?? { user_id: tx.owner_user_id } : null
   const shown = -tx.amount_minor // Plaid: positive = money out
@@ -28,10 +30,18 @@ export default function TransactionRow({ tx, meId, people, showDate = true, onSe
             <span>{details(tx, showDate)}</span>
           </p>
         </div>
-        {/* Money out in plain text, money in green: spending isn't an alarm. */}
-        <span className={shown > 0 ? 'amount money-in' : 'amount'}>
-          {shown > 0 ? '+' : shown < 0 ? '−' : ''}
-          {formatMoney(Math.abs(shown), tx.currency)}
+        <span className="tx-amount">
+          {/* Money out in plain text, money in green: spending isn't an alarm. */}
+          <span className={shown > 0 ? 'amount money-in' : 'amount'}>
+            {shown > 0 ? '+' : shown < 0 ? '−' : ''}
+            {formatMoney(Math.abs(shown), tx.currency)}
+          </span>
+          {showBank && tx.bank_name && (
+            <span className="small muted tx-bank">
+              {tx.bank_name}
+              {tx.account_mask && ` ••${tx.account_mask}`}
+            </span>
+          )}
         </span>
       </Wrap>
     </li>

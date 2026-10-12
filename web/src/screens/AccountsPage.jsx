@@ -15,7 +15,8 @@ import { useFadeOnChange } from '../lib/motion.js'
 // in two columns, You have and You owe, grouped by type, and the connected
 // banks with their status and Unlink. Switch between your accounts, each
 // person who shares with you, and everyone. The API only returns what this
-// person may see (#28); the switcher only narrows it.
+// person may see (#28); the switcher only narrows it. Bank chips (#84,
+// option A) narrow the two columns to one bank; net worth stays whole.
 
 const HAVE_GROUPS = [
   ['everyday', 'Everyday'],
@@ -36,6 +37,11 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
   const [members, setMembers] = useState([])
   // 'yours', 'everyone' or a user ID; Family links here with ?person=<id>.
   const [who, setWho] = useState(() => new URLSearchParams(window.location.search).get('person') || 'yours')
+  // A linked bank's ID, or '' for all (#84). Kept in the address.
+  const [bank, setBank] = useState(() => {
+    const v = new URLSearchParams(window.location.search).get('bank') ?? ''
+    return /^[0-9a-f-]{36}$/i.test(v) ? v : ''
+  })
   const [error, setError] = useState('')
   const home = household.home_currency
   const canLink = household.role === 'owner' || household.role === 'adult'
@@ -71,6 +77,24 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
   const have = sum(counted.filter((a) => !isOwed(a)))
   const owe = sum(counted.filter((a) => isOwed(a)))
   const uncounted = accounts.length - counted.length
+
+  // The picked bank, if it belongs to the person shown; otherwise all.
+  const picked = shown.find((b) => b.id === bank)
+  const inBank = picked ? accounts.filter((a) => a.bank.id === picked.id) : accounts
+  const inBankCounted = inBank.filter((a) => a.currency === home && a.current_balance_minor != null)
+  const bankHave = sum(inBankCounted.filter((a) => !isOwed(a)))
+  const bankOwe = sum(inBankCounted.filter((a) => isOwed(a)))
+
+  useEffect(() => {
+    if (banks && bank && !picked) setBank('') // switched to someone without this bank
+  }, [banks, bank, picked])
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search)
+    if (bank) p.set('bank', bank)
+    else p.delete('bank')
+    const url = p.size ? `/accounts?${p}` : '/accounts'
+    if (window.location.pathname + window.location.search !== url) window.history.replaceState(null, '', url + window.location.hash)
+  }, [bank])
 
   return (
     <>
@@ -120,13 +144,23 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
       ) : (
         <>
           <NetWorth have={have} owe={owe} home={home} />
+          {shown.length > 1 && (
+            <div className="chips bank-chips" role="group" aria-label="Which bank">
+              {[['', 'All', accounts.length], ...shown.map((b) => [b.id, b.institution_name || 'Bank', b.accounts.length])].map(([id, label, n]) => (
+                <button key={id || 'all'} className="chip chip-outline" aria-pressed={(picked?.id ?? '') === id} onClick={() => setBank(id)}>
+                  {label} <span className="chip-count">{n}</span>
+                </button>
+              ))}
+            </div>
+          )}
           <div className="accounts-grid">
             <AccountColumn
               id="have"
               title="You have"
-              total={have}
+              total={bankHave}
+              bankName={picked?.institution_name}
               groups={HAVE_GROUPS}
-              accounts={accounts.filter((a) => !isOwed(a))}
+              accounts={inBank.filter((a) => !isOwed(a))}
               home={home}
               people={people}
               showOwner={who === 'everyone'}
@@ -135,9 +169,10 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
             <AccountColumn
               id="owe"
               title="You owe"
-              total={owe}
+              total={bankOwe}
+              bankName={picked?.institution_name}
               groups={OWE_GROUPS}
-              accounts={accounts.filter((a) => isOwed(a))}
+              accounts={inBank.filter((a) => isOwed(a))}
               home={home}
               people={people}
               showOwner={who === 'everyone'}
@@ -190,7 +225,7 @@ function NetWorth({ have, owe, home }) {
   )
 }
 
-function AccountColumn({ id, title, total, groups, accounts, home, people, showOwner, meId, owed = false }) {
+function AccountColumn({ id, title, total, bankName, groups, accounts, home, people, showOwner, meId, owed = false }) {
   return (
     <section
       id={id}
@@ -205,6 +240,7 @@ function AccountColumn({ id, title, total, groups, accounts, home, people, showO
       </div>
       <p className="small muted account-count">
         {accounts.length} {accounts.length === 1 ? 'account' : 'accounts'}
+        {bankName && ` · ${bankName}`}
       </p>
       {accounts.length === 0 && <p className="small muted">{owed ? 'Nothing owed here.' : 'Nothing here yet.'}</p>}
       {groups.map(([key, label]) => {
