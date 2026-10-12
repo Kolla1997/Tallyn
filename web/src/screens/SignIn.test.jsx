@@ -9,7 +9,7 @@ describe('SignIn after an idle sign-out', () => {
   const note = /signed out after 30 minutes without activity/i
 
   it('shows the note once', () => {
-    localStorage.setItem('tallyn.signedOutIdle', '1')
+    localStorage.setItem('tallyn.signOutNote', 'idle')
     localStorage.setItem('tallyn.lastActive', '123')
     const { unmount } = render(<SignIn />)
     expect(screen.getByRole('status')).toHaveTextContent(note)
@@ -23,5 +23,11 @@ describe('SignIn after an idle sign-out', () => {
     render(<SignIn />)
     expect(screen.queryByText(note)).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Welcome back' })).toBeInTheDocument()
+  })
+
+  it('says why after 12 hours (#92)', () => {
+    localStorage.setItem('tallyn.signOutNote', 'max')
+    render(<SignIn />)
+    expect(screen.getByRole('status')).toHaveTextContent('For your security, Tallyn asks you to sign in again every 12 hours.')
   })
 })

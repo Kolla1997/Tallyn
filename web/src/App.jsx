@@ -3,6 +3,7 @@ import AuthPage from './components/AuthPage.jsx'
 import { configured, supabase } from './lib/supabase.js'
 import SignIn from './screens/SignIn.jsx'
 import IdleGuard from './components/IdleGuard.jsx'
+import SessionLimit from './components/SessionLimit.jsx'
 import Verify2FA from './screens/Verify2FA.jsx'
 import Home from './screens/Home.jsx'
 import TallynLoader from './components/TallynLoader.jsx'
@@ -36,6 +37,12 @@ export default function App() {
     </AuthPage>
   )
 }
+
+// The Sign out button ends the session everywhere (Supabase's default);
+// automatic sign-outs (#91, #92) end only this device's, so stepping away
+// from the laptop doesn't sign out your phone.
+const signOut = () => supabase.auth.signOut()
+const signOutHere = () => supabase.auth.signOut({ scope: 'local' })
 
 function AuthFlow() {
   const [session, setSession] = useState(undefined) // undefined while loading
@@ -73,15 +80,14 @@ function AuthFlow() {
     }
   }, [session])
 
-  const signOut = () => supabase.auth.signOut()
-
   // The signed-in app has its own layout (#39); everything before it uses
   // the centered sign-in layout.
   if (session && aal?.currentLevel === 'aal2') {
     return (
       <>
-        {/* Sign out after 30 minutes without activity (#91). */}
-        <IdleGuard onSignOut={signOut} />
+        {/* Sign out after 30 minutes without activity (#91), or 12 hours after signing in (#92). */}
+        <IdleGuard onSignOut={signOutHere} />
+        <SessionLimit accessToken={session.access_token} onSignOut={signOutHere} />
         <ConsentGate onSignOut={signOut}>
           <Home email={session.user.email} onSignOut={signOut} />
         </ConsentGate>

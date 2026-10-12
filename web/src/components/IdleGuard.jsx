@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { LAST_ACTIVE_KEY, hasLastActive, idleState, lastActive, markActive, rememberIdleSignOut } from '../lib/idle.js'
+import { LAST_ACTIVE_KEY, hasLastActive, idleState, lastActive, markActive } from '../lib/idle.js'
+import { rememberSignOutNote } from '../lib/session.js'
 
 // Sign out after 30 minutes without activity (#91, Dinesh picked A): for the
 // last minute a dialog counts down ("Still there?"), with the page blurred
@@ -24,7 +25,7 @@ export default function IdleGuard({ onSignOut }) {
   const signOut = useCallback(() => {
     if (signingOut.current) return
     signingOut.current = true
-    rememberIdleSignOut()
+    rememberSignOutNote('idle')
     onSignOut()
   }, [onSignOut])
 

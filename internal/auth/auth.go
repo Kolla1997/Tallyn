@@ -31,6 +31,17 @@ var (
 	ErrNoToken     = errors.New("auth: no bearer token")
 	ErrInvalid     = errors.New("auth: invalid token")
 	ErrMFARequired = errors.New("auth: 2FA not completed")
+	// ErrSessionExpired: signed in more than MaxSession ago (#92).
+	ErrSessionExpired = errors.New("auth: session too old, sign in again")
+)
+
+// MaxSession is how long a sign-in lasts, however active the person is (#92,
+// ADR 0012). Supabase's own time-box setting needs a paid plan, so the API
+// enforces it from the sign-in time in the token. The web app signs out at
+// exactly 12 hours; the extra minute here covers clock differences.
+const (
+	MaxSession    = 12 * time.Hour
+	sessionLeeway = time.Minute
 )
 
 // Session is what a verified access token says about the caller.
@@ -39,6 +50,10 @@ type Session struct {
 	SessionID string
 	AAL       string    // "aal2" for every session that reaches a handler
 	TOTPAt    time.Time // when this session last entered a 2FA code; zero if never
+	// SignedInAt is when this session began: its oldest amr entry (the
+	// password sign-in). A 2FA step-up (#38) adds a newer entry, so it
+	// doesn't restart the clock.
+	SignedInAt time.Time
 }
 
 type claims struct {
@@ -112,15 +127,24 @@ func (v *Verifier) Verify(token string) (Session, error) {
 	if c.AAL != "aal2" {
 		return Session{}, ErrMFARequired
 	}
-	var totpAt time.Time
+	var totpAt, signedInAt time.Time
 	for _, a := range c.AMR {
+		t := time.Unix(a.Timestamp, 0)
+		if a.Timestamp > 0 && (signedInAt.IsZero() || t.Before(signedInAt)) {
+			signedInAt = t
+		}
 		if a.Method == "totp" || a.Method == "mfa/totp" {
-			if t := time.Unix(a.Timestamp, 0); t.After(totpAt) {
+			if t.After(totpAt) {
 				totpAt = t
 			}
 		}
 	}
-	return Session{UserID: c.Subject, SessionID: c.SessionID, AAL: c.AAL, TOTPAt: totpAt}, nil
+	// No sign-in time means the age can't be checked: refuse rather than let
+	// the token last forever. Supabase always sends amr.
+	if signedInAt.IsZero() || time.Since(signedInAt) > MaxSession+sessionLeeway {
+		return Session{}, ErrSessionExpired
+	}
+	return Session{UserID: c.Subject, SessionID: c.SessionID, AAL: c.AAL, TOTPAt: totpAt, SignedInAt: signedInAt}, nil
 }
 
 // Require lets a request through only with a verified, 2FA-completed session,
@@ -132,6 +156,9 @@ func (v *Verifier) Require(next http.Handler) http.Handler {
 			code := "unauthorized"
 			if errors.Is(err, ErrMFARequired) {
 				code = "mfa_required"
+			}
+			if errors.Is(err, ErrSessionExpired) {
+				code = "session_expired" // the web app shows why (#92)
 			}
 			w.Header().Set("WWW-Authenticate", `Bearer realm="tallyn"`)
 			writeError(w, http.StatusUnauthorized, code)

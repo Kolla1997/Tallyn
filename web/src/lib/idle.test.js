@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { IDLE_MS, clearActive, hasLastActive, idleState, lastActive, markActive, rememberIdleSignOut, takeIdleSignOut } from './idle.js'
+import { IDLE_MS, clearActive, hasLastActive, idleState, lastActive, markActive } from './idle.js'
 
 // Sign out after 30 minutes without activity (#91).
 describe('idleState', () => {
@@ -29,10 +29,5 @@ describe('shared activity and the sign-in note', () => {
     expect(hasLastActive()).toBe(true)
     clearActive()
     expect(hasLastActive()).toBe(false)
-  })
-  it('shows the note once', () => {
-    rememberIdleSignOut()
-    expect(takeIdleSignOut()).toBe(true)
-    expect(takeIdleSignOut()).toBe(false)
   })
 })
