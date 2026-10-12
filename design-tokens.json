@@ -28,7 +28,7 @@
       "value": "#FFFFFF"
     },
     "text-secondary": {
-      "value": "#6B5F5C"
+      "value": "#55494A"
     },
     "border": {
       "value": "#DDD3C3"
@@ -127,6 +127,10 @@
     "glow-opacity": {
       "value": "0.55",
       "$description": "Strength of the sage, clay and sand glows behind the cards"
+    },
+    "card-shade": {
+      "value": "0 6px 20px rgba(59, 47, 47, 0.10), 0 1px 3px rgba(59, 47, 47, 0.08)",
+      "$description": "Soft shade under cards and the floating sidebar, lifting them off the glow (#64)"
     }
   }
 }
