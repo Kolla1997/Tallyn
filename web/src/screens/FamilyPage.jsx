@@ -9,6 +9,7 @@ import { Link } from '../lib/router.jsx'
 import { isOwed } from '../lib/summary.js'
 import { Invite } from './Members.jsx'
 import { PageHead } from './Shell.jsx'
+import TallynLoader from '../components/TallynLoader.jsx'
 
 // Family (#39 step 4, #37, #38): everyone in the household on the left; pick
 // a person to see their money (what you may see of it), what you share with
@@ -125,7 +126,7 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
         </p>
       )}
       {!members || !sharing ? (
-        <p className="muted">Loading…</p>
+        <TallynLoader />
       ) : (
         <div className="family-grid">
           <section className="panel family-list" aria-label="People in your household">

@@ -11,6 +11,7 @@ import TransactionsPage from './TransactionsPage.jsx'
 import FamilyPage from './FamilyPage.jsx'
 import Settings from './Settings.jsx'
 import Shell, { PageHead } from './Shell.jsx'
+import TallynLoader from '../components/TallynLoader.jsx'
 
 const HOUSEHOLD_KEY = 'tallyn.household'
 
@@ -85,7 +86,7 @@ export default function Home({ email, onSignOut }) {
       </AuthPage>
     )
   }
-  if (!me) return <p className="muted center-note">Loading…</p>
+  if (!me) return <TallynLoader />
 
   const households = me.households ?? []
   const household = households.find((h) => h.id === selected) ?? households[0]

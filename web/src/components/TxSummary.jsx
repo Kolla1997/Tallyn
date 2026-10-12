@@ -3,6 +3,7 @@ import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { cleanName } from './TransactionRow.jsx'
 import TxIcon from './TxIcon.jsx'
+import TallynLoader from './TallynLoader.jsx'
 
 // The Transactions page's right column (#58): a summary of whatever is
 // filtered, or the details of the transaction you picked.
@@ -20,7 +21,7 @@ export function TxSummary({ totals, scope, month }) {
   if (!totals) {
     return (
       <section className="panel">
-        <p className="small muted">{totals === null ? 'Adding up…' : 'Nothing to add up for these filters.'}</p>
+        {totals === null ? <TallynLoader small /> : <p className="small muted">Nothing to add up for these filters.</p>}
       </section>
     )
   }

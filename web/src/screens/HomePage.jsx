@@ -10,6 +10,7 @@ import { Link } from '../lib/router.jsx'
 import { currencies, isOwed, ownerGroup, summarize } from '../lib/summary.js'
 import { LinkBank } from './Banks.jsx'
 import { PageHead } from './Shell.jsx'
+import TallynLoader from '../components/TallynLoader.jsx'
 
 // Home (#39 step 2), matching docs/03 Design/Comps/web-app-draft.html:
 // total balance and net worth, your accounts apart from money shared with you
@@ -75,7 +76,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
         </p>
       )}
       {!banks ? (
-        <p className="muted">Loading…</p>
+        <TallynLoader />
       ) : (
         <HomeColumns
           wide={wide}

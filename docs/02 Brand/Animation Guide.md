@@ -2,8 +2,8 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-08
-issue: 10
+updated: 2026-10-11
+issues: [10, 66]
 tags: [brand, motion]
 ---
 # Animation Guide
@@ -12,6 +12,7 @@ The logo intro: leaves wobble in (1.6s), the dot pops (0.6s, from 1.0s), "Tallyn
 
 | Use | File in `brand/animation/` |
 |---|---|
+| Web app loading (#66) | `SVG/tallyn-mark-animated-light.svg` in `web/src/components/TallynLoader.jsx`, with "Adding it all up" and dots that appear one by one |
 | App splash and loading (iOS, Android) | `Lottie/tallyn-mark-intro-*.json`, then `Lottie/tallyn-mark-breathe-*.json` |
 | Website | `SVG/tallyn-lockup-animated-*.svg` or `SVG/tallyn-mark-animated-*.svg` |
 | Preview in a browser | `HTML/tallyn-logo-intro-*.html` |
