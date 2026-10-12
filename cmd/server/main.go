@@ -122,8 +122,14 @@ func main() {
 			Tokens:      tokens,
 			SyncNow:     syncNow,
 			Reconnected: reconnected,
+			SupabaseURL: os.Getenv("SUPABASE_URL"),
 		}),
 		ReadHeaderTimeout: 10 * time.Second,
+		// #24: slow or stuck clients can't hold connections open.
+		ReadTimeout:    30 * time.Second,
+		WriteTimeout:   60 * time.Second, // linking a bank waits on Plaid
+		IdleTimeout:    120 * time.Second,
+		MaxHeaderBytes: 64 << 10,
 	}
 
 	go func() {

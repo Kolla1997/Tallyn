@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #24 Security headers and server hardening (ADR 0011): Content-Security-Policy allowing only us, Plaid, its logo hosts and the Supabase project; X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy, COOP, HSTS over HTTPS only; API answers no-store, hashed files cached a year; read/write/idle timeouts; per-person rate limits (600/min, Plaid 30/h, invites 20/h, accepts 10/10min). Dev server sends the same policy. Tested in the browser: every page, Plaid Link opening, logos, fonts and the production build, no violations.
 - #97 Merged PR #101 (phone layout fixes); closed and moved to Done.
 - #97 Phone layout fixes (Dinesh picked A for all four): Home credit cards show name and amount on one line with details below (no more 90px columns); on phones Transactions shows the bank beside the category (web keeps it under the amount); tap areas grow to ~44px for text links and 40px for the Yours / Everyone switch and Family role buttons, dots fill their gaps, and the day card gets ‹ › to step days; Home's Share with family and Invite became one "Family and sharing" button.
 - #96 Closed, not a bug: the "Plaid Link embedded more than once" warning comes from React StrictMode mounting twice in development (checked with StrictMode off locally: no warning). Production is unaffected; StrictMode stays.

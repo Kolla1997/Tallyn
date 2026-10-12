@@ -52,6 +52,7 @@ type Deps struct {
 	Tokens      Tokens                          // *tokencrypt.Box
 	SyncNow     func(bankID string)             // sync.Syncer.SyncNow; optional
 	Reconnected func(bankID string)             // sync.Syncer.Reconnected; optional (#51)
+	SupabaseURL string                          // allowed in the Content-Security-Policy (#24)
 }
 
 // NewRouter returns the server's handler: JSON API under /api/ and the
@@ -65,6 +66,7 @@ func NewRouter(d Deps) http.Handler {
 	if requireAuth == nil || d.Store == nil {
 		requireAuth = auth.Unavailable
 	}
+	lim := newLimits()
 	api := http.NewServeMux()
 	api.HandleFunc("GET /api/me", me(d.Store))
 	api.HandleFunc("PUT /api/me", setMe(d.Store))
@@ -76,16 +78,16 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("PUT /api/households/{id}/members/{user}", setMemberRole(d.Store))
 	api.HandleFunc("DELETE /api/households/{id}/members/{user}", removeMember(d.Store))
 	api.HandleFunc("GET /api/households/{id}/invites", invites(d.Store))
-	api.HandleFunc("POST /api/households/{id}/invites", createInvite(d.Store))
+	api.Handle("POST /api/households/{id}/invites", limited(lim.invites, createInvite(d.Store)))
 	api.HandleFunc("DELETE /api/invites/{id}", revokeInvite(d.Store))
-	api.HandleFunc("POST /api/invites/accept", acceptInvite(d.Store))
+	api.Handle("POST /api/invites/accept", limited(lim.accepts, acceptInvite(d.Store)))
 	api.HandleFunc("POST /api/households", createHousehold(d.Store))
 	b := banks{store: d.Store, plaid: d.Plaid, tokens: d.Tokens, syncNow: d.SyncNow, reconnected: d.Reconnected}
-	api.HandleFunc("POST /api/plaid/link-token", b.needsPlaid(b.linkToken))
-	api.HandleFunc("POST /api/plaid/exchange", b.needsPlaid(b.exchange))
+	api.Handle("POST /api/plaid/link-token", limited(lim.plaid, b.needsPlaid(b.linkToken)))
+	api.Handle("POST /api/plaid/exchange", limited(lim.plaid, b.needsPlaid(b.exchange)))
 	api.HandleFunc("GET /api/banks", b.list)
 	api.HandleFunc("DELETE /api/banks/{id}", b.needsPlaid(b.unlink))
-	api.HandleFunc("POST /api/banks/{id}/reconnect-token", b.needsPlaid(b.reconnectToken))
+	api.Handle("POST /api/banks/{id}/reconnect-token", limited(lim.plaid, b.needsPlaid(b.reconnectToken)))
 	api.HandleFunc("POST /api/banks/{id}/reconnected", b.needsPlaid(b.reconnectDone))
 	api.HandleFunc("GET /api/transactions", transactions(d.Store))
 	api.HandleFunc("GET /api/transactions/summary", txSummary(d.Store))
@@ -96,10 +98,11 @@ func NewRouter(d Deps) http.Handler {
 	})
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /api/health", health)
-	mux.Handle("/api/", requireAuth(api))
+	mux.Handle("GET /api/health", noStore(http.HandlerFunc(health)))
+	// API answers are never cached; limits count per signed-in person (#24).
+	mux.Handle("/api/", noStore(requireAuth(limited(lim.all, api))))
 	mux.Handle("/", spa(d.WebDir))
-	return mux
+	return securityHeaders(d.SupabaseURL, mux)
 }
 
 func health(w http.ResponseWriter, _ *http.Request) {
@@ -202,8 +205,16 @@ func spa(dir string) http.Handler {
 				http.Error(w, "web app not built: run `cd web && npm run build`", http.StatusNotFound)
 				return
 			}
+			// Always check for a new app version (#24).
+			w.Header().Set("Cache-Control", "no-cache")
 			http.ServeFile(w, r, index)
 			return
+		}
+		// Built files have a content hash in their name: cache them a year.
+		if strings.HasPrefix(r.URL.Path, "/assets/") {
+			w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		} else {
+			w.Header().Set("Cache-Control", "no-cache")
 		}
 		files.ServeHTTP(w, r)
 	})
