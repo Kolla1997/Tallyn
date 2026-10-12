@@ -46,6 +46,7 @@ func txFilter(q url.Values) db.TxFilter {
 		Category: q.Get("category"),
 		Month:    q.Get("month"),
 		Day:      q.Get("day"),
+		Bank:     q.Get("bank"), // #83
 	}
 }
 

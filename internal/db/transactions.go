@@ -16,6 +16,8 @@ type Transaction struct {
 	ID               string       `json:"id"`
 	AccountID        string       `json:"account_id"`
 	AccountName      string       `json:"account_name"`
+	AccountMask      *string      `json:"account_mask"` // nil when the account is hidden (shared without balances)
+	BankName         *string      `json:"bank_name"`    // same (#83)
 	OwnerUserID      string       `json:"owner_user_id"`
 	AmountMinor      int64        `json:"amount_minor"`
 	Currency         string       `json:"currency"`
@@ -54,6 +56,7 @@ type TxFilter struct {
 	Month    string // "2026-10": posted that month, the same date Spending uses
 	Day      string // "2026-10-08": posted that day; wins over Month (#75)
 	Year     string // "2026": posted that year; only when Month and Day are empty (#75)
+	Bank     string // a linked bank's ID (plaid_items.id): only its accounts (#83)
 	Limit    int    // 1-100, default 50
 	Offset   int    // for "Show more"
 }
@@ -72,12 +75,18 @@ const filterSQL = `t.household_id = $1
 			  and ($3 = '%%' or coalesce(t.merchant_name, t.name) ilike $3)
 			  and ($4 = '' or t.category_primary = $4)
 			  and ($5::date is null or t.date >= $5::date)
-			  and ($6::date is null or t.date < $6::date)`
+			  and ($6::date is null or t.date < $6::date)
+			  and ($7 = '' or t.account_id in (
+			    -- RLS on accounts: a bank you can't see matches nothing (#83)
+			    select ba.id from public.accounts ba where ba.plaid_item_id = nullif($7, '')::uuid))`
 
 // args checks the filter and returns the arguments for filterSQL after the
-// household ($2 to $6), or ErrInvalid.
+// household ($2 to $7), or ErrInvalid.
 func (f TxFilter) args() ([]any, error) {
 	if f.Owner != "" && !uuidRE.MatchString(f.Owner) {
+		return nil, ErrInvalid
+	}
+	if f.Bank != "" && !uuidRE.MatchString(f.Bank) {
 		return nil, ErrInvalid
 	}
 	if f.Category != "" && !categoryRE.MatchString(f.Category) {
@@ -121,7 +130,7 @@ func (f TxFilter) args() ([]any, error) {
 	}
 	// The search text is a plain substring: escape LIKE's wildcards.
 	like := "%" + strings.NewReplacer(`\`, `\\`, "%", `\%`, "_", `\_`).Replace(strings.TrimSpace(f.Query)) + "%"
-	return []any{f.Owner, like, f.Category, from, to}, nil
+	return []any{f.Owner, like, f.Category, from, to, f.Bank}, nil
 }
 
 // Transactions lists the household's transactions that userID may see,
@@ -148,7 +157,7 @@ func (d *DB) Transactions(ctx context.Context, userID, householdID string, f TxF
 
 	err = d.AsUser(ctx, userID, func(tx pgx.Tx) error {
 		rows, err := tx.Query(ctx, `
-			select t.id, t.account_id, coalesce(a.name, ''), coalesce(o.owner::text, ''), t.amount_minor, t.currency,
+			select t.id, t.account_id, coalesce(a.name, ''), a.mask, i.institution_name, coalesce(o.owner::text, ''), t.amount_minor, t.currency,
 			       t.date::text, t.authorized_date::text, coalesce(t.merchant_name, t.name),
 			       t.category_primary, t.category_detailed, t.pending, t.payment_channel, t.logo_url,
 			       d.transaction_id is not null,
@@ -158,11 +167,12 @@ func (d *DB) Transactions(ctx context.Context, userID, householdID string, f TxF
 			-- left join: transactions can be shared without balances, so the
 			-- account itself may be hidden (0007_sharing.sql)
 			left join public.accounts a on a.id = t.account_id
+			left join public.plaid_items i on i.id = a.plaid_item_id
 			left join public.transaction_details d on d.transaction_id = t.id
 			cross join lateral (select public.transaction_owner(t.account_id) as owner) o
 			where `+filterSQL+`
 			order by t.date desc, t.created_at desc, t.id
-			limit $7 offset $8`, args...)
+			limit $8 offset $9`, args...)
 		if err != nil {
 			return err
 		}
@@ -170,7 +180,7 @@ func (d *DB) Transactions(ctx context.Context, userID, householdID string, f TxF
 			var t Transaction
 			var visible bool
 			var w Whereabouts
-			if err := rows.Scan(&t.ID, &t.AccountID, &t.AccountName, &t.OwnerUserID, &t.AmountMinor, &t.Currency,
+			if err := rows.Scan(&t.ID, &t.AccountID, &t.AccountName, &t.AccountMask, &t.BankName, &t.OwnerUserID, &t.AmountMinor, &t.Currency,
 				&t.Date, &t.AuthorizedDate, &t.Merchant, &t.CategoryPrimary, &t.CategoryDetailed, &t.Pending, &t.PaymentChannel,
 				&t.LogoURL, &visible, &w.AuthorizedAt, &w.PostedAt, &w.Address, &w.City, &w.Region, &w.PostalCode, &w.Country,
 				&w.Lat, &w.Lon, &w.StoreNumber); err != nil {
