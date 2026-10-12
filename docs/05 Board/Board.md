@@ -37,8 +37,6 @@ kanban-plugin: board
 ## Review
 
 - [ ] [#10 Brand: logo and design tokens](https://github.com/Kolla1997/Tallyn/issues/10) #type/design #area/brand #priority/p0
-- [ ] [#84 Accounts: filter by bank](https://github.com/Kolla1997/Tallyn/issues/84) #type/feature #area/frontend
-- [ ] [#87 Smooth loading effect when filters change](https://github.com/Kolla1997/Tallyn/issues/87) #type/feature #area/design #area/frontend
 
 
 ## Blocked
@@ -71,6 +69,8 @@ kanban-plugin: board
 - [x] [#75 Transactions: a year of spending as dots, with a day overview on hover](https://github.com/Kolla1997/Tallyn/issues/75) #type/feature #area/frontend #area/backend #priority/p2
 - [x] [#77 Count loan payments as transfers, not spending](https://github.com/Kolla1997/Tallyn/issues/77) #type/feature #area/frontend #area/backend
 - [x] [#83 Transactions: filter by bank and show the bank on each transaction](https://github.com/Kolla1997/Tallyn/issues/83) #type/feature #area/frontend #area/backend
+- [x] [#84 Accounts: filter by bank](https://github.com/Kolla1997/Tallyn/issues/84) #type/feature #area/frontend
+- [x] [#87 Smooth loading effect when filters change](https://github.com/Kolla1997/Tallyn/issues/87) #type/feature #area/design #area/frontend
 
 
 %% kanban:settings
