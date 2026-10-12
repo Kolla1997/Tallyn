@@ -2919,3 +2919,19 @@ label.agree input {
   background: var(--color-error);
   color: var(--color-white);
 }
+
+/* Bank chips on Accounts (#84, option A): between net worth and the lists. */
+.bank-chips {
+  margin-bottom: var(--space-s4);
+}
+
+.chip-outline {
+  background: transparent;
+  border: 1px solid var(--color-border);
+}
+
+.chip-count {
+  margin-left: var(--space-s1);
+  font-size: 12px;
+  opacity: 0.75;
+}
