@@ -2,7 +2,7 @@
 type: spec
 status: active
 owner: Dinesh
-updated: 2026-10-08
+updated: 2026-10-12
 issue: 8
 tags: [spec, plaid, security]
 ---
@@ -24,7 +24,7 @@ An owner or adult connects a US bank through Plaid Link, sees its accounts and b
 ## Scope
 **In:**
 - Create a household (name and home currency), using `create_household()` from #6
-- Link a bank with Plaid Link: **US banks only, Transactions only**
+- Link a bank with Plaid Link: **US banks only, Transactions**, plus Liabilities as an optional product where the bank has cards or loans (#27, [[0010-plaid-liabilities-for-credit-cards]])
 - **Owners and adults link, only for themselves.** Teens and children can't link
 - Save the item and its accounts with balances in minor units; the access token is encrypted first
 - List the household's banks and accounts (RLS decides who sees what)
@@ -33,7 +33,7 @@ An owner or adult connects a US bank through Plaid Link, sees its accounts and b
 
 **Out:**
 - Transactions and balance refresh (#9), Plaid webhooks (#9)
-- Other countries, Liabilities, Investments, `auth` (account and routing numbers: never)
+- Other countries, Investments, `auth` (account and routing numbers: never)
 - Linking an account *for* a child (#12)
 - Choosing between several households (#12); the app uses the first one for now
 - Update mode for items that need the user to log in again (#9)

@@ -113,6 +113,27 @@ type BankAccount struct {
 	Currency       string  `json:"currency"`
 	CurrentMinor   *int64  `json:"current_balance_minor"`
 	AvailableMinor *int64  `json:"available_balance_minor"`
+	LimitMinor     *int64  `json:"credit_limit_minor"`
+	Card           *Card   `json:"card"` // credit cards only, once the bank has sent details (#27)
+}
+
+// Card is what the bank says about a credit card (#27). Amounts are minor
+// units of the account's currency; dates are YYYY-MM-DD.
+type Card struct {
+	APRs               []CardAPR `json:"aprs"`
+	MinimumMinor       *int64    `json:"minimum_payment_minor"`
+	NextDueDate        *string   `json:"next_payment_due_date"`
+	LastStatementMinor *int64    `json:"last_statement_balance_minor"`
+	LastStatementDate  *string   `json:"last_statement_date"`
+	LastPaymentMinor   *int64    `json:"last_payment_minor"`
+	LastPaymentDate    *string   `json:"last_payment_date"`
+	Overdue            *bool     `json:"is_overdue"`
+}
+
+// CardAPR is one of a card's rates, e.g. {"purchase_apr", "15.24"}.
+type CardAPR struct {
+	Type    string `json:"type"`
+	Percent string `json:"percent"`
 }
 
 // Banks lists the banks and accounts in householdID that userID may see.
@@ -148,8 +169,18 @@ func (d *DB) Banks(ctx context.Context, userID, householdID string) ([]Bank, err
 
 		rows, err = tx.Query(ctx, `
 			select a.id, a.plaid_item_id, a.name, a.mask, a.type, a.subtype, a.currency,
-			       a.current_balance_minor, a.available_balance_minor
+			       a.current_balance_minor, a.available_balance_minor, a.credit_limit_minor,
+			       case when c.account_id is not null then jsonb_build_object(
+			         'aprs', c.aprs,
+			         'minimum_payment_minor', c.minimum_payment_minor,
+			         'next_payment_due_date', c.next_payment_due_date,
+			         'last_statement_balance_minor', c.last_statement_balance_minor,
+			         'last_statement_date', c.last_statement_date,
+			         'last_payment_minor', c.last_payment_minor,
+			         'last_payment_date', c.last_payment_date,
+			         'is_overdue', c.is_overdue) end
 			from public.accounts a
+			left join public.credit_cards c on c.account_id = a.id
 			where a.household_id = $1
 			order by a.name, a.id`, householdID)
 		if err != nil {

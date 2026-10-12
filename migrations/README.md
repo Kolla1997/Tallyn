@@ -17,6 +17,8 @@ Rules (see `CLAUDE.md` §7):
 | `0007_sharing.sql` | sharing settings: consent-based visibility, new unlink rule (#28, ADR 0007) |
 | `0008_invites.sql` | invitations: hashed single-use links bound to the invited email (#12, ADR 0008) |
 | `0009_transaction_logos.sql` | merchant logos (Plaid's logo hosts only) and `transaction_owner()` (#42) |
+| `0010_consents.sql` | who agreed to which version of the Terms and Privacy Policy (#36) |
+| `0011_credit_cards.sql` | credit limits, card details from Plaid Liabilities (APRs, minimum, due date), sync once a day (#27) |
 
 Apply them in order on the Supabase project (SQL editor, or `psql "$ADMIN_DATABASE_URL" -f <file>`). Migrations run as `postgres`; the app itself never does (ADR 0006).
 Tests apply them to a throwaway Postgres: see `internal/db/db_test.go`. `TestEveryTableHasRLS` fails if a table is missing RLS.

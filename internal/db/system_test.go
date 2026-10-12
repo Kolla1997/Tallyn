@@ -304,3 +304,103 @@ func TestSpending(t *testing.T) {
 		t.Fatalf("bad month: err = %v", err)
 	}
 }
+
+// Credit cards (#27): the sync saves limits and card details; whoever may see
+// the card's balance sees them, nobody else; cards the bank drops go away.
+func TestSaveCreditCards(t *testing.T) {
+	f := setup(t)
+	ctx := context.Background()
+	limit, neg := int64(200000), int64(-5)
+	res := plaid.SyncResult{Accounts: []plaid.Account{
+		{PlaidAccountID: "acct-a", Name: "Checking", Type: "depository", Currency: "USD", CurrentMinor: ptr(int64(123456))},
+		{PlaidAccountID: "card-a", Name: "Fake Card", Mask: "3333", Type: "credit", Subtype: "credit card", Currency: "USD", CurrentMinor: ptr(int64(41000)), LimitMinor: &limit},
+		{PlaidAccountID: "card-b", Name: "Odd Card", Type: "credit", Currency: "USD", LimitMinor: &neg},
+	}, NextCursor: "c"}
+	if _, err := f.sys.SaveSync(ctx, syncItem(t, f, f.aliceItem), res); err != nil {
+		t.Fatal(err)
+	}
+	item := syncItem(t, f, f.aliceItem)
+	if item.LiabilitiesSyncedAt != nil {
+		t.Fatal("card details were never fetched")
+	}
+	min, overdue := int64(2000), false
+	cards := []plaid.CreditCard{
+		{PlaidAccountID: "card-a", APRs: []plaid.APR{{Type: "purchase_apr", Percent: "15.24"}}, MinimumMinor: &min,
+			NextDueDate: "2026-10-28", LastStatementDate: "2026-09-28", Overdue: &overdue},
+		{PlaidAccountID: "card-b", APRs: []plaid.APR{}},
+		{PlaidAccountID: "acct-b", APRs: []plaid.APR{}}, // bob's account, another bank: skipped
+	}
+	if err := f.sys.SaveCreditCards(ctx, item, cards); err != nil {
+		t.Fatal(err)
+	}
+	if syncItem(t, f, f.aliceItem).LiabilitiesSyncedAt == nil {
+		t.Fatal("fetch time not recorded")
+	}
+	if n := f.count(t, alice, `select count(*) from credit_cards`); n != 2 {
+		t.Fatalf("alice sees %d cards, want 2", n)
+	}
+
+	banks, err := f.db.Banks(ctx, alice, f.testHH)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var card, odd *BankAccount
+	for _, b := range banks {
+		for i, a := range b.Accounts {
+			switch a.Name {
+			case "Fake Card":
+				card = &b.Accounts[i]
+			case "Odd Card":
+				odd = &b.Accounts[i]
+			}
+		}
+	}
+	if card == nil || card.LimitMinor == nil || *card.LimitMinor != 200000 || card.Card == nil {
+		t.Fatalf("card = %+v", card)
+	}
+	c := card.Card
+	if len(c.APRs) != 1 || c.APRs[0].Percent != "15.24" || *c.MinimumMinor != 2000 || *c.NextDueDate != "2026-10-28" ||
+		*c.LastStatementDate != "2026-09-28" || c.Overdue == nil || *c.Overdue {
+		t.Fatalf("card details = %+v", c)
+	}
+	if odd == nil || odd.LimitMinor != nil {
+		t.Fatalf("negative limit kept: %+v", odd)
+	}
+
+	// The daily balance refresh updates limits without a transaction sync.
+	raised := int64(300000)
+	if err := f.sys.SaveAccounts(ctx, item, []plaid.Account{
+		{PlaidAccountID: "card-a", Name: "Fake Card", Mask: "3333", Type: "credit", Subtype: "credit card", Currency: "USD", CurrentMinor: ptr(int64(50000)), LimitMinor: &raised},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if n := f.count(t, alice, `select count(*) from accounts where plaid_account_id = 'card-a' and credit_limit_minor = 300000 and current_balance_minor = 50000`); n != 1 {
+		t.Fatal("balance refresh didn't update the card")
+	}
+
+	// Same visibility as the balance: carl (child) and bob see none.
+	if n := f.count(t, carl, `select count(*) from credit_cards`); n != 0 {
+		t.Fatalf("carl sees %d of alice's cards", n)
+	}
+	if n := f.count(t, bob, `select count(*) from credit_cards`); n != 0 {
+		t.Fatalf("bob sees %d cards from another household", n)
+	}
+	// Nobody but the sync writes them.
+	if _, err := f.execAs(alice, `update credit_cards set minimum_payment_minor = 0`); err == nil {
+		t.Fatal("alice could change card details")
+	}
+
+	// The bank stops reporting card-b: it goes; an empty answer clears all.
+	if err := f.sys.SaveCreditCards(ctx, item, cards[:1]); err != nil {
+		t.Fatal(err)
+	}
+	if n := f.count(t, alice, `select count(*) from credit_cards`); n != 1 {
+		t.Fatalf("after card-b dropped: %d cards", n)
+	}
+	if err := f.sys.SaveCreditCards(ctx, item, nil); err != nil {
+		t.Fatal(err)
+	}
+	if n := f.count(t, alice, `select count(*) from credit_cards`); n != 0 {
+		t.Fatalf("after empty answer: %d cards", n)
+	}
+}

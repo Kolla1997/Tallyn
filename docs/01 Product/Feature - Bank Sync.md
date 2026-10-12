@@ -2,7 +2,7 @@
 type: spec
 status: active
 owner: Dinesh
-updated: 2026-10-09
+updated: 2026-10-12
 issue: 9
 tags: [spec, plaid, sync]
 ---
@@ -48,6 +48,7 @@ Design and security: [[0005-bank-sync-system-role]].
 - `internal/db` `System`: the only code that runs as `tallyn_sync` (migration `0005_bank_sync.sql`). `SaveSync` writes balances, transactions, details, removals and the cursor in **one transaction**, and only if the bank's cursor hasn't moved since it was read.
 - `transaction_details` holds time and location, separate from `transactions`, with its own RLS policy built on `can_see_whereabouts()`. #28 changes that one function.
 - Spending excludes income, transfers between accounts and credit card payments (which would count card purchases twice). Currencies are summed separately.
+- About once a day after a good sync (#27): `/accounts/get` for fresh balances and credit limits (the transaction sync only sends balances with new transactions), then `/liabilities/get` for credit card details, saved by `SaveAccounts` and `SaveCreditCards` (`0011_credit_cards.sql`). Banks without cards, or that haven't consented, are cleared quietly with Plaid's code in the log. See [[Feature - Credit Cards]].
 - Logs carry counts and Tallyn's bank IDs only: no merchants, amounts, places or tokens.
 - `GET /api/transactions?household_id=&limit=` and `GET /api/spending?household_id=&month=YYYY-MM`.
 

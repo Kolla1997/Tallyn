@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-09
+updated: 2026-10-12
 issues: [6, 7, 8, 9, 30]
 tags: [tech, architecture]
 ---
@@ -46,7 +46,7 @@ The React app signs in with `supabase-js` (publishable key only) and sends the a
 
 ## Security
 - Plaid access tokens are **encrypted by the Go backend** (AES-256-GCM, `internal/tokencrypt`) before they're stored, and revoked at Plaid when a bank is unlinked: [[0004-plaid-token-encryption-and-link-path]]
-- Linking banks: US only, Transactions only, owners and adults for themselves only. Writes go through checked database functions
+- Linking banks: US only, Transactions plus optional Liabilities ([[0010-plaid-liabilities-for-credit-cards]]), owners and adults for themselves only. Writes go through checked database functions
 - **RLS on every Supabase table**
 - Only the backend connects to the database, and it runs user requests as the user (`internal/db` `AsUser`), not as the service role
 - The API and the sync log in with their own narrow roles (`tallyn_api`, `tallyn_sync`); the app never uses `postgres` and refuses to start with a login that can bypass RLS. All SQL is constant, enforced by a test: [[0006-separate-database-logins]]

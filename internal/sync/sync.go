@@ -1,6 +1,7 @@
 // Package sync keeps linked banks up to date: every few hours it pulls new,
-// changed and removed transactions and current balances from Plaid and saves
-// them through the database's system role (ADR 0005).
+// changed and removed transactions and current balances from Plaid, and about
+// once a day credit card details (#27), and saves them through the database's
+// system role (ADR 0005).
 //
 // Security:
 //   - Only this package gets the system database access (db.System).
@@ -26,12 +27,20 @@ type Store interface {
 	Item(ctx context.Context, id string) (db.SyncItem, error)
 	SaveSync(ctx context.Context, item db.SyncItem, r plaid.SyncResult) (db.SyncStats, error)
 	SetStatus(ctx context.Context, id, status string) error
+	SaveCreditCards(ctx context.Context, item db.SyncItem, cards []plaid.CreditCard) error
+	SaveAccounts(ctx context.Context, item db.SyncItem, accounts []plaid.Account) error
 }
 
-// Plaid fetches transaction changes. *plaid.Client implements it.
+// Plaid fetches transaction changes and card details. *plaid.Client implements it.
 type Plaid interface {
 	SyncTransactions(ctx context.Context, accessToken, cursor string) (plaid.SyncResult, error)
+	Liabilities(ctx context.Context, accessToken string) ([]plaid.CreditCard, error)
+	Accounts(ctx context.Context, accessToken string) (plaid.Item, []plaid.Account, error)
 }
+
+// cardsEvery is how often card details are fetched: Plaid refreshes them
+// about once a day, and each call counts against the bank's rate limit.
+const cardsEvery = 20 * time.Hour
 
 // Tokens decrypts access tokens. *tokencrypt.Box implements it.
 type Tokens interface {
@@ -186,7 +195,40 @@ func (s *Syncer) SyncOne(ctx context.Context, item db.SyncItem) Outcome {
 		return Failed
 	}
 	log.Printf("sync: bank %s: %d added or changed, %d removed, %d skipped", item.ID, st.Upserted, st.Removed, st.Skipped)
+	s.syncCards(ctx, item, string(token))
 	return Synced
+}
+
+// syncCards refreshes balances and limits, then fetches the bank's credit card
+// details, when they're a day old or were never fetched. A failure here never
+// fails the bank's sync: transactions are already saved, and the next run
+// tries again.
+func (s *Syncer) syncCards(ctx context.Context, item db.SyncItem, token string) {
+	if item.LiabilitiesSyncedAt != nil && time.Since(*item.LiabilitiesSyncedAt) < cardsEvery {
+		return
+	}
+	// The transaction sync only sends balances with new transactions.
+	if _, accounts, err := s.plaid.Accounts(ctx, token); err != nil {
+		log.Printf("sync: bank %s: balances: %v", item.ID, err)
+	} else if err := s.store.SaveAccounts(ctx, item, accounts); err != nil && !errors.Is(err, db.ErrNotFound) {
+		log.Printf("sync: bank %s: save balances: %v", item.ID, err)
+	}
+	cards, err := s.plaid.Liabilities(ctx, token)
+	switch {
+	case plaid.NoLiabilities(err):
+		var pe *plaid.Error
+		errors.As(err, &pe)
+		log.Printf("sync: bank %s: no card details (%s)", item.ID, pe.Code)
+		cards = nil // no cards, or not shared: clear and wait a day
+	case err != nil:
+		log.Printf("sync: bank %s: card details: %v", item.ID, err)
+		return
+	}
+	if err := s.store.SaveCreditCards(ctx, item, cards); err != nil && !errors.Is(err, db.ErrNotFound) {
+		log.Printf("sync: bank %s: save card details: %v", item.ID, err)
+		return
+	}
+	log.Printf("sync: bank %s: %d credit cards", item.ID, len(cards))
 }
 
 func (s *Syncer) setStatus(ctx context.Context, id, status string) {

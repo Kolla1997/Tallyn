@@ -93,6 +93,10 @@ func TestCreateLinkToken(t *testing.T) {
 	if got := f.lastBody["products"]; len(got.([]any)) != 1 || got.([]any)[0] != "transactions" {
 		t.Fatalf("products = %v", got)
 	}
+	// Card and loan details only where the bank has them (#27).
+	if got := f.lastBody["optional_products"]; len(got.([]any)) != 1 || got.([]any)[0] != "liabilities" {
+		t.Fatalf("optional_products = %v", got)
+	}
 	if u := f.lastBody["user"].(map[string]any)["client_user_id"]; u != "11111111-1111-4111-8111-111111111111" {
 		t.Fatalf("client_user_id = %v", u)
 	}
@@ -118,7 +122,7 @@ func TestAccounts(t *testing.T) {
 			{"account_id":"a1","name":"Plaid Checking","official_name":"Plaid Gold Standard","mask":"0000","type":"depository","subtype":"checking",
 			 "balances":{"current":110,"available":100.1,"iso_currency_code":"USD","unofficial_currency_code":null}},
 			{"account_id":"a2","name":"Plaid Credit Card","official_name":null,"mask":"3333","type":"credit","subtype":"credit card",
-			 "balances":{"current":410.07,"available":null,"iso_currency_code":"USD","unofficial_currency_code":null}},
+			 "balances":{"current":410.07,"available":null,"limit":2000,"iso_currency_code":"USD","unofficial_currency_code":null}},
 			{"account_id":"a3","name":"Coins","type":"investment","subtype":null,
 			 "balances":{"current":0.5,"available":null,"iso_currency_code":null,"unofficial_currency_code":"BTC"}}
 		],
@@ -137,7 +141,10 @@ func TestAccounts(t *testing.T) {
 	if a := accts[0]; a.Currency != "USD" || *a.CurrentMinor != 11000 || *a.AvailableMinor != 10010 || a.Mask != "0000" {
 		t.Fatalf("checking = %+v", a)
 	}
-	if a := accts[1]; *a.CurrentMinor != 41007 || a.AvailableMinor != nil || a.OfficialName != "" {
+	if a := accts[0]; a.LimitMinor != nil {
+		t.Fatalf("checking has no limit: %+v", a)
+	}
+	if a := accts[1]; *a.CurrentMinor != 41007 || a.AvailableMinor != nil || a.OfficialName != "" || a.LimitMinor == nil || *a.LimitMinor != 200000 {
 		t.Fatalf("credit = %+v", a)
 	}
 	if a := accts[2]; a.Currency != "BTC" || a.CurrentMinor != nil {
