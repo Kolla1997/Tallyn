@@ -2081,6 +2081,8 @@ button.tx-row-inner:focus-visible {
   .ring-seg,
   .ring-key {
     transition: none;
+  }
+}
 
 /* Settings (#39 step 5): same list-and-detail layout as Family. */
 .settings-grid .family-person {
