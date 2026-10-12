@@ -14,6 +14,7 @@ kanban-plugin: board
 - [ ] [#22 Password reset](https://github.com/Kolla1997/Tallyn/issues/22) #type/feature #area/frontend #priority/p1
 - [ ] [#23 Recovery when someone loses their authenticator app](https://github.com/Kolla1997/Tallyn/issues/23) #type/feature #area/frontend #priority/p1
 - [ ] [#24 Content-Security-Policy and security headers](https://github.com/Kolla1997/Tallyn/issues/24) #type/feature #area/backend #priority/p1
+- [ ] [#27 Debt details: interest rates, due dates and minimum payments (Plaid Liabilities)](https://github.com/Kolla1997/Tallyn/issues/27) #type/feature #area/backend #priority/p0
 - [ ] [#34 Spending limits per member, with progress and alerts](https://github.com/Kolla1997/Tallyn/issues/34) #type/feature #area/backend #priority/p1
 - [ ] [#37 Show shared money separately from your own](https://github.com/Kolla1997/Tallyn/issues/37) #type/design #area/frontend #priority/p1
 - [ ] [#51 Reconnect a bank that needs sign-in (Plaid update mode)](https://github.com/Kolla1997/Tallyn/issues/51) #type/feature #area/frontend #area/backend #priority/p1
@@ -22,6 +23,8 @@ kanban-plugin: board
 - [ ] [#55 Notifications](https://github.com/Kolla1997/Tallyn/issues/55) #type/feature #area/frontend #area/backend #priority/p2
 - [ ] [#56 Close your Tallyn account](https://github.com/Kolla1997/Tallyn/issues/56) #type/feature #area/frontend #area/backend #priority/p1
 - [ ] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
+- [ ] [#80 Accounts: filter by bank](https://github.com/Kolla1997/Tallyn/issues/80) #type/feature #area/frontend
+- [ ] [#81 Transactions: filter by bank and show the bank on every transaction](https://github.com/Kolla1997/Tallyn/issues/81) #type/feature #area/frontend #area/backend
 
 
 ## In Progress
@@ -34,8 +37,6 @@ kanban-plugin: board
 ## Review
 
 - [ ] [#10 Brand: logo and design tokens](https://github.com/Kolla1997/Tallyn/issues/10) #type/design #area/brand #priority/p0
-- [ ] [#27 Debt details: interest rates, due dates and minimum payments (Plaid Liabilities)](https://github.com/Kolla1997/Tallyn/issues/27) #type/feature #area/backend #priority/p0
-- [ ] [#77 Count loan payments as transfers, not spending](https://github.com/Kolla1997/Tallyn/issues/77) #type/feature #area/frontend #area/backend
 
 
 ## Blocked
@@ -66,6 +67,7 @@ kanban-plugin: board
 - [x] [#68 Home shows your own money first, with a Yours / Everyone switch](https://github.com/Kolla1997/Tallyn/issues/68) #type/feature #area/frontend #priority/p1
 - [x] [#72 Sidebar: one profile card with a menu, Collapse by the logo](https://github.com/Kolla1997/Tallyn/issues/72) #type/design #area/frontend #priority/p2
 - [x] [#75 Transactions: a year of spending as dots, with a day overview on hover](https://github.com/Kolla1997/Tallyn/issues/75) #type/feature #area/frontend #area/backend #priority/p2
+- [x] [#77 Count loan payments as transfers, not spending](https://github.com/Kolla1997/Tallyn/issues/77) #type/feature #area/frontend #area/backend
 
 
 %% kanban:settings
