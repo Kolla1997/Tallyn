@@ -2467,3 +2467,42 @@ label.agree input {
 .card a {
   color: var(--color-clay-deep);
 }
+
+/* Sign in / sign up switch (#25, option C): an "or" divider, then a bold link. */
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s2);
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.switch-link {
+  align-self: center;
+  background: none;
+  border: none;
+  padding: var(--space-s1) var(--space-s2);
+  font: inherit;
+  font-weight: 700;
+  color: var(--color-clay-deep);
+  cursor: pointer;
+  border-radius: var(--radius-input);
+}
+
+.switch-link:hover {
+  text-decoration: underline;
+}
+
+.switch-link:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}

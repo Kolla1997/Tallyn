@@ -109,14 +109,18 @@ export default function SignIn() {
           {signup ? 'Create account' : 'Sign in'}
         </button>
       </form>
+      {/* Switch between signing in and signing up (#25, Dinesh picked C). */}
+      <p className="or-divider" aria-hidden="true">
+        or
+      </p>
       <button
-        className="link"
+        className="switch-link"
         onClick={() => {
           setError('')
           setMode(signup ? 'signin' : 'signup')
         }}
       >
-        {signup ? 'Already have an account? Sign in' : 'New to Tallyn? Create an account'}
+        {signup ? 'Sign in to your account' : 'Create a new account'} <span aria-hidden="true">→</span>
       </button>
     </section>
   )
