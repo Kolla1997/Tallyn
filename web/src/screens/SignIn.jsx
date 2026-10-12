@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { LEGAL, rememberAgreement } from '../lib/legal.js'
+import { Link } from '../lib/router.jsx'
 import { supabase } from '../lib/supabase.js'
 
 // Sign in or create an account with email and password. 2FA comes next.
@@ -9,10 +11,12 @@ export default function SignIn() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [sentTo, setSentTo] = useState('')
+  const [agreed, setAgreed] = useState(false) // sign-up only (#36)
 
   async function submit(e) {
     e.preventDefault()
     setError('')
+    if (mode === 'signup' && !agreed) return
     setBusy(true)
     const { data, error } =
       mode === 'signin'
@@ -28,6 +32,8 @@ export default function SignIn() {
       return
     }
     // With email confirmation on, sign-up returns no session until the link is opened.
+    // Recorded with the versions at the first sign-in (components/ConsentGate.jsx).
+    if (mode === 'signup') rememberAgreement()
     if (mode === 'signup' && !data.session) {
       setSentTo(email)
     }
@@ -83,7 +89,23 @@ export default function SignIn() {
             {error}
           </p>
         )}
-        <button className="btn" type="submit" disabled={busy}>
+        {signup && (
+          <label className="agree">
+            <input type="checkbox" required checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
+            <span>
+              I agree to the{' '}
+              <Link to={LEGAL.terms.path} target="_blank" rel="noopener">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link to={LEGAL.privacy.path} target="_blank" rel="noopener">
+                Privacy Policy
+              </Link>
+              . Tallyn is for people 18 and over.
+            </span>
+          </label>
+        )}
+        <button className="btn" type="submit" disabled={busy || (signup && !agreed)}>
           {signup ? 'Create account' : 'Sign in'}
         </button>
       </form>

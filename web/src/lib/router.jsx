@@ -30,7 +30,8 @@ export function Link({ to, children, ...rest }) {
       href={to}
       aria-current={path === to ? 'page' : undefined}
       onClick={(e) => {
-        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+        // Let the browser handle new tabs (Cmd-click, or target="_blank").
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || rest.target === '_blank') return
         e.preventDefault()
         navigate(to)
       }}

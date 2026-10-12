@@ -18,6 +18,8 @@ import (
 // Store is the data the API reads and writes. *db.DB implements it.
 type Store interface {
 	Me(ctx context.Context, userID string) (db.Me, error)
+	Consents(ctx context.Context, userID string) ([]db.Consent, error)
+	Accept(ctx context.Context, userID string, versions map[string]string) error
 	CreateHousehold(ctx context.Context, userID, name, homeCurrency string) (db.MyHousehold, error)
 	CanLink(ctx context.Context, userID, householdID string) (bool, error)
 	LinkBank(ctx context.Context, userID, householdID string, b db.NewBank) (string, error)
@@ -64,6 +66,8 @@ func NewRouter(d Deps) http.Handler {
 	api := http.NewServeMux()
 	api.HandleFunc("GET /api/me", me(d.Store))
 	api.HandleFunc("PUT /api/me", setMe(d.Store))
+	api.HandleFunc("GET /api/consent", consent(d.Store))
+	api.HandleFunc("POST /api/consent", acceptConsent(d.Store))
 	api.HandleFunc("GET /api/sharing", sharing(d.Store))
 	api.HandleFunc("PUT /api/sharing", setSharing(d.Store))
 	api.HandleFunc("GET /api/households/{id}/members", members(d.Store))

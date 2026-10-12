@@ -40,6 +40,7 @@ The **repo root is the Obsidian vault**. Notes live in `docs/`. Code folders are
 | `design-tokens.json` | Color, type and spacing values, used by `web/` | **Yes, for token values.** Notes describe them; this file defines them |
 | `brand/` | Logo masters, icons, exported assets | Yes, for asset files |
 | `docs/04 Tech/` | Architecture, stack, dev setup, ADRs | Yes, for tech decisions |
+| `legal/` | Terms of Service and Privacy Policy, with `version` and `effective` in their frontmatter (#36). Shown at `/terms` and `/privacy`; versions must match `internal/api/consent.go` | Yes, for legal text. Lawyer-reviewed before changes go live |
 | `docs/05 Board/Board.md` | Mirror of **Tallyn Board** (committed work) | **No.** It's generated, so never edit it |
 | `docs/06 Ideas/Ideas Board.md` | Mirror of **Tallyn Ideas** (idea pipeline) | **No.** It's generated, so never edit it |
 | `docs/06 Ideas/` | Longer write-ups of ideas, one note each, with `issue: N` | Yes, for idea detail |
