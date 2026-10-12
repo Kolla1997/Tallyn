@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import { api } from '../lib/api.js'
+import { LEGAL } from '../lib/legal.js'
 import { Link } from '../lib/router.jsx'
 import { supabase } from '../lib/supabase.js'
 import { PageHead } from './Shell.jsx'
@@ -91,20 +92,11 @@ function Row({ label, note, children }) {
   )
 }
 
+// Not built yet. `ticket` is the issue that builds it: for us reading the
+// code, never shown to people (Settings showed GitHub links until #36's fix).
+// eslint-disable-next-line no-unused-vars
 function Soon({ ticket }) {
-  return (
-    <span className="tag">
-      Coming soon
-      {ticket && (
-        <>
-          {' · '}
-          <a href={`https://github.com/Kolla1997/Tallyn/issues/${ticket}`} target="_blank" rel="noreferrer">
-            #{ticket}
-          </a>
-        </>
-      )}
-    </span>
-  )
+  return <span className="tag">Coming soon</span>
 }
 
 function Profile({ me, email, onSaved }) {
@@ -288,16 +280,25 @@ function Notifications() {
   )
 }
 
+// The Terms and the Privacy Policy (#36, Dinesh picked A): each row opens the
+// page inside Tallyn, with the version underneath.
 function Legal() {
   return (
     <Section id="legal-h" title="Legal">
       <ul className="rows">
-        <Row label="Terms of Service">
-          <Soon ticket={36} />
-        </Row>
-        <Row label="Privacy Policy">
-          <Soon ticket={36} />
-        </Row>
+        {[LEGAL.terms, LEGAL.privacy].map((doc) => (
+          <li key={doc.path} className="settings-row">
+            <Link to={doc.path} className="settings-link">
+              <span className="grow">
+                <span className="name block">{doc.title}</span>
+                <span className="small muted block">Version {doc.version}</span>
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+                <path d="m9 6 6 6-6 6" />
+              </svg>
+            </Link>
+          </li>
+        ))}
       </ul>
     </Section>
   )

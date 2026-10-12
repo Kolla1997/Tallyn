@@ -11,6 +11,8 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #36 Settings → Legal (found by Dinesh, picked A): Terms of Service and Privacy Policy were still "Coming soon" after #36 shipped. Each row now opens the page inside Tallyn, with the version underneath.
+- #1 Settings: "Coming soon" tags no longer link to GitHub issues (customers saw our private ticket links); the ticket number stays in the code only.
 - #27 Merged PR #93 (Debts page, loans, migration 0013); closed and moved to Done.
 - #27 Debts page: rings card (one ring per kind of debt, You owe in the middle) beside a facts card (payments due this month, interest this year, overdue); one card per debt, two per row, with notched gauges and group totals beside the headings. Debts in the sidebar after Transactions (receipt icon), in a new ☰ menu on phones. Student loans and mortgages from Plaid Liabilities: migration `0013_loans.sql` run on dev at Dinesh's OK; never account numbers or addresses. Dinesh picked rings 1, cards 2, gauge C, icon A, and sketched the split top cards. "See all debts" from Home. New spec [[Feature - Debts]].
 - #27 Found: sandbox student loan owes more than it borrowed (interest added), so its card says so and rings never show less than is owed. A class clash with Home's older `DebtStack` (`.debt-card`) was avoided by prefixing the new page's classes `debts-`.
