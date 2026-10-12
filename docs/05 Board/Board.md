@@ -25,7 +25,6 @@ kanban-plugin: board
 - [ ] [#55 Notifications](https://github.com/Kolla1997/Tallyn/issues/55) #type/feature #area/frontend #area/backend #priority/p2
 - [ ] [#56 Close your Tallyn account](https://github.com/Kolla1997/Tallyn/issues/56) #type/feature #area/frontend #area/backend #priority/p1
 - [ ] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
-- [ ] [#64 Floating rounded sidebar, darker secondary text and a soft shade under cards](https://github.com/Kolla1997/Tallyn/issues/64) #type/design #area/design #area/frontend #priority/p2
 
 
 ## In Progress
@@ -62,6 +61,7 @@ kanban-plugin: board
 - [x] [#42 Transactions page with person switcher, search and merchant logos](https://github.com/Kolla1997/Tallyn/issues/42) #type/feature #area/frontend #priority/p1
 - [x] [#58 Transactions: summary and details panel](https://github.com/Kolla1997/Tallyn/issues/58) #type/feature #area/frontend #area/backend #priority/p1
 - [x] [#61 Frosted glass finish on every card](https://github.com/Kolla1997/Tallyn/issues/61) #type/design #area/design #area/frontend #priority/p2
+- [x] [#64 Floating rounded sidebar, darker secondary text and a soft shade under cards](https://github.com/Kolla1997/Tallyn/issues/64) #type/design #area/design #area/frontend #priority/p2
 
 
 %% kanban:settings
