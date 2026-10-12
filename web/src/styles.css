@@ -2337,3 +2337,46 @@ body::before {
     opacity: 1;
   }
 }
+
+/* Yours / Everyone switch on the balance card (#68). Light on dark glass. */
+.total-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-s3);
+  flex-wrap: wrap;
+}
+
+.total-head .total-label {
+  margin: 0;
+}
+
+.scope-switch {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid rgb(255 255 255 / 0.3);
+  border-radius: var(--radius-button);
+}
+
+.scope-switch button {
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  background: none;
+  color: var(--color-cream);
+  padding: 3px 12px;
+  border-radius: var(--radius-button);
+  cursor: pointer;
+}
+
+.scope-switch button[aria-pressed='true'] {
+  background: var(--color-cream);
+  color: var(--color-cocoa);
+}
+
+.scope-switch button:focus-visible {
+  outline: 2px solid var(--color-cream);
+  outline-offset: 2px;
+}
