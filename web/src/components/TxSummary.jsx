@@ -111,7 +111,7 @@ function CategoryRing({ categories, spent, cur, month }) {
         <p className="small muted">No spending here.</p>
       ) : (
         <div className="ring-wrap">
-          <svg width="150" height="150" viewBox="0 0 140 140" role="img" aria-label={`Spending by category, ${formatMoney(spent, cur)} in total`}>
+          <svg width="180" height="180" viewBox="0 0 140 140" role="img" aria-label={`Spending by category, ${formatMoney(spent, cur)} in total`}>
             {top.map((c) => {
               const share = (c.amount / spent) * C
               const len = Math.max(share - GAP, 1)
