@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #72 Signing in always lands on Home (Dinesh): when signed out, the address resets to `/`, so you no longer come back to the page you signed out from (e.g. Settings). Invite links are unaffected (`/join` is captured and reset at load); `/terms` and `/privacy` keep their address.
 - #72 Removed Settings from the profile menu (Dinesh): it's already in the main menu. The menu now has Sign out, plus the household switcher when in more than one.
 - #72 Created and built on branch `72-sidebar-profile` (Dinesh picked A): the bottom of the sidebar is one profile card (avatar, name, "Owner · Dkolla") that opens a menu: switch household (when in more than one), Settings, Sign out; opens upward, or beside the collapsed rail; Esc and outside clicks close it and focus returns to the card; arrow keys move through it. Collapse moved to a round icon next to the logo. Fixed: `Link` let a passed `onClick` replace its in-app navigation (Settings from the menu reloaded the page). Old household box and household dot removed.
 - #25 Merged PR #71 (sign-in switch, page footer with the wordmark); #25 stays open for the remaining sign-in and 2FA screens.

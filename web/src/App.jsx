@@ -42,6 +42,16 @@ function AuthFlow() {
     return () => data.subscription.unsubscribe()
   }, [])
 
+  // Signed out: start again from Home, so signing in always lands on Home and
+  // not on the last page you were on (#72). The legal pages are public and
+  // render before this, so they keep their address.
+  useEffect(() => {
+    if (session === null && window.location.pathname !== '/') {
+      window.history.replaceState(null, '', '/')
+      window.dispatchEvent(new PopStateEvent('popstate'))
+    }
+  }, [session])
+
   // Re-check the 2FA level whenever the session changes. Keep the last result
   // meanwhile, so a token refresh doesn't unmount the current screen.
   useEffect(() => {
