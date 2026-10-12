@@ -283,6 +283,7 @@ func TestSpending(t *testing.T) {
 		mk("pay", -300000, "INCOME", "INCOME_WAGES"),
 		mk("xfer", 20000, "TRANSFER_OUT", "TRANSFER_OUT_ACCOUNT_TRANSFER"),
 		mk("card", 40000, "LOAN_PAYMENTS", "LOAN_PAYMENTS_CREDIT_CARD_PAYMENT"),
+		mk("car", 35000, "LOAN_PAYMENTS", "LOAN_PAYMENTS_CAR_PAYMENT"), // a transfer too (#77)
 		mk("refund", -200, "FOOD_AND_DRINK", "FOOD_AND_DRINK_GROCERIES"),
 		{PlaidTransactionID: "sept", PlaidAccountID: "acct-a", AmountMinor: 9999, Currency: "USD", Date: "2026-09-30", Name: "sept", CategoryPrimary: "TRAVEL"},
 	}, NextCursor: "c"}

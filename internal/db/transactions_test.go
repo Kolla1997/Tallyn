@@ -195,6 +195,7 @@ func TestTransactionSummary(t *testing.T) {
 	extra := []plaid.Transaction{
 		{PlaidTransactionID: "a-save", PlaidAccountID: "acct-a", AmountMinor: 5000, Currency: "USD", Date: "2026-10-10", Name: "Move to savings", CategoryPrimary: "TRANSFER_OUT"},
 		{PlaidTransactionID: "a-card", PlaidAccountID: "acct-a", AmountMinor: 2500, Currency: "USD", Date: "2026-10-10", Name: "Card payment", CategoryPrimary: "LOAN_PAYMENTS", CategoryDetailed: "LOAN_PAYMENTS_CREDIT_CARD_PAYMENT"},
+		{PlaidTransactionID: "a-car", PlaidAccountID: "acct-a", AmountMinor: 30000, Currency: "USD", Date: "2026-10-10", Name: "Car loan", CategoryPrimary: "LOAN_PAYMENTS", CategoryDetailed: "LOAN_PAYMENTS_CAR_PAYMENT"},
 		{PlaidTransactionID: "a-pay", PlaidAccountID: "acct-a", AmountMinor: -100000, Currency: "USD", Date: "2026-10-11", Name: "Payroll", CategoryPrimary: "INCOME"},
 		{PlaidTransactionID: "a-refund", PlaidAccountID: "acct-a", AmountMinor: -500, Currency: "USD", Date: "2026-10-12", Name: "Fresh Market", MerchantName: "Fresh Market", CategoryPrimary: "FOOD_AND_DRINK"},
 	}
@@ -222,8 +223,8 @@ func TestTransactionSummary(t *testing.T) {
 	if oct.MoneyInMinor != 100000+500 {
 		t.Errorf("money in = %d, want payroll plus the refund", oct.MoneyInMinor)
 	}
-	if oct.TransfersMinor != 5000+2500 {
-		t.Errorf("transfers = %d, want the savings move and the card payment", oct.TransfersMinor)
+	if oct.TransfersMinor != 5000+2500+30000 {
+		t.Errorf("transfers = %d, want the savings move, the card payment and the car loan (#77)", oct.TransfersMinor)
 	}
 	if len(oct.Categories) != 3 || oct.Categories[0].Category != "FOOD_AND_DRINK" || oct.Categories[0].AmountMinor != 7028+1009 || oct.Categories[0].Count != 8 {
 		t.Errorf("categories = %+v", oct.Categories)
