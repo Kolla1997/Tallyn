@@ -200,8 +200,9 @@ type Spend struct {
 var monthRE = regexp.MustCompile(`^\d{4}-(0[1-9]|1[0-2])$`)
 
 // Spending sums money out by category for one month ("2026-10"), over the
-// transactions userID may see. Income, transfers between accounts and credit
-// card payments aren't spending (a card payment would count the purchases twice).
+// transactions userID may see. Income, transfers between accounts and loan
+// payments, credit cards included, aren't spending (#77: Dinesh treats loan
+// payments like transfers; a card payment would also count the purchases twice).
 // Currencies are kept apart until conversion exists (#11).
 func (d *DB) Spending(ctx context.Context, userID, householdID, month string) ([]Spend, error) {
 	list := []Spend{}
@@ -215,8 +216,7 @@ func (d *DB) Spending(ctx context.Context, userID, householdID, month string) ([
 			where household_id = $1
 			  and date >= ($2 || '-01')::date and date < ($2 || '-01')::date + interval '1 month'
 			  and amount_minor > 0
-			  and coalesce(category_primary, '') not in ('INCOME', 'TRANSFER_IN', 'TRANSFER_OUT')
-			  and coalesce(category_detailed, '') <> 'LOAN_PAYMENTS_CREDIT_CARD_PAYMENT'
+			  and coalesce(category_primary, '') not in ('INCOME', 'TRANSFER_IN', 'TRANSFER_OUT', 'LOAN_PAYMENTS')
 			group by 1, 2
 			order by 3 desc, 1`, householdID, month)
 		if err != nil {
@@ -230,12 +230,12 @@ func (d *DB) Spending(ctx context.Context, userID, householdID, month string) ([
 
 // TxSummary totals the transactions matching a filter, in one currency
 // (#58). Same rules as Spending: income and refunds are money in; transfers
-// between accounts and credit card payments aren't spending.
+// between accounts and loan payments aren't spending (#77).
 type TxSummary struct {
 	Currency       string          `json:"currency"`
 	MoneyInMinor   int64           `json:"money_in_minor"`
 	SpentMinor     int64           `json:"spent_minor"`
-	TransfersMinor int64           `json:"transfers_minor"` // moved out to other accounts and card payments
+	TransfersMinor int64           `json:"transfers_minor"` // moved out to other accounts and loan payments
 	Categories     []Spend         `json:"categories"`      // spending by category, biggest first
 	Merchants      []MerchantSpend `json:"merchants"`       // top five by spending
 }
@@ -250,8 +250,7 @@ type MerchantSpend struct {
 // kindSQL sorts a transaction into transfer, spent or in (Plaid: positive
 // amount = money out).
 const kindSQL = `case
-			  when coalesce(t.category_primary, '') in ('TRANSFER_IN', 'TRANSFER_OUT')
-			    or coalesce(t.category_detailed, '') = 'LOAN_PAYMENTS_CREDIT_CARD_PAYMENT' then 'transfer'
+			  when coalesce(t.category_primary, '') in ('TRANSFER_IN', 'TRANSFER_OUT', 'LOAN_PAYMENTS') then 'transfer'
 			  when t.amount_minor > 0 and coalesce(t.category_primary, '') <> 'INCOME' then 'spent'
 			  when t.amount_minor < 0 then 'in'
 			  else 'other' end`
@@ -398,7 +397,7 @@ type DayTopBuy struct {
 
 // Daily returns spending per day for a year, over every transaction userID
 // may see that matches f (person, search, category). Same rules as Summary:
-// transfers, card payments and income aren't spending. Days with no spending
+// transfers, loan payments and income aren't spending. Days with no spending
 // are left out.
 func (d *DB) Daily(ctx context.Context, userID, householdID string, f TxFilter) ([]DaySpend, error) {
 	out := []DaySpend{}

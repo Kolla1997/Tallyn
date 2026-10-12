@@ -18,7 +18,8 @@ import TallynLoader from '../components/TallynLoader.jsx'
 // Everything shown is what the API returns for this person, so the sharing
 // rules (#28) already apply.
 
-const NOT_SPENDING = new Set(['INCOME', 'TRANSFER_IN', 'TRANSFER_OUT'])
+// Loan payments count as transfers, not spending (#77).
+const NOT_SPENDING = new Set(['INCOME', 'TRANSFER_IN', 'TRANSFER_OUT', 'LOAN_PAYMENTS'])
 const now = new Date()
 const MONTH = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 const monthName = (d) => d.toLocaleDateString('en-US', { month: 'long' })
@@ -184,7 +185,6 @@ function TotalCard({ banks, txs, mine, me, roles, home, scope, onScope }) {
   let any = false
   for (const tx of yours ? mine : txs) {
     if (tx.currency !== cur || tx.date < monthStart || NOT_SPENDING.has(tx.category_primary ?? '')) continue
-    if (tx.category_detailed === 'LOAN_PAYMENTS_CREDIT_CARD_PAYMENT') continue
     flow -= tx.amount_minor // Plaid: positive = money out
     any = true
   }
@@ -407,9 +407,9 @@ function SharedWithYou({ banks, me, people, roles, home }) {
 
 // Your recent transactions (#39, option C): only yours, since everyone's are
 // on the Transactions page. Spending, transfers and income are kept apart, so
-// card payments and moves between accounts don't look like spending. Same
+// loan payments and moves between accounts don't look like spending (#77). Same
 // rules as the spending card.
-const TRANSFER = new Set(['TRANSFER_IN', 'TRANSFER_OUT'])
+const TRANSFER = new Set(['TRANSFER_IN', 'TRANSFER_OUT', 'LOAN_PAYMENTS'])
 const RECENT_TABS = [
   ['spending', 'Spending', 'No spending yet.'],
   ['transfers', 'Transfers', 'No transfers yet.'],
@@ -417,7 +417,7 @@ const RECENT_TABS = [
 ]
 
 export function txKind(t) {
-  if (TRANSFER.has(t.category_primary) || t.category_detailed === 'LOAN_PAYMENTS_CREDIT_CARD_PAYMENT') return 'transfers'
+  if (TRANSFER.has(t.category_primary)) return 'transfers'
   if (t.category_primary === 'INCOME') return 'income'
   return 'spending'
 }
@@ -534,7 +534,7 @@ function SpendingCard({ spending, month, home, everyone = false }) {
           </ul>
         </>
       )}
-      <p className="small muted">Transfers and card payments aren&apos;t counted as spending.</p>
+      <p className="small muted">Transfers and loan payments aren&apos;t counted as spending.</p>
     </section>
   )
 }
