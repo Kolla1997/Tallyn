@@ -6,7 +6,8 @@
 //   - Access tokens are never logged or put in errors. Callers encrypt them
 //     (internal/tokencrypt) before storing them.
 //   - Errors carry Plaid's error code and request ID, never request bodies.
-//   - Link is US-only and asks for Transactions only (collect the least data).
+//   - Link is US-only and asks for Transactions, plus Liabilities where the bank
+//     has cards or loans (#27). Nothing else (collect the least data).
 package plaid
 
 import (
@@ -142,6 +143,9 @@ func (c *Client) CreateLinkToken(ctx context.Context, userID string) (string, er
 		"country_codes": []string{"US"},
 		"user":          map[string]string{"client_user_id": userID},
 		"products":      []string{"transactions"},
+		// Card and loan details (#27): optional, so banks without cards or
+		// loans still link. Billed per bank in Production.
+		"optional_products": []string{"liabilities"},
 		// History for a new link (decided 2026-10-09). Can't be changed later
 		// for an item without unlinking and linking again.
 		"transactions": map[string]int{"days_requested": 90},
@@ -197,6 +201,7 @@ type Account struct {
 	Currency       string `json:"currency"`
 	CurrentMinor   *int64 `json:"current_balance_minor"`
 	AvailableMinor *int64 `json:"available_balance_minor"`
+	LimitMinor     *int64 `json:"credit_limit_minor"` // credit cards and credit lines (#27)
 }
 
 // Accounts returns the item and its accounts.
@@ -230,6 +235,7 @@ type rawAccount struct {
 	Balances     struct {
 		Current     *json.Number `json:"current"`
 		Available   *json.Number `json:"available"`
+		Limit       *json.Number `json:"limit"`
 		ISOCurrency *string      `json:"iso_currency_code"`
 		Unofficial  *string      `json:"unofficial_currency_code"`
 	} `json:"balances"`
@@ -254,6 +260,9 @@ func convertAccounts(raw []rawAccount) ([]Account, error) {
 				return nil, err
 			}
 			if acct.AvailableMinor, err = minor(a.Balances.Available, acct.Currency); err != nil {
+				return nil, err
+			}
+			if acct.LimitMinor, err = minor(a.Balances.Limit, acct.Currency); err != nil {
 				return nil, err
 			}
 		case a.Balances.Unofficial != nil && *a.Balances.Unofficial != "":

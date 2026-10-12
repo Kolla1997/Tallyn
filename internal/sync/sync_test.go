@@ -18,15 +18,17 @@ import (
 // All tokens, IDs and merchants here are fake.
 
 type fakeStore struct {
-	mu      gosync.Mutex
-	items   map[string]db.SyncItem
-	saved   []string
-	status  map[string]string
-	saveErr error
+	mu       gosync.Mutex
+	items    map[string]db.SyncItem
+	saved    []string
+	status   map[string]string
+	saveErr  error
+	cards    map[string]int // bank ID -> cards saved, last time
+	accounts []string       // banks whose balances were refreshed
 }
 
 func newStore(items ...db.SyncItem) *fakeStore {
-	s := &fakeStore{items: map[string]db.SyncItem{}, status: map[string]string{}}
+	s := &fakeStore{items: map[string]db.SyncItem{}, status: map[string]string{}, cards: map[string]int{}}
 	for _, it := range items {
 		s.items[it.ID] = it
 	}
@@ -62,6 +64,18 @@ func (s *fakeStore) SaveSync(_ context.Context, it db.SyncItem, r plaid.SyncResu
 	s.saved = append(s.saved, it.ID+"@"+r.NextCursor)
 	return db.SyncStats{Upserted: len(r.Added)}, nil
 }
+func (s *fakeStore) SaveCreditCards(_ context.Context, it db.SyncItem, cards []plaid.CreditCard) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.cards[it.ID] = len(cards)
+	return nil
+}
+func (s *fakeStore) SaveAccounts(_ context.Context, it db.SyncItem, accounts []plaid.Account) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.accounts = append(s.accounts, it.ID)
+	return nil
+}
 func (s *fakeStore) SetStatus(_ context.Context, id, status string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -70,9 +84,23 @@ func (s *fakeStore) SetStatus(_ context.Context, id, status string) error {
 }
 
 type fakePlaid struct {
-	mu      gosync.Mutex
-	results map[string][]result // by access token, consumed in order
-	tokens  []string
+	mu        gosync.Mutex
+	results   map[string][]result // by access token, consumed in order
+	tokens    []string
+	cards     map[string][]plaid.CreditCard // by access token
+	cardsErr  error
+	cardCalls int
+}
+
+func (p *fakePlaid) Accounts(context.Context, string) (plaid.Item, []plaid.Account, error) {
+	return plaid.Item{}, []plaid.Account{{PlaidAccountID: "card-1"}}, nil
+}
+
+func (p *fakePlaid) Liabilities(_ context.Context, token string) ([]plaid.CreditCard, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.cardCalls++
+	return p.cards[token], p.cardsErr
 }
 
 type result struct {
@@ -234,5 +262,56 @@ func TestSyncNowNeverBlocks(t *testing.T) {
 	case <-done:
 	case <-time.After(time.Second):
 		t.Fatal("SyncNow blocked")
+	}
+}
+
+// Card details (#27): fetched after a good sync when a day old or never;
+// a bank without cards is cleared; a failure doesn't fail the sync.
+func TestSyncCards(t *testing.T) {
+	captureLog(t)
+	ctx := context.Background()
+	recent := time.Now().Add(-time.Hour)
+	old := time.Now().Add(-25 * time.Hour)
+	fresh, stale, never := bank("bank-1"), bank("bank-2"), bank("bank-3")
+	fresh.LiabilitiesSyncedAt, stale.LiabilitiesSyncedAt = &recent, &old
+	store := newStore(fresh, stale, never)
+	p := &fakePlaid{results: map[string][]result{}, cards: map[string][]plaid.CreditCard{
+		"access-bank-2": {{PlaidAccountID: "card-1"}, {PlaidAccountID: "card-2"}},
+	}}
+	s := New(store, p, fakeTokens{}, time.Hour)
+	for _, it := range []db.SyncItem{fresh, stale, never} {
+		if got := s.SyncOne(ctx, it); got != Synced {
+			t.Fatalf("%s: %s", it.ID, got)
+		}
+	}
+	if p.cardCalls != 2 {
+		t.Fatalf("card calls = %d, want 2 (not the bank fetched an hour ago)", p.cardCalls)
+	}
+	if _, ok := store.cards["bank-1"]; ok || store.cards["bank-2"] != 2 || store.cards["bank-3"] != 0 {
+		t.Fatalf("saved cards = %v", store.cards)
+	}
+	// Balances and limits refreshed on the same daily schedule.
+	if len(store.accounts) != 2 || store.accounts[0] != "bank-2" || store.accounts[1] != "bank-3" {
+		t.Fatalf("balances refreshed for %v", store.accounts)
+	}
+
+	// No cards at this bank: cleared, and the sync is still fine.
+	store = newStore(never)
+	p = &fakePlaid{results: map[string][]result{}, cardsErr: &plaid.Error{Code: "PRODUCTS_NOT_SUPPORTED"}}
+	if got := New(store, p, fakeTokens{}, time.Hour).SyncOne(ctx, never); got != Synced {
+		t.Fatalf("got %s", got)
+	}
+	if n, ok := store.cards["bank-3"]; !ok || n != 0 {
+		t.Fatalf("not cleared: %v", store.cards)
+	}
+
+	// Plaid fails: nothing saved, sync still counts as done.
+	store = newStore(never)
+	p = &fakePlaid{results: map[string][]result{}, cardsErr: &plaid.Error{Code: "INTERNAL_SERVER_ERROR"}}
+	if got := New(store, p, fakeTokens{}, time.Hour).SyncOne(ctx, never); got != Synced {
+		t.Fatalf("got %s", got)
+	}
+	if _, ok := store.cards["bank-3"]; ok {
+		t.Fatal("saved after a failure")
 	}
 }

@@ -11,6 +11,10 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #1 Home's Transfers tab note now says "Loan and card payments", following #77.
+- #27 Credit cards on Home (Dinesh picked F from six drafts): total limit bar with each card's balance in shades of Clay, then each card with APR, minimum and due date, soonest first. Migration `0011_credit_cards.sql` run on dev at Dinesh's OK. Plaid Link now asks for Liabilities as an optional product (ADR 0010, supersedes 0004's "Transactions only"). The sync refreshes balances, limits and card details about once a day. New spec [[Feature - Credit Cards]].
+- #27 Found: Plaid's transaction sync only sends balances with new transactions, so balances could go stale on quiet days. The daily `/accounts/get` fixes that too.
+- #27 Open: existing sandbox banks answer `ADDITIONAL_CONSENT_REQUIRED`, so cards show limit and balance but no APR or due date until reconnected (#51) or linked again. Liabilities price in Production to confirm.
 - #77 Loan payments (all of Plaid's `LOAN_PAYMENTS`, not only credit card payments) now count as transfers, not spending (Dinesh's decision): Transactions totals, category ring and spending dots, Home spending card and month flow, and Home's Transfers tab. Copy: "Transfers and loan payments aren't counted as spending".
 - #1 Reopened Housekeeping (closed since Oct 8) at Dinesh's OK.
 - #75 Merged PR #76 (spending dots as twelve months in their own card, day filter); closed and moved to Done.

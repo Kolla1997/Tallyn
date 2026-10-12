@@ -8,6 +8,7 @@ import { categoryLabel, formatMoney } from '../lib/money.js'
 import { Avatar, nameOf } from '../lib/people.jsx'
 import { Link } from '../lib/router.jsx'
 import { currencies, isOwed, ownerGroup, summarize } from '../lib/summary.js'
+import CreditCards from '../components/CreditCards.jsx'
 import { LinkBank } from './Banks.jsx'
 import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
@@ -88,6 +89,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
           wide={wide}
           total={<TotalCard banks={banks} txs={txs ?? []} mine={mine ?? []} me={me} roles={roles} home={household.home_currency} scope={scope} onScope={setScope} />}
           accounts={<YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} everyone={scope === 'everyone'} />}
+          cards={<CreditCards banks={banks} me={me} home={household.home_currency} everyone={scope === 'everyone'} />}
           recent={<RecentTransactions txs={(scope === 'yours' ? mine : txs) ?? []} me={me} people={people} everyone={scope === 'everyone'} />}
           spending={<SpendingCard spending={spending?.[scope] ?? []} month={MONTH} home={household.home_currency} everyone={scope === 'everyone'} />}
           shared={<SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />}
@@ -109,13 +111,14 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
 
 // Three columns on wide screens (1440px and up), two from 1280px, one below
 // (the one- and two-column cases share markup; CSS stacks them under 1280px).
-function HomeColumns({ wide, total, accounts, recent, spending, shared, family, goals }) {
+function HomeColumns({ wide, total, accounts, cards, recent, spending, shared, family, goals }) {
   if (wide) {
     return (
       <div className="cols cols-3">
         <div className="col">
           {total}
           {accounts}
+          {cards}
         </div>
         <div className="col">
           {spending}
@@ -134,6 +137,7 @@ function HomeColumns({ wide, total, accounts, recent, spending, shared, family, 
       <div className="col">
         {total}
         {accounts}
+        {cards}
         {recent}
       </div>
       <div className="col">
@@ -454,7 +458,7 @@ function RecentTransactions({ txs, me, people, everyone = false }) {
         </ul>
       )}
       {tab === 'transfers' && (
-        <p className="small muted">Card payments and moves between your own accounts sit here, so they don&apos;t look like spending.</p>
+        <p className="small muted">Loan and card payments and moves between your own accounts sit here, so they don&apos;t look like spending.</p>
       )}
     </section>
   )

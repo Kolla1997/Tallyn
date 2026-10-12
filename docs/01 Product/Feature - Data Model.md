@@ -2,7 +2,7 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-09
+updated: 2026-10-12
 issues: [6, 8, 9, 28]
 tags: [spec, database]
 ---
@@ -63,6 +63,7 @@ erDiagram
 - Users can read bank data but never write it. The Plaid access token column isn't readable by users at all.
 - Linking and unlinking a bank go through two checked functions instead (`0004_plaid_link.sql`): only owners and adults link, only for themselves. See [[Feature - Bank Linking]].
 - The bank sync writes through its own narrow role, `tallyn_sync` (`0005_bank_sync.sql`). Transaction time and location live in `transaction_details`, visible only to the person who made the transaction plus household owners for teens and children. See [[Feature - Bank Sync]].
+- Credit cards (#27, `0011_credit_cards.sql`): `accounts.credit_limit_minor`, and `credit_cards` (one row per card: APRs, minimum, due date, last statement and payment, overdue), visible to whoever may see the card's balance, written only by the sync. See [[Feature - Credit Cards]].
 - Unlinking a bank or deleting a household removes everything under it.
 
 ## Tech notes

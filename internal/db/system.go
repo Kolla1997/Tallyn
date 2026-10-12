@@ -2,8 +2,10 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -71,13 +73,15 @@ type SyncItem struct {
 	Sealed      []byte
 	Cursor      string
 	Status      string
+	// When card details were last fetched (#27); nil if never.
+	LiabilitiesSyncedAt *time.Time
 }
 
 // ErrStaleCursor means another sync saved this bank since we read it. The
 // result is dropped; the next run starts from the newer cursor.
 var ErrStaleCursor = errors.New("db: bank was synced by someone else meanwhile")
 
-const syncItemCols = `id, plaid_item_id, access_token_encrypted, coalesce(transactions_cursor, ''), status`
+const syncItemCols = `id, plaid_item_id, access_token_encrypted, coalesce(transactions_cursor, ''), status, liabilities_synced_at`
 
 // ItemsToSync lists the banks to sync: active ones only. Banks that need the
 // person to log in again, or that were disconnected, are skipped.
@@ -149,23 +153,7 @@ func (s *System) SaveSync(ctx context.Context, item SyncItem, r plaid.SyncResult
 		}
 
 		b := &pgx.Batch{}
-		// Balances, and accounts the bank added since linking. The WHERE stops
-		// an account ID from another bank ever being taken over.
-		for _, a := range r.Accounts {
-			b.Queue(`insert into public.accounts
-				(household_id, plaid_item_id, owner_user_id, plaid_account_id, name, official_name, mask, type, subtype,
-				 currency, current_balance_minor, available_balance_minor, balance_updated_at)
-				values ($1, $2, $3, $4, $5, nullif($6, ''), nullif($7, ''), $8, nullif($9, ''), $10, $11, $12, now())
-				on conflict (plaid_account_id) do update set
-				  name = excluded.name, official_name = excluded.official_name, mask = excluded.mask,
-				  type = excluded.type, subtype = excluded.subtype, currency = excluded.currency,
-				  current_balance_minor = excluded.current_balance_minor,
-				  available_balance_minor = excluded.available_balance_minor,
-				  balance_updated_at = now()
-				where accounts.plaid_item_id = excluded.plaid_item_id`,
-				household, item.ID, owner, a.PlaidAccountID, a.Name, a.OfficialName, a.Mask, a.Type, a.Subtype,
-				a.Currency, a.CurrentMinor, a.AvailableMinor)
-		}
+		queueAccounts(b, household, owner, item.ID, r.Accounts)
 		if err := tx.SendBatch(ctx, b).Close(); err != nil {
 			return mapErr(err)
 		}
@@ -214,6 +202,99 @@ func (s *System) SaveSync(ctx context.Context, item SyncItem, r plaid.SyncResult
 		return nil
 	})
 	return st, err
+}
+
+// queueAccounts queues balances and limits, and accounts the bank added since
+// linking. The WHERE stops an account ID from another bank ever being taken over.
+func queueAccounts(b *pgx.Batch, household, owner, itemID string, accounts []plaid.Account) {
+	for _, a := range accounts {
+		b.Queue(`insert into public.accounts
+			(household_id, plaid_item_id, owner_user_id, plaid_account_id, name, official_name, mask, type, subtype,
+			 currency, current_balance_minor, available_balance_minor, credit_limit_minor, balance_updated_at)
+			values ($1, $2, $3, $4, $5, nullif($6, ''), nullif($7, ''), $8, nullif($9, ''), $10, $11, $12, $13, now())
+			on conflict (plaid_account_id) do update set
+			  name = excluded.name, official_name = excluded.official_name, mask = excluded.mask,
+			  type = excluded.type, subtype = excluded.subtype, currency = excluded.currency,
+			  current_balance_minor = excluded.current_balance_minor,
+			  available_balance_minor = excluded.available_balance_minor,
+			  credit_limit_minor = excluded.credit_limit_minor,
+			  balance_updated_at = now()
+			where accounts.plaid_item_id = excluded.plaid_item_id`,
+			household, itemID, owner, a.PlaidAccountID, a.Name, a.OfficialName, a.Mask, a.Type, a.Subtype,
+			a.Currency, a.CurrentMinor, a.AvailableMinor, nonNegative(a.LimitMinor))
+	}
+}
+
+// SaveAccounts saves a bank's current balances and limits on their own (#27):
+// the transaction sync only sends them along with new transactions, so the
+// sync also asks for them about once a day.
+func (s *System) SaveAccounts(ctx context.Context, item SyncItem, accounts []plaid.Account) error {
+	return s.as(ctx, func(tx pgx.Tx) error {
+		var household, owner string
+		err := tx.QueryRow(ctx, `select household_id, owner_user_id from public.plaid_items where id = $1 for update`, item.ID).Scan(&household, &owner)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrNotFound
+		}
+		if err != nil {
+			return err
+		}
+		b := &pgx.Batch{}
+		queueAccounts(b, household, owner, item.ID, accounts)
+		return mapErr(tx.SendBatch(ctx, b).Close())
+	})
+}
+
+// nonNegative drops a negative limit, which no bank should send.
+func nonNegative(v *int64) *int64 {
+	if v == nil || *v < 0 {
+		return nil
+	}
+	return v
+}
+
+// SaveCreditCards replaces a bank's credit card details (#27) with cards, and
+// records that they were fetched now. Cards whose account isn't in this bank
+// are skipped; cards the bank no longer reports are removed. An empty list
+// (the bank has no cards, or doesn't support it) clears them.
+func (s *System) SaveCreditCards(ctx context.Context, item SyncItem, cards []plaid.CreditCard) error {
+	return s.as(ctx, func(tx pgx.Tx) error {
+		var exists bool
+		if err := tx.QueryRow(ctx, `select true from public.plaid_items where id = $1 for update`, item.ID).Scan(&exists); err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return ErrNotFound // unlinked meanwhile
+			}
+			return err
+		}
+		b := &pgx.Batch{}
+		keep := []string{}
+		for _, c := range cards {
+			aprs, err := json.Marshal(c.APRs)
+			if err != nil {
+				return err
+			}
+			keep = append(keep, c.PlaidAccountID)
+			// Only an account of this bank; its household comes from the account.
+			b.Queue(`insert into public.credit_cards
+				(account_id, household_id, aprs, minimum_payment_minor, next_payment_due_date,
+				 last_statement_balance_minor, last_statement_date, last_payment_minor, last_payment_date, is_overdue, updated_at)
+				select a.id, a.household_id, $3::jsonb, $4, nullif($5, '')::date, $6, nullif($7, '')::date, $8, nullif($9, '')::date, $10, now()
+				from public.accounts a where a.plaid_account_id = $1 and a.plaid_item_id = $2
+				on conflict (account_id) do update set
+				  aprs = excluded.aprs, minimum_payment_minor = excluded.minimum_payment_minor,
+				  next_payment_due_date = excluded.next_payment_due_date,
+				  last_statement_balance_minor = excluded.last_statement_balance_minor,
+				  last_statement_date = excluded.last_statement_date,
+				  last_payment_minor = excluded.last_payment_minor, last_payment_date = excluded.last_payment_date,
+				  is_overdue = excluded.is_overdue, updated_at = now()`,
+				c.PlaidAccountID, item.ID, string(aprs), nonNegative(c.MinimumMinor), c.NextDueDate,
+				c.LastStatementMinor, c.LastStatementDate, c.LastPaymentMinor, c.LastPaymentDate, c.Overdue)
+		}
+		b.Queue(`delete from public.credit_cards
+			where account_id in (select id from public.accounts where plaid_item_id = $1 and not (plaid_account_id = any($2)))`,
+			item.ID, keep)
+		b.Queue(`update public.plaid_items set liabilities_synced_at = now() where id = $1`, item.ID)
+		return mapErr(tx.SendBatch(ctx, b).Close())
+	})
 }
 
 func queueTransaction(b *pgx.Batch, household, account string, t plaid.Transaction) {
