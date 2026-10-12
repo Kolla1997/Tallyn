@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { cleanName } from './TransactionRow.jsx'
 
-// A year of spending as dots (#75, Dinesh's idea): one dot per day, seven rows
-// (Sunday to Saturday) by about 53 weeks, redder on days with more spending.
+// A year of spending as dots (#75, Dinesh's idea): one dot per day, redder on
+// days with more spending, as twelve little months (Dinesh picked C): each
+// month is a calendar block, seven days across starting Sunday.
 // Days ahead are hollow. Hover, focus or tap a dot for that day's overview;
 // clicking a spending day narrows the list to it. No labels: each dot
 // names its date and amount for screen readers.
@@ -15,7 +16,6 @@ const longDate = (d) => d.toLocaleDateString('en-US', { weekday: 'long', month: 
 export default function SpendingDots({ year, days, home, selected, onPick }) {
   const [shown, setShown] = useState(null) // { key, left, top }
   const box = useRef(null)
-  const scroller = useRef(null)
   const today = iso(new Date())
 
   const byDay = useMemo(() => Object.fromEntries((days ?? []).filter((d) => d.currency === home).map((d) => [d.date, d])), [days, home])
@@ -31,34 +31,22 @@ export default function SpendingDots({ year, days, home, selected, onPick }) {
     return (v) => (!v ? 0 : v <= cuts[0] ? 1 : v <= cuts[1] ? 2 : v <= cuts[2] ? 3 : 4)
   }, [byDay])
 
-  // Every day of the year, starting on the Sunday on or before Jan 1.
-  const cells = useMemo(() => {
-    const first = new Date(Number(year), 0, 1, 12)
-    const start = new Date(first)
-    start.setDate(first.getDate() - first.getDay())
-    const out = []
-    for (let i = 0; i < 54 * 7; i++) {
-      const d = new Date(start)
-      d.setDate(start.getDate() + i)
-      if (d.getFullYear() > Number(year) && d.getDay() === 0) break
-      out.push(d)
-    }
-    return out
-  }, [year])
-
-  // Phones: start scrolled to the current month.
-  useEffect(() => {
-    const el = scroller.current
-    if (el && el.scrollWidth > el.clientWidth) {
-      const week = Math.floor(cells.findIndex((d) => iso(d) === today) / 7)
-      el.scrollLeft = Math.max(0, week * 11 - el.clientWidth / 2)
-    }
-  }, [cells, today])
+  // Each month: blanks up to the weekday of the 1st, then its days.
+  const months = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, m) => {
+        const first = new Date(Number(year), m, 1, 12)
+        const days = []
+        for (let d = new Date(first); d.getMonth() === m; d.setDate(d.getDate() + 1)) days.push(new Date(d))
+        return { name: first.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), lead: first.getDay(), days }
+      }),
+    [year],
+  )
 
   const show = (key, el) => {
     const r = el.getBoundingClientRect()
     const b = box.current.getBoundingClientRect()
-    const left = Math.min(Math.max(0, r.left - b.left - 110), b.width - 250)
+    const left = Math.max(0, Math.min(r.left - b.left - 116, b.width - 240))
     setShown({ key, left, top: r.bottom - b.top + 8 })
   }
 
@@ -80,29 +68,33 @@ export default function SpendingDots({ year, days, home, selected, onPick }) {
 
   return (
     <div className="dots" ref={box} onMouseLeave={() => setShown(null)}>
-      <div className="dots-scroll" ref={scroller}>
-        <div className="dots-grid" role="group" aria-label={`Your spending by day in ${year}`}>
-          {cells.map((d) => {
-            const key = iso(d)
-            if (d.getFullYear() !== Number(year)) return <span key={key} className="day-dot day-dot-blank" aria-hidden="true" />
-            const ahead = key > today
-            const day = byDay[key]
-            const label = `${longDate(d)}, ${ahead ? 'still ahead' : day ? `${formatMoney(day.amount_minor, day.currency)} spent` : 'nothing spent'}`
-            return (
-              <button
-                key={key}
-                type="button"
-                className={`day-dot ${ahead ? 'day-dot-ahead' : LEVELS[level(day?.amount_minor)]}${selected === key ? ' day-dot-selected' : ''}`}
-                aria-label={label}
-                aria-pressed={selected === key}
-                onMouseEnter={(e) => show(key, e.currentTarget)}
-                onFocus={(e) => show(key, e.currentTarget)}
-                onBlur={() => setShown(null)}
-                onClick={(e) => (ahead || !day ? show(key, e.currentTarget) : onPick(selected === key ? '' : key))}
-              />
-            )
-          })}
-        </div>
+      <div className="dots-months" role="group" aria-label={`Your spending by day in ${year}`}>
+        {months.map((month) => (
+          <div key={month.name} className="dots-month" role="group" aria-label={month.name}>
+            {Array.from({ length: month.lead }, (_, i) => (
+              <span key={i} className="day-dot day-dot-blank" aria-hidden="true" />
+            ))}
+            {month.days.map((d) => {
+              const key = iso(d)
+              const ahead = key > today
+              const day = byDay[key]
+              const label = `${longDate(d)}, ${ahead ? 'still ahead' : day ? `${formatMoney(day.amount_minor, day.currency)} spent` : 'nothing spent'}`
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  className={`day-dot ${ahead ? 'day-dot-ahead' : LEVELS[level(day?.amount_minor)]}${selected === key ? ' day-dot-selected' : ''}`}
+                  aria-label={label}
+                  aria-pressed={selected === key}
+                  onMouseEnter={(e) => show(key, e.currentTarget)}
+                  onFocus={(e) => show(key, e.currentTarget)}
+                  onBlur={() => setShown(null)}
+                  onClick={(e) => (ahead || !day ? show(key, e.currentTarget) : onPick(selected === key ? '' : key))}
+                />
+              )
+            })}
+          </div>
+        ))}
       </div>
       {card && (
         <div className="dots-card" style={{ left: shown.left, top: shown.top }} role="tooltip">

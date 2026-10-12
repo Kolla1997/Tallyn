@@ -190,17 +190,17 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     <>
       <PageHead title="Transactions" sub={iAmKid ? 'Your transactions' : 'Everything you can see in your household'} />
 
-      <section className="panel tx-filters" aria-label="Filter transactions">
-        {others.length > 0 && (
-          <div className="chips" role="group" aria-label="Whose transactions">
-            {[[me.user_id, 'Yours'], ...others.map((m) => [m.user_id, nameOf(m)]), ['all', 'Everyone']].map(([id, label]) => (
-              <button key={id} className="chip" aria-pressed={who === id} onClick={() => setWho(id)}>
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
-        <div className="tx-filter-grid">
+      <div className="tx-top">
+        <section className="panel tx-filters" aria-label="Filter transactions">
+          {others.length > 0 && (
+            <div className="chips" role="group" aria-label="Whose transactions">
+              {[[me.user_id, 'Yours'], ...others.map((m) => [m.user_id, nameOf(m)]), ['all', 'Everyone']].map(([id, label]) => (
+                <button key={id} className="chip" aria-pressed={who === id} onClick={() => setWho(id)}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="tx-filter-fields">
             <label>
               <span className="sr-only">Search merchants</span>
@@ -246,6 +246,9 @@ export default function TransactionsPage({ me, household, refreshKey }) {
               </p>
             )}
           </div>
+        </section>
+        {/* The year of dots (#75): its own card, over the summary on web. */}
+        <section className="panel tx-dots-card" aria-label="Spending by day">
           <SpendingDots
             year={year}
             days={daily}
@@ -256,8 +259,8 @@ export default function TransactionsPage({ me, household, refreshKey }) {
               setDay(d)
             }}
           />
-        </div>
-      </section>
+        </section>
+      </div>
 
       {error && (
         <p className="error" role="alert">

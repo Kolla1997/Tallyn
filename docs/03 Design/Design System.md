@@ -82,6 +82,7 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-08 | No shadows, 22px cards, pill buttons | Soft, family-friendly, not bank-like |
 | 2026-10-12 | Dashed edge also on Family and Goals on Home, not only Shared with you; your own money stays solid | Dinesh chose option A: groups the household cards together (#72) |
 | 2026-10-12 | Spending by day as dots: Sand for no spending, then Clay at 25%, 50%, 75% on white, then Clay Deep; days ahead are a hollow Border ring. No new tokens | Dinesh's idea, only dots with a hover card (#75) |
+| 2026-10-12 | Spending dots sit in their own card over the summary, as twelve month blocks (six across on web, four on phones), no labels | Dinesh chose option C: uses the card's full space and reads like a calendar (#75) |
 | 2026-10-11 | Floating rounded glass sidebar, darker secondary text (#55494A) and a soft shade under cards | Dinesh chose option 2: text easier to read on glass (about 6.8:1 at the strongest glow) and more depth (#64) |
 | 2026-10-11 | **Cards are frosted glass** over a soft sage, clay and sand glow (replaces "flat white cards" from 2026-10-08; still no drop shadows) | Dinesh chose option B: more depth and a modern feel. Kept readable with a 70% surface, solid dialogs and fallbacks (#61) |
 | 2026-10-11 | Compact density on web (1024px+), comfortable on phones; up to 1600px wide; Home in three columns from 1440px | Dinesh: use the screen and show more at a glance; phones keep sizes that are easy to read and tap |

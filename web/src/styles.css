@@ -843,10 +843,7 @@ a.btn {
 }
 
 .tx-filters {
-  margin-bottom: var(--space-s4);
-  /* Above the cards below, so a dot's day card isn't covered (#75). */
-  position: relative;
-  z-index: 5;
+  min-width: 0;
 }
 
 .filter-row {
@@ -2692,13 +2689,22 @@ label.agree input {
   outline: none;
 }
 
-/* Transactions filters with the year of dots (#75): fields on the left,
-   dots on the right on web; stacked on phones. */
-.tx-filter-grid {
+/* Transactions top (#75): filters card and the year-of-dots card, split
+   like the list and summary below; stacked on phones. */
+.tx-top {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-s4);
-  align-items: center;
+  margin-bottom: var(--space-s4);
+  /* Above the cards below, so a dot's day card isn't covered. */
+  position: relative;
+  z-index: 5;
+}
+
+@media (min-width: 1024px) {
+  .tx-top {
+    grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
+  }
 }
 
 .tx-filter-fields {
@@ -2716,35 +2722,41 @@ label.agree input {
   margin: 0;
 }
 
-@media (min-width: 1024px) {
-  .tx-filter-grid {
-    grid-template-columns: minmax(280px, 1fr) auto;
-    gap: var(--space-s6);
-  }
+.tx-dots-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
 }
 
 .dots {
   position: relative;
-  min-width: 0;
 }
 
-.dots-scroll {
-  overflow-x: auto;
-  padding: 2px;
-}
-
-.dots-grid {
+/* Twelve little months: six across on web, four across on phones. */
+.dots-months {
   display: grid;
-  grid-auto-flow: column;
-  grid-template-rows: repeat(7, 8px);
-  grid-auto-columns: 8px;
-  gap: 3px;
-  width: max-content;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-s3) 10px;
+}
+
+@media (min-width: 1024px) {
+  .dots-months {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.dots-month {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  align-content: start;
 }
 
 .day-dot {
-  width: 8px;
-  height: 8px;
+  width: 100%;
+  max-width: 10px;
+  aspect-ratio: 1;
   padding: 0;
   border: 0;
   border-radius: 50%;
