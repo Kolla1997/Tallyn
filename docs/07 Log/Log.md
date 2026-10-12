@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-11
+- #64 #66 Merged PR #65 (floating rounded sidebar 220/60px, darker secondary text, soft card shade) and PR #67 (gear icon, Tallyn loading animation with dots); both tickets closed and moved to Done, branches deleted. Checked on `main`: styles balanced, all changes live. Open: iCloud is slowing and briefly hiding files in the repo (missing `.env`, git "not a repository", 40s build); move the repo out of iCloud.
 - #64 Sidebar narrower (Dinesh): 220px expanded (was 246), 60px collapsed (was 70) with 42px icon buttons; labels, household and name still fit on one line.
 - #66 Created and built on branch `66-icon-loader` (Dinesh picked icon 1 and loading A): Settings is now a gear; every loading state shows the animated Tallyn mark from `brand/animation/SVG/tallyn-mark-animated-light.svg` with "Adding it all up" and dots that appear one by one (Dinesh's idea). Announced once to screen readers; still mark and still dots under reduced motion. Left as they were: the Show more button text and a bank's sync status.
 - #64 Created and built on branch `64-sidebar-shade` (Dinesh option 2): sidebar floats as a rounded glass panel 12px in from the edges (collapsed and expanded), secondary text darker (`text-secondary` #6B5F5C → #55494A) with small labels at weight 500, and a soft shade under cards (`card-shade` token). Design System updated. #1 CLAUDE.md now says every visual change needs a draft Dinesh picks from first (§0, §6).
