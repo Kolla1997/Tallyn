@@ -142,7 +142,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
 
 // The profile card at the bottom of the sidebar (#72, option A): you, your
 // role and household. It opens a menu to switch household (when you're in
-// more than one), go to Settings, or sign out. Esc or a click outside closes
+// more than one) or sign out. Settings is in the main menu above. Esc or a click outside closes
 // it, and focus goes back to the card.
 function ProfileMenu({ name, initial, household, households, onChooseHousehold, onSignOut, collapsed }) {
   const [open, setOpen] = useState(false)
@@ -231,10 +231,6 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
               <hr />
             </>
           )}
-          <Link to="/settings" role="menuitem" className="profile-item" onClick={() => close(false)}>
-            <SettingsIcon width={16} height={16} />
-            Settings
-          </Link>
           <button role="menuitem" className="profile-item" onClick={onSignOut}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10" />
