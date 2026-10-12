@@ -19,6 +19,8 @@ import TallynLoader from '../components/TallynLoader.jsx'
 // rules (#28) already apply.
 
 const NOT_SPENDING = new Set(['INCOME', 'TRANSFER_IN', 'TRANSFER_OUT'])
+const now = new Date()
+const MONTH = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 const monthName = (d) => d.toLocaleDateString('en-US', { month: 'long' })
 
 export default function HomePage({ me, household, refreshKey, onChanged }) {
@@ -26,7 +28,8 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
   const [members, setMembers] = useState([])
   const [txs, setTxs] = useState(null)
   const [mine, setMine] = useState(null)
-  const [spending, setSpending] = useState(null)
+  const [spending, setSpending] = useState(null) // { yours, everyone } summaries for this month
+  const [scope, setScope] = useState('yours') // Home opens on your own money (#68)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -36,15 +39,17 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
       api(`/api/banks?household_id=${hh}`),
       api(`/api/households/${hh}/members`),
       api(`/api/transactions?household_id=${hh}&limit=200`),
-      api(`/api/spending?household_id=${hh}`),
       api(`/api/transactions?household_id=${hh}&owner=${encodeURIComponent(me.user_id)}&limit=100`),
+      api(`/api/transactions/summary?household_id=${hh}&month=${MONTH}&owner=${encodeURIComponent(me.user_id)}`),
+      api(`/api/transactions/summary?household_id=${hh}&month=${MONTH}`),
     ]).then(
-      ([b, m, t, s, y]) => {
+      ([b, m, t, y, sy, se]) => {
         setBanks(b.banks)
         setMembers(m.members)
         setTxs(t.transactions)
-        setSpending(s)
         setMine(y.transactions)
+        const cats = (d) => d.summary.flatMap((x) => x.categories)
+        setSpending({ yours: cats(sy), everyone: cats(se) })
       },
       () => setError("We couldn't load your household's money. Try again in a moment."),
     )
@@ -80,10 +85,10 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
       ) : (
         <HomeColumns
           wide={wide}
-          total={<TotalCard banks={banks} txs={txs ?? []} me={me} roles={roles} home={household.home_currency} />}
-          accounts={<YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} />}
-          recent={<RecentTransactions txs={mine ?? []} me={me} people={people} />}
-          spending={<SpendingCard spending={spending?.spending ?? []} month={spending?.month} home={household.home_currency} />}
+          total={<TotalCard banks={banks} txs={txs ?? []} mine={mine ?? []} me={me} roles={roles} home={household.home_currency} scope={scope} onScope={setScope} />}
+          accounts={<YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} everyone={scope === 'everyone'} />}
+          recent={<RecentTransactions txs={(scope === 'yours' ? mine : txs) ?? []} me={me} people={people} everyone={scope === 'everyone'} />}
+          spending={<SpendingCard spending={spending?.[scope] ?? []} month={MONTH} home={household.home_currency} everyone={scope === 'everyone'} />}
           shared={<SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />}
           family={<FamilyCard members={members} isOwner={household.role === 'owner'} />}
           goals={
@@ -152,8 +157,11 @@ function useMinWidth(px) {
   return match
 }
 
-function TotalCard({ banks, txs, me, roles, home }) {
+// The balance card (#68): your own money first, or everyone's you can see.
+// The switch here changes the whole Home page.
+function TotalCard({ banks, txs, mine, me, roles, home, scope, onScope }) {
   const totals = summarize(banks, me.user_id, roles)
+  const yoursOnly = summarize(banks.filter((b) => b.owner_user_id === me.user_id), me.user_id, roles)
   const list = currencies(totals, home)
   if (list.length === 0) {
     return (
@@ -166,30 +174,53 @@ function TotalCard({ banks, txs, me, roles, home }) {
   }
   const cur = list[0]
   const t = totals[cur]
+  const y = yoursOnly[cur] ?? { have: 0, owe: 0, net: 0 }
+  const yours = scope === 'yours'
 
   // Money in minus money out this month, from recent transactions in this currency.
   const start = new Date()
   const monthStart = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-01`
   let flow = 0
   let any = false
-  for (const tx of txs) {
+  for (const tx of yours ? mine : txs) {
     if (tx.currency !== cur || tx.date < monthStart || NOT_SPENDING.has(tx.category_primary ?? '')) continue
     if (tx.category_detailed === 'LOAN_PAYMENTS_CREDIT_CARD_PAYMENT') continue
     flow -= tx.amount_minor // Plaid: positive = money out
     any = true
   }
 
-  const parts = [
-    ['Yours', t.yours],
-    ['Shared with you', t.shared],
-    ['Your kids', t.kids],
-  ].filter(([, v], i) => i === 0 || v !== 0)
+  const parts = (
+    yours
+      ? [
+          ['Everyone you can see', t.have],
+          ['Shared with you', t.shared],
+          ['Your kids', t.kids],
+        ]
+      : [
+          ['Yours', t.yours],
+          ['Shared with you', t.shared],
+          ['Your kids', t.kids],
+        ]
+  ).filter(([, v], i) => i === 0 || v !== 0)
+  const big = yours ? y : t
 
   return (
-    <section className="panel total-card" aria-label="Total balance">
-      <p className="total-label">Total balance · {cur} · everything you can see</p>
+    <section className="panel total-card" aria-label={yours ? 'Your balance' : 'Total balance'}>
+      <div className="total-head">
+        <p className="total-label">{yours ? `Your balance · ${cur}` : `Total balance · ${cur} · everything you can see`}</p>
+        <div className="scope-switch" role="group" aria-label="Show on Home">
+          {[
+            ['yours', 'Yours'],
+            ['everyone', 'Everyone'],
+          ].map(([key, label]) => (
+            <button key={key} aria-pressed={scope === key} onClick={() => onScope(key)}>
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
       <div className="total-row">
-        <p className="amount total-big">{formatMoney(t.have, cur)}</p>
+        <p className="amount total-big">{formatMoney(big.have, cur)}</p>
         {any && (
           <p className="small total-note">
             {flow >= 0 ? '+' : '−'}
@@ -207,11 +238,12 @@ function TotalCard({ banks, txs, me, roles, home }) {
       </div>
       <div className="total-networth">
         <div>
-          <span>Net worth</span>
-          <span className="amount">{formatMoney(t.net, cur)}</span>
+          <span>{yours ? 'Your net worth' : 'Net worth'}</span>
+          <span className="amount">{formatMoney(big.net, cur)}</span>
         </div>
         <p className="small">
-          What you have, {formatMoney(t.have, cur)}, minus what you owe, {formatMoney(t.owe, cur)} on cards and loans
+          What {yours ? 'you have' : 'everyone has'}, {formatMoney(big.have, cur)}, minus what {yours ? 'you owe' : 'they owe'},{' '}
+          {formatMoney(big.owe, cur)} on cards and loans
         </p>
       </div>
       {list.length > 1 && (
@@ -230,11 +262,10 @@ function TotalCard({ banks, txs, me, roles, home }) {
 
 // Your accounts (#39, option B): what you have and what you owe, then your
 // biggest balances (two of each). The full list is on the Accounts page.
-function YourAccounts({ banks, me, canLink, home }) {
-  const mine = banks
-    .filter((b) => b.owner_user_id === me.user_id)
-    .flatMap((b) => b.accounts.map((a) => ({ ...a, bankName: b.institution_name })))
-  const cur = currencies(summarize(banks.filter((b) => b.owner_user_id === me.user_id), me.user_id, {}), home)[0]
+function YourAccounts({ banks, me, canLink, home, everyone = false }) {
+  const shown = everyone ? banks : banks.filter((b) => b.owner_user_id === me.user_id)
+  const mine = shown.flatMap((b) => b.accounts.map((a) => ({ ...a, bankName: b.institution_name })))
+  const cur = currencies(summarize(shown, me.user_id, {}), home)[0]
   const inCur = mine.filter((a) => a.currency === cur && a.current_balance_minor != null)
   const have = inCur.filter((a) => !isOwed(a))
   const owe = inCur.filter((a) => isOwed(a))
@@ -246,9 +277,9 @@ function YourAccounts({ banks, me, canLink, home }) {
   return (
     <section className="panel" aria-labelledby="yours-h">
       <div className="panel-head">
-        <h2 id="yours-h">Your accounts</h2>
+        <h2 id="yours-h">{everyone ? 'Everyone’s accounts' : 'Your accounts'}</h2>
         {mine.length > 0 && (
-          <Link to="/accounts" className="link small">
+          <Link to={everyone ? '/accounts?person=everyone' : '/accounts'} className="link small">
             All {mine.length} {mine.length === 1 ? 'account' : 'accounts'}
           </Link>
         )}
@@ -261,14 +292,14 @@ function YourAccounts({ banks, me, canLink, home }) {
         <>
           <div className="have-owe">
             <Link to="/accounts#have" className="tone-sage">
-              <span className="small">You have</span>
+              <span className="small">{everyone ? 'Everyone has' : 'You have'}</span>
               <span className="amount">{formatMoney(sum(have), cur)}</span>
               <span className="small muted">
                 {have.length} {have.length === 1 ? 'account' : 'accounts'}
               </span>
             </Link>
             <Link to="/accounts#owe" className="tone-clay">
-              <span className="small">You owe</span>
+              <span className="small">{everyone ? 'Everyone owes' : 'You owe'}</span>
               <span className="amount">{formatMoney(sum(owe), cur)}</span>
               <span className="small muted">
                 {owe.length} {owe.length === 1 ? 'account' : 'accounts'}
@@ -391,7 +422,7 @@ export function txKind(t) {
   return 'spending'
 }
 
-function RecentTransactions({ txs, me, people }) {
+function RecentTransactions({ txs, me, people, everyone = false }) {
   const [tab, setTab] = useState('spending')
   const shown = txs.filter((t) => txKind(t) === tab).slice(0, 5)
   const empty = RECENT_TABS.find(([key]) => key === tab)[2]
@@ -399,8 +430,8 @@ function RecentTransactions({ txs, me, people }) {
   return (
     <section className="panel" aria-labelledby="tx-h">
       <div className="panel-head">
-        <h2 id="tx-h">Your recent transactions</h2>
-        <Link to="/transactions" className="link small">
+        <h2 id="tx-h">{everyone ? 'Recent transactions' : 'Your recent transactions'}</h2>
+        <Link to={everyone ? '/transactions?owner=all' : '/transactions'} className="link small">
           See all
         </Link>
       </div>
@@ -435,7 +466,7 @@ function RecentTransactions({ txs, me, people }) {
 // Transactions page filtered to that category and month.
 const SPEND_COLORS = ['clay', 'sage', 'cocoa', 'sage-light']
 
-function SpendingCard({ spending, month, home }) {
+function SpendingCard({ spending, month, home, everyone = false }) {
   const rows = spending.filter((s) => s.currency === home).sort((a, b) => b.amount_minor - a.amount_minor)
   const total = rows.reduce((sum, r) => sum + r.amount_minor, 0)
   const top = rows.slice(0, SPEND_COLORS.length).map((r, i) => ({ ...r, color: SPEND_COLORS[i] }))
@@ -457,7 +488,9 @@ function SpendingCard({ spending, month, home }) {
   return (
     <section className="panel" aria-labelledby="sp-h">
       <div className="panel-head">
-        <h2 id="sp-h">Spending in {monthName(new Date())}</h2>
+        <h2 id="sp-h">
+          {everyone ? 'Spending' : 'Your spending'} in {monthName(new Date())}
+        </h2>
         {rows.length > 0 && <span className="amount">{formatMoney(total, home)}</span>}
       </div>
       {rows.length === 0 ? (
@@ -473,8 +506,9 @@ function SpendingCard({ spending, month, home }) {
             {top.map((r) => {
               const label = r.label ?? categoryLabel(r.category)
               // Same month as these totals, so the counts match what opens.
-              // Everyone's, like these totals; Transactions starts on yours otherwise.
-              const p = new URLSearchParams({ owner: 'all' })
+              // The same person as these totals: Transactions opens on yours
+              // by default, so Everyone needs owner=all.
+              const p = new URLSearchParams(everyone ? { owner: 'all' } : {})
               if (r.category !== 'OTHER') p.set('category', r.category)
               if (month) p.set('month', month)
               const to = `/transactions?${p}`
