@@ -32,7 +32,6 @@ kanban-plugin: board
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
-- [ ] [#91 Sign out after 30 minutes of inactivity](https://github.com/Kolla1997/Tallyn/issues/91) #type/feature #area/frontend #priority/p1
 
 
 ## Review
@@ -75,6 +74,7 @@ kanban-plugin: board
 - [x] [#83 Transactions: filter by bank and show the bank on each transaction](https://github.com/Kolla1997/Tallyn/issues/83) #type/feature #area/frontend #area/backend
 - [x] [#84 Accounts: filter by bank](https://github.com/Kolla1997/Tallyn/issues/84) #type/feature #area/frontend
 - [x] [#87 Smooth loading effect when filters change](https://github.com/Kolla1997/Tallyn/issues/87) #type/feature #area/design #area/frontend
+- [x] [#91 Sign out after 30 minutes of inactivity](https://github.com/Kolla1997/Tallyn/issues/91) #type/feature #area/frontend #priority/p1
 - [x] [#96 Plaid Link is set up more than once on a page](https://github.com/Kolla1997/Tallyn/issues/96) #type/bug #area/frontend #priority/p1
 - [x] [#97 Phone layout fixes from the audit](https://github.com/Kolla1997/Tallyn/issues/97) #type/design #area/frontend #priority/p1
 - [x] [#100 Lint, web tests and checks on every PR](https://github.com/Kolla1997/Tallyn/issues/100) #type/tech-debt #area/infra #priority/p2
