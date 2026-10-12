@@ -803,12 +803,17 @@ a.btn {
 .tx-logo {
   background: var(--color-white);
   border: 1px solid var(--color-border);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
+/* The logo fills its circle exactly, whatever size the circle is. */
 .tx-logo img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
 .tone-clay {
@@ -1213,7 +1218,6 @@ a.btn {
   }
 
   .tx-icon,
-  .tx-logo img,
   .avatar:not(.avatar-sm) {
     width: 32px;
     height: 32px;
