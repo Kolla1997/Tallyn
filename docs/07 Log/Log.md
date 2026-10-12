@@ -11,6 +11,8 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #72 Merged PR #73 (profile card, Collapse by the logo, sign-in lands on Home, dashed Family and Goals); closed and moved to Done.
+- #1 Transactions icon is now two-way arrows (Dinesh picked option 3), in the sidebar and the phone tab bar.
 - #72 Family and Goals on Home get the dashed edge like Shared with you (Dinesh picked A); your own money stays solid. Design System: dashed edge now means the household and other people; decision recorded.
 - #72 Signing in always lands on Home (Dinesh): when signed out, the address resets to `/`, so you no longer come back to the page you signed out from (e.g. Settings). Invite links are unaffected (`/join` is captured and reset at load); `/terms` and `/privacy` keep their address.
 - #72 Removed Settings from the profile menu (Dinesh): it's already in the main menu. The menu now has Sign out, plus the household switcher when in more than one.
