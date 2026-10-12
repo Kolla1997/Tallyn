@@ -81,11 +81,11 @@ func TestSummaryRoute(t *testing.T) {
 func TestTransactionsRoute(t *testing.T) {
 	s := &txStore{}
 	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s})
-	rec := send(h, "GET", "/api/transactions?household_id="+testHH+"&limit=20&offset=40&owner=u1&q=fresh&category=FOOD_AND_DRINK&month=2026-10&day=2026-10-08", "")
+	rec := send(h, "GET", "/api/transactions?household_id="+testHH+"&limit=20&offset=40&owner=u1&q=fresh&category=FOOD_AND_DRINK&month=2026-10&day=2026-10-08&bank=b1", "")
 	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "Fake Grocer") || !strings.Contains(rec.Body.String(), `"more":true`) {
 		t.Fatalf("got %d %s", rec.Code, rec.Body)
 	}
-	if s.got != (db.TxFilter{Owner: "u1", Query: "fresh", Category: "FOOD_AND_DRINK", Month: "2026-10", Day: "2026-10-08", Limit: 20, Offset: 40}) {
+	if s.got != (db.TxFilter{Owner: "u1", Query: "fresh", Category: "FOOD_AND_DRINK", Month: "2026-10", Day: "2026-10-08", Bank: "b1", Limit: 20, Offset: 40}) {
 		t.Fatalf("filter = %+v", s.got)
 	}
 	s.txErr = db.ErrInvalid

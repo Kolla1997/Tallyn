@@ -854,7 +854,7 @@ a.btn {
 
 .filter-row .grow {
   flex: 1;
-  min-width: 200px;
+  min-width: 160px; /* three across on web: category, month, bank (#83) */
 }
 
 .filter-row input,
@@ -2934,4 +2934,21 @@ label.agree input {
   margin-left: var(--space-s1);
   font-size: 12px;
   opacity: 0.75;
+}
+
+/* Amount, with the bank under it on Transactions (#83, option B). */
+.tx-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex: none;
+  max-width: 45%;
+  text-align: right;
+}
+
+.tx-bank {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
