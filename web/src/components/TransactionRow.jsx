@@ -5,30 +5,35 @@ import TxIcon from './TxIcon.jsx'
 // One transaction (#42), used on Home and the Transactions page: icon
 // (merchant logo or category), merchant, details, and whose it is when it
 // isn't yours. Time and place only appear when this person may see them.
-export default function TransactionRow({ tx, meId, people, showDate = true }) {
+// With onSelect, the row is a button that picks this transaction (#58).
+export default function TransactionRow({ tx, meId, people, showDate = true, onSelect, selected = false }) {
   const mine = tx.owner_user_id === meId
   const owner = tx.owner_user_id ? people[tx.owner_user_id] ?? { user_id: tx.owner_user_id } : null
   const shown = -tx.amount_minor // Plaid: positive = money out
+  const Wrap = onSelect ? 'button' : 'div'
+  const pick = onSelect && { type: 'button', 'aria-pressed': selected, onClick: () => onSelect(tx.id) }
   return (
-    <li className="tx-row">
-      <TxIcon tx={tx} />
-      <div className="grow">
-        <p className="name">{cleanName(tx.merchant)}</p>
-        <p className="small muted tx-meta">
-          {!mine && owner && (
-            <span className="tx-owner">
-              <Avatar member={owner} small />
-              {nameOf(owner)}
-            </span>
-          )}
-          <span>{details(tx, showDate)}</span>
-        </p>
-      </div>
-      {/* Money out in plain text, money in green: spending isn't an alarm. */}
-      <span className={shown > 0 ? 'amount money-in' : 'amount'}>
-        {shown > 0 ? '+' : shown < 0 ? '−' : ''}
-        {formatMoney(Math.abs(shown), tx.currency)}
-      </span>
+    <li className={onSelect ? 'tx-row tx-row-pick' : 'tx-row'}>
+      <Wrap className="tx-row-inner" {...pick}>
+        <TxIcon tx={tx} />
+        <div className="grow">
+          <p className="name">{cleanName(tx.merchant)}</p>
+          <p className="small muted tx-meta">
+            {!mine && owner && (
+              <span className="tx-owner">
+                <Avatar member={owner} small />
+                {nameOf(owner)}
+              </span>
+            )}
+            <span>{details(tx, showDate)}</span>
+          </p>
+        </div>
+        {/* Money out in plain text, money in green: spending isn't an alarm. */}
+        <span className={shown > 0 ? 'amount money-in' : 'amount'}>
+          {shown > 0 ? '+' : shown < 0 ? '−' : ''}
+          {formatMoney(Math.abs(shown), tx.currency)}
+        </span>
+      </Wrap>
     </li>
   )
 }

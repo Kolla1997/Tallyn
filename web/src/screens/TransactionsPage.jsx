@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import TransactionRow from '../components/TransactionRow.jsx'
+import { TxDetails, TxSummary } from '../components/TxSummary.jsx'
 import { api } from '../lib/api.js'
-import { categoryLabel } from '../lib/money.js'
+import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { PageHead } from './Shell.jsx'
 
@@ -57,6 +58,8 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   const [category, setCategory] = useState(() => fromAddress('category'))
   const [month, setMonth] = useState(() => fromAddress('month'))
   const [list, setList] = useState(null)
+  const [summary, setSummary] = useState(null)
+  const [picked, setPicked] = useState(() => new URLSearchParams(window.location.search).get('tx') ?? '')
   const [more, setMore] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState('')
@@ -75,21 +78,28 @@ export default function TransactionsPage({ me, household, refreshKey }) {
     if (who) p.set('owner', who)
     if (category) p.set('category', category)
     if (month) p.set('month', month)
+    if (picked) p.set('tx', picked)
     const url = p.size ? `/transactions?${p}` : '/transactions'
     if (window.location.pathname + window.location.search !== url) window.history.replaceState(null, '', url)
-  }, [who, category, month])
+  }, [who, category, month, picked])
 
   useEffect(() => {
     const t = setTimeout(() => setQuery(search.trim()), 300)
     return () => clearTimeout(t)
   }, [search])
 
-  const url = (offset) => {
-    const p = new URLSearchParams({ household_id: household.id, limit: String(PAGE), offset: String(offset) })
+  const filters = () => {
+    const p = new URLSearchParams({ household_id: household.id })
     if (who) p.set('owner', who)
     if (query) p.set('q', query)
     if (category) p.set('category', category)
     if (month) p.set('month', month)
+    return p
+  }
+  const url = (offset) => {
+    const p = filters()
+    p.set('limit', String(PAGE))
+    p.set('offset', String(offset))
     return `/api/transactions?${p}`
   }
 
@@ -105,6 +115,11 @@ export default function TransactionsPage({ me, household, refreshKey }) {
         setMore(d.more)
       },
       () => id === request.current && setError("We couldn't load transactions. Try again in a moment."),
+    )
+    // Totals over every matching transaction, not just this page (#58).
+    api(`/api/transactions/summary?${filters()}`).then(
+      (d) => id === request.current && setSummary(d.summary),
+      () => id === request.current && setSummary([]),
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [household.id, who, query, category, month, refreshKey])
@@ -131,6 +146,18 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   const groups = useMemo(() => groupByDay(list ?? []), [list])
   const filtered = who || query || category || month
   const months = recentMonths()
+  const pickedTx = list?.find((t) => t.id === picked) ?? null
+  const home = household.home_currency
+  const totals = summary?.find((s) => s.currency === home) ?? summary?.[0] ?? null
+  const scope = [month ? monthLabel(month) : 'All time', who ? (who === me.user_id ? 'yours' : nameOf(people[who] ?? { user_id: who })) : 'everyone'].join(' · ')
+
+  // Esc closes the details.
+  useEffect(() => {
+    if (!picked) return
+    const onKey = (e) => e.key === 'Escape' && setPicked('')
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [picked])
 
   return (
     <>
@@ -183,37 +210,80 @@ export default function TransactionsPage({ me, household, refreshKey }) {
         </p>
       )}
 
-      {!list ? (
-        <p className="muted">Loading…</p>
-      ) : list.length === 0 ? (
-        <section className="panel empty-state">
-          <p className="muted">
-            {filtered
-              ? 'No transactions match. Try another person, search, category or month.'
-              : 'No transactions yet. A new bank can take a few minutes to show its history.'}
-          </p>
-        </section>
-      ) : (
-        <div className="tx-days">
-          {groups.map(([day, txs]) => (
-            <section key={day} className="panel" aria-label={dayLabel(day)}>
-              <h2 className="day-heading">{dayLabel(day)}</h2>
-              <ul className="rows">
-                {txs.map((tx) => (
-                  <TransactionRow key={tx.id} tx={tx} meId={me.user_id} people={people} showDate={false} />
-                ))}
-              </ul>
+      <div className="tx-layout">
+        <div className="tx-main">
+          {!list ? (
+            <p className="muted">Loading…</p>
+          ) : list.length === 0 ? (
+            <section className="panel empty-state">
+              <p className="muted">
+                {filtered
+                  ? 'No transactions match. Try another person, search, category or month.'
+                  : 'No transactions yet. A new bank can take a few minutes to show its history.'}
+              </p>
             </section>
-          ))}
-          {more && (
-            <button className="btn btn-secondary show-more" onClick={showMore} disabled={loadingMore}>
-              {loadingMore ? 'Loading…' : 'Show more'}
-            </button>
+          ) : (
+            <>
+              <section className="panel tx-list" aria-label="Transactions">
+                {groups.map(([day, txs]) => (
+                  <div key={day} className="tx-day">
+                    <h2 className="day-heading">
+                      <span>{dayLabel(day)}</span>
+                      <span className="small muted">{dayTotal(txs)}</span>
+                    </h2>
+                    <ul className="rows">
+                      {txs.map((tx) => (
+                        <TransactionRow
+                          key={tx.id}
+                          tx={tx}
+                          meId={me.user_id}
+                          people={people}
+                          showDate={false}
+                          onSelect={(id) => setPicked(id === picked ? '' : id)}
+                          selected={tx.id === picked}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </section>
+              {more && (
+                <button className="btn btn-secondary show-more" onClick={showMore} disabled={loadingMore}>
+                  {loadingMore ? 'Loading…' : 'Show more'}
+                </button>
+              )}
+              {!pickedTx && <p className="small muted tx-hint">Pick a transaction to see its details</p>}
+            </>
           )}
         </div>
-      )}
+
+        <aside className="tx-side" aria-label={pickedTx ? 'Transaction details' : 'Summary'}>
+          {pickedTx ? (
+            <TxDetails
+              tx={pickedTx}
+              meId={me.user_id}
+              people={people}
+              onBack={() => setPicked('')}
+              onMerchant={(name) => {
+                setPicked('')
+                setSearch(name)
+              }}
+            />
+          ) : (
+            <TxSummary totals={totals} scope={scope} month={month} />
+          )}
+        </aside>
+      </div>
     </>
   )
+}
+
+// A day's net: money in minus money out, as shown on the rows.
+function dayTotal(txs) {
+  const net = -txs.reduce((t, tx) => t + tx.amount_minor, 0)
+  const cur = txs[0]?.currency
+  if (txs.some((tx) => tx.currency !== cur)) return ''
+  return `${net > 0 ? '+' : net < 0 ? '−' : ''}${formatMoney(Math.abs(net), cur)}`
 }
 
 // Groups by posted date, which is the order the server returns.

@@ -878,6 +878,11 @@ a.btn {
 .day-heading {
   font-size: 15px;
   color: var(--color-text-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-s3);
+  margin: 0 0 var(--space-s1);
 }
 
 .show-more {
@@ -1076,7 +1081,9 @@ a.btn {
   margin-bottom: var(--space-s4);
 }
 
-.have-owe > a {
+.have-owe > a,
+
+.have-owe > div {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -1236,7 +1243,9 @@ a.btn {
     margin-bottom: var(--space-s3);
   }
 
-  .have-owe > a {
+  .have-owe > a,
+
+  .have-owe > div {
     padding: var(--space-s2) var(--space-s3);
   }
 
@@ -1244,10 +1253,6 @@ a.btn {
     padding: var(--space-s1) var(--space-s3);
   }
 
-  .tx-filters,
-  .tx-days {
-    max-width: 1000px;
-  }
 }
 
 /* Three columns from 1440px (Home). */
@@ -1390,7 +1395,9 @@ a.btn {
   padding: var(--space-s1) var(--space-s4);
 }
 
-.have-owe > a {
+.have-owe > a,
+
+.have-owe > div {
   color: inherit;
   text-decoration: none;
 }
@@ -1691,7 +1698,8 @@ a.btn {
 }
 
 /* Have / owe tiles on phones: keep big amounts inside the tile. */
-.have-owe > a {
+.have-owe > a,
+.have-owe > div {
   min-width: 0;
 }
 
@@ -1837,5 +1845,181 @@ a.btn {
 @media (prefers-reduced-motion: reduce) {
   .debt-card {
     transition: none;
+  }
+}
+
+/* Transactions: list with summary or details beside it (#58). */
+.tx-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-s4);
+  align-items: start;
+  margin-top: var(--space-s4);
+}
+
+.tx-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s3);
+  min-width: 0;
+}
+
+.tx-list {
+  gap: var(--space-s4);
+}
+
+.tx-row-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+  width: 100%;
+  min-width: 0;
+}
+
+.rows > li.tx-row-pick {
+  padding: 0;
+}
+
+button.tx-row-inner {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: var(--space-s2);
+  margin: 0 calc(-1 * var(--space-s2));
+  width: calc(100% + 2 * var(--space-s2));
+  border-radius: var(--radius-input);
+  cursor: pointer;
+}
+
+button.tx-row-inner:hover {
+  background: var(--color-cream);
+}
+
+button.tx-row-inner[aria-pressed='true'] {
+  background: var(--color-sand);
+}
+
+button.tx-row-inner:focus-visible {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+.tx-hint {
+  text-align: center;
+  margin: 0;
+}
+
+.tx-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s4);
+}
+
+.tx-summary .have-owe {
+  margin-bottom: 0;
+}
+
+.ring-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s4);
+  flex-wrap: wrap;
+}
+
+.ring-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  fill: var(--color-text-secondary);
+}
+
+.ring-total {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 17px;
+  fill: var(--color-cocoa);
+}
+
+.ring-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-width: 160px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-s3);
+}
+
+.ring-pct {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s2);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.ring-tick {
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+}
+
+.tx-details {
+  gap: var(--space-s3);
+}
+
+.tx-back {
+  align-self: flex-start;
+}
+
+.tx-details-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+}
+
+.tx-details-head h2 {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.tx-map {
+  height: 96px;
+  border-radius: var(--radius-input);
+  background: var(--color-sand);
+  display: grid;
+  place-items: center;
+}
+
+.tx-details .link {
+  align-self: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .tx-layout {
+    grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
+  }
+
+  .tx-side {
+    position: sticky;
+    top: var(--space-s4);
+  }
+}
+
+/* Phones: summary above the list; details open over the page. */
+@media (max-width: 1023px) {
+  .tx-side {
+    order: -1;
+  }
+
+  .tx-details {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    border-radius: 0;
+    overflow-y: auto;
   }
 }

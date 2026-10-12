@@ -26,6 +26,7 @@ type Store interface {
 	DeleteBank(ctx context.Context, userID, bankID string) error
 	Transactions(ctx context.Context, userID, householdID string, f db.TxFilter) ([]db.Transaction, bool, error)
 	Spending(ctx context.Context, userID, householdID, month string) ([]db.Spend, error)
+	Summary(ctx context.Context, userID, householdID string, f db.TxFilter) ([]db.TxSummary, error)
 	Sharing(ctx context.Context, userID, householdID string) (db.Sharing, error)
 	SetSharing(ctx context.Context, userID, householdID, viewerID string, categories []string) error
 	SetDisplayName(ctx context.Context, userID, name string) error
@@ -79,6 +80,7 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("GET /api/banks", b.list)
 	api.HandleFunc("DELETE /api/banks/{id}", b.needsPlaid(b.unlink))
 	api.HandleFunc("GET /api/transactions", transactions(d.Store))
+	api.HandleFunc("GET /api/transactions/summary", txSummary(d.Store))
 	api.HandleFunc("GET /api/spending", spending(d.Store))
 	api.HandleFunc("/api/", func(w http.ResponseWriter, _ *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found")

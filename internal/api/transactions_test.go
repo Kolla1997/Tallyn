@@ -29,6 +29,30 @@ func (s *txStore) Spending(_ context.Context, uid, hh, month string) ([]db.Spend
 	return []db.Spend{{Category: "FOOD_AND_DRINK", Currency: "USD", AmountMinor: 1234, Count: 1}}, s.spendErr
 }
 
+func (s *txStore) Summary(_ context.Context, uid, hh string, f db.TxFilter) ([]db.TxSummary, error) {
+	s.got = f
+	return []db.TxSummary{{Currency: "USD", SpentMinor: 1234, Categories: []db.Spend{}, Merchants: []db.MerchantSpend{{Merchant: "Fake Grocer", AmountMinor: 1234, Count: 1}}}}, s.txErr
+}
+
+func TestSummaryRoute(t *testing.T) {
+	s := &txStore{}
+	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s})
+	rec := send(h, "GET", "/api/transactions/summary?household_id="+testHH+"&owner=u1&q=fresh&category=FOOD_AND_DRINK&month=2026-10", "")
+	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"spent_minor":1234`) || !strings.Contains(rec.Body.String(), "Fake Grocer") {
+		t.Fatalf("got %d %s", rec.Code, rec.Body)
+	}
+	if s.got != (db.TxFilter{Owner: "u1", Query: "fresh", Category: "FOOD_AND_DRINK", Month: "2026-10"}) {
+		t.Fatalf("filter = %+v (same filters as the list, no paging)", s.got)
+	}
+	s.txErr = db.ErrInvalid
+	if rec := send(h, "GET", "/api/transactions/summary?household_id="+testHH+"&month=bad", ""); rec.Code != http.StatusBadRequest {
+		t.Fatalf("invalid filter: %d", rec.Code)
+	}
+	if rec := get(h, "/api/transactions/summary?household_id="+testHH, ""); rec.Code != http.StatusUnauthorized {
+		t.Fatalf("without a session: %d", rec.Code)
+	}
+}
+
 func TestTransactionsRoute(t *testing.T) {
 	s := &txStore{}
 	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s})
