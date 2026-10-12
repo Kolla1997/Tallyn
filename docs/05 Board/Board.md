@@ -29,6 +29,7 @@ kanban-plugin: board
 - [ ] [#97 Phone layout fixes from the audit](https://github.com/Kolla1997/Tallyn/issues/97) #type/design #area/frontend #priority/p1
 - [ ] [#98 Keyboard access for the spending dots](https://github.com/Kolla1997/Tallyn/issues/98) #type/feature #area/frontend #priority/p2
 - [ ] [#99 Faster loading: compressed fonts and a split bundle](https://github.com/Kolla1997/Tallyn/issues/99) #type/tech-debt #area/frontend #priority/p2
+- [ ] [#100 Lint, web tests and checks on every PR](https://github.com/Kolla1997/Tallyn/issues/100) #type/tech-debt #area/infra #priority/p2
 
 
 ## In Progress
