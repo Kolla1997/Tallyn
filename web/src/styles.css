@@ -3065,7 +3065,7 @@ label.agree input {
   }
 }
 
-.ring-chart {
+.rings-chart {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-s5);
@@ -3073,26 +3073,26 @@ label.agree input {
 }
 
 @media (min-width: 900px) {
-  .ring-chart {
+  .rings-chart {
     grid-template-columns: 330px minmax(0, 1fr);
     gap: var(--space-s6);
   }
 }
 
-.ring-svg {
+.rings-svg {
   position: relative;
   width: min(330px, 100%);
   margin: 0 auto;
   container-type: inline-size;
 }
 
-.ring-svg svg {
+.rings-svg svg {
   display: block;
   width: 100%;
   height: auto;
 }
 
-.ring-track {
+.rings-track {
   fill: none;
   stroke: var(--color-sand);
   transform-origin: center;
@@ -3101,27 +3101,27 @@ label.agree input {
   transform: scale(0.6);
 }
 
-.ring-chart.is-ready .ring-track {
+.rings-chart.is-ready .rings-track {
   opacity: 1;
   transform: none;
   transition: transform 600ms cubic-bezier(0.2, 0.9, 0.25, 1.15) var(--delay), opacity 400ms ease-out var(--delay);
 }
 
-.ring-arc {
+.rings-arc {
   fill: none;
   cursor: pointer;
   transition: stroke-dasharray 1100ms cubic-bezier(0.2, 0.85, 0.25, 1.05) var(--arc-delay), opacity 200ms ease-out;
 }
 
-.ring-arc.is-dim {
+.rings-arc.is-dim {
   opacity: 0.28;
 }
 
-.ring-arc.is-hot {
+.rings-arc.is-hot {
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-clay-deep) 45%, transparent));
 }
 
-.ring-center {
+.rings-center {
   position: absolute;
   inset: 0;
   display: flex;
@@ -3132,19 +3132,19 @@ label.agree input {
   pointer-events: none;
 }
 
-.ring-center-value {
+.rings-center-value {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1.15;
 }
 
-.ring-center-label {
+.rings-center-label {
   font-size: 12px;
   color: var(--color-text-secondary);
   line-height: 1.3;
 }
 
-.ring-legend {
+.rings-legend {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -3153,18 +3153,18 @@ label.agree input {
   gap: var(--space-s2);
 }
 
-.ring-legend li {
+.rings-legend li {
   opacity: 0;
   transform: translateX(24px);
 }
 
-.ring-chart.is-ready .ring-legend li {
+.rings-chart.is-ready .rings-legend li {
   opacity: 1;
   transform: none;
   transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--delay), opacity 300ms ease-out var(--delay);
 }
 
-.ring-legend-row {
+.rings-legend-row {
   display: grid;
   grid-template-columns: 12px minmax(0, 1fr) auto;
   gap: var(--space-s1) var(--space-s3);
@@ -3181,29 +3181,29 @@ label.agree input {
   transition: background 200ms ease-out, opacity 200ms ease-out;
 }
 
-.ring-legend-row:hover,
-.ring-legend-row.is-hot,
-.ring-legend-row:focus-visible {
+.rings-legend-row:hover,
+.rings-legend-row.is-hot,
+.rings-legend-row:focus-visible {
   background: color-mix(in srgb, var(--color-clay) 8%, var(--color-white));
   outline: none;
 }
 
-.ring-legend-row.is-dim {
+.rings-legend-row.is-dim {
   opacity: 0.45;
 }
 
-.ring-swatch {
+.rings-swatch {
   width: 12px;
   height: 12px;
   border-radius: 4px;
 }
 
-.ring-legend-amount {
+.rings-legend-amount {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.ring-legend-bar {
+.rings-legend-bar {
   grid-column: 2 / 4;
   height: 6px;
   border-radius: var(--radius-button);
@@ -3211,7 +3211,7 @@ label.agree input {
   overflow: hidden;
 }
 
-.ring-legend-bar i {
+.rings-legend-bar i {
   display: block;
   height: 100%;
   transition: width 900ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--delay);
@@ -3373,16 +3373,16 @@ label.agree input {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ring-track,
-  .ring-legend li {
+  .rings-track,
+  .rings-legend li {
     opacity: 1;
     transform: none;
   }
 
-  .ring-chart.is-ready .ring-track,
-  .ring-chart.is-ready .ring-legend li,
-  .ring-arc,
-  .ring-legend-bar i,
+  .rings-chart.is-ready .rings-track,
+  .rings-chart.is-ready .rings-legend li,
+  .rings-arc,
+  .rings-legend-bar i,
   .notch {
     transition: none;
   }
