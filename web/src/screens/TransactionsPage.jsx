@@ -227,7 +227,13 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   const home = household.home_currency
   const totals = summary?.find((s) => s.currency === home) ?? summary?.[0] ?? null
   const dayLabelLong = day ? new Date(`${day}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : ''
-  const scope = [day ? dayLabelLong : month ? monthLabel(month) : 'All time', who === 'all' ? 'everyone' : who === me.user_id ? 'yours' : nameOf(people[who] ?? { user_id: who }), bankChoices.find(([id]) => id === bank)?.[1]].filter(Boolean).join(' · ')
+  const scope = [
+    day ? dayLabelLong : month ? monthLabel(month) : 'All time',
+    who === 'all' ? 'everyone' : who === me.user_id ? 'yours' : nameOf(people[who] ?? { user_id: who }),
+    bankChoices.find(([id]) => id === bank)?.[1],
+  ]
+    .filter(Boolean)
+    .join(' · ')
 
   // Esc closes the details.
   useEffect(() => {

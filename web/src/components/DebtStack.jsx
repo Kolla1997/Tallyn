@@ -23,9 +23,7 @@ const PEEK = 34 // px of each card showing behind the next
 export default function DebtStack({ title, accounts, home }) {
   // Credit cards first, then loans; biggest first within each.
   const sorted = [...accounts].sort(
-    (x, y) =>
-      (accountKind(x) === 'card' ? 0 : 1) - (accountKind(y) === 'card' ? 0 : 1) ||
-      (y.current_balance_minor ?? 0) - (x.current_balance_minor ?? 0),
+    (x, y) => (accountKind(x) === 'card' ? 0 : 1) - (accountKind(y) === 'card' ? 0 : 1) || (y.current_balance_minor ?? 0) - (x.current_balance_minor ?? 0),
   )
   const [front, setFront] = useState(null) // id of the card brought forward
   const order = front ? [...sorted.filter((a) => a.id !== front), sorted.find((a) => a.id === front)] : sorted
@@ -64,7 +62,17 @@ export default function DebtStack({ title, accounts, home }) {
                 >
                   <span className="debt-card-top">
                     <span className="debt-card-name">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        focusable="false"
+                      >
                         <path d={ICON[kind]} />
                       </svg>
                       {a.name}
@@ -73,9 +81,7 @@ export default function DebtStack({ title, accounts, home }) {
                   </span>
                   <span>
                     <span className="debt-card-kind">{KIND[kind]} · owed</span>
-                    <span className="debt-card-amount">
-                      {a.current_balance_minor == null ? '—' : formatMoney(a.current_balance_minor, a.currency)}
-                    </span>
+                    <span className="debt-card-amount">{a.current_balance_minor == null ? '—' : formatMoney(a.current_balance_minor, a.currency)}</span>
                   </span>
                 </button>
               )
@@ -105,9 +111,7 @@ export default function DebtStack({ title, accounts, home }) {
                             {a.name}
                             {a.mask && <span className="muted"> ••{a.mask}</span>}
                           </span>
-                          <span className="amount money-out">
-                            {a.current_balance_minor == null ? '—' : formatMoney(a.current_balance_minor, a.currency)}
-                          </span>
+                          <span className="amount money-out">{a.current_balance_minor == null ? '—' : formatMoney(a.current_balance_minor, a.currency)}</span>
                         </button>
                       </li>
                     ))}

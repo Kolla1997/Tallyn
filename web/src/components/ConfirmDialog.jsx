@@ -33,9 +33,7 @@ export default function ConfirmDialog({ title, children, action, typeToConfirm, 
       if (needsCode) {
         const { data } = await supabase.auth.mfa.listFactors()
         const factor = data?.totp?.find((f) => f.status === 'verified')
-        const { error: codeError } = factor
-          ? await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code })
-          : { error: true }
+        const { error: codeError } = factor ? await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code }) : { error: true }
         if (codeError) {
           setCode('')
           throw new Error("That code didn't work. Check the code in your app and try again.")

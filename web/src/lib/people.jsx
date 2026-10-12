@@ -22,11 +22,7 @@ export function initialOf(member) {
 // their name.
 export function Avatar({ member, small = false }) {
   return (
-    <span
-      className={small ? 'avatar avatar-sm' : 'avatar'}
-      style={{ background: colorFor(member?.user_id) }}
-      aria-hidden="true"
-    >
+    <span className={small ? 'avatar avatar-sm' : 'avatar'} style={{ background: colorFor(member?.user_id) }} aria-hidden="true">
       {initialOf(member)}
     </span>
   )

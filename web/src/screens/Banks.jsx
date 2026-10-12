@@ -27,9 +27,7 @@ export function LinkBank({ householdId, onLinked, onError, label = 'Link a bank'
         onLinked()
       } catch (e) {
         onError(
-          e.message === 'already_linked'
-            ? 'That bank is already linked.'
-            : "We couldn't finish linking that bank. Nothing was saved, so you can try again.",
+          e.message === 'already_linked' ? 'That bank is already linked.' : "We couldn't finish linking that bank. Nothing was saved, so you can try again.",
         )
       }
       setBusy(false)

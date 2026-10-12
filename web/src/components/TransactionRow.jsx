@@ -10,7 +10,7 @@ import TxIcon from './TxIcon.jsx'
 // (#83, option B); hidden when the account is (shared without balances).
 export default function TransactionRow({ tx, meId, people, showDate = true, showBank = false, onSelect, selected = false }) {
   const mine = tx.owner_user_id === meId
-  const owner = tx.owner_user_id ? people[tx.owner_user_id] ?? { user_id: tx.owner_user_id } : null
+  const owner = tx.owner_user_id ? (people[tx.owner_user_id] ?? { user_id: tx.owner_user_id }) : null
   const shown = -tx.amount_minor // Plaid: positive = money out
   const Wrap = onSelect ? 'button' : 'div'
   const pick = onSelect && { type: 'button', 'aria-pressed': selected, onClick: () => onSelect(tx.id) }

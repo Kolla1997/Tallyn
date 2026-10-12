@@ -19,8 +19,8 @@ export default function SetUp2FA({ onSignOut }) {
     <section className="card">
       <h1>Protect your account</h1>
       <p className="muted">
-        Tallyn asks for a code from an authenticator app each time you sign in, so your password alone
-        isn&apos;t enough. Microsoft Authenticator, Google Authenticator and 1Password all work.
+        Tallyn asks for a code from an authenticator app each time you sign in, so your password alone isn&apos;t enough. Microsoft Authenticator, Google
+        Authenticator and 1Password all work.
       </p>
       {error && (
         <p className="error" role="alert">
@@ -60,8 +60,6 @@ async function enrol() {
 
   const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', issuer: 'Tallyn' })
   if (error) throw error
-  const qr = data.totp.qr_code.startsWith('data:')
-    ? data.totp.qr_code
-    : `data:image/svg+xml;utf-8,${encodeURIComponent(data.totp.qr_code)}`
+  const qr = data.totp.qr_code.startsWith('data:') ? data.totp.qr_code : `data:image/svg+xml;utf-8,${encodeURIComponent(data.totp.qr_code)}`
   return { id: data.id, qr, secret: data.totp.secret }
 }

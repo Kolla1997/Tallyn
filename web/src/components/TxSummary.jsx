@@ -20,11 +20,7 @@ const fit = (text, max) => Math.min(max, INSIDE / (String(text).length * 0.6))
 
 export function TxSummary({ totals, scope, month, day }) {
   if (!totals) {
-    return (
-      <section className="panel">
-        {totals === null ? <TallynLoader small /> : <p className="small muted">Nothing to add up for these filters.</p>}
-      </section>
-    )
+    return <section className="panel">{totals === null ? <TallynLoader small /> : <p className="small muted">Nothing to add up for these filters.</p>}</section>
   }
   const cur = totals.currency
   return (
@@ -84,9 +80,7 @@ export function TxSummary({ totals, scope, month, day }) {
 // category in the middle; the others fade back.
 function CategoryRing({ categories, spent, cur, month, day }) {
   const [active, setActive] = useState(null) // label of the highlighted category
-  const top = categories
-    .slice(0, RING.length)
-    .map((c, i) => ({ label: categoryLabel(c.category), amount: c.amount_minor, count: c.count, color: RING[i] }))
+  const top = categories.slice(0, RING.length).map((c, i) => ({ label: categoryLabel(c.category), amount: c.amount_minor, count: c.count, color: RING[i] }))
   const rest = categories.slice(RING.length)
   if (rest.length > 0) {
     top.push({
@@ -99,7 +93,9 @@ function CategoryRing({ categories, spent, cur, month, day }) {
   const shown = top.find((c) => c.label === active)
   const tag = day
     ? new Date(`${day}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    : month ? new Date(`${month}-01T12:00:00`).toLocaleDateString('en-US', { month: 'short' }) : 'All time'
+    : month
+      ? new Date(`${month}-01T12:00:00`).toLocaleDateString('en-US', { month: 'short' })
+      : 'All time'
   const R = 52
   const C = 2 * Math.PI * R
   const GAP = top.length > 1 ? 6 : 0
@@ -201,7 +197,12 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
   const shown = -tx.amount_minor
   const w = tx.whereabouts
   const when = w?.authorized_at || w?.posted_at
-  const day = new Date(`${tx.authorized_date || tx.date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+  const day = new Date(`${tx.authorized_date || tx.date}T12:00:00`).toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
   const time = when && new Date(when).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
   const place = [w?.city, [w?.region, w?.postal_code].filter(Boolean).join(' ')].filter(Boolean).join(', ')
   const hasPlace = Boolean(w?.address || place || (w?.lat != null && w?.lon != null))
@@ -244,7 +245,18 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
       {hasPlace ? (
         <div className="tx-place">
           <div className="tx-address">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
               <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" />
               <circle cx="12" cy="9.5" r="2.5" />
             </svg>

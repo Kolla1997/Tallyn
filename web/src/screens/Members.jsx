@@ -29,7 +29,7 @@ export function Invite({ householdId, onCreated }) {
     } catch (err) {
       setError(
         err.message === 'already_member'
-          ? "That person is already in your household."
+          ? 'That person is already in your household.'
           : err.message === 'bad_request'
             ? 'Check the email address and try again.'
             : "We couldn't create the invite.",
@@ -74,8 +74,7 @@ export function Invite({ householdId, onCreated }) {
       {link && (
         <div className="confirm" role="status">
           <p>
-            Send this link to <strong>{link.email}</strong>. It works once, only for that email, for 7 days. You won&apos;t
-            see it again, so copy it now.
+            Send this link to <strong>{link.email}</strong>. It works once, only for that email, for 7 days. You won&apos;t see it again, so copy it now.
           </p>
           <p className="secret">{link.url}</p>
           <div className="confirm-actions">

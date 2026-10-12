@@ -337,9 +337,7 @@ function Person({ person, members, onSelect, me, household, sharing, setSharing,
             </>
           ) : (
             <p className="small muted">
-              {parentView || received.includes('balances')
-                ? `${name} hasn't linked a bank yet.`
-                : `${name} hasn't shared balances with you.`}
+              {parentView || received.includes('balances') ? `${name} hasn't linked a bank yet.` : `${name} hasn't shared balances with you.`}
             </p>
           )}
         </div>
@@ -391,7 +389,20 @@ function Person({ person, members, onSelect, me, household, sharing, setSharing,
         </div>
       )}
 
-      {you && <YourSummary person={person} members={members} me={me} household={household} sharing={sharing} theirs={theirs} have={have} owe={owe} meId={meId} onSelect={onSelect} />}
+      {you && (
+        <YourSummary
+          person={person}
+          members={members}
+          me={me}
+          household={household}
+          sharing={sharing}
+          theirs={theirs}
+          have={have}
+          owe={owe}
+          meId={meId}
+          onSelect={onSelect}
+        />
+      )}
 
       {(you || (isOwner && person.role !== 'child')) && (
         <div className="person-footer">
@@ -402,14 +413,7 @@ function Person({ person, members, onSelect, me, household, sharing, setSharing,
       )}
 
       {dialog?.kind === 'remove' && (
-        <ConfirmDialog
-          title={`Remove ${name}?`}
-          action="Remove"
-          typeToConfirm={name}
-          needsCode
-          onConfirm={remove}
-          onClose={() => setDialog(null)}
-        >
+        <ConfirmDialog title={`Remove ${name}?`} action="Remove" typeToConfirm={name} needsCode onConfirm={remove} onClose={() => setDialog(null)}>
           <p>
             {name} will lose access to {household.name}. Their banks stay theirs.
           </p>
@@ -493,9 +497,7 @@ function YourSummary({ person, members, me, household, sharing, theirs, have, ow
       <div className="person-section">
         <h3 className="sub-heading">You share with</h3>
         {shareable.length === 0 ? (
-          <p className="small muted">
-            {isKid(me.role) ? 'Your parents already see your money.' : 'There’s nobody to share with yet.'}
-          </p>
+          <p className="small muted">{isKid(me.role) ? 'Your parents already see your money.' : 'There’s nobody to share with yet.'}</p>
         ) : (
           <ul className="rows share-list">
             {shareable.map((m) => {

@@ -76,7 +76,11 @@ export default function CreditCards({ banks, me, home, everyone = false, onChang
 
       {totalLimit > 0 && (
         <>
-          <div className="cc-bar" role="img" aria-label={`${pct}% of your ${formatMoney(totalLimit, cur)} total limit used, ${formatMoney(available, cur)} available`}>
+          <div
+            className="cc-bar"
+            role="img"
+            aria-label={`${pct}% of your ${formatMoney(totalLimit, cur)} total limit used, ${formatMoney(available, cur)} available`}
+          >
             {withLimit.map((a, i) => (
               <span key={a.id} className={`cc-piece cc-shade-${i % SHADES}`} style={{ width: `${Math.min(100, (used(a) / totalLimit) * 100)}%` }} />
             ))}
