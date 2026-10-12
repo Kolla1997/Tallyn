@@ -8,6 +8,10 @@ import { cleanName } from './TransactionRow.jsx'
 // Days ahead are hollow. Hover, focus or tap a dot for that day's overview;
 // clicking a spending day narrows the list to it. No labels: each dot
 // names its date and amount for screen readers.
+//
+// Keyboard (#98): the year is one Tab stop. Arrows move a day (left, right)
+// or a week (up, down), Home and End go to the start or end of the month,
+// Page Up and Page Down move a month, Enter picks the day, Esc hides the card.
 
 const LEVELS = ['day-dot-0', 'day-dot-1', 'day-dot-2', 'day-dot-3', 'day-dot-4']
 const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -15,6 +19,7 @@ const longDate = (d) => d.toLocaleDateString('en-US', { weekday: 'long', month: 
 
 export default function SpendingDots({ year, days, home, selected, onPick }) {
   const [shown, setShown] = useState(null) // { key, left, top }
+  const [active, setActive] = useState('') // the dot Tab lands on (#98)
   const box = useRef(null)
   const today = iso(new Date())
 
@@ -43,6 +48,11 @@ export default function SpendingDots({ year, days, home, selected, onPick }) {
     [year],
   )
 
+  // The one Tab stop: the last dot used, else the picked day, else today,
+  // else 1 January.
+  const inYear = (key) => key?.startsWith(`${year}-`)
+  const stop = inYear(active) ? active : inYear(selected) ? selected : inYear(today) ? today : `${year}-01-01`
+
   const show = (key, el) => {
     const r = el.getBoundingClientRect()
     const b = box.current.getBoundingClientRect()
@@ -58,7 +68,44 @@ export default function SpendingDots({ year, days, home, selected, onPick }) {
     const el = box.current?.querySelector(`[data-key="${iso(d)}"]`)
     if (!el) return
     show(iso(d), el)
+    setActive(iso(d))
     el.focus({ preventScroll: true })
+  }
+
+  // Arrows, Home/End and Page Up/Down move between days, within the year.
+  const keyDown = (e) => {
+    if (e.key === 'Escape' && shown) {
+      e.preventDefault()
+      setShown(null)
+      if (!e.target.dataset.key) box.current?.querySelector(`[data-key="${shown.key}"]`)?.focus({ preventScroll: true })
+      return
+    }
+    const from = e.target.dataset.key
+    if (!from || e.altKey || e.ctrlKey || e.metaKey) return
+    const d = new Date(`${from}T12:00:00`)
+    const end = (y, m) => new Date(y, m + 1, 0).getDate()
+    const month = (delta) => {
+      const day = d.getDate()
+      d.setDate(1)
+      d.setMonth(d.getMonth() + delta)
+      d.setDate(Math.min(day, end(d.getFullYear(), d.getMonth())))
+    }
+    const moves = {
+      ArrowLeft: () => d.setDate(d.getDate() - 1),
+      ArrowRight: () => d.setDate(d.getDate() + 1),
+      ArrowUp: () => d.setDate(d.getDate() - 7),
+      ArrowDown: () => d.setDate(d.getDate() + 7),
+      Home: () => d.setDate(1),
+      End: () => d.setDate(end(d.getFullYear(), d.getMonth())),
+      PageUp: () => month(-1),
+      PageDown: () => month(1),
+    }
+    if (!moves[e.key]) return
+    e.preventDefault()
+    moves[e.key]()
+    const key = iso(d) < `${year}-01-01` ? `${year}-01-01` : iso(d) > `${year}-12-31` ? `${year}-12-31` : iso(d)
+    setActive(key)
+    box.current?.querySelector(`[data-key="${key}"]`)?.focus()
   }
   // Keep the card while focus moves onto its own buttons.
   const blur = (e) => {
@@ -82,8 +129,8 @@ export default function SpendingDots({ year, days, home, selected, onPick }) {
   }
 
   return (
-    <div className="dots" ref={box} onMouseLeave={() => setShown(null)}>
-      <div className="dots-months" role="group" aria-label={`Your spending by day in ${year}`}>
+    <div className="dots" ref={box} onMouseLeave={() => setShown(null)} onKeyDown={keyDown}>
+      <div className="dots-months" role="group" aria-label={`Your spending by day in ${year}. Use the arrow keys to move between days.`}>
         {months.map((month) => (
           <div key={month.name} className="dots-month" role="group" aria-label={month.name}>
             {Array.from({ length: month.lead }, (_, i) => (
@@ -101,9 +148,13 @@ export default function SpendingDots({ year, days, home, selected, onPick }) {
                   className={`day-dot ${ahead ? 'day-dot-ahead' : LEVELS[level(day?.amount_minor)]}${selected === key ? ' day-dot-selected' : ''}`}
                   aria-label={label}
                   aria-pressed={selected === key}
+                  tabIndex={key === stop ? 0 : -1}
                   onMouseEnter={(e) => show(key, e.currentTarget)}
                   data-key={key}
-                  onFocus={(e) => show(key, e.currentTarget)}
+                  onFocus={(e) => {
+                    setActive(key)
+                    show(key, e.currentTarget)
+                  }}
                   onBlur={blur}
                   onClick={(e) => (ahead || !day ? show(key, e.currentTarget) : onPick(selected === key ? '' : key))}
                 />
