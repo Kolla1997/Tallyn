@@ -1988,12 +1988,35 @@ button.tx-row-inner:focus-visible {
   overflow-wrap: anywhere;
 }
 
-.tx-map {
-  height: 96px;
+/* Where a purchase happened: address and Open in Maps (#58; in-app map is #60). */
+.tx-place {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s2);
+}
+
+.tx-place p {
+  margin: 0;
+}
+
+.tx-address {
+  display: flex;
+  gap: var(--space-s3);
+  align-items: flex-start;
+  background: var(--color-cream);
   border-radius: var(--radius-input);
-  background: var(--color-sand);
-  display: grid;
-  place-items: center;
+  padding: var(--space-s3);
+}
+
+.tx-address svg {
+  color: var(--color-clay-deep);
+  flex: none;
+  margin-top: 2px;
+}
+
+.tx-maps {
+  align-self: flex-start;
+  text-decoration: none;
 }
 
 .tx-details .link {

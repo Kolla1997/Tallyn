@@ -195,7 +195,8 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
   const when = w?.authorized_at || w?.posted_at
   const day = new Date(`${tx.authorized_date || tx.date}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
   const time = when && new Date(when).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-  const where = [w?.city, w?.region].filter(Boolean).join(', ')
+  const place = [w?.city, [w?.region, w?.postal_code].filter(Boolean).join(' ')].filter(Boolean).join(', ')
+  const hasPlace = Boolean(w?.address || place || (w?.lat != null && w?.lon != null))
   const owner = tx.owner_user_id === meId ? 'You' : nameOf(people[tx.owner_user_id] ?? { user_id: tx.owner_user_id })
   const name = cleanName(tx.merchant)
 
@@ -231,17 +232,45 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
         )}
         <dt>Category</dt>
         <dd>{tx.category_primary ? categoryLabel(tx.category_primary) : 'Other'}</dd>
-        {where && (
-          <>
-            <dt>Where</dt>
-            <dd>{where}</dd>
-          </>
-        )}
       </dl>
-      {where ? <div className="tx-map small muted">Map coming later</div> : <p className="small muted">No location for this one.</p>}
+      {hasPlace ? (
+        <div className="tx-place">
+          <div className="tx-address">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+              <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" />
+              <circle cx="12" cy="9.5" r="2.5" />
+            </svg>
+            <span>
+              {w.address && <span className="block">{w.address}</span>}
+              {place && <span className="block">{place}</span>}
+              {w.store_number && <span className="block small muted">Store #{w.store_number}</span>}
+            </span>
+          </div>
+          <a className="btn btn-secondary btn-small tx-maps" href={mapsLink(w, name)} target="_blank" rel="noreferrer noopener">
+            Open in Maps
+          </a>
+          <p className="small muted">Opens your maps app. Tallyn doesn&apos;t send the location anywhere until you tap.</p>
+        </div>
+      ) : (
+        <p className="small muted">No location for this one.</p>
+      )}
       <button className="link small" onClick={() => onMerchant(tx.merchant)}>
         All {name} transactions
       </button>
     </section>
   )
+}
+
+// A link to the place in the person's maps app: Apple Maps on Apple devices,
+// Google Maps elsewhere. Coordinates when the bank gave them, else the address.
+function mapsLink(w, name) {
+  const coords = w.lat != null && w.lon != null ? `${w.lat},${w.lon}` : null
+  const text = [w.address, w.city, w.region, w.postal_code].filter(Boolean).join(', ') || name
+  if (/Mac|iPhone|iPad/.test(navigator.userAgent)) {
+    const p = new URLSearchParams({ q: name })
+    if (coords) p.set('ll', coords)
+    else p.set('address', text)
+    return `https://maps.apple.com/?${p}`
+  }
+  return `https://www.google.com/maps/search/?${new URLSearchParams({ api: '1', query: coords ?? text })}`
 }
