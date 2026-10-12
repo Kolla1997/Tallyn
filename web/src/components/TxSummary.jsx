@@ -4,6 +4,7 @@ import { nameOf } from '../lib/people.jsx'
 import { cleanName } from './TransactionRow.jsx'
 import TxIcon from './TxIcon.jsx'
 import TallynLoader from './TallynLoader.jsx'
+import CountUp from './CountUp.jsx'
 
 // The Transactions page's right column (#58): a summary of whatever is
 // filtered, or the details of the transaction you picked.
@@ -35,11 +36,15 @@ export function TxSummary({ totals, scope, month, day }) {
         <div className="have-owe">
           <div className="tone-sage">
             <span className="small">Money in</span>
-            <span className="amount money-in">+{formatMoney(totals.money_in_minor, cur)}</span>
+            <span className="amount money-in">
+              <CountUp value={totals.money_in_minor} format={(v) => `+${formatMoney(v, cur)}`} />
+            </span>
           </div>
           <div className="tone-clay">
             <span className="small">Spent</span>
-            <span className="amount">{formatMoney(totals.spent_minor, cur)}</span>
+            <span className="amount">
+              <CountUp value={totals.spent_minor} format={(v) => formatMoney(v, cur)} />
+            </span>
           </div>
         </div>
         {totals.transfers_minor > 0 && (

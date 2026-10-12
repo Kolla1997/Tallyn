@@ -9,6 +9,8 @@ import { Avatar, nameOf } from '../lib/people.jsx'
 import { Link } from '../lib/router.jsx'
 import { currencies, isOwed, ownerGroup, summarize } from '../lib/summary.js'
 import CreditCards from '../components/CreditCards.jsx'
+import CountUp from '../components/CountUp.jsx'
+import { useFadeOnChange } from '../lib/motion.js'
 import { LinkBank } from './Banks.jsx'
 import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
@@ -165,6 +167,7 @@ function useMinWidth(px) {
 // The balance card (#68): your own money first, or everyone's you can see.
 // The switch here changes the whole Home page.
 function TotalCard({ banks, txs, mine, me, roles, home, scope, onScope }) {
+  const fading = useFadeOnChange(scope) // #87: Yours / Everyone fades and counts
   const totals = summarize(banks, me.user_id, roles)
   const yoursOnly = summarize(banks.filter((b) => b.owner_user_id === me.user_id), me.user_id, roles)
   const list = currencies(totals, home)
@@ -209,7 +212,7 @@ function TotalCard({ banks, txs, mine, me, roles, home, scope, onScope }) {
   const big = yours ? y : t
 
   return (
-    <section className="panel total-card" aria-label={yours ? 'Your balance' : 'Total balance'}>
+    <section className={fading ? 'panel total-card is-fading' : 'panel total-card'} aria-label={yours ? 'Your balance' : 'Total balance'}>
       <div className="total-head">
         <p className="total-label">{yours ? `Your balance · ${cur}` : `Total balance · ${cur} · everything you can see`}</p>
         <div className="scope-switch" role="group" aria-label="Show on Home">
@@ -224,7 +227,9 @@ function TotalCard({ banks, txs, mine, me, roles, home, scope, onScope }) {
         </div>
       </div>
       <div className="total-row">
-        <p className="amount total-big">{formatMoney(big.have, cur)}</p>
+        <p className="amount total-big">
+          <CountUp value={big.have} format={(v) => formatMoney(v, cur)} />
+        </p>
         {any && (
           <p className="small total-note">
             {flow >= 0 ? '+' : '−'}
@@ -243,7 +248,9 @@ function TotalCard({ banks, txs, mine, me, roles, home, scope, onScope }) {
       <div className="total-networth">
         <div>
           <span>{yours ? 'Your net worth' : 'Net worth'}</span>
-          <span className="amount">{formatMoney(big.net, cur)}</span>
+          <span className="amount">
+            <CountUp value={big.net} format={(v) => formatMoney(v, cur)} />
+          </span>
         </div>
         <p className="small">
           What {yours ? 'you have' : 'everyone has'}, {formatMoney(big.have, cur)}, minus what {yours ? 'you owe' : 'they owe'},{' '}
@@ -277,9 +284,10 @@ function YourAccounts({ banks, me, canLink, home, everyone = false }) {
   const biggest = (list) => [...list].sort((x, y) => y.current_balance_minor - x.current_balance_minor).slice(0, 2)
   const top = [...biggest(have), ...biggest(owe)]
   const others = mine.length - inCur.length
+  const fading = useFadeOnChange(everyone)
 
   return (
-    <section className="panel" aria-labelledby="yours-h">
+    <section className={fading ? 'panel is-fading' : 'panel'} aria-labelledby="yours-h">
       <div className="panel-head">
         <h2 id="yours-h">{everyone ? 'Everyone’s accounts' : 'Your accounts'}</h2>
         {mine.length > 0 && (
@@ -297,14 +305,18 @@ function YourAccounts({ banks, me, canLink, home, everyone = false }) {
           <div className="have-owe">
             <Link to="/accounts#have" className="tone-sage">
               <span className="small">{everyone ? 'Everyone has' : 'You have'}</span>
-              <span className="amount">{formatMoney(sum(have), cur)}</span>
+              <span className="amount">
+                <CountUp value={sum(have)} format={(v) => formatMoney(v, cur)} />
+              </span>
               <span className="small muted">
                 {have.length} {have.length === 1 ? 'account' : 'accounts'}
               </span>
             </Link>
             <Link to="/accounts#owe" className="tone-clay">
               <span className="small">{everyone ? 'Everyone owes' : 'You owe'}</span>
-              <span className="amount">{formatMoney(sum(owe), cur)}</span>
+              <span className="amount">
+                <CountUp value={sum(owe)} format={(v) => formatMoney(v, cur)} />
+              </span>
               <span className="small muted">
                 {owe.length} {owe.length === 1 ? 'account' : 'accounts'}
               </span>
@@ -430,9 +442,10 @@ function RecentTransactions({ txs, me, people, everyone = false }) {
   const [tab, setTab] = useState('spending')
   const shown = txs.filter((t) => txKind(t) === tab).slice(0, 5)
   const empty = RECENT_TABS.find(([key]) => key === tab)[2]
+  const fading = useFadeOnChange(`${tab}|${everyone}`)
 
   return (
-    <section className="panel" aria-labelledby="tx-h">
+    <section className={fading ? 'panel is-fading' : 'panel'} aria-labelledby="tx-h">
       <div className="panel-head">
         <h2 id="tx-h">{everyone ? 'Recent transactions' : 'Your recent transactions'}</h2>
         <Link to={everyone ? '/transactions?owner=all' : '/transactions'} className="link small">
@@ -488,14 +501,19 @@ function SpendingCard({ spending, month, home, everyone = false }) {
     const p = (v / total) * 100
     return p < 1 ? '<1%' : `${Math.round(p)}%`
   }
+  const fading = useFadeOnChange(everyone)
 
   return (
-    <section className="panel" aria-labelledby="sp-h">
+    <section className={fading ? 'panel is-fading' : 'panel'} aria-labelledby="sp-h">
       <div className="panel-head">
         <h2 id="sp-h">
           {everyone ? 'Spending' : 'Your spending'} in {monthName(new Date())}
         </h2>
-        {rows.length > 0 && <span className="amount">{formatMoney(total, home)}</span>}
+        {rows.length > 0 && (
+          <span className="amount">
+            <CountUp value={total} format={(v) => formatMoney(v, home)} />
+          </span>
+        )}
       </div>
       {rows.length === 0 ? (
         <p className="small muted">No spending yet this month.</p>

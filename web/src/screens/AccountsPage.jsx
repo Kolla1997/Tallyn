@@ -8,6 +8,8 @@ import { isOwed } from '../lib/summary.js'
 import { LinkBank } from './Banks.jsx'
 import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import CountUp from '../components/CountUp.jsx'
+import { useFadeOnChange } from '../lib/motion.js'
 
 // Accounts (#39 step 3): net worth with a have-vs-owe bar, then every account
 // in two columns, You have and You owe, grouped by type, and the connected
@@ -157,16 +159,17 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
 }
 
 // Net worth with a bar showing how what you have compares with what you owe.
+// Switching person counts the numbers to their new values (#87).
 function NetWorth({ have, owe, home }) {
   const net = have - owe
   const both = have + owe
+  const money = (v) => formatMoney(v, home)
   return (
-    <section className="panel net-worth" aria-label="Net worth">
+    <section className={useFadeOnChange(`${have}|${owe}`) ? 'panel net-worth is-fading' : 'panel net-worth'} aria-label="Net worth">
       <div className="net-worth-head">
         <span className="small muted">Net worth</span>
         <span className="amount net-worth-total">
-          {net < 0 ? '−' : ''}
-          {formatMoney(Math.abs(net), home)}
+          <CountUp value={net} format={(v) => `${v < 0 ? '−' : ''}${money(Math.abs(v))}`} />
         </span>
       </div>
       {both > 0 && (
@@ -177,10 +180,10 @@ function NetWorth({ have, owe, home }) {
       )}
       <div className="net-worth-key small muted">
         <span>
-          <span className="dot dot-sage" aria-hidden="true" /> Have {formatMoney(have, home)}
+          <span className="dot dot-sage" aria-hidden="true" /> Have <CountUp value={have} format={money} />
         </span>
         <span>
-          <span className="dot dot-clay" aria-hidden="true" /> Owe {formatMoney(owe, home)}
+          <span className="dot dot-clay" aria-hidden="true" /> Owe <CountUp value={owe} format={money} />
         </span>
       </div>
     </section>
@@ -189,10 +192,16 @@ function NetWorth({ have, owe, home }) {
 
 function AccountColumn({ id, title, total, groups, accounts, home, people, showOwner, meId, owed = false }) {
   return (
-    <section id={id} className={`panel account-col ${owed ? 'account-col-owe' : 'account-col-have'}`} aria-labelledby={`${id}-h`}>
+    <section
+      id={id}
+      className={`panel account-col ${owed ? 'account-col-owe' : 'account-col-have'}${useFadeOnChange(accounts.map((a) => a.id).join()) ? ' is-fading' : ''}`}
+      aria-labelledby={`${id}-h`}
+    >
       <div className="panel-head">
         <h2 id={`${id}-h`}>{title}</h2>
-        <span className={owed ? 'amount money-out' : 'amount'}>{formatMoney(total, home)}</span>
+        <span className={owed ? 'amount money-out' : 'amount'}>
+          <CountUp value={total} format={(v) => formatMoney(v, home)} />
+        </span>
       </div>
       <p className="small muted account-count">
         {accounts.length} {accounts.length === 1 ? 'account' : 'accounts'}
@@ -268,7 +277,7 @@ function ConnectedBanks({ banks, me, people, onUnlinked }) {
   }
 
   return (
-    <section className="panel connected-banks" aria-labelledby="banks-h">
+    <section className={useFadeOnChange(banks.map((b) => b.id).join()) ? 'panel connected-banks is-fading' : 'panel connected-banks'} aria-labelledby="banks-h">
       <div className="panel-head">
         <h2 id="banks-h">Connected banks</h2>
       </div>

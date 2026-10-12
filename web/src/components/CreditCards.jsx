@@ -1,4 +1,6 @@
 import { formatMoney } from '../lib/money.js'
+import { useFadeOnChange } from '../lib/motion.js'
+import CountUp from './CountUp.jsx'
 
 // Credit cards on Home (#27, Dinesh picked F): one bar for the total limit,
 // each card's balance a piece of it in a shade of clay, the rest available.
@@ -27,6 +29,7 @@ function dueState(card, today) {
 }
 
 export default function CreditCards({ banks, me, home, everyone = false }) {
+  const fading = useFadeOnChange(everyone) // #87
   const shown = everyone ? banks : banks.filter((b) => b.owner_user_id === me.user_id)
   const all = shown.flatMap((b) => b.accounts.filter((a) => a.type === 'credit').map((a) => ({ ...a, bankName: b.institution_name })))
   if (all.length === 0) return null
@@ -46,11 +49,14 @@ export default function CreditCards({ banks, me, home, everyone = false }) {
   const pct = totalLimit ? Math.round((withLimit.reduce((t, a) => t + used(a), 0) / totalLimit) * 100) : null
 
   return (
-    <section className="panel" aria-labelledby="cards-h">
+    <section className={fading ? 'panel is-fading' : 'panel'} aria-labelledby="cards-h">
       <div className="panel-head">
         <h2 id="cards-h">{everyone ? 'Everyone’s credit cards' : 'Credit cards'}</h2>
         <span className="small muted">
-          <strong className="cc-total">{formatMoney(totalUsed, cur)}</strong> used
+          <strong className="cc-total">
+            <CountUp value={totalUsed} format={(v) => formatMoney(v, cur)} />
+          </strong>{' '}
+          used
           {totalLimit > 0 && <> of {formatMoney(totalLimit, cur)} total limit</>}
         </span>
       </div>

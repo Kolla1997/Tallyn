@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #87 Loading effect when filters change (Dinesh picked A with count-up): Transactions dims its cards with a sliding Clay bar while loading (only after 150ms), then fades the new content in; totals count to their new values; Accounts and Home fade the cards that change on their switches; bars slide. Reduced motion gets a plain fade. Animation Guide and Design System updated.
 - #1 CLAUDE.md: talk through a new ticket (understanding, suggestions, scope, questions) before creating it; `/i` stays instant.
 - #77 Merged PR #78 (loan payments count as transfers); closed and moved to Done.
 - #27 Merged PR #79 (credit cards on Home, Liabilities, migration 0011). #27 stays open for loans and mortgages; card moved back to Backlog.
