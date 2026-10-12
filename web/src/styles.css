@@ -3526,3 +3526,64 @@ label.agree input {
     cursor: pointer;
   }
 }
+
+/* Sign out after inactivity (#91, Dinesh picked A and note 1). */
+.idle-dialog::backdrop {
+  background: rgb(59 47 47 / 0.35);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* Without blur, or with reduced transparency: a nearly solid cover, so
+   balances still can't be read. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .idle-dialog::backdrop {
+    background: rgb(59 47 47 / 0.92);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .idle-dialog::backdrop {
+    background: rgb(59 47 47 / 0.92);
+    backdrop-filter: none;
+  }
+}
+
+.idle-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s3);
+}
+
+.idle-dialog:not([open]) {
+  display: none;
+}
+
+.idle-dialog h2,
+.idle-dialog p {
+  margin: 0;
+}
+
+.idle-count {
+  color: var(--color-cocoa);
+  font-variant-numeric: tabular-nums;
+}
+
+.info-note {
+  display: flex;
+  gap: var(--space-s2);
+  align-items: flex-start;
+  margin: 0 0 var(--space-s3);
+  padding: var(--space-s2) var(--space-s3);
+  border-radius: var(--radius-input);
+  background: color-mix(in srgb, var(--color-sage) 14%, var(--color-white));
+  color: var(--color-cocoa);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.info-note svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--color-sage-deep);
+}
