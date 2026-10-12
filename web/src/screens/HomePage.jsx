@@ -458,7 +458,7 @@ function RecentTransactions({ txs, me, people, everyone = false }) {
         </ul>
       )}
       {tab === 'transfers' && (
-        <p className="small muted">Card payments and moves between your own accounts sit here, so they don&apos;t look like spending.</p>
+        <p className="small muted">Loan and card payments and moves between your own accounts sit here, so they don&apos;t look like spending.</p>
       )}
     </section>
   )
