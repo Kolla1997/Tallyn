@@ -14,10 +14,8 @@ kanban-plugin: board
 - [ ] [#22 Password reset](https://github.com/Kolla1997/Tallyn/issues/22) #type/feature #area/frontend #priority/p1
 - [ ] [#23 Recovery when someone loses their authenticator app](https://github.com/Kolla1997/Tallyn/issues/23) #type/feature #area/frontend #priority/p1
 - [ ] [#24 Content-Security-Policy and security headers](https://github.com/Kolla1997/Tallyn/issues/24) #type/feature #area/backend #priority/p1
-- [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#27 Debt details: interest rates, due dates and minimum payments (Plaid Liabilities)](https://github.com/Kolla1997/Tallyn/issues/27) #type/feature #area/backend #priority/p0
 - [ ] [#34 Spending limits per member, with progress and alerts](https://github.com/Kolla1997/Tallyn/issues/34) #type/feature #area/backend #priority/p1
-- [ ] [#36 Terms of Service and Privacy Policy pages, with consent at sign-up](https://github.com/Kolla1997/Tallyn/issues/36) #type/feature #area/frontend #priority/p0
 - [ ] [#37 Show shared money separately from your own](https://github.com/Kolla1997/Tallyn/issues/37) #type/design #area/frontend #priority/p1
 - [ ] [#51 Reconnect a bank that needs sign-in (Plaid update mode)](https://github.com/Kolla1997/Tallyn/issues/51) #type/feature #area/frontend #area/backend #priority/p1
 - [ ] [#53 Rename a household](https://github.com/Kolla1997/Tallyn/issues/53) #type/feature #area/frontend #area/backend #priority/p2
@@ -30,6 +28,7 @@ kanban-plugin: board
 ## In Progress
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
+- [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
 
 
@@ -55,6 +54,7 @@ kanban-plugin: board
 - [x] [#16 Automate board sync with a GitHub Action](https://github.com/Kolla1997/Tallyn/issues/16) #type/feature #area/infra #priority/p2
 - [x] [#28 Sharing settings: choose what each household member can see](https://github.com/Kolla1997/Tallyn/issues/28) #type/feature #area/backend #priority/p1
 - [x] [#30 Separate database logins for the API and the bank sync](https://github.com/Kolla1997/Tallyn/issues/30) #type/tech-debt #area/backend #priority/p1
+- [x] [#36 Terms of Service and Privacy Policy pages, with consent at sign-up](https://github.com/Kolla1997/Tallyn/issues/36) #type/feature #area/frontend #priority/p0
 - [x] [#38 Confirmation dialog before removing members, leaving or unlinking](https://github.com/Kolla1997/Tallyn/issues/38) #type/feature #area/frontend #priority/p1
 - [x] [#39 Build the app screens from the comps, for phone and web](https://github.com/Kolla1997/Tallyn/issues/39) #type/design #area/frontend #priority/p1
 - [x] [#42 Transactions page with person switcher, search and merchant logos](https://github.com/Kolla1997/Tallyn/issues/42) #type/feature #area/frontend #priority/p1
