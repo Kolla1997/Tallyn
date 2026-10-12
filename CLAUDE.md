@@ -13,6 +13,8 @@ Before building or changing anything (code, docs, design, config, issues), **sha
 
 Then stop and wait. Don't start until Dinesh approves (a plan he has already approved in the conversation counts).
 
+**Talk before creating a ticket.** When Dinesh asks for a new ticket, first discuss it: what you understand, your suggestions, how to split or scope it, and open questions. Create the ticket only once you've agreed what it covers, and write that agreement into it. `/i` is the exception (see below).
+
 **Visual changes need a visual draft first.** For anything people will see (a screen, card, chart, layout, colour, icon, finish), show a design draft with 2–3 options using real data where possible, mark anything made up, recommend one, and wait until Dinesh names the option to build. Build only the option he picks (or his mix of them), and show a new draft if he asks for changes to it. See §6.
 
 **No approval needed for:**
@@ -90,7 +92,7 @@ A **ticket number is the GitHub issue number**, written `#12`. Every piece of wo
 
 **Rule: no ticket, no work.**
 1. Before starting a task, find its issue on the board (`gh issue list`, or `docs/05 Board/Board.md`).
-2. If there isn't one, create it before changing anything, using the matching form type and labels:
+2. If there isn't one, discuss it with Dinesh first (§0), then create it before changing anything, using the matching form type and labels:
    `gh issue create --title "..." --label "type:feature,area:backend" --body "..."`
    Then tell Dinesh the new number.
 3. Small fixes (typos, formatting, renames) go under the pinned **Housekeeping** issue, not a new ticket each time.
