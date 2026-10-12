@@ -13,6 +13,8 @@ Before building or changing anything (code, docs, design, config, issues), **sha
 
 Then stop and wait. Don't start until Dinesh approves (a plan he has already approved in the conversation counts).
 
+**Visual changes need a visual draft first.** For anything people will see (a screen, card, chart, layout, colour, icon, finish), show a design draft with 2–3 options using real data where possible, mark anything made up, recommend one, and wait until Dinesh names the option to build. Build only the option he picks (or his mix of them), and show a new draft if he asks for changes to it. See §6.
+
 **No approval needed for:**
 - Read-only steps: reading files, `gh issue list` / `view`, running `scripts/sync_board.py`
 - `/i <idea>`: typing the command is the approval. Log the idea and change nothing else
@@ -144,6 +146,8 @@ Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand,
 - Use only values from `design-tokens.json`. If one is missing, propose it in `docs/03 Design/Design System.md` first.
 - Use the logo only as described in `docs/02 Brand/Logo Guide.md`, from the files in `brand/logo/`. Never redraw, recolor or stretch it.
 - Write copy in the voice set out in `docs/02 Brand/Voice and Tone.md`. This is a money app for families, so be clear and calm, never pushy.
+- Every card is frosted glass over a soft glow (`docs/03 Design/Design System.md` → Glass finish, #61). Keep text AA readable on it, keep dialogs, inputs and buttons solid, and keep the fallbacks for browsers without blur and for reduced transparency.
+- Draft before building (§0): no visual change goes in without a draft Dinesh has picked from.
 
 ## 7. Security rules (finance app)
 
