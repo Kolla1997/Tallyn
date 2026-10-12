@@ -2114,6 +2114,12 @@ body::before {
   backdrop-filter: var(--glass-blur);
 }
 
+/* Blur gives every card its own layer, so the sidebar (and its tooltips)
+   must sit above the page content or the cards would cover them. */
+.sidebar {
+  z-index: 30;
+}
+
 /* Others' money keeps its dashed edge (#37), in a colour you can see on glass. */
 .panel.panel-shared {
   border: 1px dashed var(--color-border);
