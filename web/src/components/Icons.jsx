@@ -45,9 +45,10 @@ export const SettingsIcon = (p) => (
     <circle cx="12" cy="12" r="2.8" />
   </svg>
 )
+// Two-way arrows (#1, Dinesh picked option 3): money moving in and out.
 export const TransactionsIcon = (p) => (
   <svg {...base} {...p}>
-    <path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" />
+    <path d="M4 8h14M14.5 4.5 18 8l-3.5 3.5M20 16H6M9.5 12.5 6 16l3.5 3.5" />
   </svg>
 )
 export const PlusIcon = (p) => (
