@@ -11,6 +11,8 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-12
+- #96 Closed, not a bug: the "Plaid Link embedded more than once" warning comes from React StrictMode mounting twice in development (checked with StrictMode off locally: no warning). Production is unaffected; StrictMode stays.
+- #97 #98 #99 #100 Created from the audit (phone layout fixes, keyboard access for the dots, faster loading, lint/tests/PR checks); #24 extended with timeouts, rate limits and cache headers.
 - #27 #36 Merged PR #94 (Debts ring chart no longer hides the Transactions category legend) and PR #95 (Settings → Legal links, no ticket links shown to customers).
 - #36 Settings → Legal (found by Dinesh, picked A): Terms of Service and Privacy Policy were still "Coming soon" after #36 shipped. Each row now opens the page inside Tallyn, with the version underneath.
 - #1 Settings: "Coming soon" tags no longer link to GitHub issues (customers saw our private ticket links); the ticket number stays in the code only.
