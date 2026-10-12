@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import AuthPage from './components/AuthPage.jsx'
 import { configured, supabase } from './lib/supabase.js'
 import SignIn from './screens/SignIn.jsx'
+import IdleGuard from './components/IdleGuard.jsx'
 import SetUp2FA from './screens/SetUp2FA.jsx'
 import Verify2FA from './screens/Verify2FA.jsx'
 import Home from './screens/Home.jsx'
@@ -74,9 +75,13 @@ function AuthFlow() {
   // the centered sign-in layout.
   if (session && aal?.currentLevel === 'aal2') {
     return (
-      <ConsentGate onSignOut={signOut}>
-        <Home email={session.user.email} onSignOut={signOut} />
-      </ConsentGate>
+      <>
+        {/* Sign out after 30 minutes without activity (#91). */}
+        <IdleGuard onSignOut={signOut} />
+        <ConsentGate onSignOut={signOut}>
+          <Home email={session.user.email} onSignOut={signOut} />
+        </ConsentGate>
+      </>
     )
   }
   let screen
