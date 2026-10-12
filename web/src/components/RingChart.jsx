@@ -42,8 +42,8 @@ export default function RingChart({ rings, total, totalLabel, format }) {
   const fontSize = `min(26px, ${((HOLE * 100) / (centerText.length * 0.6)).toFixed(2)}cqw)`
 
   return (
-    <div className={ready ? 'ring-chart is-ready' : 'ring-chart'}>
-      <div className="ring-svg">
+    <div className={ready ? 'rings-chart is-ready' : 'rings-chart'}>
+      <div className="rings-svg">
         <svg viewBox={`0 0 ${SIZE} ${SIZE}`} aria-hidden="true" focusable="false">
           {rings.map((r, i) => {
             const radius = INNER + (rings.length - 1 - i) * (STROKE + GAP) + STROKE / 2
@@ -51,9 +51,9 @@ export default function RingChart({ rings, total, totalLabel, format }) {
             const len = pct(r) * C
             return (
               <g key={r.key} style={{ '--delay': `${i * 80}ms`, '--arc-delay': `${350 + i * 110}ms` }}>
-                <circle className="ring-track" cx={c} cy={c} r={radius} strokeWidth={STROKE} />
+                <circle className="rings-track" cx={c} cy={c} r={radius} strokeWidth={STROKE} />
                 <circle
-                  className={`ring-arc${hot != null && hot !== i ? ' is-dim' : ''}${hot === i ? ' is-hot' : ''}`}
+                  className={`rings-arc${hot != null && hot !== i ? ' is-dim' : ''}${hot === i ? ' is-hot' : ''}`}
                   cx={c}
                   cy={c}
                   r={radius}
@@ -69,34 +69,34 @@ export default function RingChart({ rings, total, totalLabel, format }) {
             )
           })}
         </svg>
-        <div className="ring-center">
-          <span className="ring-center-value" style={{ fontSize }}>
+        <div className="rings-center">
+          <span className="rings-center-value" style={{ fontSize }}>
             {h ? centerValue : <CountUp value={shownTotal} format={format} />}
           </span>
-          <span className="ring-center-label" style={{ maxWidth: `${HOLE * 100}%` }}>
+          <span className="rings-center-label" style={{ maxWidth: `${HOLE * 100}%` }}>
             {h ? `${h.label} · ${Math.round(pct(h) * 100)}% of ${format(h.max)} ${h.maxNote}` : totalLabel}
           </span>
         </div>
       </div>
 
-      <ul className="ring-legend">
+      <ul className="rings-legend">
         {rings.map((r, i) => (
           <li key={r.key} style={{ '--delay': `${700 + i * 120}ms` }}>
             <button
               type="button"
-              className={`ring-legend-row${hot != null && hot !== i ? ' is-dim' : ''}${hot === i ? ' is-hot' : ''}`}
+              className={`rings-legend-row${hot != null && hot !== i ? ' is-dim' : ''}${hot === i ? ' is-hot' : ''}`}
               onMouseEnter={() => setHot(i)}
               onMouseLeave={() => setHot(null)}
               onFocus={() => setHot(i)}
               onBlur={() => setHot(null)}
             >
-              <span className="ring-swatch" style={{ background: r.color }} aria-hidden="true" />
+              <span className="rings-swatch" style={{ background: r.color }} aria-hidden="true" />
               <span className="grow">{r.label}</span>
-              <span className="ring-legend-amount">
+              <span className="rings-legend-amount">
                 <strong>{format(r.value)}</strong>
                 <span className="small muted"> of {format(r.max)}</span>
               </span>
-              <span className="ring-legend-bar" aria-hidden="true">
+              <span className="rings-legend-bar" aria-hidden="true">
                 <i style={{ width: ready ? `${Math.round(pct(r) * 100)}%` : 0, background: r.color }} />
               </span>
             </button>
