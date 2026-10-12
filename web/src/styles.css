@@ -1930,14 +1930,12 @@ button.tx-row-inner:focus-visible {
 
 .ring-label {
   font-family: var(--font-body);
-  font-size: 11px;
   fill: var(--color-text-secondary);
 }
 
 .ring-total {
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 17px;
   fill: var(--color-cocoa);
 }
 

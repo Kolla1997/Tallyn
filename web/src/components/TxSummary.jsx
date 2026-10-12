@@ -11,6 +11,11 @@ import TxIcon from './TxIcon.jsx'
 const RING = ['var(--color-clay-deep)', 'var(--color-sage-deep)', 'var(--color-cocoa)', 'var(--color-sage-light)']
 const OTHER = 'var(--color-sand)'
 
+// The space inside the ring is about 76 of the drawing's 140 units. Shrink
+// long text (big totals, long names) so it always fits; ~0.6em per character.
+const INSIDE = 76
+const fit = (text, max) => Math.min(max, INSIDE / (String(text).length * 0.6))
+
 export function TxSummary({ totals, scope, month }) {
   if (!totals) {
     return (
@@ -134,22 +139,22 @@ function CategoryRing({ categories, spent, cur, month }) {
             })}
             {shown ? (
               <>
-                <text x="70" y="56" textAnchor="middle" className="ring-label">
-                  {shown.label.length > 18 ? `${shown.label.slice(0, 17)}…` : shown.label}
+                <text x="70" y="56" textAnchor="middle" className="ring-label" fontSize={fit(shown.label, 11)}>
+                  {shown.label}
                 </text>
-                <text x="70" y="76" textAnchor="middle" className="ring-total">
+                <text x="70" y="76" textAnchor="middle" className="ring-total" fontSize={fit(formatMoney(shown.amount, cur), 17)}>
                   {formatMoney(shown.amount, cur)}
                 </text>
-                <text x="70" y="93" textAnchor="middle" className="ring-label">
+                <text x="70" y="93" textAnchor="middle" className="ring-label" fontSize={fit(`${pct(shown.amount)} · ${shown.count} purchases`, 10)}>
                   {pct(shown.amount)} · {shown.count} {shown.count === 1 ? 'purchase' : 'purchases'}
                 </text>
               </>
             ) : (
               <>
-                <text x="70" y="64" textAnchor="middle" className="ring-label">
+                <text x="70" y="64" textAnchor="middle" className="ring-label" fontSize="11">
                   Total spent
                 </text>
-                <text x="70" y="84" textAnchor="middle" className="ring-total">
+                <text x="70" y="84" textAnchor="middle" className="ring-total" fontSize={fit(formatMoney(spent, cur), 17)}>
                   {formatMoney(spent, cur)}
                 </text>
               </>
