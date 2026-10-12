@@ -27,7 +27,7 @@ type Store interface {
 	Item(ctx context.Context, id string) (db.SyncItem, error)
 	SaveSync(ctx context.Context, item db.SyncItem, r plaid.SyncResult) (db.SyncStats, error)
 	SetStatus(ctx context.Context, id, status string) error
-	SaveCreditCards(ctx context.Context, item db.SyncItem, cards []plaid.CreditCard) error
+	SaveCreditCards(ctx context.Context, item db.SyncItem, cards []plaid.CreditCard, state string) error
 	SaveAccounts(ctx context.Context, item db.SyncItem, accounts []plaid.Account) error
 }
 
@@ -72,6 +72,10 @@ type Syncer struct {
 type request struct {
 	bankID  string
 	attempt int
+	// reconnect: the person just signed in again or agreed to share card
+	// details (Plaid Link update mode, #51). Sync even if marked
+	// needs_reauth, and fetch card details now.
+	reconnect bool
 }
 
 // New returns a Syncer that syncs every bank each `every` (6 hours, decided 2026-10-09).
@@ -113,6 +117,12 @@ func (s *Syncer) SyncNow(bankID string) {
 	s.enqueue(request{bankID: bankID})
 }
 
+// Reconnected asks for a bank to be synced right after Plaid Link update mode
+// (#51). A good sync sets it back to active. Never blocks.
+func (s *Syncer) Reconnected(bankID string) {
+	s.enqueue(request{bankID: bankID, reconnect: true})
+}
+
 func (s *Syncer) enqueue(r request) {
 	select {
 	case s.now <- r:
@@ -130,11 +140,17 @@ func (s *Syncer) syncRequested(ctx context.Context, r request) {
 		log.Printf("sync: bank %s: load: %v", r.bankID, err)
 		return
 	}
-	if item.Status != "active" {
+	switch {
+	case r.reconnect && item.Status == "needs_reauth":
+		// the person just signed in again: try it
+	case item.Status != "active":
 		return
 	}
+	if r.reconnect {
+		item.LiabilitiesSyncedAt = nil // they may have just shared card details
+	}
 	if s.SyncOne(ctx, item) == NotReady && r.attempt < len(s.retries) {
-		next := request{bankID: r.bankID, attempt: r.attempt + 1}
+		next := request{bankID: r.bankID, attempt: r.attempt + 1, reconnect: r.reconnect}
 		time.AfterFunc(s.retries[r.attempt], func() { s.enqueue(next) })
 	}
 }
@@ -214,17 +230,22 @@ func (s *Syncer) syncCards(ctx context.Context, item db.SyncItem, token string) 
 		log.Printf("sync: bank %s: save balances: %v", item.ID, err)
 	}
 	cards, err := s.plaid.Liabilities(ctx, token)
+	state := "shared"
 	switch {
+	case err == nil:
+	case plaid.CardDetailsState(err) == plaid.CardsNotReady:
+		log.Printf("sync: bank %s: card details not ready yet", item.ID)
+		return // keep what we have; the next run asks again
 	case plaid.NoLiabilities(err):
 		var pe *plaid.Error
 		errors.As(err, &pe)
 		log.Printf("sync: bank %s: no card details (%s)", item.ID, pe.Code)
-		cards = nil // no cards, or not shared: clear and wait a day
-	case err != nil:
+		cards, state = nil, plaid.CardDetailsState(err) // clear, and remember why (#51)
+	default:
 		log.Printf("sync: bank %s: card details: %v", item.ID, err)
 		return
 	}
-	if err := s.store.SaveCreditCards(ctx, item, cards); err != nil && !errors.Is(err, db.ErrNotFound) {
+	if err := s.store.SaveCreditCards(ctx, item, cards, state); err != nil && !errors.Is(err, db.ErrNotFound) {
 		log.Printf("sync: bank %s: save card details: %v", item.ID, err)
 		return
 	}

@@ -15,6 +15,7 @@ import (
 // Plaid is the part of the Plaid API the bank routes use. *plaid.Client implements it.
 type Plaid interface {
 	CreateLinkToken(ctx context.Context, userID string) (string, error)
+	CreateUpdateLinkToken(ctx context.Context, userID, accessToken string) (string, error)
 	ExchangePublicToken(ctx context.Context, publicToken string) (accessToken, itemID string, err error)
 	Accounts(ctx context.Context, accessToken string) (plaid.Item, []plaid.Account, error)
 	InstitutionName(ctx context.Context, institutionID string) (string, error)
@@ -37,6 +38,9 @@ type banks struct {
 	plaid   Plaid
 	tokens  Tokens
 	syncNow func(bankID string)
+	// reconnected syncs a bank right after Plaid Link update mode, even if
+	// it's marked as needing sign-in, and fetches card details now (#51).
+	reconnected func(bankID string)
 }
 
 func (b banks) needsPlaid(h http.HandlerFunc) http.HandlerFunc {
@@ -200,6 +204,64 @@ func (b banks) unlink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// reconnectToken opens Plaid Link in update mode for a bank that needs
+// sign-in, or hasn't shared card details (#51). Allowed for whoever may unlink
+// it: the person who linked it, or a household owner for a kid's bank. The
+// access token is decrypted only for the Plaid call and never sent back.
+func (b banks) reconnectToken(w http.ResponseWriter, r *http.Request) {
+	uid, ok := userID(w, r)
+	if !ok {
+		return
+	}
+	bankID := r.PathValue("id")
+	itemID, sealed, err := b.store.UnlinkTarget(r.Context(), uid, bankID)
+	if errors.Is(err, db.ErrNotFound) {
+		writeError(w, http.StatusNotFound, "not_found")
+		return
+	}
+	if err != nil {
+		log.Printf("api: reconnect %s: %v", bankID, err)
+		writeError(w, http.StatusInternalServerError, "internal")
+		return
+	}
+	accessToken, err := b.tokens.Open(sealed, []byte(itemID))
+	if err != nil {
+		log.Printf("api: reconnect %s: cannot decrypt the access token (wrong TOKEN_ENCRYPTION_KEY?)", bankID)
+		writeError(w, http.StatusInternalServerError, "internal")
+		return
+	}
+	tok, err := b.plaid.CreateUpdateLinkToken(r.Context(), uid, string(accessToken))
+	if err != nil {
+		log.Printf("api: reconnect %s: %v", bankID, err)
+		writeError(w, http.StatusBadGateway, "bank_service_error")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"link_token": tok})
+}
+
+// reconnectDone is called after Plaid Link update mode succeeds: sync the
+// bank now, which sets it back to active once the bank answers. Same check
+// as reconnectToken, so only people who may reconnect can trigger it.
+func (b banks) reconnectDone(w http.ResponseWriter, r *http.Request) {
+	uid, ok := userID(w, r)
+	if !ok {
+		return
+	}
+	bankID := r.PathValue("id")
+	if _, _, err := b.store.UnlinkTarget(r.Context(), uid, bankID); errors.Is(err, db.ErrNotFound) {
+		writeError(w, http.StatusNotFound, "not_found")
+		return
+	} else if err != nil {
+		log.Printf("api: reconnected %s: %v", bankID, err)
+		writeError(w, http.StatusInternalServerError, "internal")
+		return
+	}
+	if b.reconnected != nil {
+		b.reconnected(bankID)
+	}
+	w.WriteHeader(http.StatusAccepted)
 }
 
 func (b banks) mayLink(w http.ResponseWriter, r *http.Request, uid, householdID string) bool {

@@ -36,21 +36,34 @@ var (
 	aprTypes  = map[string]bool{"purchase_apr": true, "balance_transfer_apr": true, "cash_apr": true, "special": true}
 )
 
-// NoLiabilities reports whether err only means this bank has no card or loan
-// details to give: not supported, not consented to, or not ready yet. The
-// sync skips those quietly.
-func NoLiabilities(err error) bool {
+// What a Liabilities error says about a bank's card details (#51).
+const (
+	CardsConsentNeeded = "consent_needed" // the person must agree in Plaid first
+	CardsNotOffered    = "not_offered"    // this bank doesn't offer them
+	CardsNotReady      = "not_ready"      // Plaid is still fetching: try later
+)
+
+// CardDetailsState says what err means for card details: one of the states
+// above, or "" when it's a real failure.
+func CardDetailsState(err error) string {
 	var pe *Error
 	if !errors.As(err, &pe) {
-		return false
+		return ""
 	}
 	switch pe.Code {
-	case "PRODUCTS_NOT_SUPPORTED", "NO_LIABILITY_ACCOUNTS", "PRODUCT_NOT_READY",
-		"ADDITIONAL_CONSENT_REQUIRED", "INVALID_PRODUCT", "PRODUCT_NOT_ENABLED":
-		return true
+	case "ADDITIONAL_CONSENT_REQUIRED":
+		return CardsConsentNeeded
+	case "PRODUCTS_NOT_SUPPORTED", "NO_LIABILITY_ACCOUNTS", "INVALID_PRODUCT", "PRODUCT_NOT_ENABLED":
+		return CardsNotOffered
+	case "PRODUCT_NOT_READY":
+		return CardsNotReady
 	}
-	return false
+	return ""
 }
+
+// NoLiabilities reports whether err only means this bank has no card or loan
+// details to give right now (any state above), rather than a failure.
+func NoLiabilities(err error) bool { return CardDetailsState(err) != "" }
 
 // Liabilities returns the bank's credit card details. Student loans and
 // mortgages come later (#27).

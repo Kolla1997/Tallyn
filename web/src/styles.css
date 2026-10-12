@@ -3030,3 +3030,15 @@ label.agree input {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* Reconnect (#51): the bank's buttons in one row. */
+.bank-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s2);
+  align-items: center;
+}
+
+.bank-actions .chip-danger {
+  align-self: center;
+}

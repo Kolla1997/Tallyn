@@ -98,6 +98,7 @@ type Bank struct {
 	OwnerUserID     string        `json:"owner_user_id"`
 	Status          string        `json:"status"` // active, needs_reauth, disconnected
 	LastSyncedAt    *time.Time    `json:"last_synced_at"`
+	CardDetails     *string       `json:"card_details"` // shared, consent_needed, not_offered; nil if not asked yet (#51)
 	CanUnlink       bool          `json:"can_unlink"`
 	Accounts        []BankAccount `json:"accounts"`
 }
@@ -146,7 +147,7 @@ func (d *DB) Banks(ctx context.Context, userID, householdID string) ([]Bank, err
 	err := d.AsUser(ctx, userID, func(tx pgx.Tx) error {
 		byID := map[string]int{}
 		rows, err := tx.Query(ctx, `
-			select i.id, i.institution_name, i.owner_user_id, i.status, i.last_synced_at,
+			select i.id, i.institution_name, i.owner_user_id, i.status, i.last_synced_at, i.card_details,
 			       public.can_unlink(i.household_id, i.owner_user_id)
 			from public.plaid_items i
 			where i.household_id = $1
@@ -156,7 +157,7 @@ func (d *DB) Banks(ctx context.Context, userID, householdID string) ([]Bank, err
 		}
 		for rows.Next() {
 			var b Bank
-			if err := rows.Scan(&b.ID, &b.InstitutionName, &b.OwnerUserID, &b.Status, &b.LastSyncedAt, &b.CanUnlink); err != nil {
+			if err := rows.Scan(&b.ID, &b.InstitutionName, &b.OwnerUserID, &b.Status, &b.LastSyncedAt, &b.CardDetails, &b.CanUnlink); err != nil {
 				return err
 			}
 			b.Accounts = []BankAccount{}

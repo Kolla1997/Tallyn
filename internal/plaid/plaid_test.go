@@ -201,3 +201,22 @@ func TestInstitutionName(t *testing.T) {
 		t.Fatalf("body = %v", f.lastBody)
 	}
 }
+
+// Update mode (#51): the existing item's access token, consent for card and
+// loan details, and no products (Plaid refuses products in update mode).
+func TestCreateUpdateLinkToken(t *testing.T) {
+	c, f := setup(t, "/link/token/create", 200, `{"link_token":"link-sandbox-update"}`)
+	tok, err := c.CreateUpdateLinkToken(context.Background(), "11111111-1111-4111-8111-111111111111", fakeToken)
+	if err != nil || tok != "link-sandbox-update" {
+		t.Fatalf("got %q, %v", tok, err)
+	}
+	if f.lastBody["access_token"] != fakeToken {
+		t.Fatalf("access_token = %v", f.lastBody["access_token"])
+	}
+	if _, ok := f.lastBody["products"]; ok {
+		t.Fatal("products sent in update mode")
+	}
+	if got := f.lastBody["additional_consented_products"]; len(got.([]any)) != 1 || got.([]any)[0] != "liabilities" {
+		t.Fatalf("additional_consented_products = %v", got)
+	}
+}

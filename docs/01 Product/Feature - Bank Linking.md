@@ -30,13 +30,13 @@ An owner or adult connects a US bank through Plaid Link, sees its accounts and b
 - List the household's banks and accounts (RLS decides who sees what)
 - Unlink: revoke at Plaid (`/item/remove`), then delete our copy and, by cascade, its accounts and transactions
 - Unlink is allowed for the person who linked the bank, or a household owner
+- **Reconnect** (#51): Plaid Link in update mode for a bank that needs sign-in, or to add APR and due dates for banks linked before Liabilities (`additional_consented_products`). Same people as Unlink; the access token is decrypted only for the Plaid call. Afterwards the bank syncs straight away and is set back to active
 
 **Out:**
 - Transactions and balance refresh (#9), Plaid webhooks (#9)
 - Other countries, Investments, `auth` (account and routing numbers: never)
 - Linking an account *for* a child (#12)
 - Choosing between several households (#12); the app uses the first one for now
-- Update mode for items that need the user to log in again (#9)
 - Moving the encryption key to a cloud KMS (before launch, see Open questions)
 
 ## Design

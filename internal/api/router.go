@@ -51,6 +51,7 @@ type Deps struct {
 	Plaid       Plaid                           // *plaid.Client
 	Tokens      Tokens                          // *tokencrypt.Box
 	SyncNow     func(bankID string)             // sync.Syncer.SyncNow; optional
+	Reconnected func(bankID string)             // sync.Syncer.Reconnected; optional (#51)
 }
 
 // NewRouter returns the server's handler: JSON API under /api/ and the
@@ -79,11 +80,13 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("DELETE /api/invites/{id}", revokeInvite(d.Store))
 	api.HandleFunc("POST /api/invites/accept", acceptInvite(d.Store))
 	api.HandleFunc("POST /api/households", createHousehold(d.Store))
-	b := banks{store: d.Store, plaid: d.Plaid, tokens: d.Tokens, syncNow: d.SyncNow}
+	b := banks{store: d.Store, plaid: d.Plaid, tokens: d.Tokens, syncNow: d.SyncNow, reconnected: d.Reconnected}
 	api.HandleFunc("POST /api/plaid/link-token", b.needsPlaid(b.linkToken))
 	api.HandleFunc("POST /api/plaid/exchange", b.needsPlaid(b.exchange))
 	api.HandleFunc("GET /api/banks", b.list)
 	api.HandleFunc("DELETE /api/banks/{id}", b.needsPlaid(b.unlink))
+	api.HandleFunc("POST /api/banks/{id}/reconnect-token", b.needsPlaid(b.reconnectToken))
+	api.HandleFunc("POST /api/banks/{id}/reconnected", b.needsPlaid(b.reconnectDone))
 	api.HandleFunc("GET /api/transactions", transactions(d.Store))
 	api.HandleFunc("GET /api/transactions/summary", txSummary(d.Store))
 	api.HandleFunc("GET /api/transactions/daily", txDaily(d.Store))

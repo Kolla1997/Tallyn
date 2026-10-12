@@ -34,7 +34,7 @@ On Home, see your total credit limit, how much is used, and each card's APR, min
 - Payment reminders (#55)
 
 ## Design
-Option F (Dinesh picked from six drafts): header "$10,860 used of $24,000 total limit"; one bar for the total limit with each card's balance as a piece in shades of Clay and Sand for what's available; "45% used" and "$13,140 available" under it. Then one line per card, soonest due first: name and last digits, bank · APR · minimum, used of its limit, and the due date (amber chip within 5 days, Error "Overdue"). Cards without details yet say "No APR or due date from the bank yet." Cards in another currency are counted in a note. See [[Design System]].
+Option F (Dinesh picked from six drafts): header "$10,860 used of $24,000 total limit"; one bar for the total limit with each card's balance as a piece in shades of Clay and Sand for what's available; "45% used" and "$13,140 available" under it. Then one line per card, soonest due first: name and last digits, bank · APR · minimum, used of its limit, and the due date (amber chip within 5 days, Error "Overdue"). Cards without details say "No APR or due date yet · Add APR and due dates" when the bank needs permission (or hasn't been asked), and "Your bank doesn't share APR or due dates for this card." once it has answered (`plaid_items.card_details`, migration `0012`, #51). Due dates show the year when it isn't this year; a date that has passed reads "Last due …" and sorts after upcoming ones. Cards in another currency are counted in a note. See [[Design System]].
 
 ## Tech notes
 - Migration `0011_credit_cards.sql`: `accounts.credit_limit_minor`, `plaid_items.liabilities_synced_at`, `credit_cards` with RLS (`can_see_account_data(account_id, 'balances')`) and a sync-only write policy.
@@ -45,9 +45,8 @@ Option F (Dinesh picked from six drafts): header "$10,860 used of $24,000 total 
 
 ## Rollout
 1. Run `0011_credit_cards.sql` on dev (done 2026-10-12).
-2. Sandbox banks linked before this show limits but not card details (`ADDITIONAL_CONSENT_REQUIRED`). Link a new sandbox bank to see APRs and due dates.
+2. Banks linked before this show limits but not card details (`ADDITIONAL_CONSENT_REQUIRED`). **Add APR and due dates** (#51) on the bank in Accounts, or on the card on Home, asks for consent in Plaid and fetches them straight away.
 3. Production: confirm the Liabilities price first.
 
 ## Open questions
 > [!todo] Liabilities price per bank in Production: ask Plaid (Dinesh).
-> [!todo] Reconnect flow for banks linked before Liabilities (#51).

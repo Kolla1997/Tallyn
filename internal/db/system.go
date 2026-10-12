@@ -253,10 +253,16 @@ func nonNegative(v *int64) *int64 {
 }
 
 // SaveCreditCards replaces a bank's credit card details (#27) with cards, and
-// records that they were fetched now. Cards whose account isn't in this bank
+// records that they were fetched now and what the bank said (#51): "shared",
+// "consent_needed" or "not_offered". Cards whose account isn't in this bank
 // are skipped; cards the bank no longer reports are removed. An empty list
 // (the bank has no cards, or doesn't support it) clears them.
-func (s *System) SaveCreditCards(ctx context.Context, item SyncItem, cards []plaid.CreditCard) error {
+func (s *System) SaveCreditCards(ctx context.Context, item SyncItem, cards []plaid.CreditCard, state string) error {
+	switch state {
+	case "shared", "consent_needed", "not_offered":
+	default:
+		return ErrInvalid
+	}
 	return s.as(ctx, func(tx pgx.Tx) error {
 		var exists bool
 		if err := tx.QueryRow(ctx, `select true from public.plaid_items where id = $1 for update`, item.ID).Scan(&exists); err != nil {
@@ -292,7 +298,7 @@ func (s *System) SaveCreditCards(ctx context.Context, item SyncItem, cards []pla
 		b.Queue(`delete from public.credit_cards
 			where account_id in (select id from public.accounts where plaid_item_id = $1 and not (plaid_account_id = any($2)))`,
 			item.ID, keep)
-		b.Queue(`update public.plaid_items set liabilities_synced_at = now() where id = $1`, item.ID)
+		b.Queue(`update public.plaid_items set liabilities_synced_at = now(), card_details = $2 where id = $1`, item.ID, state)
 		return mapErr(tx.SendBatch(ctx, b).Close())
 	})
 }

@@ -5,7 +5,8 @@ import { api } from '../lib/api.js'
 import { formatMoney } from '../lib/money.js'
 import { Avatar, nameOf } from '../lib/people.jsx'
 import { isOwed } from '../lib/summary.js'
-import { LinkBank } from './Banks.jsx'
+import { LinkBank, ReconnectBank } from './Banks.jsx'
+import { canAddCardDetails, cardsWithoutDetails } from '../lib/cards.js'
 import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
 import CountUp from '../components/CountUp.jsx'
@@ -179,7 +180,14 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
               meId={me.user_id}
               owed
             />
-            <ConnectedBanks banks={shown} me={me} people={people} onUnlinked={() => (load(), onChanged?.())} />
+            <ConnectedBanks
+              banks={shown}
+              me={me}
+              people={people}
+              onUnlinked={() => (load(), onChanged?.())}
+              onReconnected={() => (load(), onChanged?.())}
+              onError={setError}
+            />
           </div>
           {uncounted > 0 && (
             <p className="small muted">
@@ -300,7 +308,7 @@ function AccountItem({ a, owner, meId }) {
 
 // Each bank's status and, where this person may, Unlink. Unlinking asks you
 // to type the bank's name (#38); it's your own data, so no 2FA code.
-function ConnectedBanks({ banks, me, people, onUnlinked }) {
+function ConnectedBanks({ banks, me, people, onUnlinked, onReconnected, onError }) {
   const [unlinking, setUnlinking] = useState(null) // the bank being unlinked
 
   async function unlink(bank) {
@@ -342,10 +350,24 @@ function ConnectedBanks({ banks, me, people, onUnlinked }) {
                     : 'This bank was disconnected and isn’t updating.'}
                 </p>
               )}
+              {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
+                <p className="small muted">
+                  {cardsWithoutDetails(b)} {cardsWithoutDetails(b) === 1 ? 'credit card doesn’t' : 'credit cards don’t'} have APR or due dates yet.
+                </p>
+              )}
               {b.can_unlink && (
-                <button className="chip chip-danger" onClick={() => setUnlinking(b)}>
-                  Unlink
-                </button>
+                <div className="bank-actions">
+                  {/* Reconnect (#51): sign in again, or share card details (#27). */}
+                  {b.status === 'needs_reauth' && (
+                    <ReconnectBank bankId={b.id} label="Reconnect" onDone={onReconnected} onError={onError} />
+                  )}
+                  {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
+                    <ReconnectBank bankId={b.id} label="Add APR and due dates" className="chip" onDone={onReconnected} onError={onError} />
+                  )}
+                  <button className="chip chip-danger" onClick={() => setUnlinking(b)}>
+                    Unlink
+                  </button>
+                </div>
               )}
             </li>
           )
