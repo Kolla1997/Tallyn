@@ -38,6 +38,7 @@ tags: [home]
 - [[Architecture]]: system overview
 - [[Tech Stack]]: what we use and why
 - [[Dev Setup]]: run it locally
+- [[Test Plan]]: what is tested, at which level, and the gaps (#111)
 - [[0001-record-architecture-decisions|ADRs]]: decision records
 
 ## Work
