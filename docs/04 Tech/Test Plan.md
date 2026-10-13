@@ -30,7 +30,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - **One plan** that maps every use case to the tests that prove it, at the right level, with a ticket for each gap.
 - **Success:**
   - every row below is either covered, or has a ticket;
-  - before launch, every **P0** row is covered at the level the plan asks for;
+  - **the launch bar** (agreed): every **P0** row is covered at the level the plan asks for, and the release checklist passes;
   - a manual release checklist covers the few things automation can't, such as a real bank and a real authenticator.
 
 ## Test levels
@@ -39,7 +39,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | **Unit** | One function or component, with no network or database. Rules, formatting, edge cases | Go `testing`; Vitest + Testing Library (jsdom) | Every PR |
 | **Integration** | The API with a real Postgres: RLS, roles, SQL, handlers end to end with a test token | Go tests with `TALLYN_TEST_DATABASE_URL` (Postgres 16 in CI) | Every PR |
 | **Contract** | Our Plaid and Supabase code against recorded responses | Go `httptest` fakes (Plaid today) | Every PR |
-| **Browser end-to-end** | A person's path through the real app: sign-in, 2FA, a page, a change | Proposed: **Playwright** with a test Supabase project and the Plaid sandbox | Proposed: nightly, and before a release |
+| **Browser end-to-end** | A person's path through the real app: sign-in, 2FA, a page, a change | **Playwright** with a separate Supabase test project and the Plaid sandbox (#113) | Nightly, and before each release |
 | **Manual** | What can't be automated safely: real email, a real authenticator app, a real bank, how it looks | Release checklist (below) | Before a release |
 
 **Priority:**
@@ -87,7 +87,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Unlink a bank, and who may | P0 | — | Yes | No | `TestUnlink` (db, api), `TestUnlinkRules` |
 | Scheduled sync: transactions, cards, loans; one bad bank doesn't stop the others | P1 | Yes | Yes | — | `sync_test.go` (9), `plaid/transactions_test.go`, `liabilities_test.go`, `system_test.go` |
 | The sync login can't reach what it shouldn't | P0 | — | Yes | — | `logins_test.go`, `system_test.go` (`TestSyncRoleLimits`) |
-| Connect a bank isn't blocked by the Plaid rate limit after normal browsing | P1 | No | No | No | **Known bug**: pages ask for a link token on every visit (found in #99) |
+| Connect a bank isn't blocked by the Plaid rate limit after normal browsing | P1 | No | No | No | **Known bug** [#115](https://github.com/Kolla1997/Tallyn/issues/115): pages ask for a link token on every visit (found in #99) |
 
 ### Money, transactions and debts
 | Use case | P | Unit | Integration | End-to-end | Tests today |
@@ -122,12 +122,12 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - Writing all the missing tests here: each gap gets its own ticket.
 - Load and penetration testing: separate tickets, closer to launch.
 
-## Proposed gap tickets (to agree before creating)
-1. **Browser end-to-end tests (Playwright)** for the P0 paths: sign-in with 2FA, Home totals, connecting a sandbox bank, inviting a member, sharing. This needs a test Supabase project with a seeded test user and a test TOTP secret, kept in CI secrets and never in the repo.
-2. **Component tests for the untested screens:** Home, Accounts, Family and sharing, Settings, ConsentGate, IdleGuard, SetUp2FA. Add a `PUT /api/me` handler test.
-3. **Fix the Plaid link-token bug** (ask only on Connect a bank), with a test.
-4. **Automatic sign-outs end only this device:** a test that `IdleGuard` and `SessionLimit` use `scope: 'local'`.
-5. **Layout checks in the browser:** phone and desktop width, no sideways scroll, no hidden content. These would have caught #94 and #97.
+## Gap tickets (agreed 2026-10-12)
+1. [#113](https://github.com/Kolla1997/Tallyn/issues/113) **Browser end-to-end tests** for the P0 paths: sign-in with 2FA, Home totals, connecting a sandbox bank, inviting a member, sharing. They use a separate Supabase test project with a seeded test user and a test TOTP secret, kept in GitHub secrets and never in the repo.
+2. [#114](https://github.com/Kolla1997/Tallyn/issues/114) **Tests for the untested screens:** Home, Accounts, Family and sharing, Settings, ConsentGate, IdleGuard, SetUp2FA. Plus a `PUT /api/me` handler test.
+3. [#115](https://github.com/Kolla1997/Tallyn/issues/115) **Fix the Plaid link-token bug** (ask only on Connect a bank), with a test.
+4. [#116](https://github.com/Kolla1997/Tallyn/issues/116) **Automatic sign-outs end only this device:** tests for `scope: 'local'`.
+5. [#117](https://github.com/Kolla1997/Tallyn/issues/117) **Layout checks in the browser:** phone and desktop width, no sideways scroll, no hidden content. These would have caught #94 and #97.
 
 ## Release checklist (manual, before each release)
 - [ ] Sign up with a new email, confirm it, set up 2FA with a real authenticator app.
@@ -140,12 +140,12 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - [ ] Production build: security headers present, fonts are WOFF2, pages load on demand.
 
 ## Open questions
-> [!todo] Ask Dinesh
-> - Browser end-to-end tests in CI on every PR, or nightly plus before releases? Every PR is safer but slower. Nightly is cheaper.
-> - What coverage counts as good enough to launch? Proposed: every P0 row covered at its level, and the release checklist passed.
-> - A separate Supabase project for automated tests (the free plan allows two active projects, so check how many are in use), or reuse tallyn-dev?
+None at the moment. New ones go here as `> [!todo]` callouts.
 
 ## Decisions
 | Date | Decision | Why |
 |---|---|---|
+| 2026-10-12 | Browser end-to-end tests run nightly and before each release, not on every PR | Dinesh: cheaper and faster PRs; unit and integration tests still run on every PR (#111) |
+| 2026-10-12 | A separate Supabase project for automated tests | Dinesh: tests never touch tallyn-dev's real sign-ins or data (#111, #113) |
+| 2026-10-12 | Launch bar: every P0 row covered at its level, and the release checklist passed | Dinesh (#111) |
 | 2026-10-12 | Every feature and bug-fix PR updates this plan and adds its tests (CLAUDE.md §5) | Dinesh: so the plan never falls out of date and gaps can't hide again (#111) |
