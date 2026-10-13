@@ -2,7 +2,7 @@
 type: spec
 status: active
 owner: Dinesh
-updated: 2026-10-08
+updated: 2026-10-12
 issues: [7, 22, 23, 24, 25]
 tags: [spec, auth, security]
 ---
@@ -28,13 +28,14 @@ Every API call that touches family data comes from a person who signed in with e
 - Set up 2FA after first log-in: scan a QR code or type the secret, then confirm a code
 - Log in: email + password, then the 6-digit code
 - Sign out
+- Password reset ([#22](https://github.com/Kolla1997/Tallyn/issues/22), Dinesh picked A): "Forgot password?" by the Password label → email → link → **the 2FA code first** (Supabase needs it to change the password of an account with 2FA, so a reset never skips 2FA) → a new password of at least 8 characters → Home, signed out on other devices. "Check your email" reads the same whether or not the account exists. An expired or used link offers a new one
 - `internal/auth`: verify the Supabase access token on every `/api/` request and require 2FA (`aal2`)
 - `GET /api/me`: the signed-in person's profile and households, read through `AsUser` so RLS applies
 - Bare-bones screens using `design-tokens.json`
 
 **Out:**
 - Styled sign-in screens (the comps don't have them yet; see [[Design System]]): [#25](https://github.com/Kolla1997/Tallyn/issues/25)
-- Password reset: [#22](https://github.com/Kolla1997/Tallyn/issues/22). Changing email: not ticketed yet
+- Changing email: not ticketed yet
 - Recovery if someone loses their authenticator app: [#23](https://github.com/Kolla1997/Tallyn/issues/23)
 - SMS 2FA (a paid Supabase add-on), social and SSO log-in
 - Invitations and finer role rules ([#12](https://github.com/Kolla1997/Tallyn/issues/12))

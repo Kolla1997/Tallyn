@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import SignIn from './SignIn.jsx'
 
@@ -29,5 +29,25 @@ describe('SignIn after an idle sign-out', () => {
     localStorage.setItem('tallyn.signOutNote', 'max')
     render(<SignIn />)
     expect(screen.getByRole('status')).toHaveTextContent('For your security, Tallyn asks you to sign in again every 12 hours.')
+  })
+
+  it('Forgot password? opens the reset form, and back returns (#22)', () => {
+    render(<SignIn />)
+    fireEvent.click(screen.getByRole('button', { name: 'Forgot password?' }))
+    expect(screen.getByRole('heading', { name: 'Reset your password' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Back to sign in/ }))
+    expect(screen.getByRole('heading', { name: 'Welcome back' })).toBeInTheDocument()
+  })
+
+  it('an expired reset link opens on the expired screen (#22)', () => {
+    render(<SignIn expired onExpiredSeen={() => {}} />)
+    expect(screen.getByRole('heading', { name: 'This link has expired' })).toBeInTheDocument()
+  })
+
+  it('sign-up asks for at least 8 characters (#22)', () => {
+    render(<SignIn />)
+    fireEvent.click(screen.getByRole('button', { name: /Create a new account/ }))
+    expect(screen.getByText(/At least 8 characters/)).toBeInTheDocument()
+    expect(screen.getByLabelText('Password')).toHaveAttribute('minlength', '8')
   })
 })

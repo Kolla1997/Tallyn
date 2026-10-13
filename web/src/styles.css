@@ -3692,3 +3692,91 @@ label.agree input {
   color: var(--color-cocoa);
   text-decoration-color: currentColor;
 }
+
+/* Password reset (#22, Dinesh picked A). */
+/* A label with a button on its line: laid out like the wrapping <label>. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s1);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-s2);
+}
+
+.link.label-link {
+  font-size: 13px;
+  font-weight: 500;
+  align-self: auto;
+}
+
+.password-field {
+  position: relative;
+  display: flex;
+}
+
+.password-field input {
+  flex: 1;
+  min-width: 0;
+  padding-right: 64px;
+}
+
+.password-show {
+  position: absolute;
+  right: var(--space-s2);
+  top: 50%;
+  transform: translateY(-50%);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  padding: var(--space-s1) var(--space-s2);
+  border-radius: var(--radius-input);
+  text-decoration: underline;
+  text-decoration-color: var(--color-border);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.password-rule {
+  margin: calc(-1 * var(--space-s2)) 0 0;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  display: flex;
+  gap: var(--space-s1);
+}
+
+.password-rule-ok {
+  color: var(--color-success);
+}
+
+.reset-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--color-sage) 18%, var(--color-white));
+  color: var(--color-sage-deep);
+}
+
+.reset-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.text-strong {
+  color: var(--color-cocoa);
+}
+
+.password-changed {
+  margin-bottom: var(--space-s4);
+}

@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { clearActive } from '../lib/idle.js'
 import { NOTES, takeSignOutNote } from '../lib/session.js'
+import { MIN_PASSWORD, resetAskedEmail } from '../lib/recovery.js'
+import { PasswordRule, ResetRequest } from './ResetPassword.jsx'
 import { LEGAL, rememberAgreement } from '../lib/legal.js'
 import { Link } from '../lib/router.jsx'
 import { supabase } from '../lib/supabase.js'
 
 // Sign in or create an account with email and password. 2FA comes next.
-export default function SignIn() {
-  const [mode, setMode] = useState('signin') // 'signin' | 'signup'
+// `expired`: a password reset link had expired or was used (#22).
+export default function SignIn({ expired = false, onExpiredSeen }) {
+  const [mode, setMode] = useState(expired ? 'reset' : 'signin') // 'signin' | 'signup' | 'reset'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -47,6 +50,20 @@ export default function SignIn() {
     if (mode === 'signup' && !data.session) {
       setSentTo(email)
     }
+  }
+
+  // Forgot password (#22, Dinesh picked A).
+  if (mode === 'reset') {
+    return (
+      <ResetRequest
+        initialEmail={email || (expired ? (resetAskedEmail() ?? '') : '')}
+        expired={expired}
+        onBack={() => {
+          onExpiredSeen?.()
+          setMode('signin')
+        }}
+      />
+    )
   }
 
   if (sentTo) {
@@ -98,16 +115,29 @@ export default function SignIn() {
           Email
           <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
-        <label>
-          Password
+        {/* "Forgot password?" sits on the label's line (#22) but outside the
+            <label>, which would otherwise name the button, not the field. */}
+        <div className="field">
+          <span className="label-row">
+            <label htmlFor="sign-in-password">Password</label>
+            {!signup && (
+              <button type="button" className="link label-link" onClick={() => setMode('reset')}>
+                Forgot password?
+              </button>
+            )}
+          </span>
           <input
+            id="sign-in-password"
             type="password"
             autoComplete={signup ? 'new-password' : 'current-password'}
             required
+            minLength={signup ? MIN_PASSWORD : undefined}
+            aria-describedby={signup ? 'password-rule' : undefined}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </label>
+        </div>
+        {signup && <PasswordRule ok={password.length >= MIN_PASSWORD} />}
         {error && (
           <p className="error" role="alert">
             {error}
