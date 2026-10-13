@@ -25,6 +25,7 @@ kanban-plugin: board
 - [ ] [#114 Tests for the untested screens and PUT /api/me](https://github.com/Kolla1997/Tallyn/issues/114) #type/tech-debt #area/frontend #priority/p2
 - [ ] [#115 Connect a bank can hit the Plaid rate limit](https://github.com/Kolla1997/Tallyn/issues/115) #type/bug #area/frontend #priority/p1
 - [ ] [#116 Test that automatic sign-outs end only this device](https://github.com/Kolla1997/Tallyn/issues/116) #type/tech-debt #area/frontend #priority/p2
+- [ ] [#117 Layout checks in the browser at phone and desktop width](https://github.com/Kolla1997/Tallyn/issues/117) #type/tech-debt #area/frontend #priority/p2
 
 
 ## In Progress
