@@ -99,8 +99,9 @@ function AuthFlow() {
   else if (!session) screen = <SignIn />
   else if (aal.nextLevel === 'aal2') screen = <Verify2FA onSignOut={signOut} />
   else screen = <SetUp2FA onSignOut={signOut} />
+  // The 2FA screens sit in the middle of the page (#108, Dinesh picked A).
   return (
-    <AuthPage>
+    <AuthPage centred={Boolean(session && aal)}>
       <Suspense fallback={<TallynLoader />}>{screen}</Suspense>
     </AuthPage>
   )
