@@ -133,6 +133,12 @@ The Ideas board also has **Impact** (High/Medium/Low) and **Effort** (S/M/L) fie
 
    Promotion adds the issue to Tallyn Board under **Backlog**, swaps the label `type:idea` → `type:feature` (or the type given), and comments on the issue with the date. Write a Feature Spec if it's bigger than about a day's work.
 4. **Build:** move it to In Progress when work starts and to Review when a PR is open. If it can't move, put it in **Blocked**, add the `blocker` label and say what blocks it in a comment. Merging a PR with `Closes #N` closes it. Then add a Log entry starting with `#N`.
+   - **Test Plan (#111):** every ticket that adds or changes a feature, and every bug fix, updates `docs/04 Tech/Test Plan.md` in the same PR:
+     - add or update its use-case rows (priority, coverage at each level, test names);
+     - write the tests at the level the plan asks for (for a bug, a test that would have caught it);
+     - list any test that can't be written yet as a gap, and add manual-only checks to the release checklist.
+
+     For P0 features, write the rows when the scope is agreed, before the code. The PR description says which rows were added or updated.
 5. **Park or reject** ideas you won't do now, with a one-line reason in a comment. Don't delete them.
 6. **Sync:** `python3 scripts/sync_board.py` first auto-promotes cards in **Promoted**, then regenerates both board notes in Obsidian. Edit on GitHub, not in the mirrors. It runs:
    - automatically, via the GitHub Action `.github/workflows/sync-board.yml`: every hour (card moves send no events, so allow up to an hour), on issue changes, and from Actions → "Sync board mirrors" → Run workflow. It commits changed mirrors to `main` as `Sync board mirrors (#1)`, so `git pull` before reading them
@@ -163,6 +169,7 @@ Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand,
 
 - Don't start work, commit or open a PR without a ticket number.
 - Don't hand-edit `docs/05 Board/Board.md` or `docs/06 Ideas/Ideas Board.md`.
+- Don't open a feature or bug-fix PR without updating the Test Plan (§5, #111).
 - Don't build or change anything before sharing your thinking and getting an OK (§0).
 - Don't commit `.obsidian/workspace*.json`, `.claude/settings.local.json` or secrets.
 - Don't invent product facts. If something is unknown, write `> [!todo] Unknown — ask Dinesh` and move on.
