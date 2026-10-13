@@ -9,6 +9,14 @@ tags: [spec, tech, testing]
 
 # Test Plan
 
+> [!warning] Keep this plan current (rule, 2026-10-12)
+> Every ticket that adds or changes a feature, and every bug fix, updates this plan **in the same PR**:
+> - add or update its rows (priority, coverage, test names);
+> - write the tests at the level asked for (for a bug, a test that would have caught it);
+> - list what can't be tested yet as a gap, and manual-only checks in the release checklist.
+>
+> For P0 features, write the rows when the scope is agreed, before the code. The PR description says which rows changed. See CLAUDE.md §5.
+
 ## Problem
 Tallyn has a solid base of tests, but nothing says which use cases they cover and which they don't. Gaps get found by chance. For example, the hidden category legend (#94) was only caught by looking at the screen.
 
@@ -53,7 +61,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Sign out after 30 minutes idle, warning at 29 (#91) | P1 | Yes | — | No | `idle.test.js`, `SignIn.test.jsx`; the `IdleGuard` dialog isn't tested |
 | Sign in again after 12 hours, enforced by the API (#92) | P0 | Yes | Yes | No | `session.test.js`, `SessionLimit.test.jsx`, `auth_test.go` |
 | Automatic sign-outs end only this device | P1 | No | — | No | — |
-| Password reset, code before the new password (#22) | P0 | Yes | — | No | In PR #110 (`recovery`, `ResetPassword`, `Verify2FA` tests) |
+| Password reset, code before the new password (#22) | P0 | Yes | — | No | `recovery.test.js`, `ResetPassword.test.jsx`, `SignIn.test.jsx`, `Verify2FA.test.jsx` (PR #110); a real reset email is manual (release checklist) |
 | Step-up 2FA for member changes (#38) | P0 | — | Yes | No | `members_test.go` (`TestMemberStepUp`) |
 | Security headers, CSP, caching | P0 | — | Yes | No | `security_test.go` (`TestSecurityHeaders`) |
 | Rate limits per user and per route | P1 | — | Yes | — | `security_test.go` (`TestLimiter`, `TestInviteAcceptRateLimit`) |
@@ -140,3 +148,4 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 ## Decisions
 | Date | Decision | Why |
 |---|---|---|
+| 2026-10-12 | Every feature and bug-fix PR updates this plan and adds its tests (CLAUDE.md §5) | Dinesh: so the plan never falls out of date and gaps can't hide again (#111) |
