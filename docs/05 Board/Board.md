@@ -29,7 +29,6 @@ kanban-plugin: board
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
-- [ ] [#108 Make the 2FA code screen clearer](https://github.com/Kolla1997/Tallyn/issues/108) #type/design #area/frontend
 
 
 ## Review
@@ -79,6 +78,7 @@ kanban-plugin: board
 - [x] [#98 Keyboard access for the spending dots](https://github.com/Kolla1997/Tallyn/issues/98) #type/feature #area/frontend #priority/p2
 - [x] [#99 Faster loading: compressed fonts and a split bundle](https://github.com/Kolla1997/Tallyn/issues/99) #type/tech-debt #area/frontend #priority/p2
 - [x] [#100 Lint, web tests and checks on every PR](https://github.com/Kolla1997/Tallyn/issues/100) #type/tech-debt #area/infra #priority/p2
+- [x] [#108 Make the 2FA code screen clearer](https://github.com/Kolla1997/Tallyn/issues/108) #type/design #area/frontend
 
 
 %% kanban:settings
