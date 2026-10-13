@@ -10,7 +10,6 @@ kanban-plugin: board
 
 - [ ] [#2 Test idea, please ignore](https://github.com/Kolla1997/Tallyn/issues/2) #type/idea
 - [ ] [#33 Formulas to split available balance across goals](https://github.com/Kolla1997/Tallyn/issues/33) #type/idea #area/backend
-- [ ] [#111 Detailed test plan for unit and integration testing](https://github.com/Kolla1997/Tallyn/issues/111) #type/idea #area/infra
 
 
 ## Exploring
@@ -20,6 +19,7 @@ kanban-plugin: board
 ## Promoted
 
 - [x] [#4 Test idea, please ignore](https://github.com/Kolla1997/Tallyn/issues/4) #type/feature
+- [x] [#111 Detailed test plan for unit and integration testing](https://github.com/Kolla1997/Tallyn/issues/111) #type/docs #area/infra
 
 
 ## Parked
