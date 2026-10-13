@@ -21,7 +21,10 @@ kanban-plugin: board
 - [ ] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
 - [ ] [#80 Accounts: filter by bank](https://github.com/Kolla1997/Tallyn/issues/80) #type/feature #area/frontend
 - [ ] [#81 Transactions: filter by bank and show the bank on every transaction](https://github.com/Kolla1997/Tallyn/issues/81) #type/feature #area/frontend #area/backend
-- [ ] [#111 Detailed test plan for unit and integration testing](https://github.com/Kolla1997/Tallyn/issues/111) #type/docs #area/infra
+- [ ] [#113 Browser end-to-end tests for the P0 paths](https://github.com/Kolla1997/Tallyn/issues/113) #type/tech-debt #area/infra #priority/p1
+- [ ] [#114 Tests for the untested screens and PUT /api/me](https://github.com/Kolla1997/Tallyn/issues/114) #type/tech-debt #area/frontend #priority/p2
+- [ ] [#115 Connect a bank can hit the Plaid rate limit](https://github.com/Kolla1997/Tallyn/issues/115) #type/bug #area/frontend #priority/p1
+- [ ] [#116 Test that automatic sign-outs end only this device](https://github.com/Kolla1997/Tallyn/issues/116) #type/tech-debt #area/frontend #priority/p2
 
 
 ## In Progress
@@ -29,12 +32,12 @@ kanban-plugin: board
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
+- [ ] [#111 Detailed test plan for unit and integration testing](https://github.com/Kolla1997/Tallyn/issues/111) #type/docs #area/infra
 
 
 ## Review
 
 - [ ] [#10 Brand: logo and design tokens](https://github.com/Kolla1997/Tallyn/issues/10) #type/design #area/brand #priority/p0
-- [ ] [#22 Password reset](https://github.com/Kolla1997/Tallyn/issues/22) #type/feature #area/frontend #priority/p1
 
 
 ## Blocked
@@ -52,6 +55,7 @@ kanban-plugin: board
 - [x] [#9 Scheduled bank sync (transactions and balances)](https://github.com/Kolla1997/Tallyn/issues/9) #type/feature #area/backend #priority/p0
 - [x] [#12 Household members: invitations and roles](https://github.com/Kolla1997/Tallyn/issues/12) #type/feature #area/backend #priority/p1
 - [x] [#16 Automate board sync with a GitHub Action](https://github.com/Kolla1997/Tallyn/issues/16) #type/feature #area/infra #priority/p2
+- [x] [#22 Password reset](https://github.com/Kolla1997/Tallyn/issues/22) #type/feature #area/frontend #priority/p1
 - [x] [#24 Content-Security-Policy and security headers](https://github.com/Kolla1997/Tallyn/issues/24) #type/feature #area/backend #priority/p1
 - [x] [#27 Debt details: interest rates, due dates and minimum payments (Plaid Liabilities)](https://github.com/Kolla1997/Tallyn/issues/27) #type/feature #area/backend #priority/p0
 - [x] [#28 Sharing settings: choose what each household member can see](https://github.com/Kolla1997/Tallyn/issues/28) #type/feature #area/backend #priority/p1
