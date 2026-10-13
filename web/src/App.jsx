@@ -4,6 +4,8 @@ import { configured, supabase } from './lib/supabase.js'
 import SignIn from './screens/SignIn.jsx'
 import IdleGuard from './components/IdleGuard.jsx'
 import SessionLimit from './components/SessionLimit.jsx'
+import { endRecovery, recoveryState, startRecovery } from './lib/recovery.js'
+import { ChoosePassword } from './screens/ResetPassword.jsx'
 import Verify2FA from './screens/Verify2FA.jsx'
 import Home from './screens/Home.jsx'
 import TallynLoader from './components/TallynLoader.jsx'
@@ -47,10 +49,22 @@ const signOutHere = () => supabase.auth.signOut({ scope: 'local' })
 function AuthFlow() {
   const [session, setSession] = useState(undefined) // undefined while loading
   const [aal, setAal] = useState(null)
+  const [recovery, setRecovery] = useState(recoveryState) // password reset (#22)
 
   useEffect(() => {
     // Fires INITIAL_SESSION straight away, then on every sign-in, verified code and refresh.
-    const { data } = supabase.auth.onAuthStateChange((_event, s) => setSession(s))
+    const { data } = supabase.auth.onAuthStateChange((event, s) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        startRecovery()
+        setRecovery('pending')
+      }
+      // A reset needs the link's own sign-in; without one, it's over (#22).
+      if (!s && recoveryState() === 'pending') {
+        endRecovery()
+        setRecovery('')
+      }
+      setSession(s)
+    })
     return () => data.subscription.unsubscribe()
   }, [])
 
@@ -82,6 +96,19 @@ function AuthFlow() {
 
   // The signed-in app has its own layout (#39); everything before it uses
   // the centered sign-in layout.
+  const finishReset = () => {
+    endRecovery()
+    setRecovery('')
+  }
+
+  // Password reset (#22): with the 2FA code done, choose the new password.
+  if (session && aal?.currentLevel === 'aal2' && recovery === 'pending') {
+    return (
+      <AuthPage>
+        <ChoosePassword email={session.user.email} onDone={finishReset} />
+      </AuthPage>
+    )
+  }
   if (session && aal?.currentLevel === 'aal2') {
     return (
       <>
@@ -96,8 +123,18 @@ function AuthFlow() {
   }
   let screen
   if (session === undefined || (session && !aal)) screen = <TallynLoader />
-  else if (!session) screen = <SignIn />
-  else if (aal.nextLevel === 'aal2') screen = <Verify2FA onSignOut={signOut} />
+  else if (!session) screen = <SignIn expired={recovery === 'expired'} onExpiredSeen={finishReset} />
+  else if (aal.nextLevel === 'aal2')
+    screen = (
+      <Verify2FA
+        onSignOut={signOut}
+        recovering={recovery === 'pending'}
+        onCancelReset={() => {
+          finishReset()
+          signOutHere()
+        }}
+      />
+    )
   else screen = <SetUp2FA onSignOut={signOut} />
   // The 2FA screens sit in the middle of the page (#108, Dinesh picked A).
   return (

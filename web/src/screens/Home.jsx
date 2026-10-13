@@ -2,6 +2,7 @@ import { Suspense, lazy, useCallback, useEffect, useState } from 'react'
 import AuthPage from '../components/AuthPage.jsx'
 import { api } from '../lib/api.js'
 import { pendingInvite } from '../lib/invite.js'
+import { takePasswordChanged } from '../lib/recovery.js'
 import { Link, usePath } from '../lib/router.jsx'
 import CreateHousehold from './CreateHousehold.jsx'
 import HomePage from './HomePage.jsx'
@@ -42,6 +43,9 @@ function saveHousehold(id) {
 export default function Home({ email, onSignOut }) {
   const path = usePath()
   const [me, setMe] = useState(null)
+  // Just reset the password (#22): say so on the first page, once.
+  const [passwordChanged] = useState(takePasswordChanged)
+  const [firstPath] = useState(() => window.location.pathname)
   const [error, setError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0) // bumps when banks, sharing or members change
   const [selected, setSelected] = useState(savedHousehold)
@@ -171,6 +175,28 @@ export default function Home({ email, onSignOut }) {
   return (
     <Shell me={me} household={household} households={households} onChooseHousehold={choose} onSignOut={onSignOut}>
       <div key={household.id}>
+        {passwordChanged && path === firstPath && (
+          <p className="info-note password-changed" role="status">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <rect x="5" y="10.5" width="14" height="10" rx="2.5" />
+              <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" />
+            </svg>
+            <span>
+              <strong>Your password is changed.</strong> You&apos;ve been signed out on your other devices.
+            </span>
+          </p>
+        )}
         <Suspense fallback={<TallynLoader />}>{page}</Suspense>
       </div>
     </Shell>
