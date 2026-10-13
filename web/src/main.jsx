@@ -1,3 +1,4 @@
+import './lib/recovery-capture.js' // first: a password reset link (#22)
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { applyTokens } from './lib/tokens.js'
