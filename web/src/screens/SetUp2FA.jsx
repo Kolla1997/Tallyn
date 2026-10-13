@@ -36,14 +36,18 @@ export default function SetUp2FA({ onSignOut }) {
           <p className="muted">Can&apos;t scan it? Enter this key instead:</p>
           <p className="secret">{factor.secret}</p>
           <ol start={2}>
-            <li>Enter the 6-digit code your app shows for Tallyn.</li>
+            <li>
+              Enter the <span className="nowrap">6-digit</span> code your app shows for Tallyn.
+            </li>
           </ol>
           <CodeForm factorId={factor.id} button="Turn on 2FA" />
         </>
       )}
-      <button className="link" onClick={onSignOut}>
-        Sign out
-      </button>
+      <div className="card-links card-links-end">
+        <button className="link-quiet" onClick={onSignOut}>
+          Sign out
+        </button>
+      </div>
     </section>
   )
 }

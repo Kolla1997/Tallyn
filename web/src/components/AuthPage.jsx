@@ -4,9 +4,10 @@ import { Link } from '../lib/router.jsx'
 
 // Centered single-card layout with the logo: sign-in, 2FA, joining a
 // household, creating your first household, and full-page errors.
-export default function AuthPage({ children, wide = false }) {
+// `centred` puts the card in the middle of the page (the 2FA screens, #108).
+export default function AuthPage({ children, wide = false, centred = false }) {
   return (
-    <main className={wide ? 'page page-wide' : 'page'}>
+    <main className={`page${wide ? ' page-wide' : ''}${centred ? ' page-centred' : ''}`}>
       <img className="logo" src={logo} alt="Tallyn" />
       {children}
       <SiteFooter />
