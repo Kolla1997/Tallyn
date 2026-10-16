@@ -1,6 +1,6 @@
 ---
 type: adr
-status: draft
+status: active
 owner: Dinesh
 updated: 2026-10-16
 issue: 23
@@ -9,7 +9,7 @@ tags: [adr, security, auth]
 
 # 0013 — Backup codes, and the server-only Supabase key
 
-- **Status:** Proposed
+- **Status:** Accepted (Dinesh, 2026-10-16)
 - **Date:** 2026-10-16
 - **Ticket:** #23
 
