@@ -11,7 +11,6 @@ kanban-plugin: board
 - [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p1
 - [ ] [#13 Shared budgets and spending categories](https://github.com/Kolla1997/Tallyn/issues/13) #type/feature #area/frontend #priority/p1
 - [ ] [#14 Savings goals](https://github.com/Kolla1997/Tallyn/issues/14) #type/feature #area/frontend #priority/p2
-- [ ] [#23 Recovery when someone loses their authenticator app](https://github.com/Kolla1997/Tallyn/issues/23) #type/feature #area/frontend #priority/p1
 - [ ] [#34 Spending limits per member, with progress and alerts](https://github.com/Kolla1997/Tallyn/issues/34) #type/feature #area/backend #priority/p1
 - [ ] [#37 Show shared money separately from your own](https://github.com/Kolla1997/Tallyn/issues/37) #type/design #area/frontend #priority/p1
 - [ ] [#53 Rename a household](https://github.com/Kolla1997/Tallyn/issues/53) #type/feature #area/frontend #area/backend #priority/p2
@@ -25,11 +24,13 @@ kanban-plugin: board
 - [ ] [#114 Tests for the untested screens and PUT /api/me](https://github.com/Kolla1997/Tallyn/issues/114) #type/tech-debt #area/frontend #priority/p2
 - [ ] [#116 Test that automatic sign-outs end only this device](https://github.com/Kolla1997/Tallyn/issues/116) #type/tech-debt #area/frontend #priority/p2
 - [ ] [#117 Layout checks in the browser at phone and desktop width](https://github.com/Kolla1997/Tallyn/issues/117) #type/tech-debt #area/frontend #priority/p2
+- [ ] [#120 Family owner can reset a member's 2FA](https://github.com/Kolla1997/Tallyn/issues/120) #type/feature #area/backend #priority/p2
 
 
 ## In Progress
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
+- [ ] [#23 Recovery when someone loses their authenticator app](https://github.com/Kolla1997/Tallyn/issues/23) #type/feature #area/frontend #priority/p1
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
 
