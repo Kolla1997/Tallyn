@@ -32,7 +32,6 @@ kanban-plugin: board
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
-- [ ] [#122 Tidy the sidebar: new collapse icon, smaller menu and profile card, legal links in the profile menu](https://github.com/Kolla1997/Tallyn/issues/122) #type/design #area/frontend
 
 
 ## Review
@@ -87,6 +86,7 @@ kanban-plugin: board
 - [x] [#108 Make the 2FA code screen clearer](https://github.com/Kolla1997/Tallyn/issues/108) #type/design #area/frontend
 - [x] [#111 Detailed test plan for unit and integration testing](https://github.com/Kolla1997/Tallyn/issues/111) #type/docs #area/infra
 - [x] [#115 Connect a bank can hit the Plaid rate limit](https://github.com/Kolla1997/Tallyn/issues/115) #type/bug #area/frontend #priority/p1
+- [x] [#122 Tidy the sidebar: new collapse icon, smaller menu and profile card, legal links in the profile menu](https://github.com/Kolla1997/Tallyn/issues/122) #type/design #area/frontend
 
 
 %% kanban:settings
