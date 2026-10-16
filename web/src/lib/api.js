@@ -1,5 +1,5 @@
 import { supabase } from './supabase.js'
-import { rememberSignOutNote } from './session.js'
+import { rememberSignOutNote, signOutHere } from './session.js'
 
 let expiring = false
 
@@ -24,7 +24,7 @@ export async function api(path, { method = 'GET', body } = {}) {
     if (res.status === 401 && data.error === 'session_expired' && !expiring) {
       expiring = true
       rememberSignOutNote('max')
-      supabase.auth.signOut({ scope: 'local' }).finally(() => (expiring = false))
+      signOutHere().finally(() => (expiring = false))
     }
     throw new Error(data.error || `HTTP ${res.status}`)
   }

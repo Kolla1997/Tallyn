@@ -60,7 +60,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Every `/api/` route refuses no token, a bad token, no 2FA | P0 | — | Yes | — | `router_test.go` (`TestAPIRequiresAuth`), `auth_test.go` |
 | Sign out after 30 minutes idle, warning at 29 (#91) | P1 | Yes | — | No | `idle.test.js`, `SignIn.test.jsx`, `IdleGuard.test.jsx` (warning, countdown, Stay, Esc, activity, after sleep) |
 | Sign in again after 12 hours, enforced by the API (#92) | P0 | Yes | Yes | No | `session.test.js`, `SessionLimit.test.jsx`, `auth_test.go` |
-| Automatic sign-outs end only this device | P1 | No | — | No | — |
+| Automatic sign-outs end only this device; the Sign out button ends every session (#116) | P1 | Yes | — | No | `session.test.js` (`signOutHere`, `signOutEverywhere`), `App.test.jsx` (which one each part gets), `api.test.js` (`session_expired` signs out this device once, with the note), `Settings.test.jsx` (label) |
 | Password reset, code before the new password (#22) | P0 | Yes | — | No | `recovery.test.js`, `ResetPassword.test.jsx`, `SignIn.test.jsx`, `Verify2FA.test.jsx` (PR #110); a real reset email is manual (release checklist) |
 | Add a second authenticator; remove one, never the last; any of them gives a valid code (#23) | P0 | Yes | — | No (#113) | `Settings.test.jsx`, `mfa.test.js`, `Verify2FA.test.jsx` |
 | Backup codes: 10 shown once after 2FA setup, stored hashed, each works once (#23) | P0 | Yes | Yes | — | `BackupCodes.test.jsx`; `api/backupcodes_test.go` (`TestNewBackupCodes`, `TestBackupCodeRoutes`); `db/backupcodes_test.go` (RLS, no hash readable) |
@@ -134,7 +134,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 1. [#113](https://github.com/Kolla1997/Tallyn/issues/113) **Browser end-to-end tests** for the P0 paths: sign-in with 2FA, Home totals, connecting a sandbox bank, inviting a member, sharing. They use a separate Supabase test project with a seeded test user and a test TOTP secret, kept in GitHub secrets and never in the repo.
 2. [#114](https://github.com/Kolla1997/Tallyn/issues/114) **Tests for the untested screens:** Home, Accounts, Family and sharing, Settings, ConsentGate, IdleGuard, SetUp2FA. Plus a `PUT /api/me` handler test. **Done (2026-10-16).** `PUT /api/me` already had a success test; #114 added its failure cases.
 3. [#115](https://github.com/Kolla1997/Tallyn/issues/115) **Fix the Plaid link-token bug** (ask only on Connect a bank), with a test.
-4. [#116](https://github.com/Kolla1997/Tallyn/issues/116) **Automatic sign-outs end only this device:** tests for `scope: 'local'`.
+4. [#116](https://github.com/Kolla1997/Tallyn/issues/116) **Automatic sign-outs end only this device:** tests for `scope: 'local'`. **Done (2026-10-16).**
 5. [#117](https://github.com/Kolla1997/Tallyn/issues/117) **Layout checks in the browser:** phone and desktop width, no sideways scroll, no hidden content. These would have caught #94 and #97.
 
 ## Release checklist (manual, before each release)

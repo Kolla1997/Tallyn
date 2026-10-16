@@ -183,7 +183,7 @@ function Security({ email, onSignOut }) {
             Sign out others
           </button>
         </Row>
-        <Row label="Sign out" note="Of this device">
+        <Row label="Sign out" note="Everywhere you’re signed in">
           <button className="btn btn-secondary btn-small" onClick={onSignOut}>
             Sign out
           </button>

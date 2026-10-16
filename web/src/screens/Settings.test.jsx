@@ -48,6 +48,12 @@ describe('Settings: authenticators', () => {
     expect(screen.queryByRole('button', { name: 'Remove' })).toBeNull()
   })
 
+  it('Sign out says it ends every session, as it does (#92, #1)', async () => {
+    await openSecurity([phone])
+    expect(screen.getByText('Everywhere you’re signed in')).toBeInTheDocument()
+    expect(screen.queryByText('Of this device')).toBeNull()
+  })
+
   it('two: each can be removed, after a fresh code', async () => {
     await openSecurity([phone, onePassword])
     expect(screen.getByText('2 authenticator apps')).toBeInTheDocument()
