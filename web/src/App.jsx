@@ -4,6 +4,7 @@ import { configured, supabase } from './lib/supabase.js'
 import SignIn from './screens/SignIn.jsx'
 import IdleGuard from './components/IdleGuard.jsx'
 import SessionLimit from './components/SessionLimit.jsx'
+import { signOutEverywhere, signOutHere } from './lib/session.js'
 import { endRecovery, recoveryState, startRecovery } from './lib/recovery.js'
 import { ChoosePassword } from './screens/ResetPassword.jsx'
 import { BackupCodesGate } from './screens/BackupCodes.jsx'
@@ -41,11 +42,9 @@ export default function App() {
   )
 }
 
-// The Sign out button ends the session everywhere (Supabase's default);
-// automatic sign-outs (#91, #92) end only this device's, so stepping away
-// from the laptop doesn't sign out your phone.
-const signOut = () => supabase.auth.signOut()
-const signOutHere = () => supabase.auth.signOut({ scope: 'local' })
+// The Sign out button ends the session everywhere; automatic sign-outs
+// (#91, #92) end only this device's (lib/session.js, tested in #116).
+const signOut = signOutEverywhere
 
 function AuthFlow() {
   const [session, setSession] = useState(undefined) // undefined while loading

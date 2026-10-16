@@ -1,5 +1,8 @@
-import { beforeEach, describe, expect, it } from 'vitest'
-import { MAX_SESSION_MS, rememberSignOutNote, sessionOver, signedInAt, takeSignOutNote } from './session.js'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { MAX_SESSION_MS, rememberSignOutNote, sessionOver, signOutEverywhere, signOutHere, signedInAt, takeSignOutNote } from './session.js'
+
+const signOut = vi.fn(() => Promise.resolve({ error: null }))
+vi.mock('./supabase.js', () => ({ supabase: { auth: { signOut: (...a) => signOut(...a) } } }))
 
 // Sign in again after 12 hours (#92).
 const b64url = (o) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
@@ -43,5 +46,24 @@ describe('sign-out note', () => {
     expect(takeSignOutNote()).toBe('')
     rememberSignOutNote('something else')
     expect(takeSignOutNote()).toBe('')
+  })
+})
+
+// The two ways to sign out (#92, #116): automatic sign-outs end only this
+// device's session; the Sign out button ends every session.
+describe('signing out', () => {
+  beforeEach(() => {
+    signOut.mockClear()
+  })
+
+  it('signOutHere ends only this device’s session', async () => {
+    await signOutHere()
+    expect(signOut).toHaveBeenCalledWith({ scope: 'local' })
+  })
+
+  it('signOutEverywhere ends every session (Supabase’s default, global)', async () => {
+    await signOutEverywhere()
+    expect(signOut).toHaveBeenCalledTimes(1)
+    expect(signOut.mock.calls[0]).toEqual([])
   })
 })

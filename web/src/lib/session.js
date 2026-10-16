@@ -3,7 +3,16 @@
 // password sign-in; a 2FA step-up adds a newer one). The Go API refuses older
 // sessions too, so this is the friendly half: sign out cleanly, with a note.
 
+import { supabase } from './supabase.js'
+
 export const MAX_SESSION_MS = 12 * 60 * 60 * 1000
+
+// Two ways to sign out (#92, tested in #116). The Sign out button ends the
+// session everywhere (Supabase's default). Automatic sign-outs (30 minutes
+// idle, #91; 12 hours, #92) end only this device's, so stepping away from
+// the laptop doesn't sign out your phone.
+export const signOutEverywhere = () => supabase.auth.signOut()
+export const signOutHere = () => supabase.auth.signOut({ scope: 'local' })
 
 // When this session signed in, in ms, or null if the token doesn't say.
 export function signedInAt(accessToken) {
