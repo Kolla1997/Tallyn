@@ -278,6 +278,48 @@ func TestRequire(t *testing.T) {
 	}
 }
 
+// Recovering a lost authenticator (#23): a password sign-in is enough for
+// that one route, and every other check still applies.
+func TestVerifySignedIn(t *testing.T) {
+	key := genEC(t)
+	v := verifierFor(&key.PublicKey)
+	aal1 := goodClaims()
+	aal1["aal"] = "aal1"
+	tok := sign(t, jwt.SigningMethodES256, key, aal1)
+	if _, err := v.Verify(tok); !errors.Is(err, ErrMFARequired) {
+		t.Fatalf("Verify(aal1) err = %v, want ErrMFARequired", err)
+	}
+	s, err := v.VerifySignedIn(tok)
+	if err != nil || s.UserID != testUser || s.AAL != "aal1" {
+		t.Fatalf("VerifySignedIn(aal1) = %+v, %v", s, err)
+	}
+	old := goodClaims()
+	old["aal"] = "aal1"
+	signedIn(old, time.Now().Add(-13*time.Hour))
+	if _, err := v.VerifySignedIn(sign(t, jwt.SigningMethodES256, key, old)); !errors.Is(err, ErrSessionExpired) {
+		t.Fatalf("13h-old aal1: err = %v, want ErrSessionExpired", err)
+	}
+	if _, err := v.VerifySignedIn(tamper(t, tok)); err == nil {
+		t.Fatal("tampered token accepted")
+	}
+
+	h := v.RequireSignedIn(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusNoContent) }))
+	for name, c := range map[string]struct {
+		header string
+		want   int
+	}{"aal1": {"Bearer " + tok, http.StatusNoContent}, "none": {"", http.StatusUnauthorized}} {
+		req := httptest.NewRequest(http.MethodPost, "/api/recovery/backup-code", nil)
+		if c.header != "" {
+			req.Header.Set("Authorization", c.header)
+		}
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, req)
+		if rec.Code != c.want {
+			t.Fatalf("%s: status %d, want %d", name, rec.Code, c.want)
+		}
+	}
+}
+
 func TestUnavailable(t *testing.T) {
 	ran := false
 	h := Unavailable(http.HandlerFunc(func(http.ResponseWriter, *http.Request) { ran = true }))

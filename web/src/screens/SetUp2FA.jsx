@@ -1,10 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
+import { LockIcon } from '../components/Icons.jsx'
+import { markJustSetUp, takeRecovered } from '../lib/backupCodes.js'
 import { supabase } from '../lib/supabase.js'
 import CodeForm from './CodeForm.jsx'
 
 // First sign-in: add Tallyn to an authenticator app (TOTP) and confirm a code.
+// Also after recovering with a backup code (#23): set up again, then save a
+// new set of backup codes.
 export default function SetUp2FA({ onSignOut }) {
   const [factor, setFactor] = useState(null) // { id, qr, secret }
+  const [recovered] = useState(takeRecovered)
   const [error, setError] = useState('')
   const started = useRef(false)
 
@@ -12,12 +17,19 @@ export default function SetUp2FA({ onSignOut }) {
     // Enrol once, even though StrictMode runs effects twice in development.
     if (started.current) return
     started.current = true
+    markJustSetUp() // backup codes come next (#23)
     enrol().then(setFactor, (e) => setError(e.message))
   }, [])
 
   return (
     <section className="card">
-      <h1>Protect your account</h1>
+      {recovered && (
+        <p className="info-note">
+          <LockIcon />
+          <span>You&apos;re in with a backup code. Your old authenticator has been removed.</span>
+        </p>
+      )}
+      <h1>{recovered ? 'Set up your authenticator' : 'Protect your account'}</h1>
       <p className="muted">
         Tallyn asks for a code from an authenticator app each time you sign in, so your password alone isn&apos;t enough. Microsoft Authenticator, Google
         Authenticator and 1Password all work.
@@ -40,7 +52,10 @@ export default function SetUp2FA({ onSignOut }) {
               Enter the <span className="nowrap">6-digit</span> code your app shows for Tallyn.
             </li>
           </ol>
-          <CodeForm factorId={factor.id} button="Turn on 2FA" />
+          <CodeForm factorIds={[factor.id]} button="Turn on 2FA" />
+          <p className="muted small">
+            {recovered ? "Then you'll get a new set of backup codes." : "Then you'll save backup codes, for when you can't use your phone."}
+          </p>
         </>
       )}
       <div className="card-links card-links-end">

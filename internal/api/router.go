@@ -53,6 +53,14 @@ type Deps struct {
 	SyncNow     func(bankID string)             // sync.Syncer.SyncNow; optional
 	Reconnected func(bankID string)             // sync.Syncer.Reconnected; optional (#51)
 	SupabaseURL string                          // allowed in the Content-Security-Policy (#24)
+
+	// Backup codes and recovery (#23, ADR 0013). RequireSignedIn lets a
+	// password sign-in (no 2FA yet) reach the one recovery route; the backup
+	// code is its second factor. Without all four, those routes answer 503.
+	RequireSignedIn func(http.Handler) http.Handler // auth.Verifier.RequireSignedIn
+	BackupCodes     BackupCodeStore                 // *db.DB
+	Factors         FactorRemover                   // *supabaseadmin.Client
+	CodeKey         []byte                          // DeriveBackupCodeKey(token key)
 }
 
 // NewRouter returns the server's handler: JSON API under /api/ and the
@@ -96,13 +104,32 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("/api/", func(w http.ResponseWriter, _ *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found")
 	})
+	recovery := http.Handler(unavailable("recovery_unavailable"))
+	if d.BackupCodes != nil && len(d.CodeKey) == 32 {
+		api.HandleFunc("GET /api/backup-codes", backupCodeStatus(d.BackupCodes))
+		api.HandleFunc("POST /api/backup-codes", newBackupCodeSet(d.BackupCodes, d.CodeKey))
+		if d.Factors != nil && d.RequireSignedIn != nil {
+			recovery = d.RequireSignedIn(limited(lim.recovery, recoverWithBackupCode(d.BackupCodes, d.Factors, d.CodeKey)))
+		}
+	} else {
+		api.Handle("/api/backup-codes", unavailable("backup_codes_unavailable"))
+	}
 
 	mux := http.NewServeMux()
 	mux.Handle("GET /api/health", noStore(http.HandlerFunc(health)))
+	// Outside the 2FA-only /api/ below: a password sign-in plus a backup code (#23).
+	mux.Handle("POST /api/recovery/backup-code", noStore(recovery))
 	// API answers are never cached; limits count per signed-in person (#24).
 	mux.Handle("/api/", noStore(requireAuth(limited(lim.all, api))))
 	mux.Handle("/", spa(d.WebDir))
 	return securityHeaders(d.SupabaseURL, mux)
+}
+
+// unavailable answers 503 with code: for routes whose setup is missing.
+func unavailable(code string) http.HandlerFunc {
+	return func(w http.ResponseWriter, _ *http.Request) {
+		writeError(w, http.StatusServiceUnavailable, code)
+	}
 }
 
 func health(w http.ResponseWriter, _ *http.Request) {

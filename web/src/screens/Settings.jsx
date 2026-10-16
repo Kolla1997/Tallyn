@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
+import { PhoneIcon } from '../components/Icons.jsx'
 import { api } from '../lib/api.js'
 import { LEGAL } from '../lib/legal.js'
+import { verifiedAuthenticators } from '../lib/mfa.js'
 import { Link } from '../lib/router.jsx'
 import { supabase } from '../lib/supabase.js'
+import { SaveBackupCodes } from './BackupCodes.jsx'
+import CodeForm from './CodeForm.jsx'
 import { PageHead } from './Shell.jsx'
 
 // Settings (#39 step 5): sections on the left, the chosen one on the right,
@@ -155,13 +159,8 @@ function Profile({ me, email, onSaved }) {
 }
 
 function Security({ email, onSignOut }) {
-  const [factor, setFactor] = useState(null)
   const [confirming, setConfirming] = useState(false)
   const [done, setDone] = useState(false)
-
-  useEffect(() => {
-    supabase.auth.mfa.listFactors().then(({ data }) => setFactor(data?.totp?.find((f) => f.status === 'verified') ?? null))
-  }, [])
 
   // Ends every other session for this account; this one stays signed in.
   async function signOutOthers() {
@@ -174,21 +173,10 @@ function Security({ email, onSignOut }) {
     <Section id="security-h" title="Sign-in and security">
       <ul className="rows">
         <Row label="Email" note={email} />
-        <Row
-          label="Two-step sign-in"
-          note={
-            factor
-              ? `Authenticator app, added ${new Date(factor.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
-              : 'Authenticator app'
-          }
-        >
-          <span className="status-on small">On</span>
-        </Row>
+        <Authenticators />
+        <BackupCodesRow email={email} />
         <Row label="Change password" note="Also “forgot password” on the sign-in screen">
           <Soon ticket={22} />
-        </Row>
-        <Row label="Lost your authenticator?" note="Recovery codes, so you can still get in">
-          <Soon ticket={23} />
         </Row>
         <Row label="Sign out of other devices" note={done ? 'Done. Only this device is signed in now.' : 'Phones, tablets and browsers other than this one'}>
           <button className="btn btn-secondary btn-small" onClick={() => setConfirming(true)}>
@@ -207,6 +195,252 @@ function Security({ email, onSignOut }) {
         </ConfirmDialog>
       )}
     </Section>
+  )
+}
+
+const shortDate = (iso) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+
+// Your authenticators (#23, Dinesh picked A): each with the name you gave it
+// and Remove, plus Add another. Never the last one: 2FA stays on.
+function Authenticators() {
+  const [list, setList] = useState(null)
+  const [adding, setAdding] = useState(false)
+  const [removing, setRemoving] = useState(null)
+  const [error, setError] = useState('')
+
+  const load = () =>
+    verifiedAuthenticators().then(
+      (l) => setList(l),
+      () => setError("We couldn't load your authenticators. Try again in a moment."),
+    )
+  useEffect(() => {
+    load()
+  }, [])
+
+  async function remove() {
+    const { error } = await supabase.auth.mfa.unenroll({ factorId: removing.id })
+    if (error) throw new Error("We couldn't remove it. Try again in a moment.")
+    await load()
+  }
+
+  const count = list?.length ?? 0
+  return (
+    <li className="settings-row settings-row-wrap">
+      <span className="grow">
+        <span className="name block">Two-step sign-in</span>
+        <span className="small muted block">{list ? (count === 1 ? '1 authenticator app' : `${count} authenticator apps`) : 'Authenticator app'}</span>
+      </span>
+      <span className="status-on small">On</span>
+      <div className="auth-list">
+        {error && (
+          <p className="error small" role="alert">
+            {error}
+          </p>
+        )}
+        <ul className="auth-items">
+          {list?.map((f) => (
+            <li key={f.id}>
+              <span className="auth-icon">
+                <PhoneIcon />
+              </span>
+              <span className="grow">
+                <strong className="block">{f.friendly_name || 'Authenticator app'}</strong>
+                <span className="small muted block">Added {shortDate(f.created_at)}</span>
+              </span>
+              {count > 1 ? (
+                <button type="button" className="link-quiet" onClick={() => setRemoving(f)}>
+                  Remove
+                </button>
+              ) : (
+                <span className="small muted">Your only one</span>
+              )}
+            </li>
+          ))}
+        </ul>
+        <button type="button" className="btn btn-secondary btn-small auth-add" onClick={() => setAdding(true)}>
+          + Add another
+        </button>
+      </div>
+      {adding && <AddAuthenticator names={list?.map((f) => f.friendly_name) ?? []} onAdded={load} onClose={() => setAdding(false)} />}
+      {removing && (
+        <ConfirmDialog
+          title={`Remove ${removing.friendly_name || 'this authenticator'}?`}
+          action="Remove"
+          needsCode
+          onConfirm={remove}
+          onClose={() => setRemoving(null)}
+        >
+          <p>Its codes will stop working for Tallyn. Your other authenticators and backup codes still work.</p>
+        </ConfirmDialog>
+      )}
+    </li>
+  )
+}
+
+// Backup codes (#23): how many are left, and a new set after a fresh code.
+function BackupCodesRow({ email }) {
+  const [status, setStatus] = useState(null)
+  const [confirming, setConfirming] = useState(false)
+  const [showing, setShowing] = useState(false)
+
+  const load = () => api('/api/backup-codes').then(setStatus, () => setStatus(null))
+  useEffect(() => {
+    load()
+  }, [])
+
+  const note = !status
+    ? 'For when you can’t use your authenticator'
+    : status.total === 0
+      ? 'None yet. Get a set for when you can’t use your authenticator'
+      : `${status.left} of ${status.total} left · for when you can’t use your authenticator`
+
+  return (
+    <li className="settings-row">
+      <span className="grow">
+        <span className="name block">Backup codes</span>
+        <span className="small muted block">{note}</span>
+        {status?.total > 0 && (
+          <span className="codes-meter" aria-hidden="true">
+            {Array.from({ length: status.total }, (_, i) => (
+              <i key={i} className={i < status.left ? 'on' : ''} />
+            ))}
+          </span>
+        )}
+      </span>
+      {status && (
+        <button className="btn btn-secondary btn-small" onClick={() => setConfirming(true)}>
+          {status.total === 0 ? 'Get codes' : 'Regenerate'}
+        </button>
+      )}
+      {confirming && (
+        <ConfirmDialog
+          title={status?.total === 0 ? 'Get backup codes?' : 'Get new backup codes?'}
+          action="Continue"
+          needsCode
+          onConfirm={async () => setShowing(true)}
+          onClose={() => setConfirming(false)}
+        >
+          <p>
+            {status?.total === 0 ? 'You’ll see ten codes once, to save somewhere safe.' : 'Your current codes stop working, and you’ll see ten new ones once.'}
+          </p>
+        </ConfirmDialog>
+      )}
+      {showing && (
+        <CodesDialog
+          email={email}
+          onClose={() => {
+            setShowing(false)
+            load()
+          }}
+        />
+      )}
+    </li>
+  )
+}
+
+function CodesDialog({ email, onClose }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const d = ref.current
+    if (!d.open) d.showModal()
+    return () => d.open && d.close()
+  }, [])
+  return (
+    <dialog ref={ref} className="dialog codes-dialog" aria-label="Your backup codes" onCancel={(e) => e.preventDefault()}>
+      <SaveBackupCodes email={email} done="Done" onDone={onClose} />
+    </dialog>
+  )
+}
+
+// Add another authenticator (#23): a name, then the QR code, then a code from
+// it. Supabase needs the name before it makes the QR code, so the name comes
+// first. Cancelling removes the half-added one.
+function AddAuthenticator({ names, onAdded, onClose }) {
+  const ref = useRef(null)
+  const [name, setName] = useState('')
+  const [factor, setFactor] = useState(null) // { id, qr, secret }
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    const d = ref.current
+    if (!d.open) d.showModal()
+    return () => d.open && d.close()
+  }, [])
+
+  async function start(e) {
+    e.preventDefault()
+    const n = name.trim()
+    if (names.some((x) => x?.toLowerCase() === n.toLowerCase())) {
+      setError('You already have one with that name. Choose another.')
+      return
+    }
+    setError('')
+    setBusy(true)
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', issuer: 'Tallyn', friendlyName: n })
+    setBusy(false)
+    if (error) {
+      setError("We couldn't start adding it. Try again in a moment.")
+      return
+    }
+    const qr = data.totp.qr_code.startsWith('data:') ? data.totp.qr_code : `data:image/svg+xml;utf-8,${encodeURIComponent(data.totp.qr_code)}`
+    setFactor({ id: data.id, qr, secret: data.totp.secret })
+  }
+
+  async function cancel() {
+    if (factor) await supabase.auth.mfa.unenroll({ factorId: factor.id })
+    onClose()
+  }
+
+  return (
+    <dialog ref={ref} className="dialog" aria-labelledby="add-auth-title" onCancel={(e) => (e.preventDefault(), cancel())}>
+      <h2 id="add-auth-title">Add another authenticator</h2>
+      {!factor ? (
+        <form onSubmit={start}>
+          <label>
+            Give it a name
+            <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} required placeholder="1Password, Work phone…" autoFocus />
+          </label>
+          {error && (
+            <p className="error" role="alert">
+              {error}
+            </p>
+          )}
+          <div className="dialog-actions">
+            <button type="button" className="btn btn-secondary" onClick={cancel}>
+              Cancel
+            </button>
+            <button type="submit" className="btn" disabled={busy || !name.trim()}>
+              Show the QR code
+            </button>
+          </div>
+        </form>
+      ) : (
+        <>
+          <p className="muted">In {name.trim()}, add an account and scan this code.</p>
+          <img className="qr" src={factor.qr} alt="QR code to add Tallyn to your other authenticator app" />
+          <p className="muted small">Can&apos;t scan it? Enter this key instead:</p>
+          <p className="secret">{factor.secret}</p>
+          <p className="muted">
+            Then enter the <span className="nowrap">6-digit</span> code it shows.
+          </p>
+          <CodeForm
+            factorIds={[factor.id]}
+            button="Add"
+            autoFocus={false}
+            onVerified={async () => {
+              await onAdded()
+              onClose()
+            }}
+          />
+          <div className="dialog-actions">
+            <button type="button" className="btn btn-secondary" onClick={cancel}>
+              Cancel
+            </button>
+          </div>
+        </>
+      )}
+    </dialog>
   )
 }
 

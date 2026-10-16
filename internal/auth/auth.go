@@ -48,7 +48,7 @@ const (
 type Session struct {
 	UserID    string // auth.users.id, a UUID
 	SessionID string
-	AAL       string    // "aal2" for every session that reaches a handler
+	AAL       string    // "aal2" for every handler except backup-code recovery (#23), which allows "aal1"
 	TOTPAt    time.Time // when this session last entered a 2FA code; zero if never
 	// SignedInAt is when this session began: its oldest amr entry (the
 	// password sign-in). A 2FA step-up (#38) adds a newer entry, so it
@@ -114,6 +114,17 @@ func newVerifier(issuer string, kf jwt.Keyfunc) *Verifier {
 // Verify checks a raw access token and returns the session it describes.
 // A valid token without 2FA returns ErrMFARequired.
 func (v *Verifier) Verify(token string) (Session, error) {
+	return v.verify(token, true)
+}
+
+// VerifySignedIn is Verify without the 2FA requirement: a password sign-in
+// is enough. Only for recovering a lost authenticator (#23), where the
+// backup code is the second factor. Every other check still applies.
+func (v *Verifier) VerifySignedIn(token string) (Session, error) {
+	return v.verify(token, false)
+}
+
+func (v *Verifier) verify(token string, needMFA bool) (Session, error) {
 	if token == "" {
 		return Session{}, ErrNoToken
 	}
@@ -124,7 +135,7 @@ func (v *Verifier) Verify(token string) (Session, error) {
 	if c.Role != "authenticated" || c.IsAnonymous || !uuidRE.MatchString(c.Subject) {
 		return Session{}, fmt.Errorf("%w: not a signed-in user", ErrInvalid)
 	}
-	if c.AAL != "aal2" {
+	if needMFA && c.AAL != "aal2" {
 		return Session{}, ErrMFARequired
 	}
 	var totpAt, signedInAt time.Time
@@ -150,8 +161,18 @@ func (v *Verifier) Verify(token string) (Session, error) {
 // Require lets a request through only with a verified, 2FA-completed session,
 // which handlers read with FromContext. Everything else gets a 401.
 func (v *Verifier) Require(next http.Handler) http.Handler {
+	return v.require(next, true)
+}
+
+// RequireSignedIn is Require without the 2FA requirement (#23): only for
+// the route that recovers a lost authenticator with a backup code.
+func (v *Verifier) RequireSignedIn(next http.Handler) http.Handler {
+	return v.require(next, false)
+}
+
+func (v *Verifier) require(next http.Handler, needMFA bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s, err := v.Verify(bearer(r))
+		s, err := v.verify(bearer(r), needMFA)
 		if err != nil {
 			code := "unauthorized"
 			if errors.Is(err, ErrMFARequired) {

@@ -16,6 +16,18 @@ export function signedInAt(accessToken) {
   }
 }
 
+// When this session last entered a 2FA code, in ms, or null (#23): backup
+// codes are only made right after a code, like the API's step-up check.
+export function totpAt(accessToken) {
+  try {
+    const part = accessToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    const times = (JSON.parse(atob(part)).amr ?? []).filter((a) => a.method === 'totp' || a.method === 'mfa/totp').map((a) => a.timestamp)
+    return times.length ? Math.max(...times) * 1000 : null
+  } catch {
+    return null
+  }
+}
+
 export function sessionOver(now, at) {
   return at != null && now - at >= MAX_SESSION_MS
 }

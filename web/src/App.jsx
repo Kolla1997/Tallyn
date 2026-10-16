@@ -6,6 +6,7 @@ import IdleGuard from './components/IdleGuard.jsx'
 import SessionLimit from './components/SessionLimit.jsx'
 import { endRecovery, recoveryState, startRecovery } from './lib/recovery.js'
 import { ChoosePassword } from './screens/ResetPassword.jsx'
+import { BackupCodesGate } from './screens/BackupCodes.jsx'
 import Verify2FA from './screens/Verify2FA.jsx'
 import Home from './screens/Home.jsx'
 import TallynLoader from './components/TallynLoader.jsx'
@@ -116,7 +117,10 @@ function AuthFlow() {
         <IdleGuard onSignOut={signOutHere} />
         <SessionLimit accessToken={session.access_token} onSignOut={signOutHere} />
         <ConsentGate onSignOut={signOut}>
-          <Home email={session.user.email} onSignOut={signOut} />
+          {/* Backup codes after setting up 2FA, or once for existing accounts (#23). */}
+          <BackupCodesGate accessToken={session.access_token} email={session.user.email} page={AuthPage}>
+            <Home email={session.user.email} onSignOut={signOut} />
+          </BackupCodesGate>
         </ConsentGate>
       </>
     )

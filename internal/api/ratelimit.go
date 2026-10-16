@@ -81,17 +81,19 @@ func limited(l *limiter, next http.Handler) http.Handler {
 // limits are the API's rate limits. Each router gets its own, so tests
 // don't share counts.
 type limits struct {
-	all     *limiter // every API call
-	plaid   *limiter // Link, reconnect and exchange: each call reaches Plaid
-	invites *limiter // creating invites
-	accepts *limiter // accepting an invite link
+	all      *limiter // every API call
+	plaid    *limiter // Link, reconnect and exchange: each call reaches Plaid
+	invites  *limiter // creating invites
+	accepts  *limiter // accepting an invite link
+	recovery *limiter // backup-code tries (#23): each one guesses a code
 }
 
 func newLimits() limits {
 	return limits{
-		all:     newLimiter(600, time.Minute),
-		plaid:   newLimiter(30, time.Hour),
-		invites: newLimiter(20, time.Hour),
-		accepts: newLimiter(10, 10*time.Minute),
+		all:      newLimiter(600, time.Minute),
+		plaid:    newLimiter(30, time.Hour),
+		invites:  newLimiter(20, time.Hour),
+		accepts:  newLimiter(10, 10*time.Minute),
+		recovery: newLimiter(5, 15*time.Minute),
 	}
 }

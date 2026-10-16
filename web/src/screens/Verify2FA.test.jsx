@@ -5,7 +5,21 @@ import Verify2FA from './Verify2FA.jsx'
 // During a password reset (#22) the 2FA code comes first, with a note, and the
 // way out cancels the reset instead of switching account.
 vi.mock('../lib/supabase.js', () => ({
-  supabase: { auth: { mfa: { listFactors: () => Promise.resolve({ data: { totp: [{ id: 'f1' }] } }) } } },
+  supabase: {
+    auth: {
+      mfa: {
+        listFactors: () =>
+          Promise.resolve({
+            data: {
+              totp: [
+                { id: 'f1', status: 'verified' },
+                { id: 'f2', status: 'verified' },
+              ],
+            },
+          }),
+      },
+    },
+  },
 }))
 
 describe('Verify2FA', () => {
@@ -25,5 +39,16 @@ describe('Verify2FA', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancel reset' }))
     expect(onCancelReset).toHaveBeenCalled()
     expect(onSignOut).not.toHaveBeenCalled()
+  })
+
+  it('lost your phone: "Can\'t get a code?" offers a backup code (#23)', async () => {
+    await act(async () => render(<Verify2FA onSignOut={() => {}} />))
+    expect(screen.getAllByRole('textbox', { name: /Digit/ })).toHaveLength(6)
+    fireEvent.click(screen.getByRole('button', { name: "Can't get a code?" }))
+    expect(screen.getByText(/Use one of the backup codes you saved/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Use a backup code' }))
+    expect(screen.getByRole('heading', { name: 'Use a backup code' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Back to the/ }))
+    expect(screen.getByRole('heading', { name: 'Enter your code' })).toBeInTheDocument()
   })
 })

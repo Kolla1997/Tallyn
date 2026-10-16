@@ -47,7 +47,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - **P1:** a core flow broken.
 - **P2:** polish.
 
-**Coverage** below: **Yes** means tested at the level shown; **Partly** means some cases, or a lower level only; **No** means not tested.
+**Coverage** below: **Yes** means tested at the level shown; **Partly** means some cases, or a lower level only; **No** means not tested; **Planned** means the row was written before the code (P0 rule) and its tests come with the feature.
 
 ## Use cases and coverage
 
@@ -62,6 +62,13 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Sign in again after 12 hours, enforced by the API (#92) | P0 | Yes | Yes | No | `session.test.js`, `SessionLimit.test.jsx`, `auth_test.go` |
 | Automatic sign-outs end only this device | P1 | No | — | No | — |
 | Password reset, code before the new password (#22) | P0 | Yes | — | No | `recovery.test.js`, `ResetPassword.test.jsx`, `SignIn.test.jsx`, `Verify2FA.test.jsx` (PR #110); a real reset email is manual (release checklist) |
+| Add a second authenticator; remove one, never the last; any of them gives a valid code (#23) | P0 | Yes | — | No (#113) | `Settings.test.jsx`, `mfa.test.js`, `Verify2FA.test.jsx` |
+| Backup codes: 10 shown once after 2FA setup, stored hashed, each works once (#23) | P0 | Yes | Yes | — | `BackupCodes.test.jsx`; `api/backupcodes_test.go` (`TestNewBackupCodes`, `TestBackupCodeRoutes`); `db/backupcodes_test.go` (RLS, no hash readable) |
+| Existing 2FA accounts asked once to save backup codes (#23) | P1 | Yes | — | No | `BackupCodes.test.jsx` (`BackupCodesGate`) |
+| Regenerate backup codes needs a fresh 2FA code; old codes stop working (#23) | P0 | Yes | Yes | — | `Settings.test.jsx`; `TestBackupCodeRoutes` (step-up); `TestBackupCodes` (old set stops working) |
+| Lost authenticator: password, then a backup code, then a new authenticator; never without a second factor (#23) | P0 | Yes | Yes | No (#113) | `BackupCodes.test.jsx` (`UseBackupCode`), `Verify2FA.test.jsx`; `TestRecoverWithBackupCode`, `TestVerifySignedIn`; a real recovery is manual (release checklist) |
+| Backup-code tries are rate-limited and logged; a wrong code changes nothing (#23) | P0 | — | Yes | — | `TestRecoveryRateLimit`, `TestRecoverWithBackupCode`, `TestRecoveryFailsSafely` |
+| The server key only removes authenticators, and never reaches the browser (#23) | P0 | Yes | Yes | — | `supabaseadmin_test.go` (only list and delete factors; errors never contain the key); `TestRecoveryUnavailableWithoutSetup`; ADR 0013 |
 | Step-up 2FA for member changes (#38) | P0 | — | Yes | No | `members_test.go` (`TestMemberStepUp`) |
 | Security headers, CSP, caching | P0 | — | Yes | No | `security_test.go` (`TestSecurityHeaders`) |
 | Rate limits per user and per route | P1 | — | Yes | — | `security_test.go` (`TestLimiter`, `TestInviteAcceptRateLimit`) |
@@ -132,6 +139,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 ## Release checklist (manual, before each release)
 - [ ] Sign up with a new email, confirm it, set up 2FA with a real authenticator app.
 - [ ] Sign in with the code; reset the password from a real email (#22).
+- [ ] Add a second authenticator app, sign in with it, remove it. Save backup codes, then recover with one: password, backup code, new authenticator (#23).
 - [ ] Connect a Plaid sandbox bank; see accounts, transactions, cards and loans.
 - [ ] Invite a second account, accept, change the role, share and unshare an account.
 - [ ] Home totals match the bank sandbox's balances in the home currency.
