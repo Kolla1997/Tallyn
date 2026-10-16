@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"slices"
 	"strings"
@@ -66,5 +67,33 @@ func TestSharingRoutes(t *testing.T) {
 	}
 	if rec := get(h, "/api/sharing?household_id="+testHH, ""); rec.Code != http.StatusUnauthorized {
 		t.Fatalf("without a session: %d", rec.Code)
+	}
+}
+
+// Saving your name (#114): only ever your own, a name the database refuses
+// is a 400, anything else a 500, and the body can't name another person.
+func TestSetMe(t *testing.T) {
+	s := &shareStore{}
+	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s})
+
+	if rec := send(h, "PUT", "/api/me", `{"display_name":"Alex"}`); rec.Code != http.StatusNoContent || s.gotUser != testUser || s.gotName != "Alex" {
+		t.Fatalf("save: %d, user %q, name %q", rec.Code, s.gotUser, s.gotName)
+	}
+	if rec := send(h, "PUT", "/api/me", `{"display_name":"Alex","user_id":"someone-else"}`); rec.Code != http.StatusBadRequest {
+		t.Fatalf("a user_id in the body must be rejected: %d", rec.Code)
+	}
+	if rec := send(h, "PUT", "/api/me", `not json`); rec.Code != http.StatusBadRequest {
+		t.Fatalf("bad JSON: %d", rec.Code)
+	}
+	s.err = db.ErrInvalid // e.g. longer than 80 characters
+	if rec := send(h, "PUT", "/api/me", `{"display_name":"x"}`); rec.Code != http.StatusBadRequest || !strings.Contains(rec.Body.String(), "invalid_name") {
+		t.Fatalf("invalid: %d %s", rec.Code, rec.Body)
+	}
+	s.err = errors.New("database down")
+	if rec := send(h, "PUT", "/api/me", `{"display_name":"x"}`); rec.Code != http.StatusInternalServerError || strings.Contains(rec.Body.String(), "database down") {
+		t.Fatalf("error: %d %s, and the cause must not leak", rec.Code, rec.Body)
+	}
+	if rec := sendAs(h, "nobody", "PUT", "/api/me", `{"display_name":"x"}`); rec.Code != http.StatusUnauthorized {
+		t.Fatalf("signed out: %d", rec.Code)
 	}
 }

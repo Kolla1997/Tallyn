@@ -54,11 +54,11 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 ### Sign-in and security (Feature - Auth, ADR 0003, 0011, 0012)
 | Use case | P | Unit | Integration | End-to-end | Tests today |
 |---|---|---|---|---|---|
-| Sign up, confirm email, agree to Terms | P1 | Partly | — | No | `SignIn.test.jsx` (notes only); consent API in `consent_test.go` |
+| Sign up, confirm email, agree to Terms | P1 | Yes | Yes | No | `SignIn.test.jsx` (8-character rule, notes), `ConsentGate.test.jsx` (asks, records the versions, agreed at sign-up, changed documents, can't check); `consent_test.go` |
 | Sign in with password, then the 2FA code | P0 | Yes | Yes | No | `CodeForm.test.jsx`; `auth_test.go` (`aal2` required) |
-| Set up 2FA (QR, then a code) | P0 | Partly | — | No | `CodeForm.test.jsx`; the screen itself isn't tested |
+| Set up 2FA (QR, then a code) | P0 | Yes | — | No (#113) | `SetUp2FA.test.jsx` (QR and key, half-finished setup cleared, backup codes next, after recovery), `CodeForm.test.jsx` |
 | Every `/api/` route refuses no token, a bad token, no 2FA | P0 | — | Yes | — | `router_test.go` (`TestAPIRequiresAuth`), `auth_test.go` |
-| Sign out after 30 minutes idle, warning at 29 (#91) | P1 | Yes | — | No | `idle.test.js`, `SignIn.test.jsx`; the `IdleGuard` dialog isn't tested |
+| Sign out after 30 minutes idle, warning at 29 (#91) | P1 | Yes | — | No | `idle.test.js`, `SignIn.test.jsx`, `IdleGuard.test.jsx` (warning, countdown, Stay, Esc, activity, after sleep) |
 | Sign in again after 12 hours, enforced by the API (#92) | P0 | Yes | Yes | No | `session.test.js`, `SessionLimit.test.jsx`, `auth_test.go` |
 | Automatic sign-outs end only this device | P1 | No | — | No | — |
 | Password reset, code before the new password (#22) | P0 | Yes | — | No | `recovery.test.js`, `ResetPassword.test.jsx`, `SignIn.test.jsx`, `Verify2FA.test.jsx` (PR #110); a real reset email is manual (release checklist) |
@@ -84,7 +84,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Change a member's role, remove a member | P0 | — | Yes | No | `invites_test.go` (`TestMemberManagement`), `members_test.go` |
 | Sharing is the owner's choice, step by step | P0 | — | Yes | No | `sharing_test.go` (db: 7 tests; api: `TestSharingRoutes`) |
 | Leaving removes your shares | P0 | — | Yes | No | `sharing_test.go` (`TestLeavingRemovesShares`) |
-| Family page and sharing screen | P1 | No | — | No | — |
+| Family page and sharing screen | P1 | Yes | — | No (#113) | `FamilyPage.test.jsx` (switches save, transactions before time and location, failure reverts, owner-only actions, remove needs name and code, no sharing with teens) |
 
 ### Banks, sync and Plaid (ADR 0004, 0005, 0010)
 | Use case | P | Unit | Integration | End-to-end | Tests today |
@@ -101,14 +101,14 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Use case | P | Unit | Integration | End-to-end | Tests today |
 |---|---|---|---|---|---|
 | Amounts in minor units, any currency's decimals | P0 | Yes | — | — | `money_test.go`, `money.test.js` |
-| Totals in the home currency, across currencies | P0 | Partly | Partly | No | `TestTransactionSummary`; Home's totals aren't tested |
+| Totals in the home currency, across currencies | P0 | Yes | Partly | No | `HomePage.test.jsx`, `AccountsPage.test.jsx` (home currency, have − owe); `TestTransactionSummary`. Several currencies at once: not yet |
 | Transactions: filters, paging, owner, logo, bank | P1 | Partly | Yes | No | `db/transactions_test.go` (7), `api/transactions_test.go`, `TransactionsPage.test.js`, `TransactionRow.test.jsx` |
 | Summary: spent, money in, transfers left out | P0 | Yes | Yes | No | `TxSummary.test.jsx`, `TestTransactionSummary`, `TestSummaryRoute` |
 | Year of dots, keyboard included (#75, #98) | P2 | Yes | Yes | No | `SpendingDots.test.jsx`, `TestDailyAndDayFilter`, `TestDailyRoute` |
 | Debts: grouping, credit cards, loans | P0 | Yes | Yes | No | `DebtsPage.test.js`, `cards.test.js`, `TestSaveCreditCards`, `TestSaveLoans`, `liabilities_test.go` |
 | Spending by category | P1 | — | Yes | No | `TestSpending`, `TestSpendingRoute` |
-| Home page: balance, net worth, accounts, recent | P0 | No | Partly | No | API only (`TestMe`, routes); `HomePage.jsx` isn't tested |
-| Accounts page, bank cards, hidden balances | P1 | No | Yes | No | `TestBankHiddenWithoutBalances`; the page isn't tested |
+| Home page: balance, net worth, accounts, recent | P0 | Yes | Partly | No (#113) | `HomePage.test.jsx` (balance, net worth, Yours / Everyone, have and owe, biggest balances, shared with you, spending, who may link, empty, error) |
+| Accounts page, bank cards, hidden balances | P1 | Yes | Yes | No | `AccountsPage.test.jsx` (columns by type, hidden balance as —, whose accounts, bank chips, status, Reconnect, Unlink); `TestBankHiddenWithoutBalances` |
 
 ### App-wide
 | Use case | P | Unit | Integration | End-to-end | Tests today |
@@ -117,7 +117,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Pages load on demand, and reload once after an update (#99) | P2 | No | — | No | — |
 | Phone layout: no sideways scroll, nothing hidden (#97, #94) | P1 | No | — | No | Checked by hand in each PR |
 | Keyboard and screen reader basics on every page | P1 | Partly | — | No | Dots, code boxes, sign-in notes |
-| Settings: your name, legal links, Soon items | P2 | No | No | No | Saving your name (`PUT /api/me`) isn't tested; `TestMe` covers only `GET` |
+| Settings: your name, legal links, Soon items | P2 | Yes | Yes | No | `Settings.test.jsx`; `TestSetMe`, `TestSharingRoutes`, `TestSharingScreenData` (80-character limit) |
 
 ## Scope
 **In:**
@@ -132,7 +132,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 
 ## Gap tickets (agreed 2026-10-12)
 1. [#113](https://github.com/Kolla1997/Tallyn/issues/113) **Browser end-to-end tests** for the P0 paths: sign-in with 2FA, Home totals, connecting a sandbox bank, inviting a member, sharing. They use a separate Supabase test project with a seeded test user and a test TOTP secret, kept in GitHub secrets and never in the repo.
-2. [#114](https://github.com/Kolla1997/Tallyn/issues/114) **Tests for the untested screens:** Home, Accounts, Family and sharing, Settings, ConsentGate, IdleGuard, SetUp2FA. Plus a `PUT /api/me` handler test.
+2. [#114](https://github.com/Kolla1997/Tallyn/issues/114) **Tests for the untested screens:** Home, Accounts, Family and sharing, Settings, ConsentGate, IdleGuard, SetUp2FA. Plus a `PUT /api/me` handler test. **Done (2026-10-16).** `PUT /api/me` already had a success test; #114 added its failure cases.
 3. [#115](https://github.com/Kolla1997/Tallyn/issues/115) **Fix the Plaid link-token bug** (ask only on Connect a bank), with a test.
 4. [#116](https://github.com/Kolla1997/Tallyn/issues/116) **Automatic sign-outs end only this device:** tests for `scope: 'local'`.
 5. [#117](https://github.com/Kolla1997/Tallyn/issues/117) **Layout checks in the browser:** phone and desktop width, no sideways scroll, no hidden content. These would have caught #94 and #97.

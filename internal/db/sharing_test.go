@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/jackc/pgx/v5"
@@ -224,6 +225,10 @@ func TestSharingScreenData(t *testing.T) {
 	ctx := context.Background()
 	if err := f.db.SetDisplayName(ctx, alice, " Alice "); err != nil {
 		t.Fatal(err)
+	}
+	// Names up to 80 characters (#114).
+	if err := f.db.SetDisplayName(ctx, alice, strings.Repeat("a", 81)); !errors.Is(err, ErrInvalid) {
+		t.Fatalf("81 characters: err = %v, want ErrInvalid", err)
 	}
 	if err := f.db.SetSharing(ctx, alice, f.testHH, dave, []string{ShareBalances, ShareTransactions}); err != nil {
 		t.Fatal(err)

@@ -98,3 +98,56 @@ describe('Settings: backup codes', () => {
     expect(screen.getByRole('button', { name: 'Get codes' })).toBeInTheDocument()
   })
 })
+
+describe('Settings: profile, legal and coming soon (#114)', () => {
+  beforeEach(() => {
+    api.mockReset()
+    Object.values(mfa).forEach((f) => f.mockReset())
+  })
+
+  async function openSection(section) {
+    window.history.replaceState(null, '', `/settings?section=${section}`)
+    const onSaved = vi.fn()
+    await act(async () =>
+      render(
+        <Settings
+          me={{ display_name: 'Sam' }}
+          household={{ id: 'hh-1', name: 'Test family', role: 'owner' }}
+          email="you@example.com"
+          onSaved={onSaved}
+          onSignOut={() => {}}
+        />,
+      ),
+    )
+    return onSaved
+  }
+
+  it('saves your name and says how your family sees you', async () => {
+    api.mockResolvedValue(null)
+    const onSaved = await openSection('profile')
+    fireEvent.change(screen.getByLabelText('Your name, as your family sees it'), { target: { value: 'Alex' } })
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Save' })))
+    expect(api).toHaveBeenCalledWith('/api/me', { method: 'PUT', body: { display_name: 'Alex' } })
+    expect(screen.getByRole('status')).toHaveTextContent('Saved. Your family now sees you as Alex.')
+    expect(onSaved).toHaveBeenCalled()
+  })
+
+  it('says when your name can’t be saved', async () => {
+    api.mockRejectedValue(new Error('invalid_name'))
+    await openSection('profile')
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Save' })))
+    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't save your name.")
+  })
+
+  it('legal: both documents with their versions', async () => {
+    await openSection('legal')
+    expect(screen.getByRole('link', { name: /Terms of Service.*Version/ })).toHaveAttribute('href', '/terms')
+    expect(screen.getByRole('link', { name: /Privacy Policy.*Version/ })).toHaveAttribute('href', '/privacy')
+  })
+
+  it('what isn’t built yet says so, without links to tickets', async () => {
+    await openSection('data')
+    expect(screen.getAllByText('Coming soon').length).toBeGreaterThan(0)
+    expect(document.querySelector('a[href*="github.com"]')).toBeNull()
+  })
+})
