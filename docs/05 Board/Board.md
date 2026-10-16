@@ -20,8 +20,6 @@ kanban-plugin: board
 - [ ] [#80 Accounts: filter by bank](https://github.com/Kolla1997/Tallyn/issues/80) #type/feature #area/frontend
 - [ ] [#81 Transactions: filter by bank and show the bank on every transaction](https://github.com/Kolla1997/Tallyn/issues/81) #type/feature #area/frontend #area/backend
 - [ ] [#113 Browser end-to-end tests for the P0 paths](https://github.com/Kolla1997/Tallyn/issues/113) #type/tech-debt #area/infra #priority/p1
-- [ ] [#116 Test that automatic sign-outs end only this device](https://github.com/Kolla1997/Tallyn/issues/116) #type/tech-debt #area/frontend #priority/p2
-- [ ] [#117 Layout checks in the browser at phone and desktop width](https://github.com/Kolla1997/Tallyn/issues/117) #type/tech-debt #area/frontend #priority/p2
 - [ ] [#120 Family owner can reset a member's 2FA](https://github.com/Kolla1997/Tallyn/issues/120) #type/feature #area/backend #priority/p2
 - [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p1
 
@@ -86,6 +84,8 @@ kanban-plugin: board
 - [x] [#111 Detailed test plan for unit and integration testing](https://github.com/Kolla1997/Tallyn/issues/111) #type/docs #area/infra
 - [x] [#114 Tests for the untested screens and PUT /api/me](https://github.com/Kolla1997/Tallyn/issues/114) #type/tech-debt #area/frontend #priority/p2
 - [x] [#115 Connect a bank can hit the Plaid rate limit](https://github.com/Kolla1997/Tallyn/issues/115) #type/bug #area/frontend #priority/p1
+- [x] [#116 Test that automatic sign-outs end only this device](https://github.com/Kolla1997/Tallyn/issues/116) #type/tech-debt #area/frontend #priority/p2
+- [x] [#117 Layout checks in the browser at phone and desktop width](https://github.com/Kolla1997/Tallyn/issues/117) #type/tech-debt #area/frontend #priority/p2
 - [x] [#122 Tidy the sidebar: new collapse icon, smaller menu and profile card, legal links in the profile menu](https://github.com/Kolla1997/Tallyn/issues/122) #type/design #area/frontend
 
 
