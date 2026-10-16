@@ -74,3 +74,16 @@ export const InviteIcon = (p) => (
     <path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1" />
   </svg>
 )
+// Sign-in and recovery (#23): notes, and the authenticator list in Settings.
+export const LockIcon = (p) => (
+  <svg {...base} width={16} height={16} {...p}>
+    <rect x="5" y="10.5" width="14" height="10" rx="2.5" />
+    <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" />
+  </svg>
+)
+export const PhoneIcon = (p) => (
+  <svg {...base} width={16} height={16} {...p}>
+    <rect x="7" y="3" width="10" height="18" rx="2" />
+    <path d="M11 18h2" />
+  </svg>
+)

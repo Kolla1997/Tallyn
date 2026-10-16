@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { supabase } from '../lib/supabase.js'
+import { verifiedAuthenticators, verifyCode } from '../lib/mfa.js'
 
 // A deliberate confirmation for actions that are hard to undo (#38): the
 // person types a name to confirm and, for the most serious ones, enters a
@@ -31,10 +31,9 @@ export default function ConfirmDialog({ title, children, action, typeToConfirm, 
     setBusy(true)
     try {
       if (needsCode) {
-        const { data } = await supabase.auth.mfa.listFactors()
-        const factor = data?.totp?.find((f) => f.status === 'verified')
-        const { error: codeError } = factor ? await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code }) : { error: true }
-        if (codeError) {
+        // A code from any of your authenticators (#23).
+        const ids = (await verifiedAuthenticators()).map((f) => f.id)
+        if (!(await verifyCode(code, ids))) {
           setCode('')
           throw new Error("That code didn't work. Check the code in your app and try again.")
         }

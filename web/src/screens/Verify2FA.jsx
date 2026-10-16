@@ -1,42 +1,36 @@
 import { useEffect, useId, useState } from 'react'
-import { supabase } from '../lib/supabase.js'
+import { LockIcon } from '../components/Icons.jsx'
+import { verifiedAuthenticators } from '../lib/mfa.js'
+import { UseBackupCode } from './BackupCodes.jsx'
 import CodeForm from './CodeForm.jsx'
 
-// Later sign-ins: the password was right, now the authenticator code.
+// Later sign-ins: the password was right, now the authenticator code (any of
+// your authenticators, #23).
 // `recovering`: on the way to a new password (#22); the code comes first.
+// Lost your phone (#23, Dinesh picked A): "Can't get a code?" offers a
+// backup code instead.
 export default function Verify2FA({ onSignOut, recovering = false, onCancelReset }) {
-  const [factorId, setFactorId] = useState(null)
+  const [factorIds, setFactorIds] = useState(null)
   const [error, setError] = useState('')
   const [help, setHelp] = useState(false)
+  const [backup, setBackup] = useState(false)
   const helpId = useId()
 
   useEffect(() => {
-    supabase.auth.mfa.listFactors().then(({ data, error }) => {
-      if (error) setError(error.message)
-      else if (data.totp[0]) setFactorId(data.totp[0].id)
-    })
+    verifiedAuthenticators().then(
+      (list) => setFactorIds(list.map((f) => f.id)),
+      (e) => setError(e.message),
+    )
   }, [])
+
+  if (backup) return <UseBackupCode onBack={() => setBackup(false)} />
 
   return (
     <section className="card">
       <h1>Enter your code</h1>
       {recovering && (
         <p className="info-note">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <rect x="5" y="10.5" width="14" height="10" rx="2.5" />
-            <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" />
-          </svg>
+          <LockIcon />
           <span>To keep your account safe, enter your authenticator code before choosing a new password.</span>
         </p>
       )}
@@ -48,13 +42,17 @@ export default function Verify2FA({ onSignOut, recovering = false, onCancelReset
           {error}
         </p>
       )}
-      {factorId && <CodeForm factorId={factorId} button="Continue" />}
-      {/* Lost authenticator (#108): recovery itself is #23. */}
+      {factorIds?.length > 0 && <CodeForm factorIds={factorIds} button="Continue" />}
       {help && (
-        <p id={helpId} className="info-note code-help">
-          {/* TODO(#23): add how to get help until recovery codes exist (contact to confirm with Dinesh). */}
-          Lost your phone or deleted the app? Soon you&apos;ll be able to get back in with a recovery code here.
-        </p>
+        <div id={helpId} className="code-help">
+          <p className="info-note">
+            <LockIcon />
+            <span>Lost your phone or deleted the app? Use one of the backup codes you saved.</span>
+          </p>
+          <button type="button" className="btn btn-secondary" onClick={() => setBackup(true)}>
+            Use a backup code
+          </button>
+        </div>
       )}
       <div className="card-links">
         <button className="link-quiet" aria-expanded={help} aria-controls={helpId} onClick={() => setHelp(!help)}>

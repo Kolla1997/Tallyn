@@ -3,11 +3,13 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -15,6 +17,7 @@ import (
 	"github.com/Kolla1997/Tallyn/internal/auth"
 	"github.com/Kolla1997/Tallyn/internal/db"
 	"github.com/Kolla1997/Tallyn/internal/plaid"
+	"github.com/Kolla1997/Tallyn/internal/supabaseadmin"
 	banksync "github.com/Kolla1997/Tallyn/internal/sync"
 	"github.com/Kolla1997/Tallyn/internal/tokencrypt"
 )
@@ -29,13 +32,13 @@ func main() {
 	// Without Supabase settings the server still starts (health check and web
 	// app), but every protected /api/ route answers 503. Nothing is served
 	// unauthenticated.
-	var requireAuth func(http.Handler) http.Handler
+	var requireAuth, requireSignedIn func(http.Handler) http.Handler
 	if u := os.Getenv("SUPABASE_URL"); u != "" {
 		v, err := auth.New(ctx, u)
 		if err != nil {
 			log.Fatalf("tallyn: %v", err)
 		}
-		requireAuth = v.Require
+		requireAuth, requireSignedIn = v.Require, v.RequireSignedIn
 	} else {
 		log.Printf("tallyn: SUPABASE_URL not set, /api/ routes will answer 503")
 	}
@@ -44,6 +47,7 @@ func main() {
 	// refuses to start with a login that could step outside the user's role,
 	// such as Supabase's postgres.
 	var store api.Store
+	var codes api.BackupCodeStore
 	if u := os.Getenv("DATABASE_URL"); u != "" {
 		d, err := db.Open(ctx, u)
 		if err != nil {
@@ -53,7 +57,7 @@ func main() {
 		if err := d.CheckAPILogin(ctx); err != nil {
 			log.Fatalf("tallyn: %v", err)
 		}
-		store = d
+		store, codes = d, d
 	} else {
 		log.Printf("tallyn: DATABASE_URL not set, /api/ routes will answer 503")
 	}
@@ -62,12 +66,28 @@ func main() {
 	// A malformed key stops the server: better than failing on the first link.
 	var box *tokencrypt.Box
 	var plaidClient *plaid.Client
+	var codeKey []byte
 	if key := os.Getenv("TOKEN_ENCRYPTION_KEY"); key != "" && key != "replace-me" {
 		b, err := tokencrypt.New(key)
 		if err != nil {
 			log.Fatalf("tallyn: %v", err)
 		}
 		box = b
+		raw, _ := base64.StdEncoding.DecodeString(strings.TrimSpace(key)) // checked by tokencrypt.New
+		codeKey = api.DeriveBackupCodeKey(raw)                            // backup codes (#23)
+	}
+	// Recovering a lost authenticator (#23, ADR 0013) removes it through
+	// Supabase's admin API, with the server-only key. Without it, backup codes
+	// still work in Settings, and recovery answers 503.
+	var factors api.FactorRemover
+	if k := os.Getenv("SUPABASE_SERVICE_ROLE_KEY"); k != "" && k != "replace-me" {
+		c, err := supabaseadmin.New(os.Getenv("SUPABASE_URL"), k)
+		if err != nil {
+			log.Fatalf("tallyn: %v", err)
+		}
+		factors = c
+	} else {
+		log.Printf("tallyn: SUPABASE_SERVICE_ROLE_KEY not set, backup-code recovery will answer 503")
 	}
 	if id := os.Getenv("PLAID_CLIENT_ID"); id != "" && id != "replace-me" {
 		c, err := plaid.New(getenv("PLAID_ENV", "sandbox"), id, os.Getenv("PLAID_SECRET"), os.Getenv("PLAID_REDIRECT_URI"))
@@ -123,6 +143,11 @@ func main() {
 			SyncNow:     syncNow,
 			Reconnected: reconnected,
 			SupabaseURL: os.Getenv("SUPABASE_URL"),
+
+			RequireSignedIn: requireSignedIn,
+			BackupCodes:     codes,
+			Factors:         factors,
+			CodeKey:         codeKey,
 		}),
 		ReadHeaderTimeout: 10 * time.Second,
 		// #24: slow or stuck clients can't hold connections open.

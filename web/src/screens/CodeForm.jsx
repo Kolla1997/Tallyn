@@ -1,9 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { supabase } from '../lib/supabase.js'
+import { verifyCode } from '../lib/mfa.js'
 
-// Asks for the 6-digit code from the authenticator app and verifies it for
-// factorId. A correct code upgrades the session to aal2, which the app picks
-// up from onAuthStateChange.
+// Asks for the 6-digit code from the authenticator app and verifies it
+// against `factorIds` (any of your authenticators, #23). A correct code
+// upgrades the session to aal2, which the app picks up from
+// onAuthStateChange; onVerified runs after it (adding an authenticator).
 //
 // Six boxes, 3 + 3 (#108, Dinesh picked A): focus moves along as you type,
 // Backspace steps back, and pasting or phone autofill fills all six. The
@@ -11,7 +12,7 @@ import { supabase } from '../lib/supabase.js'
 // fallback and waits (sand) until then.
 const EMPTY = ['', '', '', '', '', '']
 
-export default function CodeForm({ factorId, button }) {
+export default function CodeForm({ factorIds, button, onVerified, autoFocus = true }) {
   const [digits, setDigits] = useState(EMPTY)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -20,16 +21,17 @@ export default function CodeForm({ factorId, button }) {
   const code = digits.join('')
 
   useEffect(() => {
-    boxes.current[0]?.focus()
-  }, [])
+    if (autoFocus) boxes.current[0]?.focus()
+  }, [autoFocus])
 
   async function verify(value) {
     if (busy) return
     setError('')
     setBusy(true)
-    const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code: value })
+    const ok = await verifyCode(value, factorIds)
     setBusy(false)
-    if (error) {
+    if (ok) onVerified?.()
+    else {
       setError("That code didn't work. Check the code in your app and try again.")
       setDigits(EMPTY)
       boxes.current[0]?.focus()

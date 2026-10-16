@@ -3780,3 +3780,162 @@ label.agree input {
 .password-changed {
   margin-bottom: var(--space-s4);
 }
+
+/* Authenticator recovery (#23, Dinesh picked A). */
+.codes-grid {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-s3);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-s2) var(--space-s3);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  counter-reset: code;
+}
+
+.codes-grid li {
+  counter-increment: code;
+  display: flex;
+  gap: var(--space-s2);
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.codes-grid li::before {
+  content: counter(code);
+  min-width: 1.4em;
+  text-align: right;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.codes-grid code {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.codes-actions {
+  display: flex;
+  gap: var(--space-s2);
+  flex-wrap: wrap;
+}
+
+.warn-note {
+  margin: 0;
+  padding: var(--space-s2) var(--space-s3);
+  border-radius: var(--radius-input);
+  background: color-mix(in srgb, var(--color-warning) 16%, var(--color-white));
+  font-size: 13.5px;
+}
+
+.backup-code-input {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.codes-dialog {
+  padding: 0;
+  max-width: 440px;
+}
+
+.codes-dialog .card {
+  border: none;
+  max-width: none;
+}
+
+/* Settings: your authenticators under "Two-step sign-in". */
+.settings-row-wrap {
+  flex-wrap: wrap;
+}
+
+.auth-list {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s2);
+  padding: var(--space-s2) var(--space-s3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: color-mix(in srgb, var(--color-white) 60%, transparent);
+}
+
+.auth-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.auth-items li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+  padding: var(--space-s2) 0;
+  border-top: 1px solid var(--color-border);
+  font-size: 14px;
+}
+
+.auth-items li:first-child {
+  border-top: none;
+}
+
+.auth-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  background: color-mix(in srgb, var(--color-sage) 16%, var(--color-white));
+  color: var(--color-sage-deep);
+}
+
+.auth-add {
+  align-self: flex-end;
+}
+
+.codes-meter {
+  display: flex;
+  gap: 3px;
+  margin-top: var(--space-s1);
+}
+
+.codes-meter i {
+  width: 14px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-sand);
+}
+
+.codes-meter i.on {
+  background: var(--color-sage);
+}
+
+/* Print: only the codes (Print on the backup codes screen). */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .backup-codes h1,
+  .backup-codes .codes-grid,
+  .backup-codes .codes-grid * {
+    visibility: visible;
+  }
+
+  .backup-codes {
+    position: absolute;
+    inset: 0 auto auto 0;
+    box-shadow: none;
+    border: none;
+    background: var(--color-white);
+  }
+}

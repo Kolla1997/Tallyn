@@ -17,7 +17,7 @@ describe('CodeForm', () => {
   })
 
   it('is six labelled boxes in a group, focused on the first, with phone autofill', () => {
-    render(<CodeForm factorId="f1" button="Continue" />)
+    render(<CodeForm factorIds={['f1']} button="Continue" />)
     expect(screen.getByRole('group', { name: '6-digit code' })).toBeInTheDocument()
     expect(boxes()).toHaveLength(6)
     expect(boxes()[0]).toHaveAccessibleName('Digit 1 of 6')
@@ -28,7 +28,7 @@ describe('CodeForm', () => {
   })
 
   it('moves along as you type, ignores letters, and checks the code at the 6th digit', async () => {
-    render(<CodeForm factorId="f1" button="Continue" />)
+    render(<CodeForm factorIds={['f1']} button="Continue" />)
     type(0, '1')
     expect(document.activeElement).toBe(boxes()[1])
     type(1, 'x')
@@ -41,7 +41,7 @@ describe('CodeForm', () => {
   })
 
   it('Backspace on an empty box clears the one before and goes back', () => {
-    render(<CodeForm factorId="f1" button="Continue" />)
+    render(<CodeForm factorIds={['f1']} button="Continue" />)
     type(0, '1')
     type(1, '2')
     act(() => boxes()[2].focus())
@@ -51,13 +51,13 @@ describe('CodeForm', () => {
   })
 
   it('paste and autofill fill all six boxes', async () => {
-    const { unmount } = render(<CodeForm factorId="f1" button="Continue" />)
+    const { unmount } = render(<CodeForm factorIds={['f1']} button="Continue" />)
     fireEvent.paste(boxes()[0], { clipboardData: { getData: () => '123 456' } })
     expect(values()).toEqual(['1', '2', '3', '4', '5', '6'])
     await act(async () => {})
     expect(verify).toHaveBeenLastCalledWith({ factorId: 'f1', code: '123456' })
     unmount()
-    render(<CodeForm factorId="f1" button="Continue" />)
+    render(<CodeForm factorIds={['f1']} button="Continue" />)
     type(0, '654321') // autofill puts the whole code in the first box
     expect(values()).toEqual(['6', '5', '4', '3', '2', '1'])
     await act(async () => {})
@@ -66,7 +66,7 @@ describe('CodeForm', () => {
 
   it('a wrong code clears the boxes, says so, and starts again from the first', async () => {
     verify.mockResolvedValue({ error: new Error('Invalid TOTP code') })
-    render(<CodeForm factorId="f1" button="Turn on 2FA" />)
+    render(<CodeForm factorIds={['f1']} button="Turn on 2FA" />)
     fireEvent.paste(boxes()[0], { clipboardData: { getData: () => '000000' } })
     await act(async () => {})
     expect(screen.getByRole('alert')).toHaveTextContent("That code didn't work.")
