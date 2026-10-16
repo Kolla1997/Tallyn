@@ -2,7 +2,7 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-12
+updated: 2026-10-16
 issue: 111
 tags: [spec, tech, testing]
 ---
@@ -87,7 +87,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Unlink a bank, and who may | P0 | — | Yes | No | `TestUnlink` (db, api), `TestUnlinkRules` |
 | Scheduled sync: transactions, cards, loans; one bad bank doesn't stop the others | P1 | Yes | Yes | — | `sync_test.go` (9), `plaid/transactions_test.go`, `liabilities_test.go`, `system_test.go` |
 | The sync login can't reach what it shouldn't | P0 | — | Yes | — | `logins_test.go`, `system_test.go` (`TestSyncRoleLimits`) |
-| Connect a bank isn't blocked by the Plaid rate limit after normal browsing | P1 | No | No | No | **Known bug** [#115](https://github.com/Kolla1997/Tallyn/issues/115): pages ask for a link token on every visit (found in #99) |
+| Connect a bank isn't blocked by the Plaid rate limit after normal browsing | P1 | Yes | — | No | `Banks.test.jsx` (#115: no token until clicked, one per click, closing Plaid and retrying, rate-limit message); fixed in [#115](https://github.com/Kolla1997/Tallyn/issues/115) |
 
 ### Money, transactions and debts
 | Use case | P | Unit | Integration | End-to-end | Tests today |
