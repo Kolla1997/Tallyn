@@ -11,7 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-16
-- #23 Lost authenticator (Dinesh picked A + B now, C later as #120; design A): more than one authenticator (add, name, remove in Settings, never the last; every 2FA check accepts any of them), ten backup codes (shown once, keyed hashes in `backup_codes`, migration 0014), and recovery: password → backup code → lost authenticator removed through Supabase's admin API with the server-only key → set up again → new codes. ADR 0013 (Proposed). Test Plan rows written before the code, now covered. Dinesh to do: run migration 0014, add the secret key, switch on security notification emails.
+- #23 Lost authenticator (Dinesh picked A + B now, C later as #120; design A): more than one authenticator (add, name, remove in Settings, never the last; every 2FA check accepts any of them), ten backup codes (shown once, keyed hashes in `backup_codes`, migration 0014), and recovery: password → backup code → lost authenticator removed through Supabase's admin API with the server-only key → set up again → new codes. ADR 0013 (Proposed). Test Plan rows written before the code, now covered. Migration 0014 run on tallyn-dev with Dinesh's OK (RLS on, hash column not readable; Settings shows "None yet"). Dinesh to do: add the secret key, switch on security notification emails.
 - #115 Connect a bank asks Plaid for a link token only when clicked (it used to ask whenever Home or Accounts opened, which could use up the 30-an-hour limit from #24 and break linking). The button works straight away and shows "Opening…" while the token loads; hitting the limit by clicking gets "Wait a few minutes, then try again". Test Plan row updated; `Banks.test.jsx` would have caught it.
 
 ## 2026-10-12
