@@ -73,6 +73,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Security headers, CSP, caching | P0 | — | Yes | No | `security_test.go` (`TestSecurityHeaders`) |
 | Rate limits per user and per route | P1 | — | Yes | — | `security_test.go` (`TestLimiter`, `TestInviteAcceptRateLimit`) |
 | Legal pages and consent versions match the documents | P1 | — | Yes | No | `consent_test.go` (`TestConsentVersionsMatchDocuments`) |
+| Terms and Privacy reachable in the signed-in app: profile menu, ☰ menu on phones, new tab; no footer (#122) | P1 | Yes | — | No (#117) | `Shell.test.jsx`; sizes checked in the browser (#122 PR) |
 
 ### Households, family and sharing (ADR 0007, 0008, 0009)
 | Use case | P | Unit | Integration | End-to-end | Tests today |

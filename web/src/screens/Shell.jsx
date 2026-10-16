@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import logo from '../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg'
 import mark from '../../../brand/logo/svg/tallyn-mark-light.svg'
 import { AccountsIcon, DebtsIcon, FamilyIcon, GoalsIcon, HomeIcon, MenuIcon, SettingsIcon, TransactionsIcon } from '../components/Icons.jsx'
-import { SiteFooter } from '../components/AuthPage.jsx'
 import { Link } from '../lib/router.jsx'
 
 // App layout (#39): sidebar on web (1024px and up), header and bottom tab bar
@@ -98,7 +97,9 @@ export default function Shell({ me, household, households, onChooseHousehold, on
               aria-hidden="true"
               focusable="false"
             >
-              {collapsed ? <path d="m9 6 6 6-6 6M4 6v12" /> : <path d="m15 6-6 6 6 6M20 6v12" />}
+              {/* A side panel (#122, Dinesh picked P, with no circle around it). */}
+              <rect x="3.5" y="4.5" width="17" height="15" rx="3" />
+              <path d="M9.5 4.5v15" />
             </svg>
           </button>
         </div>
@@ -128,10 +129,11 @@ export default function Shell({ me, household, households, onChooseHousehold, on
           <img src={logo} alt="Tallyn" />
           <MobileMenu name={name} initial={initial} household={household} onSignOut={onSignOut} />
         </header>
+        {/* No footer in the signed-in app (#122): Terms and Privacy are in
+            the profile menu, the ☰ menu on phones, and Settings → Legal. */}
         <main id="main" className="content">
           {children}
         </main>
-        <SiteFooter />
       </div>
 
       <nav className="tabbar" aria-label="Main">
@@ -265,6 +267,8 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
             </svg>
             Sign out
           </button>
+          <hr />
+          <LegalLinks />
         </div>
       )}
     </div>
@@ -346,6 +350,8 @@ function MobileMenu({ name, initial, household, onSignOut }) {
             </svg>
             Sign out
           </button>
+          <hr />
+          <LegalLinks />
         </div>
       )}
     </div>
@@ -362,5 +368,22 @@ export function PageHead({ title, sub, children }) {
       </div>
       {children && <div className="page-actions">{children}</div>}
     </div>
+  )
+}
+
+// Terms and Privacy, as one quiet line at the bottom of the profile and ☰
+// menus (#122, Dinesh picked M2). They open in a new tab. Plain paths, not
+// lib/legal.js, so the documents' text stays out of the first download (#99).
+function LegalLinks() {
+  return (
+    <p className="menu-legal">
+      <a role="menuitem" href="/terms" target="_blank" rel="noopener">
+        Terms of Service
+      </a>
+      <span aria-hidden="true"> · </span>
+      <a role="menuitem" href="/privacy" target="_blank" rel="noopener">
+        Privacy Policy
+      </a>
+    </p>
   )
 }
