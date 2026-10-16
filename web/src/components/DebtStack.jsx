@@ -36,9 +36,12 @@ export default function DebtStack({ title, accounts, home }) {
   return (
     <section className="panel debt-stack" aria-labelledby="debts-h">
       <div className="panel-head">
-        <h2 id="debts-h">
+        {/* The badge is for the eye; screen readers hear the count in words (#1). */}
+        <h2 id="debts-h" aria-label={`${title} (${accounts.length} ${accounts.length === 1 ? 'card or loan' : 'cards and loans'})`}>
           {title}
-          <span className="debt-count">{accounts.length}</span>
+          <span className="debt-count" aria-hidden="true">
+            {accounts.length}
+          </span>
         </h2>
         {accounts.length > 0 && <span className="amount money-out">{formatMoney(total, home)}</span>}
       </div>
