@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-16
+- #23 #22 Dinesh finished the Supabase settings on tallyn-dev: secret key in `.env` (server only; recovery now available, admin API answers 200), security notification emails on, minimum password length 8. The reset email template can't be edited on the free plan with Supabase's built-in sender (new projects since 3 June 2026), so it stays Supabase's default for now: idea #131 (our own email provider).
 - #1 Cards-and-debts heading: screen readers now hear "… (2 cards and loans)" instead of "…debts0" (found by #117); the count badge looks the same.
 - #117 Merged PR #129 with all four checks green, the new Layout check included; closed and moved to Done.
 - #117 Layout checks in a real browser on every PR (Dinesh picked a): Playwright opens the production build with fake data and a fake signed-in session, and checks every page at 375, 1024 and 1440 px (no sideways scroll, no error, key parts really visible), plus menus, sign-in, 2FA, reset and legal pages. 54 checks; proven by briefly hiding the category legend (#94) and widening a card (phone). Found: the debts heading's count badge reads as "debts0" to screen readers.
