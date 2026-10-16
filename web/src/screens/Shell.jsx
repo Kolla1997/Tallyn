@@ -97,16 +97,9 @@ export default function Shell({ me, household, households, onChooseHousehold, on
               aria-hidden="true"
               focusable="false"
             >
-              {/* #122: a side panel to collapse (Dinesh picked P, no circle
-                  around it), a double chevron to expand (R3). */}
-              {collapsed ? (
-                <path d="m6 6 6 6-6 6M12 6l6 6-6 6" />
-              ) : (
-                <>
-                  <rect x="3.5" y="4.5" width="17" height="15" rx="3" />
-                  <path d="M9.5 4.5v15" />
-                </>
-              )}
+              {/* Double chevrons, no circle around them (#122): » to expand
+                  (Dinesh picked R3), « to collapse (E1). */}
+              {collapsed ? <path d="m6 6 6 6-6 6M12 6l6 6-6 6" /> : <path d="m18 6-6 6 6 6M12 6l-6 6 6 6" />}
             </svg>
           </button>
         </div>
