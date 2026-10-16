@@ -10,6 +10,9 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-10-16
+- #115 Connect a bank asks Plaid for a link token only when clicked (it used to ask whenever Home or Accounts opened, which could use up the 30-an-hour limit from #24 and break linking). The button works straight away and shows "Opening…" while the token loads; hitting the limit by clicking gets "Wait a few minutes, then try again". Test Plan row updated; `Banks.test.jsx` would have caught it.
+
 ## 2026-10-12
 - #91 Sign out after 30 minutes without activity (Dinesh picked A and note 1): a "Still there?" dialog counts down the last 60 seconds with the page blurred behind it (balances unreadable); activity in any Tallyn tab counts (shared through localStorage), background refreshes don't; coming back after sleep or a reload past 30 minutes signs out at once; Stay signed in has focus and Esc means stay; the sign-in page then shows a calm sage note, once. Supabase's server-side timeout needs a paid plan: later.
 - #100 Merged PR #103 (lint, web tests, checks on every PR); all three checks green; closed and moved to Done. GitGuardian flagged the throwaway CI database password: removed (Postgres runs with no password) and the commit rewritten. Required checks need GitHub Pro on a private repo: Dinesh chose to stay on the free plan; we only merge PRs with green checks.
