@@ -4006,6 +4006,14 @@ label.agree input {
   }
 }
 
+/* Collapsed: just the avatar, no circle around it (#122). The keyboard
+   focus ring stays. */
+.profile.is-collapsed .profile-card {
+  padding: 0;
+  border: none;
+  background: none;
+}
+
 .menu-legal {
   margin: 0;
   padding: var(--space-s1) var(--space-s2) var(--space-s2);
