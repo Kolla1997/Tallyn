@@ -16,3 +16,17 @@ if (typeof HTMLDialogElement !== 'undefined' && !HTMLDialogElement.prototype.sho
     this.removeAttribute('open')
   }
 }
+
+// jsdom has no matchMedia (#114). Pages ask it for screen widths and reduced
+// motion: report narrow screens and reduced motion, so numbers show their
+// final value straight away instead of counting up.
+if (!window.matchMedia) {
+  window.matchMedia = (query) => ({
+    matches: query.includes('prefers-reduced-motion: reduce'),
+    media: query,
+    addEventListener() {},
+    removeEventListener() {},
+    addListener() {},
+    removeListener() {},
+  })
+}

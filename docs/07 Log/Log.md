@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-16
+- #114 Tests for the untested screens: Home, Accounts, Family and sharing, Settings (profile, legal, coming soon), ConsentGate, IdleGuard and SetUp2FA (38 new web tests, 123 in total), plus `TestSetMe` and an 80-character name check in Go. `PUT /api/me` already had a success test; the Test Plan said otherwise and is corrected. No bugs found. Test setup: a jsdom `matchMedia` stand-in and a small fake-API helper (`web/src/test/fakeApi.js`).
 - #1 Collapse button: « to collapse (Dinesh picked E1), mirroring » to expand (#122).
 - #23 #122 Merged PRs #121 (lost authenticator) and #123 (tidier sidebar), each with all three checks green; both closed and moved to Done.
 - #122 Tidier sidebar (Dinesh picked P without the circle, A and M2): side-panel collapse icon, smaller menu (40px items) and profile card (48px), Terms and Privacy as one line in the profile and ☰ menus, and no footer in the signed-in app. Sign-in pages keep their footer. After seeing it: a double chevron » to expand (R3) and no circle around the collapsed avatar.
