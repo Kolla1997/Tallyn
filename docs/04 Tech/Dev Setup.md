@@ -81,7 +81,8 @@ To try the single-deployment setup: `cd web && npm run build`, then `go run ./cm
 | Lint | `go vet ./...` and `gofmt -l cmd internal`; web: `cd web && npm run lint` (ESLint, #100) |
 | Format the web app | `cd web && npm run format` (Prettier: single quotes, no semicolons; check with `npm run format:check`) |
 | Test the web app | `cd web && npm test` (Vitest; tests sit next to the code as `*.test.js(x)`) |
-| Checks on every PR | Automatic: `.github/workflows/checks.yml` runs Go format, vet and tests (with Postgres 16) and the web lint, format check, tests and build. A PR shows ✓ or ✗ before merging (#100) |
+| Layout checks (#117) | `cd web && npm run test:layout`: Playwright builds the app with a fake Supabase address and checks every page at 375, 1024 and 1440 px with fake data (`web/e2e/fixtures.js`). First time: `npx playwright install chromium`. On failure, screenshots are in `web/test-results/` |
+| Checks on every PR | Automatic: `.github/workflows/checks.yml` runs Go format, vet and tests (with Postgres 16) and the web lint, format check, tests and build, plus the layout checks (#117). A PR shows ✓ or ✗ before merging (#100) |
 | Build the web app | `cd web && npm run build`. Each page is its own file, loaded when first opened; React and Supabase have their own files too (#99) |
 | Remake the web fonts | After changing a master in `brand/fonts/`: `python3 -m pip install fonttools brotli`, then `python3 scripts/build_fonts.py`. It writes WOFF2 files to `brand/fonts/web/` (Latin, Latin Extended and the rest, so a page downloads only what it uses) and `web/src/fonts.css`. Don't edit either by hand (#99) |
 | Build the Docker image | `docker build -t tallyn .` then `docker run -p 8080:8080 --env-file .env tallyn` |

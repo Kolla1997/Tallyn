@@ -8,9 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write src *.js",
-    "format:check": "prettier --check src *.js",
-    "test": "vitest run"
+    "format": "prettier --write src e2e *.js",
+    "format:check": "prettier --check src e2e *.js",
+    "test": "vitest run",
+    "test:layout": "playwright test"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",
@@ -20,6 +21,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.49.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
     "@vitejs/plugin-react": "^6.1.2",

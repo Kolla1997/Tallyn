@@ -38,6 +38,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 |---|---|---|---|
 | **Unit** | One function or component, with no network or database. Rules, formatting, edge cases | Go `testing`; Vitest + Testing Library (jsdom) | Every PR |
 | **Integration** | The API with a real Postgres: RLS, roles, SQL, handlers end to end with a test token | Go tests with `TALLYN_TEST_DATABASE_URL` (Postgres 16 in CI) | Every PR |
+| **Layout** | Every page at phone, laptop and desktop width: no sideways scroll, no error, key parts really visible (#117) | Playwright (Chromium) against the production build, with fake data and a fake session (`web/e2e`) | Every PR |
 | **Contract** | Our Plaid and Supabase code against recorded responses | Go `httptest` fakes (Plaid today) | Every PR |
 | **Browser end-to-end** | A person's path through the real app: sign-in, 2FA, a page, a change | **Playwright** with a separate Supabase test project and the Plaid sandbox (#113) | Nightly, and before each release |
 | **Manual** | What can't be automated safely: real email, a real authenticator app, a real bank, how it looks | Release checklist (below) | Before a release |
@@ -115,7 +116,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 |---|---|---|---|---|---|
 | SQL is always constant, never built from input | P0 | — | Yes | — | `sqlsafety_test.go` |
 | Pages load on demand, and reload once after an update (#99) | P2 | No | — | No | — |
-| Phone layout: no sideways scroll, nothing hidden (#97, #94) | P1 | No | — | No | Checked by hand in each PR |
+| Phone layout: no sideways scroll, nothing hidden (#97, #94) | P1 | — | — | Yes | `web/e2e/layout.spec.js` (#117): every page at 375, 1024 and 1440 px: no sideways scroll, no error, key parts really visible (size, on screen, not hidden by display, visibility or opacity); menus with Terms and Privacy; sign-in, 2FA, reset, legal pages. Fake data and session, every PR |
 | Keyboard and screen reader basics on every page | P1 | Partly | — | No | Dots, code boxes, sign-in notes |
 | Settings: your name, legal links, Soon items | P2 | Yes | Yes | No | `Settings.test.jsx`; `TestSetMe`, `TestSharingRoutes`, `TestSharingScreenData` (80-character limit) |
 
@@ -135,7 +136,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 2. [#114](https://github.com/Kolla1997/Tallyn/issues/114) **Tests for the untested screens:** Home, Accounts, Family and sharing, Settings, ConsentGate, IdleGuard, SetUp2FA. Plus a `PUT /api/me` handler test. **Done (2026-10-16).** `PUT /api/me` already had a success test; #114 added its failure cases.
 3. [#115](https://github.com/Kolla1997/Tallyn/issues/115) **Fix the Plaid link-token bug** (ask only on Connect a bank), with a test.
 4. [#116](https://github.com/Kolla1997/Tallyn/issues/116) **Automatic sign-outs end only this device:** tests for `scope: 'local'`. **Done (2026-10-16).**
-5. [#117](https://github.com/Kolla1997/Tallyn/issues/117) **Layout checks in the browser:** phone and desktop width, no sideways scroll, no hidden content. These would have caught #94 and #97.
+5. [#117](https://github.com/Kolla1997/Tallyn/issues/117) **Layout checks in the browser:** phone and desktop width, no sideways scroll, no hidden content. These would have caught #94 and #97. **Done (2026-10-16):** runs on every PR with fake data, so it doesn't wait for #113.
 
 ## Release checklist (manual, before each release)
 - [ ] Sign up with a new email, confirm it, set up 2FA with a real authenticator app.

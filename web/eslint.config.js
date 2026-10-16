@@ -6,7 +6,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 // Lint for the web app (#100): the recommended JavaScript rules plus React's
 // hook rules. Formatting is Prettier's job (.prettierrc), not ESLint's.
 export default [
-  { ignores: ['dist/**'] },
+  { ignores: ['dist/**', 'e2e-dist/**', 'test-results/**', 'playwright-report/**'] },
   js.configs.recommended,
   {
     files: ['**/*.{js,jsx}'],
@@ -28,7 +28,7 @@ export default [
     },
   },
   {
-    files: ['**/*.test.{js,jsx}', 'vite.config.js', 'eslint.config.js'],
+    files: ['**/*.test.{js,jsx}', 'vite.config.js', 'eslint.config.js', 'playwright.config.js', 'e2e/**'],
     languageOptions: { globals: { ...globals.node } },
   },
 ]

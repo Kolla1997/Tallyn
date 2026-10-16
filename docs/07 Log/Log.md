@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-16
+- #117 Layout checks in a real browser on every PR (Dinesh picked a): Playwright opens the production build with fake data and a fake signed-in session, and checks every page at 375, 1024 and 1440 px (no sideways scroll, no error, key parts really visible), plus menus, sign-in, 2FA, reset and legal pages. 54 checks; proven by briefly hiding the category legend (#94) and widening a card (phone). Found: the debts heading's count badge reads as "debts0" to screen readers.
 - #116 Merged PR #128 (device-only sign-out tests, Sign out label) with all three checks green; closed and moved to Done.
 - #116 Tests that automatic sign-outs (idle, 12 hours, `session_expired`) end only this device and the Sign out button ends every session; the two functions moved to `lib/session.js` (no change in behaviour).
 - #1 Settings → Sign out now says "Everywhere you're signed in" (it said "Of this device", but the button ends every session, as agreed in #92). Dinesh chose fixing the label.
