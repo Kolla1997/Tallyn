@@ -1,15 +1,15 @@
 ---
 type: adr
-status: draft
+status: active
 owner: Dinesh
-updated: 2026-10-12
+updated: 2026-10-16
 issue: 24
 tags: [adr, security]
 ---
 
 # 0011 — Security headers, caching, timeouts and rate limits
 
-- **Status:** Proposed
+- **Status:** Accepted (Dinesh, 2026-10-16)
 - **Date:** 2026-10-12
 - **Ticket:** #24
 
