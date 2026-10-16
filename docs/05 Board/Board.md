@@ -30,7 +30,6 @@ kanban-plugin: board
 ## In Progress
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
-- [ ] [#23 Recovery when someone loses their authenticator app](https://github.com/Kolla1997/Tallyn/issues/23) #type/feature #area/frontend #priority/p1
 - [ ] [#25 Styled sign-in and 2FA screens](https://github.com/Kolla1997/Tallyn/issues/25) #type/design #area/design #priority/p2
 - [ ] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
 
@@ -56,6 +55,7 @@ kanban-plugin: board
 - [x] [#12 Household members: invitations and roles](https://github.com/Kolla1997/Tallyn/issues/12) #type/feature #area/backend #priority/p1
 - [x] [#16 Automate board sync with a GitHub Action](https://github.com/Kolla1997/Tallyn/issues/16) #type/feature #area/infra #priority/p2
 - [x] [#22 Password reset](https://github.com/Kolla1997/Tallyn/issues/22) #type/feature #area/frontend #priority/p1
+- [x] [#23 Recovery when someone loses their authenticator app](https://github.com/Kolla1997/Tallyn/issues/23) #type/feature #area/frontend #priority/p1
 - [x] [#24 Content-Security-Policy and security headers](https://github.com/Kolla1997/Tallyn/issues/24) #type/feature #area/backend #priority/p1
 - [x] [#27 Debt details: interest rates, due dates and minimum payments (Plaid Liabilities)](https://github.com/Kolla1997/Tallyn/issues/27) #type/feature #area/backend #priority/p0
 - [x] [#28 Sharing settings: choose what each household member can see](https://github.com/Kolla1997/Tallyn/issues/28) #type/feature #area/backend #priority/p1
