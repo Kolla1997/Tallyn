@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-16
+- #1 Test Plan release checklist: the #23 checks written out step by step (second authenticator, backup codes, recovering with a backup code).
 - #23 #22 Dinesh finished the Supabase settings on tallyn-dev: secret key in `.env` (server only; recovery now available, admin API answers 200), security notification emails on, minimum password length 8. The reset email template can't be edited on the free plan with Supabase's built-in sender (new projects since 3 June 2026), so it stays Supabase's default for now: idea #131 (our own email provider).
 - #1 Cards-and-debts heading: screen readers now hear "… (2 cards and loans)" instead of "…debts0" (found by #117); the count badge looks the same.
 - #117 Merged PR #129 with all four checks green, the new Layout check included; closed and moved to Done.

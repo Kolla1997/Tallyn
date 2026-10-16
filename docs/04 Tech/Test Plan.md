@@ -141,7 +141,9 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 ## Release checklist (manual, before each release)
 - [ ] Sign up with a new email, confirm it, set up 2FA with a real authenticator app.
 - [ ] Sign in with the code; reset the password from a real email (#22).
-- [ ] Add a second authenticator app, sign in with it, remove it. Save backup codes, then recover with one: password, backup code, new authenticator (#23).
+- [ ] **Second authenticator (#23):** Settings → Sign-in and security → **+ Add another**: a name, scan the QR code, enter its code. Sign out and in with a code from the new one, then **Remove** it (asks for a fresh code). Your last one can't be removed.
+- [ ] **Backup codes (#23):** Settings → Sign-in and security → **Get codes** (asks for a fresh 2FA code). Ten codes show once; Copy, Download and Print work; tick "I've saved these codes" to continue. Settings then shows "10 of 10 left".
+- [ ] **Recover with a backup code (#23)**, with your phone to hand, because this removes your authenticator: sign out → sign in with your password → "Can't get a code?" → **Use a backup code** → enter one code → "You're in with a backup code" → set up your authenticator again → save the **new** set of codes. Then check: the used code no longer works, Settings shows "10 of 10 left", and the "MFA method added" email arrives.
 - [ ] Connect a Plaid sandbox bank; see accounts, transactions, cards and loans.
 - [ ] Invite a second account, accept, change the role, share and unshare an account.
 - [ ] Home totals match the bank sandbox's balances in the home currency.
