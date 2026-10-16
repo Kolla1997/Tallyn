@@ -1,15 +1,15 @@
 ---
 type: adr
-status: draft
+status: active
 owner: Dinesh
-updated: 2026-10-12
+updated: 2026-10-16
 issue: 92
 tags: [adr, security]
 ---
 
 # 0012 — Sign in again after 12 hours
 
-- **Status:** Proposed
+- **Status:** Accepted (Dinesh, 2026-10-16)
 - **Date:** 2026-10-12
 - **Ticket:** #92
 
