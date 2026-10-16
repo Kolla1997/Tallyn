@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-16
+- #116 Merged PR #128 (device-only sign-out tests, Sign out label) with all three checks green; closed and moved to Done.
 - #116 Tests that automatic sign-outs (idle, 12 hours, `session_expired`) end only this device and the Sign out button ends every session; the two functions moved to `lib/session.js` (no change in behaviour).
 - #1 Settings → Sign out now says "Everywhere you're signed in" (it said "Of this device", but the button ends every session, as agreed in #92). Dinesh chose fixing the label.
 - #114 #1 Merged PRs #124 (« collapse icon) and #125 (screen tests), each with all three checks green; #114 closed and moved to Done.
