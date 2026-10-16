@@ -11,6 +11,7 @@ kanban-plugin: board
 - [ ] [#2 Test idea, please ignore](https://github.com/Kolla1997/Tallyn/issues/2) #type/idea
 - [ ] [#33 Formulas to split available balance across goals](https://github.com/Kolla1997/Tallyn/issues/33) #type/idea #area/backend
 - [ ] [#126 Payment due dates calendar with reminders](https://github.com/Kolla1997/Tallyn/issues/126) #type/idea
+- [ ] [#127 Record bills and payments Plaid can't see](https://github.com/Kolla1997/Tallyn/issues/127) #type/idea
 
 
 ## Exploring
