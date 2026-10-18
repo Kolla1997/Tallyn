@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-17
+- #1 Board tidy-up (Dinesh): closed #37 (shared money shown apart, built in #68, #42) and #25 (styled sign-in and 2FA, built in #39, #108, #22, #23); moved already-closed #80, #81, #63, #10 and #4 to Done; Design System "Missing screens" no longer lists sign-in.
 - #131 #55 Email direction (Dinesh): Brevo for everything important (Supabase's account and security emails, reminders, notifications), since it has the most free room (about 300 a day) and must never hit a limit; Resend later for newsletters and release emails. Notifications show in the app first; email only for what matters (due dates, overdue, reconnect a bank, an optional summary). Nothing set up yet; needs a domain.
 - #27 ADR 0010 (Plaid Liabilities) corrected: loans are stored too (migration 0013), not "later". Still Proposed until Dinesh confirms the Liabilities price.
 

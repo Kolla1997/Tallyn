@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-16
+updated: 2026-10-17
 issue: 10
 tags: [design]
 ---
@@ -73,7 +73,7 @@ See [[Animation Guide]]. UI transitions are 200 to 300ms, ease-out. Respect redu
 Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy alongside). Screens: [[Design Comps]]. Patterns: [[UI Patterns]].
 
 > [!todo] Missing screens
-> Sign in (#25), add bank, budgets, empty and error states, and dark mode. Transactions, Accounts, Family and Settings are built (#39, #42).
+> Budgets (#13), empty and error states, and dark mode. Sign-in, 2FA, password reset and recovery are built (#25, #108, #22, #23), as are Home, Transactions, Accounts, Debts, Family and Settings (#39, #42, #27). Adding a bank happens in Plaid's own window.
 
 ## Decisions
 | Date | Decision | Why |
