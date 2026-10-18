@@ -18,7 +18,7 @@ kanban-plugin: board
 - [ ] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
 - [ ] [#113 Browser end-to-end tests for the P0 paths](https://github.com/Kolla1997/Tallyn/issues/113) #type/tech-debt #area/infra #priority/p1
 - [ ] [#120 Family owner can reset a member's 2FA](https://github.com/Kolla1997/Tallyn/issues/120) #type/feature #area/backend #priority/p2
-- [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p1
+- [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p3
 
 
 ## In Progress
