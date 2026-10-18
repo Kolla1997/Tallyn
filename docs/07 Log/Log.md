@@ -10,6 +10,9 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-10-17
+- #27 ADR 0010 (Plaid Liabilities) corrected: loans are stored too (migration 0013), not "later". Still Proposed until Dinesh confirms the Liabilities price.
+
 ## 2026-10-16
 - #24 #92 #23 Dinesh accepted ADR 0011 (security headers, caching, timeouts, rate limits), 0012 (sign in again after 12 hours) and 0013 (backup codes and the server-only Supabase key). They can't change now; a reversal needs a new ADR. ADR 0010 (Plaid Liabilities) stays Proposed until its price is confirmed.
 - #1 Test Plan release checklist: the #23 checks written out step by step (second authenticator, backup codes, recovering with a backup code).

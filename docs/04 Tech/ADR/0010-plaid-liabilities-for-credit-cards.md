@@ -2,7 +2,7 @@
 type: adr
 status: draft
 owner: Dinesh
-updated: 2026-10-12
+updated: 2026-10-17
 issue: 27
 tags: [adr, plaid, security]
 ---
@@ -27,7 +27,7 @@ Option 2.
 
 - Link asks for `products: [transactions]` and `optional_products: [liabilities]`. Still US only, an opaque user ID, and masks only.
 - The sync calls `/liabilities/get` about once a day (Plaid refreshes daily), after a good transaction sync, together with `/accounts/get` for fresh balances and limits. A failure there never fails the bank's sync.
-- Only credit cards are stored for now (`credit_cards`, migration `0011`): APRs, minimum, due date, last statement and payment, overdue. Student loans and mortgages come later under #27; no property address ever (decided 2026-10-09).
+- Credit cards are stored in `credit_cards` (migration `0011`): APRs, minimum, due date, last statement and payment, overdue. Student loans and mortgages are stored in `loans` (migration `0013`, also #27): rate, next and last payment, payoff date, original amount, past due, interest and principal paid this year. Never a servicer or property address, escrow or PMI (decided 2026-10-09).
 - Card details have the same visibility as the card's balance (`can_see_account_data(..., 'balances')`), and only the sync role writes them.
 - Logs carry Plaid's error code and Tallyn's bank ID only.
 
