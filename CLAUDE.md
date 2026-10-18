@@ -148,7 +148,7 @@ The Ideas board also has **Impact** (High/Medium/Low) and **Effort** (S/M/L) fie
 
    Use `--no-promote` to mirror without moving anything. A run that would only change the date stamp writes nothing. The Action needs the repo secret `BOARD_TOKEN`: a classic personal access token with `repo` and `project` scopes. Never put the token in the repo.
 
-Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand, design, frontend, backend, infra), `priority:*` (p0, p1, p2), and `blocker` for a ticket that can't move until something else is resolved (pairs with the **Blocked** column). Full list: `scripts/github/labels.yml` (copied to `.github/` by `setup_github.sh`).
+Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand, design, frontend, backend, infra), `priority:*` (p0, p1, p2, and p3 for later: not planned now), and `blocker` for a ticket that can't move until something else is resolved (pairs with the **Blocked** column). Full list: `scripts/github/labels.yml` (copied to `.github/` by `setup_github.sh`).
 
 ## 6. Brand and design guardrails
 
