@@ -17,6 +17,7 @@ kanban-plugin: board
 - [ ] [#113 Browser end-to-end tests for the P0 paths](https://github.com/Kolla1997/Tallyn/issues/113) #type/tech-debt #area/infra #priority/p1
 - [ ] [#120 Family owner can reset a member's 2FA](https://github.com/Kolla1997/Tallyn/issues/120) #type/feature #area/backend #priority/p2
 - [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p3
+- [ ] [#133 Plan from your income with templates (e.g. 55/5/10/15/15)](https://github.com/Kolla1997/Tallyn/issues/133) #type/feature #area/frontend #area/backend #priority/p1
 
 
 ## In Progress
