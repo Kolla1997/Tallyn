@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-17
+- #131 #55 Email direction (Dinesh): Brevo for everything important (Supabase's account and security emails, reminders, notifications), since it has the most free room (about 300 a day) and must never hit a limit; Resend later for newsletters and release emails. Notifications show in the app first; email only for what matters (due dates, overdue, reconnect a bank, an optional summary). Nothing set up yet; needs a domain.
 - #27 ADR 0010 (Plaid Liabilities) corrected: loans are stored too (migration 0013), not "later". Still Proposed until Dinesh confirms the Liabilities price.
 
 ## 2026-10-16
