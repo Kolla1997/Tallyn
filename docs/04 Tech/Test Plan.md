@@ -2,7 +2,7 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-16
+updated: 2026-10-21
 issue: 111
 tags: [spec, tech, testing]
 ---
@@ -107,6 +107,10 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Summary: spent, money in, transfers left out | P0 | Yes | Yes | No | `TxSummary.test.jsx`, `TestTransactionSummary`, `TestSummaryRoute` |
 | Year of dots, keyboard included (#75, #98) | P2 | Yes | Yes | No | `SpendingDots.test.jsx`, `TestDailyAndDayFilter`, `TestDailyRoute` |
 | Debts: grouping, credit cards, loans | P0 | Yes | Yes | No | `DebtsPage.test.js`, `cards.test.js`, `TestSaveCreditCards`, `TestSaveLoans`, `liabilities_test.go` |
+| Budgets: who may set and see which budget (household; one person; owners and adults on teens and children; your own) (#13) | P0 | — | Yes | No (#113) | `db/budgets_test.go` (`TestBudgetRules`, `TestBudgetVisibility`, `TestChangingBudgets`) |
+| Budgets count only opted-in members plus kids, as totals; nobody switches it on for someone else (#13, ADR 0014) | P0 | — | Yes | — | `TestBudgetCounting`, `TestOnlyYouChooseToCount` |
+| Budget progress: spending only (no income, transfers, loan payments, refunds), this week or month, local date (#13) | P0 | Yes | Yes | — | `TestBudgetCounting`, `TestPeriodBounds`; `api/budgets_test.go` (`TestBudgetRoutes`) |
+| Budgets page: pace-line tiles for the household, notches for one person, add / edit / delete, count-my-spending switch (#13) | P1 | Planned | — | Planned (#117 layout) | Second #13 PR |
 | Spending by category | P1 | — | Yes | No | `TestSpending`, `TestSpendingRoute` |
 | Home page: balance, net worth, accounts, recent | P0 | Yes | Partly | No (#113) | `HomePage.test.jsx` (balance, net worth, Yours / Everyone, have and owe, biggest balances, shared with you, spending, who may link, empty, error) |
 | Accounts page, bank cards, hidden balances | P1 | Yes | Yes | No | `AccountsPage.test.jsx` (columns by type, hidden balance as —, whose accounts, bank chips, status, Reconnect, Unlink); `TestBankHiddenWithoutBalances` |

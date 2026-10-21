@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Kolla1997/Tallyn/internal/db"
 	"github.com/Kolla1997/Tallyn/internal/plaid"
@@ -383,4 +384,18 @@ func TestReconnect(t *testing.T) {
 	if rec := send(router(s, p), "POST", path+"/reconnect-token", ""); rec.Code != http.StatusBadGateway {
 		t.Fatalf("plaid error: %d", rec.Code)
 	}
+}
+
+func (stubStore) Budgets(context.Context, string, string, time.Time) ([]db.Budget, []db.BudgetCounter, error) {
+	return nil, nil, errors.New("stub")
+}
+func (stubStore) CreateBudget(context.Context, string, string, db.NewBudget) (string, error) {
+	return "", errors.New("stub")
+}
+func (stubStore) UpdateBudget(context.Context, string, string, db.NewBudget) error {
+	return errors.New("stub")
+}
+func (stubStore) DeleteBudget(context.Context, string, string) error { return errors.New("stub") }
+func (stubStore) SetCountInBudgets(context.Context, string, string, bool) error {
+	return errors.New("stub")
 }

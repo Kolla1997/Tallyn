@@ -22,6 +22,7 @@ Rules (see `CLAUDE.md` §7):
 | `0012_card_details_state.sql` | what the bank last said about card details (shared, consent needed, not offered), so Add APR and due dates only shows when it helps (#51) |
 | `0013_loans.sql` | student loan and mortgage details from Plaid Liabilities for the Debts page (#27) |
 | `0014_backup_codes.sql` | one-time backup codes, keyed hashes only, used and replaced through two functions (#23, ADR 0013) |
+| `0015_budgets.sql` | budgets for the household or one person, the count-my-spending choice, and `budget_spending()` (totals only) (#13, ADR 0014) |
 
 Apply them in order on the Supabase project (SQL editor, or `psql "$ADMIN_DATABASE_URL" -f <file>`). Migrations run as `postgres`; the app itself never does (ADR 0006).
 Tests apply them to a throwaway Postgres: see `internal/db/db_test.go`. `TestEveryTableHasRLS` fails if a table is missing RLS.

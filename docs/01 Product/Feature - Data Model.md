@@ -2,7 +2,7 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-12
+updated: 2026-10-21
 issues: [6, 8, 9, 28]
 tags: [spec, database]
 ---
@@ -23,7 +23,7 @@ A schema in `migrations/` with RLS on every table, and tests proving that one ho
 
 ## Scope
 **In:** profiles, households, members and roles, Plaid items, accounts, transactions, FX rates, RLS policies, `internal/db` connection pool.
-**Out:** spending limits and invitations (#12), budgets and categories (#13), goals (#14), the bank sync write path (#8, #9), FX rate source (#11).
+**Out:** spending limits and invitations (#12), budgets and categories (#13; since added in `0015_budgets.sql`, see [[0014-budget-totals-opt-in|ADR 0014]]), goals (#14), the bank sync write path (#8, #9), FX rate source (#11).
 
 ## Design
 ```mermaid
