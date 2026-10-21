@@ -69,7 +69,11 @@ const PAGES = [
   [
     'Budgets',
     '/budgets',
-    (p) => [p.getByRole('region', { name: 'Household budgets' }), p.getByRole('region', { name: 'Budgets for one person' }), p.getByRole('switch')],
+    (p) => [
+      p.getByRole('region', { name: 'Household budgets' }),
+      p.getByRole('region', { name: 'Budgets for one person' }),
+      p.getByText('Count my spending in household budgets'),
+    ],
   ],
   ['Debts', '/debts', (p) => [p.getByRole('region', { name: 'What you owe by kind' }), p.getByRole('region', { name: 'Payments, interest and overdue' })]],
   ['Family', '/family', (p) => [p.getByRole('region', { name: 'People in your household' }), p.getByRole('heading', { name: 'Pat Example', exact: true })]],
