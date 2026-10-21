@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/Kolla1997/Tallyn/internal/auth"
 	"github.com/Kolla1997/Tallyn/internal/db"
@@ -40,6 +41,11 @@ type Store interface {
 	CreateInvite(ctx context.Context, userID, householdID, email, role string) (db.Invite, string, error)
 	RevokeInvite(ctx context.Context, userID, inviteID string) error
 	AcceptInvite(ctx context.Context, userID, token string) (string, error)
+	Budgets(ctx context.Context, userID, householdID string, today time.Time) ([]db.Budget, []db.BudgetCounter, error)
+	CreateBudget(ctx context.Context, userID, householdID string, b db.NewBudget) (string, error)
+	UpdateBudget(ctx context.Context, userID, budgetID string, b db.NewBudget) error
+	DeleteBudget(ctx context.Context, userID, budgetID string) error
+	SetCountInBudgets(ctx context.Context, userID, householdID string, on bool) error
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -101,6 +107,11 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("GET /api/transactions/summary", txSummary(d.Store))
 	api.HandleFunc("GET /api/transactions/daily", txDaily(d.Store))
 	api.HandleFunc("GET /api/spending", spending(d.Store))
+	api.HandleFunc("GET /api/budgets", budgets(d.Store)) // #13
+	api.HandleFunc("POST /api/budgets", createBudget(d.Store))
+	api.HandleFunc("PUT /api/budgets/counting", setBudgetCounting(d.Store))
+	api.HandleFunc("PUT /api/budgets/{id}", updateBudget(d.Store))
+	api.HandleFunc("DELETE /api/budgets/{id}", deleteBudget(d.Store))
 	api.HandleFunc("/api/", func(w http.ResponseWriter, _ *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found")
 	})

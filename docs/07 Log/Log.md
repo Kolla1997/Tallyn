@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-21
+- #13 Budgets, part 1 (data and API): migration 0015 (budgets table, the count-my-spending choice, `budget_spending()` returning daily totals only), Go functions and API routes; owners and adults set household budgets and budgets on teens and children, others set their own; only opted-in members and kids count. ADR 0014 (Proposed). Design picked: pace-line tiles for the household, notches for one person, plan buckets unchanged (#133).
 - #1 New drafting rule (Dinesh): drafts include at least one option that mixes the best parts of the others, not only single-style options (CLAUDE.md §0).
 
 ## 2026-10-17
