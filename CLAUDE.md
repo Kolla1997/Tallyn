@@ -17,6 +17,8 @@ Then stop and wait. Don't start until Dinesh approves (a plan he has already app
 
 **Visual changes need a visual draft first.** For anything people will see (a screen, card, chart, layout, colour, icon, finish), show a design draft with 2–3 options using real data where possible, mark anything made up, recommend one, and wait until Dinesh names the option to build. Build only the option he picks (or his mix of them), and show a new draft if he asks for changes to it. See §6.
 
+**Mix designs, don't just pick one.** Options shouldn't be all-or-nothing styles. When a screen has several parts (e.g. a summary and a list), include at least one option that **mixes the strongest parts** of the others, using each style where it works best, and say which part comes from where. Dinesh may also name a mix ("pace lines here, notches there"); draft that mix before building.
+
 **No approval needed for:**
 - Read-only steps: reading files, `gh issue list` / `view`, running `scripts/sync_board.py`
 - `/i <idea>`: typing the command is the approval. Log the idea and change nothing else

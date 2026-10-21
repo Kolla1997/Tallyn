@@ -10,6 +10,9 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-10-21
+- #1 New drafting rule (Dinesh): drafts include at least one option that mixes the best parts of the others, not only single-style options (CLAUDE.md §0).
+
 ## 2026-10-17
 - #11 Multi-currency total kept for later at the new **P3** ("Later: not planned now"): not needed while Tallyn is US-only. "Any currency" stays the future vision. New label `priority:p3` added to `labels.yml` and CLAUDE.md (#1).
 - #1 Board tidy-up (Dinesh): closed #37 (shared money shown apart, built in #68, #42) and #25 (styled sign-in and 2FA, built in #39, #108, #22, #23); moved already-closed #80, #81, #63, #10 and #4 to Done; Design System "Missing screens" no longer lists sign-in.
