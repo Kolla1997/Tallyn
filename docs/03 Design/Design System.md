@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-17
+updated: 2026-10-21
 issue: 10
 tags: [design]
 ---
@@ -92,6 +92,7 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-12 | 2FA code screens: six code boxes (3 + 3) checked at the 6th digit, with paste and phone autofill; the button waits in sand instead of faded clay; "Can't get a code?" and "Use a different account" in a quiet row under a thin line; card centred on the page; "6‑digit" never breaks | Dinesh picked A (#108) |
 | 2026-10-12 | Password reset: "Forgot password?" on the Password label's line; "Reset your password" → "Check your email" (same words whether or not the account exists, sage note, "Send another link" after a minute) → the 2FA code with a sage note → "Choose a new password": one field with Show and a live "At least 8 characters" check → Home with a sage note; an expired link gets a calm screen with "Send a new link" | Dinesh picked A (#22) |
 | 2026-10-16 | Lost authenticator: Settings keeps its rows ("Two-step sign-in" opens into your named authenticators with Remove and + Add another; "Backup codes" shows how many are left with a small bar and Regenerate); backup codes as a 2×5 grid with Copy, Download and Print, and a tick to continue; recovery from "Can't get a code?" with a "Use a backup code" button | Dinesh picked A (#23) |
+| 2026-10-21 | **Budgets** (#13, Dinesh's mix): household budgets are glass tiles with a **pace line** (spending so far, solid, against an even pace, dashed); budgets for one person are rows of **notches**, one per day, today outlined. Green under 80%, amber from 80%, red only once a budget is over. Budgets sits after Transactions in the sidebar and takes Goals' place in the phone tab bar (Goals moves to ☰) | Dinesh picked V3 for the household and V2 for one person. Red for an over-budget is a warning the person set up, not ordinary spending, so the 2026-10-11 "no red for spending" rule still holds |
 | 2026-10-16 | Tidier sidebar: double chevrons with no circle around them, « to collapse (E1, replacing the side-panel icon) and » to expand (R3); collapsed, the avatar has no circle around it; menu items 40px, 14px text, 18px icons; profile card 48px with a 28px avatar; sidebar 208px; Terms and Privacy as one quiet line at the bottom of the profile and ☰ menus; **no footer in the signed-in app** (sign-in pages keep theirs) | Dinesh picked P (no circle), A and M2 (#122) |
 | 2026-10-11 | Floating rounded glass sidebar, darker secondary text (#55494A) and a soft shade under cards | Dinesh chose option 2: text easier to read on glass (about 6.8:1 at the strongest glow) and more depth (#64) |
 | 2026-10-11 | **Cards are frosted glass** over a soft sage, clay and sand glow (replaces "flat white cards" from 2026-10-08; still no drop shadows) | Dinesh chose option B: more depth and a modern feel. Kept readable with a 70% surface, solid dialogs and fallbacks (#61) |

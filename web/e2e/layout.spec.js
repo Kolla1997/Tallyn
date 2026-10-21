@@ -66,6 +66,11 @@ const PAGES = [
     '/transactions',
     (p) => [p.getByRole('list', { name: /categories/i }), p.getByRole('group', { name: /Your spending by day/ }), p.getByText('Corner Cafe').first()],
   ],
+  [
+    'Budgets',
+    '/budgets',
+    (p) => [p.getByRole('region', { name: 'Household budgets' }), p.getByRole('region', { name: 'Budgets for one person' }), p.getByRole('switch')],
+  ],
   ['Debts', '/debts', (p) => [p.getByRole('region', { name: 'What you owe by kind' }), p.getByRole('region', { name: 'Payments, interest and overdue' })]],
   ['Family', '/family', (p) => [p.getByRole('region', { name: 'People in your household' }), p.getByRole('heading', { name: 'Pat Example', exact: true })]],
   ['Goals', '/goals', (p) => [p.getByText('Savings goals are on the way')]],

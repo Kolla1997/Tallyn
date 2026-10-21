@@ -153,6 +153,40 @@ const DAYS = Array.from({ length: 120 }, (_, i) => ({
 })).filter((d) => d.amount_minor > 0 && d.date.startsWith(String(today.getFullYear())))
 
 // What each API path answers. First match wins.
+// Budgets (#13): this month's and week's periods, with made-up daily totals.
+const monthFrom = iso(new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1)))
+const monthTo = iso(new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 1)))
+const weekFrom = daysAgo(today.getUTCDay())
+const spentDays = (n, each) => Array.from({ length: Math.min(n, today.getUTCDate()) }, (_, i) => ({ date: daysAgo(i), amount_minor: each }))
+const budget = (id, member, category, period, amount, days) => ({
+  id: `eeeeeeee-0000-4000-8000-00000000000${id}`,
+  member_user_id: member,
+  category,
+  period,
+  amount_minor: amount,
+  currency: 'USD',
+  from: period === 'week' ? weekFrom : monthFrom,
+  to: period === 'week' ? daysAhead(7 - today.getUTCDay()) : monthTo,
+  spent_minor: days.reduce((t, d) => t + d.amount_minor, 0),
+  days: [...days].reverse(),
+  can_manage: true,
+})
+const BUDGETS = {
+  today: iso(today),
+  budgets: [
+    budget(1, null, null, 'month', 300000, spentDays(10, 12000)),
+    budget(2, null, 'FOOD_AND_DRINK', 'month', 60000, spentDays(8, 6500)),
+    budget(3, null, 'ENTERTAINMENT', 'month', 10000, spentDays(3, 4000)),
+    budget(4, ROBIN, null, 'week', 5000, spentDays(2, 1500)),
+    budget(5, ME, 'PERSONAL_CARE', 'month', 8000, spentDays(1, 2500)),
+  ],
+  counting: [
+    { user_id: ME, counted: true, automatic: false },
+    { user_id: PAT, counted: false, automatic: false },
+    { user_id: ROBIN, counted: true, automatic: true },
+  ],
+}
+
 const ROUTES = [
   [/^\/api\/me$/, () => ({ user_id: ME, display_name: 'Sam Example', households: [{ id: HH, name: 'Example family', home_currency: 'USD', role: 'owner' }] })],
   [/^\/api\/consent$/, () => ({ versions: {}, needed: false })],
@@ -165,6 +199,7 @@ const ROUTES = [
   [/^\/api\/transactions\/daily$/, () => ({ year: today.getFullYear(), days: DAYS })],
   [/^\/api\/transactions$/, () => ({ transactions: TXS, more: false })],
   [/^\/api\/spending$/, () => ({ month: iso(today).slice(0, 7), spending: SPEND })],
+  [/^\/api\/budgets$/, () => BUDGETS],
 ]
 
 // A fake session, unsigned: the app reads it from storage and never checks

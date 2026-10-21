@@ -4038,3 +4038,324 @@ label.agree input {
   outline: 2px solid var(--color-clay-deep);
   outline-offset: 2px;
 }
+
+/* Budgets (#13, Dinesh's mix): household budgets are glass tiles with a pace
+   line, budgets for one person are rows of day notches with today outlined.
+   Green under 80%, amber from 80%, red past 100%. */
+.budgets-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(300px, 1fr);
+  gap: var(--space-s4);
+  align-items: start;
+}
+
+.budgets-split > :only-child {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 1100px) {
+  .budgets-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.budgets-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-s2);
+}
+
+.budgets-head h2 {
+  margin: 0;
+}
+
+.pace-key {
+  display: flex;
+  gap: var(--space-s3);
+}
+
+.pace-key span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pace-key b {
+  display: inline-block;
+  width: 14px;
+  border-top: 2px solid var(--color-cocoa);
+}
+
+.pace-key b.dash {
+  border-top: 2px dashed var(--color-text-secondary);
+}
+
+.budget-note {
+  margin: 0;
+  padding: var(--space-s3) var(--space-s4);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--color-sage) 14%, rgb(255 255 255 / 0.8));
+}
+
+.budget-switch {
+  align-self: flex-start;
+}
+
+.budget-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: var(--space-s3);
+}
+
+.budget-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s1);
+  min-width: 0;
+  padding: var(--space-s4);
+  border-radius: var(--radius-card);
+  background: var(--glass-surface);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight), var(--card-shade);
+}
+
+.budget-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s2);
+}
+
+.budget-top h3,
+.budget-row-head h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.budget-top .pace {
+  margin-left: auto;
+}
+
+.budget-nums {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-s2);
+}
+
+.budget-left {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 18px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.budget-left.is-over {
+  color: var(--color-error);
+}
+
+.budget-edit {
+  align-self: flex-end;
+}
+
+.pace {
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: var(--radius-button);
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+
+.pace-on {
+  background: color-mix(in srgb, var(--color-sage) 16%, var(--color-white));
+  color: var(--color-sage-deep);
+}
+
+.pace-ahead {
+  background: color-mix(in srgb, var(--color-warning) 20%, var(--color-white));
+  color: #7a5210;
+}
+
+.pace-over {
+  background: color-mix(in srgb, var(--color-error) 12%, var(--color-white));
+  color: var(--color-error);
+}
+
+.pace-full {
+  background: var(--color-sand);
+  color: var(--color-cocoa);
+}
+
+.pace-line {
+  display: block;
+  width: 100%;
+  height: 58px;
+  --line: var(--color-sage-deep);
+}
+
+.tone-line-warn {
+  --line: var(--color-warning);
+}
+
+.tone-line-over {
+  --line: var(--color-error);
+}
+
+.pace-limit {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.pace-even {
+  stroke: var(--color-text-secondary);
+  stroke-opacity: 0.6;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.pace-area {
+  fill: var(--line);
+  opacity: 0.12;
+}
+
+.pace-spent {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.pace-dot {
+  fill: var(--line);
+}
+
+.pace-line * {
+  vector-effect: non-scaling-stroke;
+}
+
+.budget-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s2);
+  padding: var(--space-s3) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.budget-row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.budget-row-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+}
+
+.budget-row-head .grow {
+  min-width: 0;
+}
+
+.budget-row-head h3 {
+  display: inline;
+}
+
+.budget-row-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-s2);
+}
+
+.budget-row-end {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-s3);
+}
+
+.day-notches {
+  display: flex;
+  gap: 3px;
+  --from: var(--color-sage-light);
+  --to: var(--color-sage-deep);
+}
+
+.day-notches.notch-warn {
+  --from: color-mix(in srgb, var(--color-warning) 55%, var(--color-white));
+  --to: var(--color-warning);
+}
+
+.day-notches.notch-over {
+  --from: var(--color-clay);
+  --to: var(--color-error);
+}
+
+.day-notches i {
+  flex: 1;
+  height: 14px;
+  border-radius: 5px;
+  background: var(--color-sand);
+}
+
+.day-notches i.on {
+  background: color-mix(in srgb, var(--to) var(--k), var(--from));
+}
+
+.day-notches i.today {
+  outline: 2px solid var(--color-cocoa);
+  outline-offset: 1px;
+}
+
+.budget-period {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.budget-period legend {
+  padding: 0;
+  margin-bottom: var(--space-s2);
+  font-weight: 500;
+}
+
+.dialog-actions .budget-delete {
+  margin-right: auto;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .budget-tile {
+    background: var(--color-white);
+    border-color: var(--color-border);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .budget-tile {
+    background: var(--color-white);
+    border-color: var(--color-border);
+  }
+}
+
+.budgets-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s4);
+}
+
+/* Dialogs are solid, so their chips need a visible edge. */
+.dialog .chip:not([aria-pressed='true']) {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}
+
+/* Dialogs are solid, so their chips need a visible edge. */
+.dialog .chip:not([aria-pressed='true']) {
+  background: var(--color-white);
+  border-color: var(--color-border);
+}

@@ -12,6 +12,7 @@ Newest first. One entry per working session or decision.
 
 ## 2026-10-21
 - #13 Budgets, part 1 (data and API): migration 0015 (budgets table, the count-my-spending choice, `budget_spending()` returning daily totals only), Go functions and API routes; owners and adults set household budgets and budgets on teens and children, others set their own; only opted-in members and kids count. ADR 0014 (Proposed). Design picked: pace-line tiles for the household, notches for one person, plan buckets unchanged (#133).
+- #13 Budgets, part 2 (the page): Budgets tab after Transactions (on phones it replaces Goals in the tab bar; Goals is in ☰), pace-line tiles for household budgets, day notches for budgets for one person, add / change / delete dialog, and the "Count my spending in household budgets" switch (teens and children see that theirs counts automatically). Tried live on tallyn-dev with real spending; the test budgets were deleted and the switch put back off afterwards. Over-budget shows in red (Design System decision).
 - #1 New drafting rule (Dinesh): drafts include at least one option that mixes the best parts of the others, not only single-style options (CLAUDE.md §0).
 
 ## 2026-10-17
