@@ -13,6 +13,7 @@ import TallynLoader from '../components/TallynLoader.jsx'
 // Faster first load (#99): Home comes with the app; the other pages load the
 // first time they're opened, with the Tallyn loader meanwhile.
 const AccountsPage = lazy(() => import('./AccountsPage.jsx'))
+const BudgetsPage = lazy(() => import('./BudgetsPage.jsx'))
 const DebtsPage = lazy(() => import('./DebtsPage.jsx'))
 const TransactionsPage = lazy(() => import('./TransactionsPage.jsx'))
 const FamilyPage = lazy(() => import('./FamilyPage.jsx'))
@@ -124,6 +125,9 @@ export default function Home({ email, onSignOut }) {
       break
     case '/accounts':
       page = <AccountsPage me={me} household={household} refreshKey={refreshKey} onChanged={refresh} />
+      break
+    case '/budgets':
+      page = <BudgetsPage me={me} household={household} refreshKey={refreshKey} />
       break
     case '/debts':
       page = <DebtsPage me={me} household={household} refreshKey={refreshKey} onChanged={refresh} />

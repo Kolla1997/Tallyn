@@ -1,21 +1,28 @@
 import { useEffect, useRef, useState } from 'react'
 import logo from '../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg'
 import mark from '../../../brand/logo/svg/tallyn-mark-light.svg'
-import { AccountsIcon, DebtsIcon, FamilyIcon, GoalsIcon, HomeIcon, MenuIcon, SettingsIcon, TransactionsIcon } from '../components/Icons.jsx'
+import { AccountsIcon, BudgetsIcon, DebtsIcon, FamilyIcon, GoalsIcon, HomeIcon, MenuIcon, SettingsIcon, TransactionsIcon } from '../components/Icons.jsx'
 import { Link } from '../lib/router.jsx'
 
 // App layout (#39): sidebar on web (1024px and up), header and bottom tab bar
 // on phones. Matches docs/03 Design/Comps/web-*-draft.html.
-// The phone tab bar keeps these five; Debts (#27) is in the sidebar on web
-// and in the ☰ menu on phones (Dinesh's choice).
+// The phone tab bar keeps these five; Debts (#27) and Goals are in the
+// sidebar on web and in the ☰ menu on phones (Dinesh's choice). Budgets (#13)
+// took Goals' place in the tab bar.
 const NAV = [
   ['/', 'Home', HomeIcon],
   ['/accounts', 'Accounts', AccountsIcon],
   ['/transactions', 'Transactions', TransactionsIcon],
+  ['/budgets', 'Budgets', BudgetsIcon],
+  ['/family', 'Family', FamilyIcon],
+]
+const SIDEBAR = [
+  ...NAV.slice(0, 4),
+  ['/debts', 'Debts', DebtsIcon],
   ['/family', 'Family', FamilyIcon],
   ['/goals', 'Goals', GoalsIcon],
+  ['/settings', 'Settings', SettingsIcon],
 ]
-const SIDEBAR = [...NAV.slice(0, 3), ['/debts', 'Debts', DebtsIcon], ...NAV.slice(3), ['/settings', 'Settings', SettingsIcon]]
 
 const SIDEBAR_KEY = 'tallyn.sidebar'
 
@@ -318,6 +325,10 @@ function MobileMenu({ name, initial, household, onSignOut }) {
           <Link to="/debts" role="menuitem" className="profile-item" onClick={() => close(false)}>
             <DebtsIcon width={18} height={18} />
             Debts
+          </Link>
+          <Link to="/goals" role="menuitem" className="profile-item" onClick={() => close(false)}>
+            <GoalsIcon width={18} height={18} />
+            Goals
           </Link>
           <Link to="/settings" role="menuitem" className="profile-item" onClick={() => close(false)}>
             <SettingsIcon width={18} height={18} />

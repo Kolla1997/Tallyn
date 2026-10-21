@@ -31,6 +31,12 @@ export const DebtsIcon = (p) => (
     <path d="M9 8.5h6M9 12h6M9 15.5h3" />
   </svg>
 )
+// Budgets (#13): a small bar chart.
+export const BudgetsIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6" />
+  </svg>
+)
 export const MenuIcon = (p) => (
   <svg {...base} {...p}>
     <path d="M4 7h16M4 12h16M4 17h16" />
