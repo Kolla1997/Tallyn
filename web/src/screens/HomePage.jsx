@@ -20,8 +20,6 @@ import TallynLoader from '../components/TallynLoader.jsx'
 // Everything shown is what the API returns for this person, so the sharing
 // rules (#28) already apply.
 
-// Loan payments count as transfers, not spending (#77).
-const NOT_SPENDING = new Set(['INCOME', 'TRANSFER_IN', 'TRANSFER_OUT', 'LOAN_PAYMENTS'])
 const now = new Date()
 const MONTH = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 const monthName = (d) => d.toLocaleDateString('en-US', { month: 'long' })
@@ -31,7 +29,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
   const [members, setMembers] = useState([])
   const [txs, setTxs] = useState(null)
   const [mine, setMine] = useState(null)
-  const [spending, setSpending] = useState(null) // { yours, everyone } summaries for this month
+  const [spending, setSpending] = useState(null) // { yours, everyone } month summaries, one per currency
   const [scope, setScope] = useState('yours') // Home opens on your own money (#68)
   const [error, setError] = useState('')
 
@@ -51,8 +49,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
         setMembers(m.members)
         setTxs(t.transactions)
         setMine(y.transactions)
-        const cats = (d) => d.summary.flatMap((x) => x.categories)
-        setSpending({ yours: cats(sy), everyone: cats(se) })
+        setSpending({ yours: sy.summary, everyone: se.summary })
       },
       () => setError("We couldn't load your household's money. Try again in a moment."),
     )
@@ -84,13 +81,18 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
       ) : (
         <HomeColumns
           wide={wide}
-          total={
-            <TotalCard banks={banks} txs={txs ?? []} mine={mine ?? []} me={me} roles={roles} home={household.home_currency} scope={scope} onScope={setScope} />
-          }
+          total={<TotalCard banks={banks} summary={spending?.[scope]} me={me} roles={roles} home={household.home_currency} scope={scope} onScope={setScope} />}
           accounts={<YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} everyone={scope === 'everyone'} />}
           cards={<CreditCards banks={banks} me={me} home={household.home_currency} everyone={scope === 'everyone'} onChanged={onChanged} onError={setError} />}
           recent={<RecentTransactions txs={(scope === 'yours' ? mine : txs) ?? []} me={me} people={people} everyone={scope === 'everyone'} />}
-          spending={<SpendingCard spending={spending?.[scope] ?? []} month={MONTH} home={household.home_currency} everyone={scope === 'everyone'} />}
+          spending={
+            <SpendingCard
+              spending={spending?.[scope]?.flatMap((x) => x.categories) ?? []}
+              month={MONTH}
+              home={household.home_currency}
+              everyone={scope === 'everyone'}
+            />
+          }
           shared={<SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />}
           family={<FamilyCard members={members} isOwner={household.role === 'owner'} />}
           goals={
@@ -163,7 +165,7 @@ function useMinWidth(px) {
 
 // The balance card (#68): your own money first, or everyone's you can see.
 // The switch here changes the whole Home page.
-function TotalCard({ banks, txs, mine, me, roles, home, scope, onScope }) {
+function TotalCard({ banks, summary, me, roles, home, scope, onScope }) {
   const fading = useFadeOnChange(scope) // #87: Yours / Everyone fades and counts
   const totals = summarize(banks, me.user_id, roles)
   const yoursOnly = summarize(
@@ -186,16 +188,9 @@ function TotalCard({ banks, txs, mine, me, roles, home, scope, onScope }) {
   const y = yoursOnly[cur] ?? { have: 0, owe: 0, net: 0 }
   const yours = scope === 'yours'
 
-  // Money in minus money out this month, from recent transactions in this currency.
-  const start = new Date()
-  const monthStart = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-01`
-  let flow = 0
-  let any = false
-  for (const tx of yours ? mine : txs) {
-    if (tx.currency !== cur || tx.date < monthStart || NOT_SPENDING.has(tx.category_primary ?? '')) continue
-    flow -= tx.amount_minor // Plaid: positive = money out
-    any = true
-  }
+  // Spent this month in this currency, from the month summary, which counts
+  // every transaction (#147). Same rules as the spending card.
+  const spent = summary?.find((x) => x.currency === cur)?.spent_minor ?? 0
 
   const parts = (
     yours
@@ -231,12 +226,7 @@ function TotalCard({ banks, txs, mine, me, roles, home, scope, onScope }) {
         <p className="amount total-big">
           <CountUp value={big.have} format={(v) => formatMoney(v, cur)} />
         </p>
-        {any && (
-          <p className="small total-note">
-            {flow >= 0 ? '+' : '−'}
-            {formatMoney(Math.abs(flow), cur)} this month
-          </p>
-        )}
+        {spent > 0 && <p className="small total-note">−{formatMoney(spent, cur)} spent this month</p>}
       </div>
       <div className="total-split">
         {parts.map(([label, v]) => (
