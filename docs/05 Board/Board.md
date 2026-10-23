@@ -27,6 +27,7 @@ kanban-plugin: board
 - [ ] [#157 Cheaper and calmer motion](https://github.com/Kolla1997/Tallyn/issues/157) #type/tech-debt #area/frontend #priority/p2
 - [ ] [#158 Tap areas and control contrast](https://github.com/Kolla1997/Tallyn/issues/158) #type/design #area/design #area/frontend #priority/p2
 - [ ] [#159 Load speed: requests wait on each other](https://github.com/Kolla1997/Tallyn/issues/159) #type/tech-debt #area/frontend #area/backend #priority/p2
+- [ ] [#160 CSS cleanup and tokens](https://github.com/Kolla1997/Tallyn/issues/160) #type/tech-debt #area/design #area/frontend #priority/p3
 
 
 ## In Progress
