@@ -32,39 +32,46 @@ export async function banksOf(person, householdId = person.householdId) {
   return banks ?? []
 }
 
-// Clicks a button in Plaid Link if it shows up. Link's screens change now and
-// then (phone number, "saved institutions"), so optional steps are skipped.
-async function clickIfShown(frame, name, timeout = 4000) {
+// Clicks a button in Plaid Link if it shows up and can be clicked. Link's
+// screens change now and then (phone number, saved banks), so optional steps
+// are skipped. A greyed-out button counts as not shown.
+async function clickIfShown(frame, name, timeout = 5000) {
   const b = frame.getByRole('button', { name }).first()
   try {
     await b.waitFor({ state: 'visible', timeout })
-    await b.click()
+    if (!(await b.isEnabled())) return false
+    await b.click({ timeout })
     return true
   } catch {
     return false
   }
 }
 
-// Goes through Plaid Link in the sandbox: pick the test bank, sign in with
-// Plaid's published sandbox login (user_good / pass_good), keep the accounts.
+// Goes through Plaid Link in the sandbox: skip the phone number, pick the test
+// bank, sign in with Plaid's published sandbox login (user_good / pass_good),
+// keep the accounts.
 export async function linkInBrowser(page) {
-  const frame = page.frameLocator('iframe[id^="plaid-link-iframe"]')
-  await expect(frame.locator('body')).toBeVisible({ timeout: 30_000 })
+  const frame = page.frameLocator('iframe[id^="plaid-link-iframe"]').first()
 
-  await clickIfShown(frame, /^(Get started|Continue)$/i, 15_000)
-  await clickIfShown(frame, /without phone number|continue as guest|skip/i)
-
+  // First screen (2026): phone number, with "Continue without phone number".
+  const skipPhone = frame.getByRole('button', { name: /continue without phone number/i })
   const search = frame
     .getByRole('textbox', { name: /search/i })
     .or(frame.getByPlaceholder(/search/i))
     .first()
+  await expect(skipPhone.or(search).first()).toBeVisible({ timeout: 30_000 })
+  if (await skipPhone.isVisible()) await skipPhone.click()
+  await clickIfShown(frame, /^(Get started|Continue)$/i, 3000) // older intro screen
+
   await search.fill(INSTITUTION)
   await frame
     .getByRole('button', { name: new RegExp(INSTITUTION, 'i') })
     .or(frame.getByText(INSTITUTION, { exact: true }))
     .first()
     .click()
-  await clickIfShown(frame, /^Continue to login$/i)
+  // Plaid may list related test banks (plain, OAuth, App2App): take the plain one.
+  await clickIfShown(frame, new RegExp(`^${INSTITUTION}$`, 'i'))
+  await clickIfShown(frame, /continue to login/i)
 
   await frame.getByRole('textbox', { name: /user/i }).first().fill('user_good')
   await frame
@@ -76,9 +83,13 @@ export async function linkInBrowser(page) {
     .first()
     .click()
 
-  // Choose accounts (all are kept), then the last screen.
-  for (let i = 0; i < 4; i++) {
-    if (!(await clickIfShown(frame, /^(Continue|Allow|Confirm|Done|Finish without saving)$/i, 8000))) break
+  // Choose accounts (all are kept), "Connect faster next time" (Finish without
+  // saving), then the last screen. Screens can take a while to load, so keep
+  // going until Link closes rather than stopping at the first pause.
+  const link = page.locator('iframe[id^="plaid-link-iframe"]').first()
+  const deadline = Date.now() + 90_000
+  while (Date.now() < deadline && (await link.isVisible())) {
+    await clickIfShown(frame, /^(Finish without saving|Continue|Allow|Confirm|Done|Not now|Skip)$/i, 2000)
   }
-  await expect(page.locator('iframe[id^="plaid-link-iframe"]')).toBeHidden({ timeout: 30_000 })
+  await expect(link).toBeHidden({ timeout: 5000 })
 }

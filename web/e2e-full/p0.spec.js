@@ -46,7 +46,7 @@ test('Home shows the total in the home currency', async ({ page, person }) => {
   await signIn(page, me)
   const card = page.getByRole('region', { name: 'Your balance' })
   await expect(card).toContainText('Your balance · USD')
-  await expect(card.locator('.total-big')).toHaveText(money(yourBalance(banks, me.id)))
+  await expect(card.locator('.total-big .sr-only')).toHaveText(money(yourBalance(banks, me.id))) // CountUp also shows it once more for sighted readers
 })
 
 test('connect a sandbox bank, then see its accounts and transactions', async ({ page, person }) => {
@@ -124,7 +124,8 @@ test('share balances with a member, then stop sharing', async ({ page, browser, 
     .getByRole('button', { name: /Test Partner/ })
     .click()
   const balances = page.getByRole('switch', { name: 'Balances' })
-  await balances.check()
+  const balancesSwitch = page.locator('label.switch', { hasText: 'Balances' }) // the styled switch people click; the checkbox itself is hidden
+  await balancesSwitch.click()
   await expect(balances).toBeChecked()
 
   await p2.reload()
@@ -133,7 +134,7 @@ test('share balances with a member, then stop sharing', async ({ page, browser, 
   await expect(shared).toContainText('Shares balances')
 
   // And stops: the member no longer sees it.
-  await balances.uncheck()
+  await balancesSwitch.click()
   await expect(balances).not.toBeChecked()
   await p2.reload()
   await expect(p2.getByRole('heading', { name: 'E2E Household' })).toBeVisible()
