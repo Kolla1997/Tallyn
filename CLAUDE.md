@@ -59,6 +59,7 @@ The **repo root is the Obsidian vault**. Notes live in `docs/`. Code folders are
 ## 3. Session routine
 
 **At the start:**
+0. If `PROGRESS.md` exists in the repo root, read it first and continue from "Next steps" unless Dinesh asks for something else. Open only the notes and files it (or the request) points to.
 1. Read `docs/00 Home.md`, then the notes relevant to the task.
 2. If the task touches work tracking, run `python3 scripts/sync_board.py` (needs `gh`) and read `docs/05 Board/Board.md`.
 3. Before any visual work (logo, UI, slides, social graphics), read `docs/02 Brand/Brand Guide.md`, `docs/02 Brand/Logo Guide.md`, `docs/03 Design/Design System.md` and `design-tokens.json`.
@@ -67,6 +68,24 @@ The **repo root is the Obsidian vault**. Notes live in `docs/`. Code folders are
 1. Add an entry to `docs/07 Log/Log.md`: date, then one line per change starting with its ticket (`- #12 ...`), decisions made and open questions.
 2. Update any note whose facts changed, and bump its `updated:` date.
 3. Record decisions: tech decisions get an ADR in `docs/04 Tech/ADR/`; brand and design decisions go in the "Decisions" table of the relevant guide.
+4. Update `PROGRESS.md` (also when Dinesh says "wrap up"). It's the handoff to the next session, not a history: replace stale content, keep it under ~300 words, and leave history to the Log, ADRs and the board. It's gitignored and hidden from Obsidian. Structure:
+   ```
+   # Progress — Tallyn
+   _Last updated: YYYY-MM-DD_ · Branch: `<branch>` · Ticket: #N
+
+   ## Done (last session only)
+   ## Next steps        (numbered; 1 = the very next concrete action)
+   ## Decisions         (only ones still in play; long-lived ones go in ADRs and guides)
+   ## Open problems
+   ## Key files         (the 3–5 files the next step needs)
+   ```
+
+**Keeping usage low:**
+- Keep replies short. Skip recaps unless Dinesh asks.
+- If a task is unclear, ask one clarifying question up front rather than guessing and redoing.
+- No subagents or extra review passes unless the task is large or Dinesh asks. This never skips what this file requires: Test Plan updates, green checks before merge, layout checks.
+- Read only the parts of files you need. Don't search the whole project when the path is known.
+- When Dinesh switches to an unrelated task, remind him to update `PROGRESS.md` and start a new session.
 
 ## 4. Writing rules for docs
 

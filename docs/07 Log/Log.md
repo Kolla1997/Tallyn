@@ -2,13 +2,16 @@
 type: log
 status: active
 owner: Dinesh
-updated: 2026-10-11
+updated: 2026-10-23
 tags: [log]
 ---
 
 # Log
 
 Newest first. One entry per working session or decision.
+
+## 2026-10-23
+- #1 Session handoff and usage rules (Dinesh): sessions start by reading `PROGRESS.md` and end by updating it; it holds only the handoff (branch, next steps, open problems), is gitignored and hidden from Obsidian. Added "Keeping usage low" rules; required checks are never skipped (CLAUDE.md §3).
 
 ## 2026-10-21
 - #13 Budgets, part 1 (data and API): migration 0015 (budgets table, the count-my-spending choice, `budget_spending()` returning daily totals only), Go functions and API routes; owners and adults set household budgets and budgets on teens and children, others set their own; only opted-in members and kids count. ADR 0014 (Proposed). Design picked: pace-line tiles for the household, notches for one person, plan buckets unchanged (#133).
