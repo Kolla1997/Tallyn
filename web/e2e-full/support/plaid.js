@@ -69,6 +69,8 @@ export async function linkInBrowser(page) {
     .or(frame.getByText(INSTITUTION, { exact: true }))
     .first()
     .click()
+  // Plaid may list related test banks (plain, OAuth, App2App): take the plain one.
+  await clickIfShown(frame, new RegExp(`^${INSTITUTION}$`, 'i'))
   await clickIfShown(frame, /continue to login/i)
 
   await frame.getByRole('textbox', { name: /user/i }).first().fill('user_good')
