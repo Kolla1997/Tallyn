@@ -32,6 +32,7 @@ export default defineConfig({
   reporter: env.CI ? [['list'], ['html', { open: 'never', outputFolder: 'playwright-report-e2e' }]] : 'list',
   use: {
     baseURL: `http://localhost:${PORT}`,
+    actionTimeout: 20_000, // a click that can't happen fails in seconds, not at the 4-minute test limit
     reducedMotion: 'reduce', // totals show their final value, no count-up
     viewport: { width: 1280, height: 900 },
     screenshot: 'only-on-failure',

@@ -46,7 +46,7 @@ test('Home shows the total in the home currency', async ({ page, person }) => {
   await signIn(page, me)
   const card = page.getByRole('region', { name: 'Your balance' })
   await expect(card).toContainText('Your balance · USD')
-  await expect(card.locator('.total-big')).toHaveText(money(yourBalance(banks, me.id)))
+  await expect(card.locator('.total-big .sr-only')).toHaveText(money(yourBalance(banks, me.id))) // CountUp also shows it once more for sighted readers
 })
 
 test('connect a sandbox bank, then see its accounts and transactions', async ({ page, person }) => {
