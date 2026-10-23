@@ -41,7 +41,7 @@ jobs:
           go-version-file: go.mod
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22 # supabase-js in the test runner needs Node's built-in WebSocket (Node 22+)
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
