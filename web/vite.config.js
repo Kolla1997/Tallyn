@@ -64,8 +64,8 @@ export default defineConfig(({ mode }) => {
     // Web tests (#100): npm test.
     test: {
       environment: 'jsdom',
-      // Playwright's layout checks (#117) run in a real browser, not here.
-      exclude: ['**/node_modules/**', 'e2e/**'],
+      // Playwright's layout checks (#117) and end-to-end tests (#113) run in a real browser, not here.
+      exclude: ['**/node_modules/**', 'e2e/**', 'e2e-full/**'],
       setupFiles: ['./src/test-setup.js'],
     },
   }

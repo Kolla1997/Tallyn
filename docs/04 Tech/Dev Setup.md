@@ -2,8 +2,8 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-16
-issues: [5, 6, 7, 8, 9, 30, 99]
+updated: 2026-10-23
+issues: [5, 6, 7, 8, 9, 30, 99, 113]
 tags: [tech, onboarding]
 ---
 
@@ -72,11 +72,34 @@ In the Supabase dashboard, for each project (dev and prod). See [[Feature - Auth
 
 To try the single-deployment setup: `cd web && npm run build`, then `go run ./cmd/server` serves the built app from `web/dist`.
 
+## Browser end-to-end tests (#113)
+The P0 paths (sign-in with 2FA, Home totals, connecting a sandbox bank, inviting a member, sharing) in a real browser, against the Go API, a **Supabase project just for tests** and the Plaid sandbox. They run nightly and by hand (GitHub → Actions → **End-to-end** → Run workflow), never on pull requests. Rows in [[Test Plan]].
+
+> [!warning] Test project only
+> Never point these at tallyn-dev or production. Each test makes its own people (`e2e-…@example.test`) with the project's secret key, and deletes them afterwards. Households they made stay behind, empty.
+
+**Set up the test project once:**
+1. Create a new Supabase project (e.g. `tallyn-e2e`) and set it up like the others: migrations in order, Auth settings and database logins (sections above). Plaid stays on **sandbox**.
+2. Add these **repository secrets** (Settings → Secrets and variables → Actions). Values come from the test project and the Plaid dashboard, never from chat or the repo:
+
+| Secret | What it is |
+|---|---|
+| `E2E_SUPABASE_URL` | The test project's URL |
+| `E2E_SUPABASE_PUBLISHABLE_KEY` | Its publishable key |
+| `E2E_SUPABASE_SECRET_KEY` | Its secret key: makes and deletes test people, and the server uses it for backup-code recovery |
+| `E2E_DATABASE_URL` | `tallyn_api` login for the test project |
+| `E2E_DATABASE_URL_SYNC` | `tallyn_sync` login for the test project |
+| `E2E_PLAID_CLIENT_ID` / `E2E_PLAID_SECRET` | Plaid client ID and **sandbox** secret |
+| `E2E_TOKEN_ENCRYPTION_KEY` | A test-only key: `openssl rand -base64 32` |
+
+**Run locally:** export the same `E2E_*` values in your shell (not in a file in the repo), then `cd web && npx playwright install chromium && npm run test:e2e`. It builds the app, starts the Go server on port 8090 and runs the tests one at a time. Failures keep screenshots and traces in `web/test-results-e2e/`.
+
 ## Common tasks
 | Task | Command |
 |---|---|
 | Sync board into docs | Automatic (hourly GitHub Action, `git pull` to get it). By hand: `python3 scripts/sync_board.py` |
 | Test | `go test ./...` (database tests skip unless `TALLYN_TEST_DATABASE_URL` is set) |
+| Browser end-to-end tests | `cd web && npm run test:e2e` (needs the `E2E_*` values, above) |
 | Test the schema and RLS | Start a throwaway Postgres: `docker run --rm -d -p 5433:5432 -e POSTGRES_PASSWORD=postgres postgres:16`, then `TALLYN_TEST_DATABASE_URL=postgres://postgres:postgres@localhost:5433/postgres go test ./internal/db`. Without Docker, Homebrew `postgresql@16` works too (steps in [PR #20](https://github.com/Kolla1997/Tallyn/pull/20)) |
 | Lint | `go vet ./...` and `gofmt -l cmd internal`; web: `cd web && npm run lint` (ESLint, #100) |
 | Format the web app | `cd web && npm run format` (Prettier: single quotes, no semicolons; check with `npm run format:check`) |
