@@ -42,20 +42,20 @@ About 110 findings. Most are invisible. Glass and contrast hold up well: every m
 7. Totals and empty states quietly leave out other currencies; Debts can say "No credit cards or loans to show. Nice." when all debts are in another currency (M3, M12).
 
 ## Proposed follow-up tickets
-To agree with Dinesh before creating (§0). Ordered by what to do first.
+Agreed with Dinesh and created 2026-10-23. Ordered by what to do first.
 
-| # | Ticket | Findings | Kind | P |
+| Ticket | What | Findings | Kind | P |
 |---|---|---|---|---|
-| 1 | Stuck and failed states: Try again instead of endless loaders, backup-code dead end, code form lock, Join keeps the invite | M1, F5, A1, A4, A14, L5 | inv + small vis (Try again button) | p1 |
-| 2 | Calm error messages: map raw Supabase and network errors to Tallyn copy, neutral sign-up message | A7, A12, M11 | inv (copy from Voice and Tone) | p1 |
-| 3 | Keyboard and screen readers: page titles, focus on navigation and view changes, dialog focus return, visible focus rings, ARIA fixes | L1, A8–A11, F1–F4, F7–F12, M7–M9, G1, G10, G13 | inv | p1 |
-| 4 | Worst-case data: long text, emoji initials, blank names, double submits, races, Markdown hang, 0% rates, money edge cases | A5, A6, A13, F6, F13–F21, M4–M6, M10, L4 | inv | p1 |
-| 5 | Glass fallbacks and reduced motion gaps, plus page basics (`color-scheme`, background before JS, `100dvh`, safe area) | G2, G3, G12, G14 | inv | p1 |
-| 6 | Other currencies made visible: say what's left out instead of $0 or "Nothing spent" | M3, M12, M13, F22 | vis (copy) | p2 |
-| 7 | Motion that's cheaper and calmer: transforms instead of layout properties, Debts ring replay, sidebar collapse | G4, G15, F23, M14 | inv if it looks the same | p2 |
-| 8 | Touch and control contrast: tap areas, small buttons, input borders, disabled states, avatar contrast, press states | A2, A3, L2, L6, G6, G7, G11, F24 | vis | p2 |
-| 9 | Load speed: consent → profile → page data run one after another (about 11s for Home on a dev reload) | L3 | inv (needs a look first) | p2 |
-| 10 | CSS cleanup and tokens: off-token colours, duplicate rules, z-index scale, off-scale sizes | G5, G8, G9 | inv; some need a rule change | p3 |
+| [#151](https://github.com/Kolla1997/Tallyn/issues/151) | Stuck and failed states: Try again instead of endless loaders, backup-code dead end, code form lock, Join keeps the invite | M1, F5, A1, A4, A14, L5 | inv + small vis (Try again button) | p1 |
+| [#152](https://github.com/Kolla1997/Tallyn/issues/152) | Calm error messages: map raw Supabase and network errors to Tallyn copy, neutral sign-up message | A7, A12, M11 | inv (copy from Voice and Tone) | p1 |
+| [#153](https://github.com/Kolla1997/Tallyn/issues/153) | Keyboard and screen readers: page titles, focus on navigation and view changes, dialog focus return, visible focus rings, ARIA fixes | L1, A8–A11, F1–F4, F7–F12, M7–M9, G1, G10, G13 | inv | p1 |
+| [#154](https://github.com/Kolla1997/Tallyn/issues/154) | Worst-case data: long text, emoji initials, blank names, double submits, races, Markdown hang, 0% rates, money edge cases | A5, A6, A13, F6, F13–F21, M4–M6, M10, L4 | inv | p1 |
+| [#155](https://github.com/Kolla1997/Tallyn/issues/155) | Glass fallbacks and reduced motion gaps, plus page basics (`color-scheme`, background before JS, `100dvh`, safe area) | G2, G3, G12, G14 | inv | p1 |
+| [#156](https://github.com/Kolla1997/Tallyn/issues/156) | Other currencies made visible: say what's left out instead of $0 or "Nothing spent" | M3, M12, M13, F22 | vis (copy) | p2 |
+| [#157](https://github.com/Kolla1997/Tallyn/issues/157) | Motion that's cheaper and calmer: transforms instead of layout properties, Debts ring replay, sidebar collapse | G4, G15, F23, M14 | inv if it looks the same | p2 |
+| [#158](https://github.com/Kolla1997/Tallyn/issues/158) | Touch and control contrast: tap areas, small buttons, input borders, disabled states, avatar contrast, press states | A2, A3, L2, L6, G6, G7, G11, F24 | vis | p2 |
+| [#159](https://github.com/Kolla1997/Tallyn/issues/159) | Load speed: consent → profile → page data run one after another (about 11s for Home on a dev reload) | L3 | inv (needs a look first) | p2 |
+| [#160](https://github.com/Kolla1997/Tallyn/issues/160) | CSS cleanup and tokens: off-token colours, duplicate rules, z-index scale, off-scale sizes | G5, G8, G9 | inv; some need a rule change | p3 |
 
 > [!todo] Dark mode stays its own piece of work, with drafts. It isn't part of these tickets.
 
