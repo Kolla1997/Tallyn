@@ -23,6 +23,10 @@ kanban-plugin: board
 - [ ] [#153 Keyboard and screen readers: page titles, focus and ARIA fixes](https://github.com/Kolla1997/Tallyn/issues/153) #type/bug #area/frontend #priority/p1
 - [ ] [#154 Worst-case data: long text, emoji, blank names, double submits, races](https://github.com/Kolla1997/Tallyn/issues/154) #type/bug #area/frontend #priority/p1
 - [ ] [#155 Glass fallbacks, reduced motion gaps and page basics](https://github.com/Kolla1997/Tallyn/issues/155) #type/bug #area/frontend #priority/p1
+- [ ] [#156 Say what other currencies are left out](https://github.com/Kolla1997/Tallyn/issues/156) #type/design #area/design #area/frontend #priority/p2
+- [ ] [#157 Cheaper and calmer motion](https://github.com/Kolla1997/Tallyn/issues/157) #type/tech-debt #area/frontend #priority/p2
+- [ ] [#158 Tap areas and control contrast](https://github.com/Kolla1997/Tallyn/issues/158) #type/design #area/design #area/frontend #priority/p2
+- [ ] [#159 Load speed: requests wait on each other](https://github.com/Kolla1997/Tallyn/issues/159) #type/tech-debt #area/frontend #area/backend #priority/p2
 
 
 ## In Progress
