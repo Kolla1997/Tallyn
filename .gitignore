@@ -31,3 +31,6 @@ web/playwright-report-e2e/
 
 # Python
 __pycache__/
+
+# Hallmark skill working files: log, screenshots, image cache (#141)
+.hallmark/
