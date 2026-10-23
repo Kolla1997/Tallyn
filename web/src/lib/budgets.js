@@ -68,15 +68,28 @@ export function decimals(currency) {
   }
 }
 
-// "1,250.5" → 125050 for USD. null when it isn't a positive amount with at
-// most the currency's decimals.
+// An amount as people write it (#146): digits, maybe split into groups of three
+// by one separator, then maybe a decimal point or comma.
+const AMOUNT = /^(\d{1,3}([,.\s'’])\d{3}(?:\2\d{3})*|\d+)(?:([.,])(\d*))?$/u
+
+// "1,250.5" → 125050 for USD, and "12,50" → 1250 for EUR. A currency sign or
+// code before or after is ignored. A comma before one or two digits is a
+// decimal point, before three a thousands separator; when both "." and ","
+// appear, the last is the decimal point. null when it isn't a positive amount
+// with at most the currency's decimals, or could be read two ways ("1.250").
 export function toMinor(text, currency) {
   const d = decimals(currency)
-  const s = String(text).trim().replace(/[,\s]/g, '').replace(/^\$/, '')
-  const re = d ? new RegExp(`^\\d+(\\.\\d{0,${d}})?$`) : /^\d+$/
-  if (!re.test(s)) return null
-  const [whole, frac = ''] = s.split('.')
-  const minor = Number(whole) * 10 ** d + Number(frac.padEnd(d, '0') || 0)
+  const s = String(text)
+    .trim()
+    .replace(/^(?:\p{Sc}|[A-Za-z]{3}(?![A-Za-z]))\s*/u, '')
+    .replace(/\s*(?:\p{Sc}|(?<![A-Za-z])[A-Za-z]{3})$/u, '')
+  const m = s.match(AMOUNT)
+  if (!m) return null
+  const [, whole, group, point, frac] = m
+  if (group && group === point) return null // "1,250,50"
+  if (group === '.' && !point) return null // "1.250": 1250 or 1.25?
+  if (point && (!d || frac.length > d)) return null
+  const minor = Number(whole.replace(/\D/g, '')) * 10 ** d + Number((frac ?? '').padEnd(d, '0') || 0)
   return minor > 0 && minor <= 100_000_000_000 ? minor : null
 }
 

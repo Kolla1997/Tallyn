@@ -59,6 +59,22 @@ describe('amounts', () => {
     expect(toMinor('$80.05', 'USD')).toBe(8005)
     expect(toMinor('1200', 'JPY')).toBe(1200)
   })
+  it('reads a comma decimal and other currencies (#146)', () => {
+    expect(toMinor('12,50', 'EUR')).toBe(1250) // not 1,250.00
+    expect(toMinor('12,5', 'EUR')).toBe(1250)
+    expect(toMinor('0,99', 'GBP')).toBe(99)
+    expect(toMinor('1.250,50', 'EUR')).toBe(125050)
+    expect(toMinor('1 250,50', 'EUR')).toBe(125050)
+    expect(toMinor('1 250,50', 'EUR')).toBe(125050)
+    expect(toMinor("1'250.50", 'CHF')).toBe(125050)
+    expect(toMinor('1,250', 'EUR')).toBe(125000) // three digits: thousands
+    expect(toMinor('1,200', 'JPY')).toBe(1200)
+    for (const t of ['€250', '250 €', '£250', 'EUR 250', '250 EUR', 'eur250']) expect(toMinor(t, 'EUR')).toBe(25000)
+  })
+  it('turns down amounts that could be read two ways (#146)', () => {
+    for (const bad of ['1.250', '1,250,50', '12 50', '1,25,000', '€', 'EUR']) expect(toMinor(bad, 'EUR')).toBeNull()
+    expect(toMinor('12,5', 'JPY')).toBeNull()
+  })
   it('turns down what isn’t an amount above zero', () => {
     for (const bad of ['', '0', '0.00', '-5', '12.345', 'abc', '1e3', '12.5.1']) expect(toMinor(bad, 'USD')).toBeNull()
     expect(toMinor('12.5', 'JPY')).toBeNull()
