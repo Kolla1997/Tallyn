@@ -114,6 +114,23 @@ describe('HomePage', () => {
     ).toMatch(/category=FOOD_AND_DRINK&month=\d{4}-\d{2}/)
   })
 
+  it('spent this month comes from the month summary, not recent transactions (#147)', async () => {
+    routeApi(api, [
+      ['/api/banks', { banks: BANKS }],
+      ['/api/households/hh-1/members', { members: MEMBERS }],
+      ['/api/transactions/summary', { summary: [{ ...SPENDING.summary[0], spent_minor: 237926, money_in_minor: 500000 }] }],
+      ['/api/transactions', { transactions: [] }], // older spending is past the recent list
+    ])
+    await open()
+    expect(screen.getByText('−$2,379.26 spent this month')).toBeInTheDocument()
+  })
+
+  it('nothing spent this month: no figure', async () => {
+    answers()
+    await open()
+    expect(screen.queryByText(/spent this month/)).not.toBeInTheDocument()
+  })
+
   it('only owners and adults can link a bank', async () => {
     answers()
     await open()
