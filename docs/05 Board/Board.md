@@ -20,6 +20,9 @@ kanban-plugin: board
 - [ ] [#133 Plan from your income with templates (e.g. 55/5/10/15/15)](https://github.com/Kolla1997/Tallyn/issues/133) #type/feature #area/frontend #area/backend #priority/p1
 - [ ] [#151 Stuck and failed states: Try again instead of endless loaders](https://github.com/Kolla1997/Tallyn/issues/151) #type/bug #area/design #area/frontend #priority/p1
 - [ ] [#152 Calm error messages instead of raw Supabase and network text](https://github.com/Kolla1997/Tallyn/issues/152) #type/bug #area/frontend #priority/p1
+- [ ] [#153 Keyboard and screen readers: page titles, focus and ARIA fixes](https://github.com/Kolla1997/Tallyn/issues/153) #type/bug #area/frontend #priority/p1
+- [ ] [#154 Worst-case data: long text, emoji, blank names, double submits, races](https://github.com/Kolla1997/Tallyn/issues/154) #type/bug #area/frontend #priority/p1
+- [ ] [#155 Glass fallbacks, reduced motion gaps and page basics](https://github.com/Kolla1997/Tallyn/issues/155) #type/bug #area/frontend #priority/p1
 
 
 ## In Progress
