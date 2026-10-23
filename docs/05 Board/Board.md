@@ -19,6 +19,8 @@ kanban-plugin: board
 - [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p3
 - [ ] [#133 Plan from your income with templates (e.g. 55/5/10/15/15)](https://github.com/Kolla1997/Tallyn/issues/133) #type/feature #area/frontend #area/backend #priority/p1
 - [ ] [#145 Full UI audit with the outside skills](https://github.com/Kolla1997/Tallyn/issues/145) #type/design #area/design #area/frontend #priority/p1
+- [ ] [#146 Budget amounts with a comma decimal save 100x too big](https://github.com/Kolla1997/Tallyn/issues/146) #type/bug #area/frontend #priority/p1
+- [ ] [#147 Home's this-month figure only counts recent transactions](https://github.com/Kolla1997/Tallyn/issues/147) #type/bug #area/frontend #priority/p1
 
 
 ## In Progress
