@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-23
+- #136 TallyX AI idea note (`docs/06 Ideas/Idea - TallyX AI.md`): the model picks tools and the backend does the maths, same privacy rules as the app, one low-cost model first (Model Routing Playbook), a measurement set before launch, legal and consent open. Added #136 to Tallyn Ideas and moved it to Exploring.
 - #1 Session handoff and usage rules (Dinesh): sessions start by reading `PROGRESS.md` and end by updating it; it holds only the handoff (branch, next steps, open problems), is gitignored and hidden from Obsidian. Added "Keeping usage low" rules; required checks are never skipped (CLAUDE.md §3).
 
 ## 2026-10-21
