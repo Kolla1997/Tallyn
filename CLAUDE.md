@@ -180,6 +180,7 @@ Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand,
 - Every card is frosted glass over a soft glow (`docs/03 Design/Design System.md` → Glass finish, #61). Keep text AA readable on it, keep dialogs, inputs and buttons solid, and keep the fallbacks for browsers without blur and for reduced transparency.
 - Draft before building (§0): no visual change goes in without a draft Dinesh has picked from.
 - Outside skills in `.claude/skills/` (listed in `.claude/skills/SOURCES.md`, #141) are advice, not rules. When one disagrees with this file, `design-tokens.json`, the Brand Guide or the Design System (easing, durations, colours, layout, workflow), Tallyn's own rules win. Their steps also don't skip §0: still draft, wait for a pick, and ask before subagents or new dependencies.
+  - **hallmark** and **ui-ux-pro-max** never pick Tallyn's look. Use them for their checks (hallmark's Floor and `sloplint`, ui-ux-pro-max's UX, accessibility and chart guidance), not their themes, palettes or fonts. Skip hallmark's theme deal, scaffold (`tokens.css`/`base.css`), photo library and edit-time hook; skip ui-ux-pro-max's `--persist` (no `design-system/` folder). Hallmark's generated images (Together AI) stay off.
 
 ## 7. Security rules (finance app)
 
