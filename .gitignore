@@ -12,6 +12,9 @@
 # Claude local settings
 .claude/settings.local.json
 
+# Session handoff note (personal, see CLAUDE.md §3)
+PROGRESS.md
+
 # Build / deps
 node_modules/
 web/dist/
