@@ -2,7 +2,7 @@
 type: guide
 status: active
 owner: Dinesh
-updated: 2026-10-08
+updated: 2026-10-23
 tags: [home]
 ---
 
@@ -31,6 +31,7 @@ tags: [home]
 
 ## Design
 - [[Design System]]: color, type, spacing, components
+- [[UI Audit 2026-10]]: findings from the full UI audit and proposed follow-up tickets (#145)
 - [[Design Comps]]: app and website screen comps
 - [[UI Patterns]]: recurring layouts and interactions
 
