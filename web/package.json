@@ -8,10 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write src e2e *.js",
-    "format:check": "prettier --check src e2e *.js",
+    "format": "prettier --write src e2e e2e-full *.js",
+    "format:check": "prettier --check src e2e e2e-full *.js",
     "test": "vitest run",
-    "test:layout": "playwright test"
+    "test:layout": "playwright test",
+    "test:e2e": "playwright test -c playwright.e2e.config.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.3",

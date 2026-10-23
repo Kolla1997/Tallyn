@@ -11,6 +11,8 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-23
+- #113 Browser end-to-end tests written (`web/e2e-full/`, `npm run test:e2e`, nightly workflow `.github/workflows/e2e.yml`, never on PRs): sign-in with 2FA, Home total, connecting a sandbox bank through the real Plaid Link screen (Dinesh picked A), invite and accept, share and unshare. Each test makes fresh test people with 2FA and deletes them after, so no TOTP secret is stored. Not run yet: waiting for the Supabase test project and its `E2E_*` secrets (Dev Setup). Test Plan rows say Planned (#113) until the first green run.
+- #136 TallyX open questions parked for later (Dinesh).
 - #136 TallyX AI idea note (`docs/06 Ideas/Idea - TallyX AI.md`): the model picks tools and the backend does the maths, same privacy rules as the app, one low-cost model first (Model Routing Playbook), a measurement set before launch, legal and consent open. Added #136 to Tallyn Ideas and moved it to Exploring.
 - #1 Session handoff and usage rules (Dinesh): sessions start by reading `PROGRESS.md` and end by updating it; it holds only the handoff (branch, next steps, open problems), is gitignored and hidden from Obsidian. Added "Keeping usage low" rules; required checks are never skipped (CLAUDE.md §3).
 
