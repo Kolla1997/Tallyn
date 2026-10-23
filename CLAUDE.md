@@ -49,6 +49,7 @@ The **repo root is the Obsidian vault**. Notes live in `docs/`. Code folders are
 | `docs/06 Ideas/Ideas Board.md` | Mirror of **Tallyn Ideas** (idea pipeline) | **No.** It's generated, so never edit it |
 | `docs/06 Ideas/` | Longer write-ups of ideas, one note each, with `issue: N` | Yes, for idea detail |
 | `.claude/commands/` | Claude Code slash commands (`/i`). Source copies live in `scripts/claude-commands/` | — |
+| `.claude/skills/` | Outside Claude Code skills, pinned copies; sources in `SOURCES.md` (#141) | No. Advice only, Tallyn rules win (§6) |
 | `docs/07 Log/` | Dated session and decision log | Yes |
 | `docs/Templates/` | Note templates. Always start new notes from these | — |
 | `cmd/`, `internal/` | Go backend (API + scheduled bank sync) | Code |
@@ -178,6 +179,7 @@ Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand,
 - Write copy in the voice set out in `docs/02 Brand/Voice and Tone.md`. This is a money app for families, so be clear and calm, never pushy.
 - Every card is frosted glass over a soft glow (`docs/03 Design/Design System.md` → Glass finish, #61). Keep text AA readable on it, keep dialogs, inputs and buttons solid, and keep the fallbacks for browsers without blur and for reduced transparency.
 - Draft before building (§0): no visual change goes in without a draft Dinesh has picked from.
+- Outside skills in `.claude/skills/` (listed in `.claude/skills/SOURCES.md`, #141) are advice, not rules. When one disagrees with this file, `design-tokens.json`, the Brand Guide or the Design System (easing, durations, colours, layout, workflow), Tallyn's own rules win. Their steps also don't skip §0: still draft, wait for a pick, and ask before subagents or new dependencies.
 
 ## 7. Security rules (finance app)
 
