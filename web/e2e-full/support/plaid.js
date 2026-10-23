@@ -83,9 +83,13 @@ export async function linkInBrowser(page) {
     .first()
     .click()
 
-  // Choose accounts (all are kept), save-with-Plaid offers, then the last screen.
-  for (let i = 0; i < 6; i++) {
-    if (!(await clickIfShown(frame, /^(Continue|Allow|Confirm|Done|Finish without saving|Not now|Skip)$/i, 10_000))) break
+  // Choose accounts (all are kept), "Connect faster next time" (Finish without
+  // saving), then the last screen. Screens can take a while to load, so keep
+  // going until Link closes rather than stopping at the first pause.
+  const link = page.locator('iframe[id^="plaid-link-iframe"]').first()
+  const deadline = Date.now() + 90_000
+  while (Date.now() < deadline && (await link.isVisible())) {
+    await clickIfShown(frame, /^(Finish without saving|Continue|Allow|Confirm|Done|Not now|Skip)$/i, 2000)
   }
-  await expect(page.locator('iframe[id^="plaid-link-iframe"]').first()).toBeHidden({ timeout: 30_000 })
+  await expect(link).toBeHidden({ timeout: 5000 })
 }
