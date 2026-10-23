@@ -142,13 +142,13 @@ The Ideas board also has **Impact** (High/Medium/Low) and **Effort** (S/M/L) fie
 
      For P0 features, write the rows when the scope is agreed, before the code. The PR description says which rows were added or updated.
 5. **Park or reject** ideas you won't do now, with a one-line reason in a comment. Don't delete them.
-6. **Sync:** `python3 scripts/sync_board.py` first auto-promotes cards in **Promoted**, then regenerates both board notes in Obsidian. Edit on GitHub, not in the mirrors. It runs:
+6. **Sync:** `python3 scripts/sync_board.py` first adds any open `type:idea` issue missing from Tallyn Ideas under **New** (so ideas made without the board, like from a cloud session or another tool, still land there), then auto-promotes cards in **Promoted**, then regenerates both board notes in Obsidian. Edit on GitHub, not in the mirrors. It runs:
    - automatically, via the GitHub Action `.github/workflows/sync-board.yml`: every hour (card moves send no events, so allow up to an hour), on issue changes, and from Actions → "Sync board mirrors" → Run workflow. It commits changed mirrors to `main` as `Sync board mirrors (#1)`, so `git pull` before reading them
    - at the start of every Claude session (§3)
    - after every `/i` and `/promote`
    - whenever Dinesh runs it by hand
 
-   Use `--no-promote` to mirror without moving anything. A run that would only change the date stamp writes nothing. The Action needs the repo secret `BOARD_TOKEN`: a classic personal access token with `repo` and `project` scopes. Never put the token in the repo.
+   Use `--no-promote` to mirror without adding or moving anything. A run that would only change the date stamp writes nothing. The Action needs the repo secret `BOARD_TOKEN`: a classic personal access token with `repo` and `project` scopes. Never put the token in the repo.
 
 Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand, design, frontend, backend, infra), `priority:*` (p0, p1, p2, and p3 for later: not planned now), and `blocker` for a ticket that can't move until something else is resolved (pairs with the **Blocked** column). Full list: `scripts/github/labels.yml` (copied to `.github/` by `setup_github.sh`).
 

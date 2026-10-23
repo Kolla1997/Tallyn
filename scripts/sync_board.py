@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Auto-promote ideas, then mirror both GitHub Projects into Obsidian Kanban notes. GitHub is the source of truth.
+"""Add missing ideas, auto-promote ideas, then mirror both GitHub Projects into Obsidian Kanban notes. GitHub is the source of truth.
 
   Tallyn Board (BOARD_NUMBER) → docs/05 Board/Board.md
   Tallyn Ideas (IDEAS_NUMBER) → docs/06 Ideas/Ideas Board.md
 
-Before mirroring, ideas in Stage 'Promoted' are moved to Tallyn Board (see promote.py).
+Before mirroring, open type:idea issues missing from Tallyn Ideas are added under 'New', and ideas in
+Stage 'Promoted' are moved to Tallyn Board (see promote.py). --no-promote skips both.
 Needs the gh CLI and scripts/board.env. Usage: python3 scripts/sync_board.py [--no-promote]
 """
 import json, pathlib, subprocess, sys, datetime
@@ -57,7 +58,8 @@ def sync(key, columns, collapsed, dest):
     print(f"✓ {sum(map(len, cols.values()))} cards → {dest}")
 
 if "--no-promote" not in sys.argv:
-    from promote import auto_promote
+    from promote import add_missing_ideas, auto_promote
+    add_missing_ideas(env)
     auto_promote(env)
 
 for b in BOARDS:
