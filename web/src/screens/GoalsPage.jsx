@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import LoadFailed from '../components/LoadFailed.jsx'
+import MonthPicker from '../components/MonthPicker.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
 import { api } from '../lib/api.js'
 import { fromMinor, toMinor } from '../lib/budgets.js'
@@ -398,9 +399,12 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
         </label>
         <fieldset className="goal-fills">
           <legend>How it fills</legend>
-          <label className="goal-radio">
+          <label className="goal-fill">
             <input type="radio" name="fills" checked={fills === 'account'} onChange={() => setFills('account')} disabled={accounts.length === 0} />
-            Follow a savings account
+            <span>
+              <strong>Follow a savings account</strong>
+              <small>Fills on its own from the balance.</small>
+            </span>
           </label>
           {fills === 'account' && accounts.length > 0 && (
             <select aria-label="Account it follows" value={account} onChange={(e) => setAccount(e.target.value)}>
@@ -414,9 +418,12 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
             </select>
           )}
           {accounts.length === 0 && <p className="small muted">No savings account to follow yet. Link a bank, or update it yourself.</p>}
-          <label className="goal-radio">
+          <label className="goal-fill">
             <input type="radio" name="fills" checked={fills === 'hand'} onChange={() => setFills('hand')} />
-            I&apos;ll update it myself
+            <span>
+              <strong>I&apos;ll update it myself</strong>
+              <small>For cash, or money Tallyn can&apos;t see.</small>
+            </span>
           </label>
         </fieldset>
         <div className="goal-row">
@@ -434,11 +441,8 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
               </select>
             </label>
           )}
-          <label>
-            By (optional)
-            <input type="month" value={by} onChange={(e) => setBy(e.target.value)} />
-          </label>
         </div>
+        <MonthPicker label="By (optional)" value={by} onChange={setBy} today={today()} />
         <fieldset className="chips goal-who">
           <legend>Who can see it</legend>
           {[

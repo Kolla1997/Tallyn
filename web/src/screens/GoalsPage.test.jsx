@@ -121,9 +121,11 @@ describe('GoalsPage', () => {
     expect(screen.getByRole('heading', { name: 'No goals yet' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'New goal' }))
     fireEvent.change(screen.getByLabelText('Name'), { target: { value: ' Beach trip ' } })
-    fireEvent.click(screen.getByRole('radio', { name: 'I’ll update it myself'.replace('’', "'") }))
+    fireEvent.click(screen.getByRole('radio', { name: /^I'll update it myself/ }))
     fireEvent.change(screen.getByLabelText('Target (USD)'), { target: { value: '5000' } })
-    fireEvent.change(screen.getByLabelText('By (optional)'), { target: { value: '2027-06' } })
+    fireEvent.click(screen.getByRole('button', { name: /By \(optional\)/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Next year' }))
+    fireEvent.click(screen.getByRole('button', { name: 'June 2027' }))
     fireEvent.click(screen.getByRole('button', { name: 'Everyone in the household' }))
     await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Create goal' })))
     expect(callsTo(api, '/api/goals', 'POST')[0][1].body).toEqual({
