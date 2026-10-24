@@ -3,6 +3,7 @@ import logo from '../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg'
 import mark from '../../../brand/logo/svg/tallyn-mark-light.svg'
 import { AccountsIcon, BudgetsIcon, DebtsIcon, FamilyIcon, GoalsIcon, HomeIcon, MenuIcon, SettingsIcon, TransactionsIcon } from '../components/Icons.jsx'
 import { Link } from '../lib/router.jsx'
+import Heading from '../components/Heading.jsx'
 
 // App layout (#39): sidebar on web (1024px and up), header and bottom tab bar
 // on phones. Matches docs/03 Design/Comps/web-*-draft.html.
@@ -370,11 +371,12 @@ function MobileMenu({ name, initial, household, onSignOut }) {
 }
 
 // One page's heading row: title, optional line under it, and actions.
-export function PageHead({ title, sub, children }) {
+// `tab` names the browser tab when it differs from the title (#153).
+export function PageHead({ title, tab, sub, children }) {
   return (
     <div className="page-head">
       <div>
-        <h1>{title}</h1>
+        <Heading title={tab ?? title}>{title}</Heading>
         {sub && <p className="muted">{sub}</p>}
       </div>
       {children && <div className="page-actions">{children}</div>}

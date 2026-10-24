@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useTakeover } from '../lib/takeover.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { cleanName } from './TransactionRow.jsx'
@@ -208,15 +209,20 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
   const hasPlace = Boolean(w?.address || place || (w?.lat != null && w?.lon != null))
   const owner = tx.owner_user_id === meId ? 'You' : nameOf(people[tx.owner_user_id] ?? { user_id: tx.owner_user_id })
   const name = cleanName(tx.merchant)
+  // On phones the details cover the page (#153): focus moves in, and back to
+  // the row when they close.
+  const panel = useRef(null)
+  const heading = useRef(null)
+  useTakeover(panel, heading, { key: tx.id })
 
   return (
-    <section className="panel tx-details" aria-labelledby="tx-details-h">
+    <section ref={panel} className="panel tx-details" aria-labelledby="tx-details-h">
       <button className="link small tx-back" onClick={onBack}>
         ← Back to summary
       </button>
       <div className="tx-details-head">
         <TxIcon tx={tx} />
-        <h2 id="tx-details-h" className="grow">
+        <h2 ref={heading} id="tx-details-h" className="grow" tabIndex={-1}>
           {name}
         </h2>
         <span className={shown > 0 ? 'amount money-in' : 'amount'}>

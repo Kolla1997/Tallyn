@@ -4,6 +4,7 @@ import { markJustSetUp, takeRecovered } from '../lib/backupCodes.js'
 import { supabase } from '../lib/supabase.js'
 import CodeForm from './CodeForm.jsx'
 import { TryAgain } from '../components/LoadFailed.jsx'
+import Heading from '../components/Heading.jsx'
 
 // First sign-in: add Tallyn to an authenticator app (TOTP) and confirm a code.
 // Also after recovering with a backup code (#23): set up again, then save a
@@ -43,7 +44,7 @@ export default function SetUp2FA({ onSignOut }) {
           <span>You&apos;re in with a backup code. Your old authenticator has been removed.</span>
         </p>
       )}
-      <h1>{recovered ? 'Set up your authenticator' : 'Protect your account'}</h1>
+      <Heading>{recovered ? 'Set up your authenticator' : 'Protect your account'}</Heading>
       <p className="muted">
         Tallyn asks for a code from an authenticator app each time you sign in, so your password alone isn&apos;t enough. Microsoft Authenticator, Google
         Authenticator and 1Password all work.

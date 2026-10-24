@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { MIN_PASSWORD, rememberPasswordChanged, rememberResetAsked } from '../lib/recovery.js'
 import { supabase } from '../lib/supabase.js'
 import { authMessage } from '../lib/authErrors.js'
+import Heading from '../components/Heading.jsx'
 
 // Password reset (#22, Dinesh picked A): ask for a link, then (after the link
 // and the 2FA code) choose a new password.
@@ -46,7 +47,7 @@ export function ResetRequest({ initialEmail = '', expired = false, onBack }) {
         <span className="reset-icon">
           <MailIcon />
         </span>
-        <h1>Check your email</h1>
+        <Heading>Check your email</Heading>
         <p className="muted">
           If there&apos;s a Tallyn account for <strong className="text-strong">{sentTo}</strong>, we&apos;ve sent it a link to reset your password. The link
           works for 1 hour.
@@ -77,7 +78,7 @@ export function ResetRequest({ initialEmail = '', expired = false, onBack }) {
 
   return (
     <section className="card">
-      <h1>{expired ? 'This link has expired' : 'Reset your password'}</h1>
+      <Heading>{expired ? 'This link has expired' : 'Reset your password'}</Heading>
       <p className="muted">
         {expired
           ? 'Reset links work once, for 1 hour. Ask for a new one and use the newest email.'
@@ -136,7 +137,7 @@ export function ChoosePassword({ email, onDone }) {
 
   return (
     <section className="card">
-      <h1>Choose a new password</h1>
+      <Heading>Choose a new password</Heading>
       {email && <p className="muted">For {email}.</p>}
       <form onSubmit={save}>
         <div className="field">

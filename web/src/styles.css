@@ -4400,3 +4400,13 @@ label.agree input {
   margin: 0;
   color: var(--color-cocoa);
 }
+
+/* Screen headings take focus when the screen changes (#153), so screen
+   readers announce it. They're not controls, so no ring. */
+h1[tabindex='-1']:focus {
+  outline: none;
+}
+
+.tx-details h2[tabindex='-1']:focus {
+  outline: none;
+}

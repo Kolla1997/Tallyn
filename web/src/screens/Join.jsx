@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { api } from '../lib/api.js'
 import { clearInvite } from '../lib/invite.js'
 import { TryAgain } from '../components/LoadFailed.jsx'
+import Heading from '../components/Heading.jsx'
 
 // Shown after sign-in when the person opened an invite link (#12).
 export default function Join({ token, onJoined, onDismiss }) {
@@ -33,7 +34,7 @@ export default function Join({ token, onJoined, onDismiss }) {
 
   return (
     <section className="card">
-      <h1>You&apos;ve been invited</h1>
+      <Heading>You&apos;ve been invited</Heading>
       <p className="muted">Someone invited you to their household on Tallyn. Joining doesn&apos;t share any of your money: you choose that later in Sharing.</p>
       {error && (
         <p className="error" role="alert">

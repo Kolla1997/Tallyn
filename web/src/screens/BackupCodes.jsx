@@ -8,6 +8,7 @@ import { api } from '../lib/api.js'
 import { clearJustSetUp, codesFile, justSetUp, markRecovered, remindLater, remindedLater } from '../lib/backupCodes.js'
 import { totpAt } from '../lib/session.js'
 import { supabase } from '../lib/supabase.js'
+import Heading from '../components/Heading.jsx'
 
 // Backup codes (#23, Dinesh picked A): ten one-time codes for when you can't
 // use your authenticator. Shown once, as a 2×5 grid with Copy, Download and
@@ -85,7 +86,7 @@ export function SaveBackupCodes({ email, canDefer = false, newFeature = false, o
           </span>
         </p>
       )}
-      <h1>Save your backup codes</h1>
+      <Heading>Save your backup codes</Heading>
       {reauth ? (
         <p className="muted">That took a little long, so we need one more code from your authenticator app before we make them.</p>
       ) : (
@@ -223,7 +224,7 @@ export function UseBackupCode({ onBack }) {
 
   return (
     <section className="card">
-      <h1>Use a backup code</h1>
+      <Heading>Use a backup code</Heading>
       <p className="muted">Enter one of the codes you saved when you set up two-step sign-in. Each code works once.</p>
       <form onSubmit={submit}>
         <label>

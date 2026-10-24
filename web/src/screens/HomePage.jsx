@@ -72,7 +72,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
 
   return (
     <>
-      <PageHead title={household.name} sub={greeting}>
+      <PageHead title={household.name} tab="Home" sub={greeting}>
         {canLink && <LinkBank householdId={household.id} onLinked={onChanged} onError={setError} />}
         {/* One button for the Family page, where inviting and sharing both
             live (#97, A: Share with family and Invite went to the same page). */}
