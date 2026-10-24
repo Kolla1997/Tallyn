@@ -62,7 +62,7 @@ export default function Settings({ me, household, email, onSaved, onSignOut }) {
         <div className="family-detail">
           {section === 'profile' && <Profile me={me} email={email} onSaved={onSaved} />}
           {section === 'security' && <Security email={email} onSignOut={onSignOut} />}
-          {section === 'household' && <Household household={household} />}
+          {section === 'household' && <Household household={household} onSaved={onSaved} />}
           {section === 'data' && <YourData />}
           {section === 'notifications' && <Notifications />}
           {section === 'legal' && <Legal />}
@@ -445,8 +445,9 @@ function AddAuthenticator({ names, onAdded, onClose }) {
   )
 }
 
-function Household({ household }) {
+function Household({ household, onSaved }) {
   const [count, setCount] = useState(null)
+  const [renaming, setRenaming] = useState(false)
   useEffect(() => {
     if (!household) return
     api(`/api/households/${encodeURIComponent(household.id)}/members`).then(
@@ -465,9 +466,19 @@ function Household({ household }) {
   return (
     <Section id="household-h" title="Household">
       <ul className="rows">
-        <Row label="Name" note={household.name}>
-          {household.role === 'owner' && <Soon ticket={53} />}
-        </Row>
+        {renaming ? (
+          <li className="settings-row">
+            <RenameHousehold household={household} onDone={() => setRenaming(false)} onSaved={onSaved} />
+          </li>
+        ) : (
+          <Row label="Name" note={household.name}>
+            {household.role === 'owner' && (
+              <button className="link small" onClick={() => setRenaming(true)}>
+                Rename
+              </button>
+            )}
+          </Row>
+        )}
         <Row label="Home currency" note={`${household.home_currency}. Totals in one currency come with conversion.`} />
         <Row label="Your role" note={ROLE_LABEL[household.role] ?? household.role} />
         <Row label="People" note={count == null ? '' : `${count} ${count === 1 ? 'member' : 'members'}`}>
@@ -477,6 +488,51 @@ function Household({ household }) {
         </Row>
       </ul>
     </Section>
+  )
+}
+
+// Renaming the household (#53): owners only, like the "Your name" form in
+// Profile. The server trims the name and keeps it to 1–80 characters.
+function RenameHousehold({ household, onDone, onSaved }) {
+  const [name, setName] = useState(household.name)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  async function save(e) {
+    e.preventDefault()
+    if (!name.trim()) return setError('Give your household a name.')
+    setBusy(true)
+    setError('')
+    try {
+      await api(`/api/households/${encodeURIComponent(household.id)}`, { method: 'PUT', body: { name } })
+      onSaved()
+      onDone()
+    } catch {
+      setError("We couldn't rename your household. Try again in a moment.")
+      setBusy(false)
+    }
+  }
+
+  return (
+    <form onSubmit={save} className="settings-form grow">
+      <label>
+        Household name
+        <input value={name} maxLength={80} onChange={(e) => setName(e.target.value)} autoFocus />
+      </label>
+      {error && (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="settings-actions">
+        <button className="btn btn-secondary" type="submit" disabled={busy}>
+          {busy ? 'Saving…' : 'Save'}
+        </button>
+        <button className="link small" type="button" onClick={onDone}>
+          Cancel
+        </button>
+      </div>
+    </form>
   )
 }
 

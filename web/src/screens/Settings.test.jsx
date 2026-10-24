@@ -239,4 +239,28 @@ describe('Settings: profile, legal and coming soon (#114)', () => {
       expect(signOut).not.toHaveBeenCalled()
     })
   })
+
+  // Rename the household (#53): owners only.
+  describe('rename the household', () => {
+    it('an owner renames it, and the app reloads the name', async () => {
+      api.mockResolvedValue({ name: 'The Riveras' })
+      const onSaved = await openSection('household')
+      fireEvent.click(screen.getByRole('button', { name: 'Rename' }))
+      fireEvent.change(screen.getByLabelText('Household name'), { target: { value: '  The Riveras ' } })
+      await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Save' })))
+      expect(api).toHaveBeenCalledWith('/api/households/hh-1', { method: 'PUT', body: { name: '  The Riveras ' } })
+      expect(onSaved).toHaveBeenCalled()
+      expect(screen.queryByLabelText('Household name')).not.toBeInTheDocument()
+    })
+
+    it('a blank name is refused before it leaves the page', async () => {
+      api.mockResolvedValue({ members: [] })
+      await openSection('household')
+      fireEvent.click(screen.getByRole('button', { name: 'Rename' }))
+      fireEvent.change(screen.getByLabelText('Household name'), { target: { value: '   ' } })
+      await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Save' })))
+      expect(screen.getByRole('alert')).toHaveTextContent('Give your household a name.')
+      expect(api).not.toHaveBeenCalledWith('/api/households/hh-1', expect.anything())
+    })
+  })
 })

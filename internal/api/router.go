@@ -56,6 +56,7 @@ type Store interface {
 	PlanSuggestion(ctx context.Context, userID, householdID, memberUserID string, today time.Time) (int64, error)
 	SavePlan(ctx context.Context, userID, householdID string, p db.NewPlan) (string, error)
 	DeletePlan(ctx context.Context, userID, planID string) error
+	RenameHousehold(ctx context.Context, userID, householdID, name string) (string, error) // #53
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -113,6 +114,7 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("DELETE /api/invites/{id}", revokeInvite(d.Store))
 	api.Handle("POST /api/invites/accept", limited(lim.accepts, acceptInvite(d.Store)))
 	api.HandleFunc("POST /api/households", createHousehold(d.Store))
+	api.HandleFunc("PUT /api/households/{id}", renameHousehold(d.Store)) // #53
 	b := banks{store: d.Store, plaid: d.Plaid, tokens: d.Tokens, syncNow: d.SyncNow, reconnected: d.Reconnected}
 	api.Handle("POST /api/plaid/link-token", limited(lim.plaid, b.needsPlaid(b.linkToken)))
 	api.Handle("POST /api/plaid/exchange", limited(lim.plaid, b.needsPlaid(b.exchange)))
