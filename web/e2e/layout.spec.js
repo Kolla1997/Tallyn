@@ -70,6 +70,7 @@ const PAGES = [
     'Budgets',
     '/budgets',
     (p) => [
+      p.getByRole('heading', { name: /on track this month|need a look/ }),
       p.getByRole('region', { name: 'Household budgets' }),
       p.getByRole('region', { name: 'Budgets for one person' }),
       p.getByText('Count my spending in household budgets'),

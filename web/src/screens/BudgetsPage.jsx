@@ -10,6 +10,7 @@ import { todayISO } from '../lib/cards.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { Avatar, nameOf } from '../lib/people.jsx'
 import { PageHead } from './Shell.jsx'
+import IncomePlan from './IncomePlan.jsx'
 
 // Budgets (#13, ADR 0014). Dinesh's mix: household budgets are glass tiles
 // with a pace line (spending through the period against an even pace), and
@@ -144,6 +145,7 @@ export default function BudgetsPage({ me, household, refreshKey }) {
       </PageHead>
 
       <div className="budgets-page">
+        <IncomePlan me={me} household={household} today={today} />
         {error && (
           <p className="error" role="alert">
             {error}
