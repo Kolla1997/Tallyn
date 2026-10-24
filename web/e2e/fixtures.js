@@ -187,6 +187,25 @@ const BUDGETS = {
   ],
 }
 
+// Plan from your income (#133): the household's plan this month, made up.
+const PLANS = {
+  today: iso(today),
+  plans: [
+    {
+      id: 'ffffffff-0000-4000-8000-000000000001',
+      member_user_id: null,
+      monthly_income_minor: 640000,
+      currency: 'USD',
+      template: '55-5-10-15-15',
+      shares: { essentials: 55, guilt_free: 5, debt: 10, short_term: 15, long_term: 15 },
+      from: monthFrom,
+      to: monthTo,
+      progress: { essentials: 278000, guilt_free: 36500, debt: 60000, short_term: 40000, long_term: 96000 },
+      can_manage: true,
+    },
+  ],
+}
+
 const ROUTES = [
   [/^\/api\/me$/, () => ({ user_id: ME, display_name: 'Sam Example', households: [{ id: HH, name: 'Example family', home_currency: 'USD', role: 'owner' }] })],
   [/^\/api\/consent$/, () => ({ versions: {}, needed: false })],
@@ -200,6 +219,7 @@ const ROUTES = [
   [/^\/api\/transactions$/, () => ({ transactions: TXS, more: false })],
   [/^\/api\/spending$/, () => ({ month: iso(today).slice(0, 7), spending: SPEND })],
   [/^\/api\/budgets$/, () => BUDGETS],
+  [/^\/api\/plans$/, () => PLANS],
 ]
 
 // A fake session, unsigned: the app reads it from storage and never checks

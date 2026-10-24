@@ -4410,3 +4410,259 @@ h1[tabindex='-1']:focus {
 .tx-details h2[tabindex='-1']:focus {
   outline: none;
 }
+
+/* Plan from your income (#133, Dinesh picked 3A): answer first, then the
+   logic (a labelled split bar), then the data (a plain bar and words per
+   job). Each job has one colour, used for its dot, its part of the split
+   and its bar; the words always carry the meaning too. */
+.job-essentials,
+.job-needs {
+  --c: var(--color-sage-deep);
+}
+
+.job-guilt_free,
+.job-wants {
+  --c: var(--color-warning);
+}
+
+.job-debt {
+  --c: var(--color-cocoa);
+}
+
+.job-short_term,
+.job-save {
+  --c: var(--color-sage);
+}
+
+.job-long_term {
+  --c: var(--color-clay);
+}
+
+.job-own {
+  --c: var(--color-sand);
+}
+
+.plan {
+  gap: var(--space-s3);
+}
+
+.plan-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-s3);
+  flex-wrap: wrap;
+}
+
+.plan-answer {
+  margin: 0;
+  font-size: 22px;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+.plan-detail,
+.plan-income,
+.plan-cant,
+.plan-row-foot {
+  margin: 0;
+}
+
+.plan-detail {
+  margin-top: var(--space-s1);
+}
+
+.plan-template {
+  background: var(--color-sand);
+  border-radius: var(--radius-button);
+  padding: var(--space-s1) var(--space-s2);
+  white-space: nowrap;
+}
+
+.plan-step {
+  margin: var(--space-s2) 0 0;
+  font-size: 15px;
+}
+
+.plan-split,
+.plan-mini {
+  display: flex;
+  gap: 3px;
+}
+
+.plan-split {
+  height: 14px;
+}
+
+.plan-mini {
+  height: 8px;
+}
+
+.plan-seg,
+.plan-mini span {
+  min-width: 4px;
+  border-radius: 4px;
+  background: var(--c);
+}
+
+.plan-key {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--space-s2);
+}
+
+.plan-key li,
+.plan-name {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-s2);
+}
+
+.plan-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--c);
+}
+
+.plan-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.plan-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s1);
+  padding: var(--space-s3) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.plan-row:first-child {
+  border-top: 0;
+}
+
+.plan-row-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s2);
+  flex-wrap: wrap;
+}
+
+.plan-name {
+  font-weight: 700;
+}
+
+.plan-words {
+  margin-left: auto;
+  font-family: var(--font-heading);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.plan-words.is-over {
+  color: var(--color-error);
+}
+
+.plan-words.is-done {
+  color: var(--color-sage-deep);
+}
+
+.plan-bar {
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--c) 20%, var(--color-white));
+}
+
+.plan-bar i {
+  display: block;
+  height: 100%;
+  background: var(--c);
+  transform-origin: left;
+}
+
+.plan-bar.is-over i {
+  background: var(--color-error);
+}
+
+.plan-setup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s2);
+}
+
+.plan-setup h2 {
+  margin: 0;
+}
+
+.plan-setup fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.plan-setup legend {
+  font-weight: 600;
+  margin-bottom: var(--space-s2);
+}
+
+.plan-templates {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--space-s2);
+}
+
+.plan-template-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s2);
+  padding: var(--space-s3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-white);
+  cursor: pointer;
+}
+
+.plan-template-card.is-on {
+  border: 2px solid var(--color-clay-deep);
+}
+
+.plan-template-card input {
+  position: absolute;
+  opacity: 0;
+}
+
+.plan-template-card:focus-within {
+  outline: 2px solid var(--color-clay-deep);
+  outline-offset: 2px;
+}
+
+.plan-own {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--space-s2);
+}
+
+.plan-own legend,
+.plan-own p {
+  grid-column: 1 / -1;
+}
+
+.plan-own label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s1);
+}
+
+.plan-actions {
+  display: flex;
+  gap: var(--space-s2);
+  flex-wrap: wrap;
+}
