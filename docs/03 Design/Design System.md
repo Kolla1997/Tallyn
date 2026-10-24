@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-23
+updated: 2026-10-24
 issue: 10
 tags: [design]
 ---
@@ -99,3 +99,4 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-11 | Compact density on web (1024px+), comfortable on phones; up to 1600px wide; Home in three columns from 1440px | Dinesh: use the screen and show more at a glance; phones keep sizes that are easy to read and tap |
 | 2026-10-11 | Spending isn't shown in red; red is only for what you owe | Calm, not alarming: ordinary purchases aren't a warning |
 | 2026-10-23 | A page that can't load shows a glass card with Try again; when money is already on screen, it stays under a solid sand banner. Retrying waits in sand (#151) | Dinesh picked D, a mix of the card (B) and the banner (C): never an endless loader, never hide numbers people already have |
+| 2026-10-24 | Plan from your income reads answer first (a sentence), then the logic (a labelled split bar), then the data (a plain bar and words per job). No chart key to learn (#133) | Dinesh picked 3A: people look for the logic first, then the numbers; the waffle, flow, bullet, treemap and waterfall drafts read slower |
