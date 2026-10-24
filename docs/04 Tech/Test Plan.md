@@ -128,7 +128,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Pages load on demand, and reload once after an update (#99) | P2 | No | — | No | — |
 | Phone layout: no sideways scroll, nothing hidden (#97, #94) | P1 | — | — | Yes | `web/e2e/layout.spec.js` (#117): every page at 375, 1024 and 1440 px: no sideways scroll, no error, key parts really visible (size, on screen, not hidden by display, visibility or opacity); menus with Terms and Privacy; sign-in, 2FA, reset, legal pages. Fake data and session, every PR |
 | A page that can’t load offers Try again (glass card); a reload that fails keeps the money on screen under a banner (#151) | P1 | Yes | — | No | `HomePage.test.jsx` (`a first load that fails offers Try again`, `a reload that fails keeps the money on screen`); other pages share `LoadFailed.jsx` |
-| Keyboard and screen reader basics on every page | P1 | Partly | — | No | Dots, code boxes, sign-in notes |
+| Keyboard and screen reader basics on every page: each screen names its tab, its heading takes focus when the screen or step changes, phone transaction details keep focus inside and return it (#153) | P1 | Partly | — | No | Dots, code boxes, sign-in notes; `Heading.test.jsx`, `takeover.test.jsx` (#153, part 1 of 3) |
 | Settings: your name, legal links, Soon items | P2 | Yes | Yes | No | `Settings.test.jsx`; `TestSetMe`, `TestSharingRoutes`, `TestSharingScreenData` (80-character limit) |
 
 ## Scope

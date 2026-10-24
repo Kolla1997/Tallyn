@@ -9,6 +9,7 @@ import HomePage from './HomePage.jsx'
 import Join from './Join.jsx'
 import Shell, { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import Heading from '../components/Heading.jsx'
 
 // Faster first load (#99): Home comes with the app; the other pages load the
 // first time they're opened, with the Tallyn loader meanwhile.
@@ -84,7 +85,7 @@ export default function Home({ email, onSignOut }) {
     return (
       <AuthPage>
         <section className="card">
-          <h1>Something went wrong</h1>
+          <Heading>Something went wrong</Heading>
           <p className="error" role="alert">
             We couldn&apos;t load your details. Try again in a moment.
           </p>
@@ -104,7 +105,7 @@ export default function Home({ email, onSignOut }) {
     return (
       <AuthPage>
         <section className="card">
-          <h1>Create your household</h1>
+          <Heading>Create your household</Heading>
           <p className="muted">Signed in as {email}, with 2FA.</p>
           <CreateHousehold onCreated={load} />
           <button className="btn btn-secondary" onClick={onSignOut}>

@@ -7,6 +7,7 @@ import { LEGAL, rememberAgreement } from '../lib/legal.js'
 import { Link } from '../lib/router.jsx'
 import { supabase } from '../lib/supabase.js'
 import { authMessage, isExistingAccount } from '../lib/authErrors.js'
+import Heading from '../components/Heading.jsx'
 
 // Sign in or create an account with email and password. 2FA comes next.
 // `expired`: a password reset link had expired or was used (#22).
@@ -72,7 +73,7 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
   if (sentTo) {
     return (
       <section className="card">
-        <h1>Check your email</h1>
+        <Heading>Check your email</Heading>
         <p>
           We sent a link to <strong>{sentTo}</strong>. Open it to confirm your account, then sign in.
         </p>
@@ -92,7 +93,7 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
   const signup = mode === 'signup'
   return (
     <section className="card">
-      <h1>{signup ? 'Create your account' : 'Welcome back'}</h1>
+      <Heading>{signup ? 'Create your account' : 'Welcome back'}</Heading>
       {note && !signup && (
         <p className="info-note" role="status">
           <svg

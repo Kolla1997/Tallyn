@@ -4,6 +4,7 @@ import { verifiedAuthenticators } from '../lib/mfa.js'
 import { UseBackupCode } from './BackupCodes.jsx'
 import CodeForm from './CodeForm.jsx'
 import { TryAgain } from '../components/LoadFailed.jsx'
+import Heading from '../components/Heading.jsx'
 
 // Later sign-ins: the password was right, now the authenticator code (any of
 // your authenticators, #23).
@@ -41,7 +42,7 @@ export default function Verify2FA({ onSignOut, recovering = false, onCancelReset
 
   return (
     <section className="card">
-      <h1>Enter your code</h1>
+      <Heading>Enter your code</Heading>
       {recovering && (
         <p className="info-note">
           <LockIcon />
