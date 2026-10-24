@@ -62,7 +62,6 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
   const [banks, setBanks] = useState([])
   const [invites, setInvites] = useState([])
   const [selected, setSelected] = useState(fromAddress)
-  const [error, setError] = useState('')
   const [failed, setFailed] = useState(false) // the last load failed (#151)
   const isOwner = household.role === 'owner'
 
@@ -127,11 +126,6 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
           </button>
         )}
       </PageHead>
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
       {failed && members && sharing && <StaleBanner what="your family" busy={retrying} onRetry={retry} />}
       {!members || !sharing ? (
         failed ? (
