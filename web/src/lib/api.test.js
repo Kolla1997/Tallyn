@@ -59,4 +59,12 @@ describe('api', () => {
     await expect(api('/api/me')).rejects.toThrow('internal')
     expect(signOut).not.toHaveBeenCalled()
   })
+
+  it('errors carry the HTTP status (#151)', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => answer(403, { error: 'forbidden' })),
+    )
+    await expect(api('/api/invites/accept', { method: 'POST', body: {} })).rejects.toMatchObject({ message: 'forbidden', status: 403 })
+  })
 })

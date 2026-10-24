@@ -150,9 +150,23 @@ describe('HomePage', () => {
     expect(screen.getByText('You haven’t linked a bank yet. Use Link a bank above.')).toBeInTheDocument()
   })
 
-  it('says so when the money can’t load', async () => {
+  it('a first load that fails offers Try again, not a loader that never stops (#151)', async () => {
     answers({ error: new Error('internal') })
     await open()
-    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't load your household's money.")
+    expect(screen.getByRole('heading', { name: "We couldn't load your money" })).toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    answers()
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Try again' })))
+    expect(screen.queryByRole('heading', { name: "We couldn't load your money" })).not.toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Your accounts' })).toBeInTheDocument()
+  })
+
+  it('a reload that fails keeps the money on screen, with a banner (#151)', async () => {
+    answers()
+    const { rerender } = await act(async () => render(<HomePage me={me} household={owner} refreshKey={0} onChanged={() => {}} />))
+    answers({ error: new Error('internal') })
+    await act(async () => rerender(<HomePage me={me} household={owner} refreshKey={1} onChanged={() => {}} />))
+    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't update your money just now.")
+    expect(screen.getByRole('region', { name: 'Your accounts' })).toBeInTheDocument()
   })
 })

@@ -11,11 +11,13 @@ export async function verifiedAuthenticators() {
 }
 
 // True if any of `factorIds` accepts the code. A wrong code is false, never
-// an error: the caller says "That code didn't work".
+// an error: the caller says "That code didn't work". Not reaching Supabase
+// throws (#151), so the caller can say so instead.
 export async function verifyCode(code, factorIds) {
   for (const factorId of factorIds) {
     const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code })
     if (!error) return true
+    if (error.name === 'AuthRetryableFetchError') throw error
   }
   return false
 }

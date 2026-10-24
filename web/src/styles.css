@@ -4359,3 +4359,44 @@ label.agree input {
   background: var(--color-white);
   border-color: var(--color-border);
 }
+
+/* When a page can't load (#151, Dinesh picked D). Nothing on screen yet: a
+   calm glass card with Try again. Money already on screen: it stays, under a
+   solid sand banner. */
+.load-failed {
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 520px;
+  margin: var(--space-s5) auto 0;
+  padding: var(--space-s6) var(--space-s5);
+}
+
+.load-failed h2,
+.load-failed p {
+  margin: 0;
+}
+
+.btn-icon-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-s2);
+}
+
+.stale-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-s2) var(--space-s4);
+  background: var(--color-sand);
+  border-radius: var(--radius-card);
+  padding: var(--space-s3) var(--space-s4);
+  margin-bottom: var(--space-s5);
+}
+
+.stale-banner p {
+  margin: 0;
+  color: var(--color-cocoa);
+}

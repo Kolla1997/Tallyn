@@ -7,7 +7,12 @@ import { BackupCodesGate, SaveBackupCodes, UseBackupCode } from './BackupCodes.j
 const api = vi.fn()
 vi.mock('../lib/api.js', () => ({ api: (...a) => api(...a) }))
 const refreshSession = vi.fn()
-vi.mock('../lib/supabase.js', () => ({ supabase: { auth: { refreshSession: () => refreshSession() } } }))
+const listFactors = vi.fn()
+vi.mock('../lib/supabase.js', () => ({
+  supabase: {
+    auth: { refreshSession: () => refreshSession(), mfa: { listFactors: () => listFactors(), challengeAndVerify: () => Promise.resolve({ error: null }) } },
+  },
+}))
 
 const CODES = ['7KQ4-M9TX', 'R2WF-8HNC', 'D5PJ-QZ3K', 'X9LT-4MVB', 'H6CN-2RYW', 'B3ZQ-7KDP', 'M8VH-5TJL', 'F4XR-9NWC', 'Q7BD-3PHM', 'T2NK-6ZQV']
 const b64url = (o) => btoa(JSON.stringify(o)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
@@ -23,10 +28,32 @@ const Page = ({ children }) => <main>{children}</main>
 beforeEach(() => {
   api.mockReset()
   refreshSession.mockReset()
+  listFactors.mockReset()
   sessionStorage.clear()
 })
 
 describe('SaveBackupCodes', () => {
+  it('making them fails: Try again instead of a dead end (#151)', async () => {
+    api.mockRejectedValueOnce(new Error('internal')).mockResolvedValueOnce({ codes: CODES })
+    await act(async () => render(<SaveBackupCodes onDone={vi.fn()} />))
+    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't make your codes.")
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Try again' })))
+    expect(api).toHaveBeenCalledTimes(2)
+    expect(screen.getAllByRole('listitem')).toHaveLength(10)
+  })
+
+  it('too long since the last code: asks for one more, then makes them (#151)', async () => {
+    listFactors.mockResolvedValue({ data: { totp: [{ id: 'f1', status: 'verified' }] }, error: null })
+    api.mockRejectedValueOnce(new Error('reauth_required')).mockResolvedValueOnce({ codes: CODES })
+    await act(async () => render(<SaveBackupCodes onDone={vi.fn()} />))
+    expect(screen.getByText(/we need one more code from your authenticator app/)).toBeInTheDocument()
+    const boxes = screen.getAllByRole('textbox')
+    '123456'.split('').forEach((d, i) => fireEvent.change(boxes[i], { target: { value: d } }))
+    await act(async () => {})
+    expect(api).toHaveBeenCalledTimes(2)
+    expect(screen.getAllByRole('listitem')).toHaveLength(10)
+  })
+
   it('makes one set (even in StrictMode), shows ten codes, and waits for the tick', async () => {
     api.mockResolvedValue({ codes: CODES })
     const onDone = vi.fn()
@@ -49,10 +76,12 @@ describe('SaveBackupCodes', () => {
     expect(screen.queryByRole('button', { name: 'Remind me next time' })).toBeNull()
   })
 
-  it('says when the code is too old to make codes', async () => {
+  it('code too old and authenticators can’t be read: says so, with Try again (#151)', async () => {
     api.mockRejectedValue(new Error('reauth_required'))
+    listFactors.mockRejectedValue(new Error('Failed to fetch'))
     await act(async () => render(<SaveBackupCodes onDone={() => {}} />))
-    expect(screen.getByRole('alert')).toHaveTextContent('That took a little long.')
+    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't make your codes.")
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
   })
 })
 

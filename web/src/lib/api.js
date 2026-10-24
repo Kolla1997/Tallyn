@@ -26,7 +26,8 @@ export async function api(path, { method = 'GET', body } = {}) {
       rememberSignOutNote('max')
       signOutHere().finally(() => (expiring = false))
     }
-    throw new Error(data.error || `HTTP ${res.status}`)
+    // The status goes with it (#151), so callers can tell "refused" from "not reached".
+    throw Object.assign(new Error(data.error || `HTTP ${res.status}`), { status: res.status })
   }
   return data
 }

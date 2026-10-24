@@ -65,6 +65,8 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Password reset, code before the new password (#22) | P0 | Yes | — | No | `recovery.test.js`, `ResetPassword.test.jsx`, `SignIn.test.jsx`, `Verify2FA.test.jsx` (PR #110); a real reset email is manual (release checklist) |
 | Add a second authenticator; remove one, never the last; any of them gives a valid code (#23) | P0 | Yes | — | No (#113) | `Settings.test.jsx`, `mfa.test.js`, `Verify2FA.test.jsx` |
 | Backup codes: 10 shown once after 2FA setup, stored hashed, each works once (#23) | P0 | Yes | Yes | — | `BackupCodes.test.jsx`; `api/backupcodes_test.go` (`TestNewBackupCodes`, `TestBackupCodeRoutes`); `db/backupcodes_test.go` (RLS, no hash readable) |
+| Backup codes that can’t be made offer Try again, or ask for one more code when the last one was too long ago, never a dead end (#151) | P0 | Yes | — | No | `BackupCodes.test.jsx` (`making them fails`, `too long since the last code`) |
+| 2FA code check that can’t reach Supabase says so, keeps the digits and doesn’t lock the form (#151) | P1 | Yes | — | — | `CodeForm.test.jsx`, `mfa.test.js`, `api.test.js` (status on errors) |
 | Existing 2FA accounts asked once to save backup codes (#23) | P1 | Yes | — | No | `BackupCodes.test.jsx` (`BackupCodesGate`) |
 | Regenerate backup codes needs a fresh 2FA code; old codes stop working (#23) | P0 | Yes | Yes | — | `Settings.test.jsx`; `TestBackupCodeRoutes` (step-up); `TestBackupCodes` (old set stops working) |
 | Lost authenticator: password, then a backup code, then a new authenticator; never without a second factor (#23) | P0 | Yes | Yes | No (#113) | `BackupCodes.test.jsx` (`UseBackupCode`), `Verify2FA.test.jsx`; `TestRecoverWithBackupCode`, `TestVerifySignedIn`; a real recovery is manual (release checklist) |
@@ -81,6 +83,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 |---|---|---|---|---|---|
 | Create a household | P1 | — | Yes | No | `db/banks_test.go`, `api/banks_test.go` (`TestCreateHousehold`) |
 | One household's data never reaches another | P0 | — | Yes | No | `db_test.go` (`TestHouseholdIsolation`, `TestEveryTableHasRLS`) |
+| Joining on a network error keeps the invite and offers Try again; a refused invite is cleared (#151) | P1 | Yes | — | — | `Join.test.jsx` |
 | Invite, accept, refuse, revoke | P0 | — | Yes | Planned (#113) | `invites_test.go`, `members_test.go` (`TestInviteRoutes`); `e2e-full/p0.spec.js` (invite a member, who accepts: link from the Family page, joined in a second browser) |
 | Change a member's role, remove a member | P0 | — | Yes | No | `invites_test.go` (`TestMemberManagement`), `members_test.go` |
 | Sharing is the owner's choice, step by step | P0 | — | Yes | Planned (#113) | `sharing_test.go` (db: 7 tests; api: `TestSharingRoutes`); `e2e-full/p0.spec.js` (share balances with a member, then stop sharing: the member's Home shows it, then doesn't) |
@@ -123,6 +126,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | SQL is always constant, never built from input | P0 | — | Yes | — | `sqlsafety_test.go` |
 | Pages load on demand, and reload once after an update (#99) | P2 | No | — | No | — |
 | Phone layout: no sideways scroll, nothing hidden (#97, #94) | P1 | — | — | Yes | `web/e2e/layout.spec.js` (#117): every page at 375, 1024 and 1440 px: no sideways scroll, no error, key parts really visible (size, on screen, not hidden by display, visibility or opacity); menus with Terms and Privacy; sign-in, 2FA, reset, legal pages. Fake data and session, every PR |
+| A page that can’t load offers Try again (glass card); a reload that fails keeps the money on screen under a banner (#151) | P1 | Yes | — | No | `HomePage.test.jsx` (`a first load that fails offers Try again`, `a reload that fails keeps the money on screen`); other pages share `LoadFailed.jsx` |
 | Keyboard and screen reader basics on every page | P1 | Partly | — | No | Dots, code boxes, sign-in notes |
 | Settings: your name, legal links, Soon items | P2 | Yes | Yes | No | `Settings.test.jsx`; `TestSetMe`, `TestSharingRoutes`, `TestSharingScreenData` (80-character limit) |
 

@@ -9,6 +9,8 @@ import { LinkBank, ReconnectBank } from './Banks.jsx'
 import { canAddCardDetails, cardsWithoutDetails } from '../lib/cards.js'
 import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
+import { useRetry } from '../lib/retry.js'
 import CountUp from '../components/CountUp.jsx'
 import { useFadeOnChange } from '../lib/motion.js'
 
@@ -44,21 +46,26 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
     return /^[0-9a-f-]{36}$/i.test(v) ? v : ''
   })
   const [error, setError] = useState('')
+  const [failed, setFailed] = useState(false) // the last load failed (#151)
   const home = household.home_currency
   const canLink = household.role === 'owner' || household.role === 'adult'
 
   const load = useCallback(() => {
     const hh = encodeURIComponent(household.id)
-    Promise.all([api(`/api/banks?household_id=${hh}`), api(`/api/households/${hh}/members`)]).then(
+    return Promise.all([api(`/api/banks?household_id=${hh}`), api(`/api/households/${hh}/members`)]).then(
       ([b, m]) => {
         setBanks(b.banks)
         setMembers(m.members)
+        setFailed(false)
       },
-      () => setError("We couldn't load your accounts. Try again in a moment."),
+      () => setFailed(true),
     )
   }, [household.id])
 
-  useEffect(load, [load, refreshKey])
+  useEffect(() => {
+    load()
+  }, [load, refreshKey])
+  const [retrying, retry] = useRetry(load)
 
   // Home's You have / You owe tiles link to #have and #owe.
   useEffect(() => {
@@ -126,8 +133,13 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
         </p>
       )}
 
+      {failed && banks && <StaleBanner busy={retrying} onRetry={retry} />}
       {!banks ? (
-        <TallynLoader />
+        failed ? (
+          <LoadFailed busy={retrying} onRetry={retry} />
+        ) : (
+          <TallynLoader />
+        )
       ) : accounts.length === 0 ? (
         <section className="panel empty-state">
           <p className="muted">
