@@ -39,6 +39,16 @@ func (stubStore) ClosingBanks(context.Context, string) ([]db.ClosingBank, error)
 	return nil, errors.New("stub")
 }
 func (stubStore) PrepareClosing(context.Context, string, []byte) error { return errors.New("stub") }
+func (stubStore) Plans(context.Context, string, string, time.Time) ([]db.Plan, error) {
+	return nil, errors.New("stub")
+}
+func (stubStore) PlanSuggestion(context.Context, string, string, string, time.Time) (int64, error) {
+	return 0, errors.New("stub")
+}
+func (stubStore) SavePlan(context.Context, string, string, db.NewPlan) (string, error) {
+	return "", errors.New("stub")
+}
+func (stubStore) DeletePlan(context.Context, string, string) error { return errors.New("stub") }
 func (stubStore) CreateHousehold(context.Context, string, string, string) (db.MyHousehold, error) {
 	return db.MyHousehold{}, errors.New("stub")
 }

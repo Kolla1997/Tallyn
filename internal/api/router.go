@@ -51,6 +51,11 @@ type Store interface {
 	ClosingBlocker(ctx context.Context, userID string) (string, error)
 	ClosingBanks(ctx context.Context, userID string) ([]db.ClosingBank, error)
 	PrepareClosing(ctx context.Context, userID string, emailHMAC []byte) error
+	// Plan from your income (#133).
+	Plans(ctx context.Context, userID, householdID string, today time.Time) ([]db.Plan, error)
+	PlanSuggestion(ctx context.Context, userID, householdID, memberUserID string, today time.Time) (int64, error)
+	SavePlan(ctx context.Context, userID, householdID string, p db.NewPlan) (string, error)
+	DeletePlan(ctx context.Context, userID, planID string) error
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -124,6 +129,10 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("PUT /api/budgets/counting", setBudgetCounting(d.Store))
 	api.HandleFunc("PUT /api/budgets/{id}", updateBudget(d.Store))
 	api.HandleFunc("DELETE /api/budgets/{id}", deleteBudget(d.Store))
+	api.HandleFunc("GET /api/plans", plans(d.Store)) // #133
+	api.HandleFunc("GET /api/plans/suggestion", planSuggestion(d.Store))
+	api.HandleFunc("PUT /api/plans", savePlan(d.Store))
+	api.HandleFunc("DELETE /api/plans/{id}", deletePlan(d.Store))
 	api.HandleFunc("/api/", func(w http.ResponseWriter, _ *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found")
 	})
