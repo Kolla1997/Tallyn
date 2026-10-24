@@ -66,7 +66,7 @@ func main() {
 	// A malformed key stops the server: better than failing on the first link.
 	var box *tokencrypt.Box
 	var plaidClient *plaid.Client
-	var codeKey []byte
+	var codeKey, closingKey []byte
 	if key := os.Getenv("TOKEN_ENCRYPTION_KEY"); key != "" && key != "replace-me" {
 		b, err := tokencrypt.New(key)
 		if err != nil {
@@ -75,19 +75,22 @@ func main() {
 		box = b
 		raw, _ := base64.StdEncoding.DecodeString(strings.TrimSpace(key)) // checked by tokencrypt.New
 		codeKey = api.DeriveBackupCodeKey(raw)                            // backup codes (#23)
+		closingKey = api.DeriveClosingKey(raw)                            // closing records (#56)
 	}
 	// Recovering a lost authenticator (#23, ADR 0013) removes it through
 	// Supabase's admin API, with the server-only key. Without it, backup codes
 	// still work in Settings, and recovery answers 503.
+	// Closing an account (#56, ADR 0015) deletes the sign-in the same way.
 	var factors api.FactorRemover
+	var accounts api.AccountDeleter
 	if k := os.Getenv("SUPABASE_SERVICE_ROLE_KEY"); k != "" && k != "replace-me" {
 		c, err := supabaseadmin.New(os.Getenv("SUPABASE_URL"), k)
 		if err != nil {
 			log.Fatalf("tallyn: %v", err)
 		}
-		factors = c
+		factors, accounts = c, c
 	} else {
-		log.Printf("tallyn: SUPABASE_SERVICE_ROLE_KEY not set, backup-code recovery will answer 503")
+		log.Printf("tallyn: SUPABASE_SERVICE_ROLE_KEY not set, backup-code recovery and closing an account will answer 503")
 	}
 	if id := os.Getenv("PLAID_CLIENT_ID"); id != "" && id != "replace-me" {
 		c, err := plaid.New(getenv("PLAID_ENV", "sandbox"), id, os.Getenv("PLAID_SECRET"), os.Getenv("PLAID_REDIRECT_URI"))
@@ -129,6 +132,7 @@ func main() {
 		syncNow = syncer.SyncNow
 		reconnected = syncer.Reconnected
 		go syncer.Run(ctx)
+		go purgeClosingRecords(ctx, system)
 		log.Printf("tallyn: bank sync every %s", every)
 	}
 
@@ -148,6 +152,8 @@ func main() {
 			BackupCodes:     codes,
 			Factors:         factors,
 			CodeKey:         codeKey,
+			Accounts:        accounts,
+			ClosingKey:      closingKey,
 		}),
 		ReadHeaderTimeout: 10 * time.Second,
 		// #24: slow or stuck clients can't hold connections open.
@@ -180,4 +186,24 @@ func getenv(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+// purgeClosingRecords deletes closing records older than db.ClosingRecordsKept
+// (#56, ADR 0015): once at start, then daily. It runs with the bank sync's
+// login, the only one allowed to.
+func purgeClosingRecords(ctx context.Context, system *db.System) {
+	t := time.NewTicker(24 * time.Hour)
+	defer t.Stop()
+	for {
+		if n, err := system.PurgeClosedAccounts(ctx, db.ClosingRecordsKept); err != nil {
+			log.Printf("tallyn: purge closing records: %v", err)
+		} else if n > 0 {
+			log.Printf("tallyn: purged %d closing records older than 3 years", n)
+		}
+		select {
+		case <-ctx.Done():
+			return
+		case <-t.C:
+		}
+	}
 }

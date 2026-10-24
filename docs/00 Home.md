@@ -23,6 +23,7 @@ tags: [home]
 - [[Feature - Sharing]]: who sees whose money, by choice
 - [[Feature - Household Members]]: invitations, roles, leaving
 - [[Feature - Your Data]]: download everything Tallyn holds about you (#54)
+- [[Feature - Close Account]]: close your account; what goes and what's kept (#56)
 
 ## Brand
 - [[Brand Guide]]: positioning, personality, brand basics

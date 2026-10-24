@@ -47,6 +47,10 @@ type Store interface {
 	DeleteBudget(ctx context.Context, userID, budgetID string) error
 	SetCountInBudgets(ctx context.Context, userID, householdID string, on bool) error
 	Export(ctx context.Context, userID string) (db.Export, error) // #54
+	// Closing an account (#56).
+	ClosingBlocker(ctx context.Context, userID string) (string, error)
+	ClosingBanks(ctx context.Context, userID string) ([]db.ClosingBank, error)
+	PrepareClosing(ctx context.Context, userID string, emailHMAC []byte) error
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -68,6 +72,10 @@ type Deps struct {
 	BackupCodes     BackupCodeStore                 // *db.DB
 	Factors         FactorRemover                   // *supabaseadmin.Client
 	CodeKey         []byte                          // DeriveBackupCodeKey(token key)
+
+	// Closing an account (#56, ADR 0015). Without both, closing answers 503.
+	Accounts   AccountDeleter // *supabaseadmin.Client
+	ClosingKey []byte         // DeriveClosingKey(token key)
 }
 
 // NewRouter returns the server's handler: JSON API under /api/ and the
@@ -86,6 +94,8 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("GET /api/me", me(d.Store))
 	api.HandleFunc("PUT /api/me", setMe(d.Store))
 	api.HandleFunc("GET /api/me/export", exportData(d.Store, lim.exports)) // #54
+	c := closer{store: d.Store, plaid: d.Plaid, tokens: d.Tokens, accounts: d.Accounts, key: d.ClosingKey}
+	api.HandleFunc("POST /api/me/close", c.close) // #56
 	api.HandleFunc("GET /api/consent", consent(d.Store))
 	api.HandleFunc("POST /api/consent", acceptConsent(d.Store))
 	api.HandleFunc("GET /api/sharing", sharing(d.Store))

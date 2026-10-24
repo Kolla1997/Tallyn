@@ -32,6 +32,13 @@ func (stubStore) Me(context.Context, string) (db.Me, error) { return db.Me{}, er
 func (stubStore) Export(context.Context, string) (db.Export, error) {
 	return db.Export{}, errors.New("stub")
 }
+func (stubStore) ClosingBlocker(context.Context, string) (string, error) {
+	return "", errors.New("stub")
+}
+func (stubStore) ClosingBanks(context.Context, string) ([]db.ClosingBank, error) {
+	return nil, errors.New("stub")
+}
+func (stubStore) PrepareClosing(context.Context, string, []byte) error { return errors.New("stub") }
 func (stubStore) CreateHousehold(context.Context, string, string, string) (db.MyHousehold, error) {
 	return db.MyHousehold{}, errors.New("stub")
 }
