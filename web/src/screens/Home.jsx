@@ -19,6 +19,7 @@ const DebtsPage = lazy(() => import('./DebtsPage.jsx'))
 const TransactionsPage = lazy(() => import('./TransactionsPage.jsx'))
 const FamilyPage = lazy(() => import('./FamilyPage.jsx'))
 const Settings = lazy(() => import('./Settings.jsx'))
+const GoalsPage = lazy(() => import('./GoalsPage.jsx'))
 
 const HOUSEHOLD_KEY = 'tallyn.household'
 
@@ -148,17 +149,7 @@ export default function Home({ email, onSignOut }) {
       )
       break
     case '/goals':
-      page = (
-        <>
-          <PageHead title="Goals" />
-          <section className="panel empty-state">
-            <h2>Savings goals are on the way</h2>
-            <p className="muted">
-              Soon you&apos;ll set goals like a family trip or a school fund, and follow a savings account so progress updates on its own.
-            </p>
-          </section>
-        </>
-      )
+      page = <GoalsPage me={me} household={household} refreshKey={refreshKey} />
       break
     case '/settings':
       page = <Settings me={me} household={household} email={email} onSaved={load} onSignOut={onSignOut} />

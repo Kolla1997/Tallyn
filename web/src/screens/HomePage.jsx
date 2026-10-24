@@ -13,6 +13,7 @@ import { useFadeOnChange } from '../lib/motion.js'
 import { LinkBank } from './Banks.jsx'
 import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import { summary, thisMonth } from '../lib/goals.js'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
 
@@ -109,15 +110,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
           }
           shared={<SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />}
           family={<FamilyCard members={members} isOwner={household.role === 'owner'} />}
-          goals={
-            <section className="panel panel-dashed" aria-labelledby="goals-h">
-              <div className="panel-head">
-                <h2 id="goals-h">Goals</h2>
-                <span className="tag">Coming soon</span>
-              </div>
-              <p className="small muted">Save for a trip or a school fund, and let a savings account keep track for you.</p>
-            </section>
-          }
+          goals={<GoalsCard household={household} />}
         />
       )}
     </>
@@ -609,6 +602,47 @@ function FamilyCard({ members, isOwner }) {
           </li>
         ))}
       </ul>
+    </section>
+  )
+}
+
+// Goals on Home (#14): the Goals page's answer, in short. Loads on its own so
+// Home never waits for it; says nothing it can't back up if it fails.
+function GoalsCard({ household }) {
+  const [goals, setGoals] = useState(null)
+  const today = new Date().toLocaleDateString('en-CA')
+  useEffect(() => {
+    api(`/api/goals?household_id=${encodeURIComponent(household.id)}&today=${today}`).then(
+      (d) => setGoals(d.goals ?? []),
+      () => setGoals([]),
+    )
+  }, [household.id, today])
+  const list = goals ?? []
+  const month = thisMonth(list, today)
+  const { title, detail } = summary(month, today, formatMoney)
+  return (
+    <section className="panel panel-dashed" aria-labelledby="goals-h">
+      <div className="panel-head">
+        <h2 id="goals-h">Goals</h2>
+        {list.length > 0 && (
+          <Link to="/goals" className="link small">
+            See goals
+          </Link>
+        )}
+      </div>
+      {list.length === 0 ? (
+        <p className="small muted">
+          Save for a trip or a school fund, and let a savings account keep track for you.{' '}
+          <Link to="/goals" className="link small">
+            Set a goal
+          </Link>
+        </p>
+      ) : (
+        <>
+          <p className="goals-card-title">{month.length ? title : `${list.length} ${list.length === 1 ? 'goal' : 'goals'}`}</p>
+          {detail && <p className="small muted">{detail}</p>}
+        </>
+      )}
     </section>
   )
 }
