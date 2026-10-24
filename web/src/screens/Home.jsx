@@ -86,7 +86,7 @@ export default function Home({ email, onSignOut }) {
         <section className="card">
           <h1>Something went wrong</h1>
           <p className="error" role="alert">
-            We couldn&apos;t load your details ({error}). Try again in a moment.
+            We couldn&apos;t load your details. Try again in a moment.
           </p>
           <button className="btn btn-secondary" onClick={onSignOut}>
             Sign out

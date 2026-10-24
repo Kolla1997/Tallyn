@@ -6,6 +6,7 @@ import { PasswordRule, ResetRequest } from './ResetPassword.jsx'
 import { LEGAL, rememberAgreement } from '../lib/legal.js'
 import { Link } from '../lib/router.jsx'
 import { supabase } from '../lib/supabase.js'
+import { authMessage, isExistingAccount } from '../lib/authErrors.js'
 
 // Sign in or create an account with email and password. 2FA comes next.
 // `expired`: a password reset link had expired or was used (#22).
@@ -41,7 +42,9 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
           })
     setBusy(false)
     if (error) {
-      setError(error.message)
+      // Same screen as a new sign-up, so nobody can find out who has an account (#152).
+      if (mode === 'signup' && isExistingAccount(error)) setSentTo(email)
+      else setError(authMessage(error))
       return
     }
     // With email confirmation on, sign-up returns no session until the link is opened.

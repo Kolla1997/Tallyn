@@ -3,6 +3,7 @@ import { LockIcon } from '../components/Icons.jsx'
 import { markJustSetUp, takeRecovered } from '../lib/backupCodes.js'
 import { supabase } from '../lib/supabase.js'
 import CodeForm from './CodeForm.jsx'
+import { TryAgain } from '../components/LoadFailed.jsx'
 
 // First sign-in: add Tallyn to an authenticator app (TOTP) and confirm a code.
 // Also after recovering with a backup code (#23): set up again, then save a
@@ -11,6 +12,7 @@ export default function SetUp2FA({ onSignOut }) {
   const [factor, setFactor] = useState(null) // { id, qr, secret }
   const [recovered] = useState(takeRecovered)
   const [error, setError] = useState('')
+  const [starting, setStarting] = useState(false)
   const started = useRef(false)
 
   useEffect(() => {
@@ -18,8 +20,20 @@ export default function SetUp2FA({ onSignOut }) {
     if (started.current) return
     started.current = true
     markJustSetUp() // backup codes come next (#23)
-    enrol().then(setFactor, (e) => setError(e.message))
+    start()
   }, [])
+
+  // Can fail to start (#152): calm words and Try again, never Supabase's text.
+  function start() {
+    setStarting(true)
+    setError('')
+    return enrol()
+      .then(setFactor, (e) => {
+        console.error(e)
+        setError("We couldn't start setting up your authenticator. Try again in a moment.")
+      })
+      .finally(() => setStarting(false))
+  }
 
   return (
     <section className="card">
@@ -39,6 +53,7 @@ export default function SetUp2FA({ onSignOut }) {
           {error}
         </p>
       )}
+      {error && !factor && <TryAgain busy={starting} onRetry={start} />}
       {factor && (
         <>
           <ol>
