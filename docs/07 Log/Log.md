@@ -10,6 +10,15 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-10-23 (UI audit)
+- #145 Full UI audit with the outside skills (#141): four read-only code audits (sign-in, money screens, family/settings/shell, app-wide CSS) and a live check at 375px and 1280px. About 110 findings in `docs/03 Design/UI Audit 2026-10.md`; follow-ups agreed and created as #151–#160. L5 ("two loaders") dropped as a false alarm. A7 corrected: with Confirm email on, sign-up doesn't reveal existing accounts.
+- #146 Budget amounts read the way people write them: "12,50" is 12.50 (it saved 1,250.00), currency signs and codes ignored, ambiguous amounts ("1.250") refused.
+- #147 Home's balance card shows "spent this month" from the month summary, so every transaction counts (Dinesh picked A: spending only, matching the Spending card).
+- #151 Failed loads (Dinesh picked D): a calm glass card with Try again when nothing is on screen yet; the numbers stay under a sand banner when a reload fails. Backup codes, the 2FA code form and Join no longer dead-end; Join keeps the invite on a network error.
+- #152 Sign-in, sign-up, reset and 2FA errors use Tallyn's words (copy agreed with Dinesh), never Supabase's text; sign-up for an existing email looks like any sign-up.
+- #153 Part 1 of 3: every screen names its browser tab ("Page · Tallyn", Home is "Home · Tallyn"); the heading takes focus when the screen or step changes; phone transaction details keep focus inside and return it. Parts 2 (dialogs and menus) and 3 (focus rings, labels) to come. Dinesh OK'd the existing Clay Deep focus ring for the menus without a draft.
+- Open: local lint and tests stall in `~/Desktop` (iCloud Drive). Fresh clones outside the Desktop run them in seconds; moving the repo to `~/Code/Tallyn` is planned (Dinesh, later).
+
 ## 2026-10-23
 - #141 Outside design skills (Dinesh): six skills from emilkowalski/skills copied into `.claude/skills/`, pinned at `2d22863`, with sources in `SOURCES.md`: emil-design-eng, animate, animation-performance, break-ui, improve-animations, and review-animations (manual only). CLAUDE.md §6: Tallyn's own rules win over outside skills. Skipped shadcn (no Tailwind or shadcn in `web/`). Also added hallmark (`7ec8682`) and ui-ux-pro-max (`d14efff`) after reading their scripts (Dinesh): used for checks only, never for Tallyn's look; theme deal, scaffold, photo library, `--persist` and Together AI images are off (CLAUDE.md §6). `.hallmark/` is gitignored.
 - #113 Browser end-to-end tests written (`web/e2e-full/`, `npm run test:e2e`, nightly workflow `.github/workflows/e2e.yml`, never on PRs): sign-in with 2FA, Home total, connecting a sandbox bank through the real Plaid Link screen (Dinesh picked A), invite and accept, share and unshare. Each test makes fresh test people with 2FA and deletes them after, so no TOTP secret is stored. Not run yet: waiting for the Supabase test project and its `E2E_*` secrets (Dev Setup). Test Plan rows say Planned (#113) until the first green run.
