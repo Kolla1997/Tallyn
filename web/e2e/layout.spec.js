@@ -78,7 +78,7 @@ const PAGES = [
   ],
   ['Debts', '/debts', (p) => [p.getByRole('region', { name: 'What you owe by kind' }), p.getByRole('region', { name: 'Payments, interest and overdue' })]],
   ['Family', '/family', (p) => [p.getByRole('region', { name: 'People in your household' }), p.getByRole('heading', { name: 'Pat Example', exact: true })]],
-  ['Goals', '/goals', (p) => [p.getByText('Savings goals are on the way')]],
+  ['Goals', '/goals', (p) => [p.getByRole('heading', { name: /set-asides|Nothing to put aside/ }), p.getByRole('region', { name: 'Your goals' })]],
   ...[
     ['profile', 'Profile'],
     ['security', 'Sign-in and security'],

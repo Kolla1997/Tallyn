@@ -206,6 +206,57 @@ const PLANS = {
   ],
 }
 
+// Savings goals (#14): one on a month with history, one kept by hand in
+// euros, and one whose progress is private. Made up.
+const ym = (back) => iso(new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - back, 1)))
+const GOALS = {
+  today: iso(today),
+  goals: [
+    {
+      id: 'aaaaaaaa-0000-4000-8000-000000000001',
+      owner_user_id: ME,
+      name: 'Beach trip',
+      target_minor: 500000,
+      currency: 'USD',
+      by_month: ym(-8),
+      account_id: null,
+      visibility: 'everyone',
+      shared_with: null,
+      can_manage: true,
+      saved_minor: 340000,
+      history: [3, 2, 1].map((b, i) => ({ month: ym(b), saved_minor: 250000 + i * 30000 })),
+    },
+    {
+      id: 'aaaaaaaa-0000-4000-8000-000000000002',
+      owner_user_id: ME,
+      name: 'A very long goal name for a family trip to see grandparents',
+      target_minor: 200000,
+      currency: 'EUR',
+      by_month: ym(-10),
+      account_id: null,
+      visibility: 'me',
+      shared_with: null,
+      can_manage: true,
+      saved_minor: 30000,
+      history: [{ month: ym(1), saved_minor: 30000 }],
+    },
+    {
+      id: 'aaaaaaaa-0000-4000-8000-000000000003',
+      owner_user_id: PAT,
+      name: "Pat's car fund",
+      target_minor: 800000,
+      currency: 'USD',
+      by_month: null,
+      account_id: 'x',
+      visibility: 'everyone',
+      shared_with: null,
+      can_manage: false,
+      saved_minor: null,
+      history: null,
+    },
+  ],
+}
+
 const ROUTES = [
   [/^\/api\/me$/, () => ({ user_id: ME, display_name: 'Sam Example', households: [{ id: HH, name: 'Example family', home_currency: 'USD', role: 'owner' }] })],
   [/^\/api\/consent$/, () => ({ versions: {}, needed: false })],
@@ -220,6 +271,7 @@ const ROUTES = [
   [/^\/api\/spending$/, () => ({ month: iso(today).slice(0, 7), spending: SPEND })],
   [/^\/api\/budgets$/, () => BUDGETS],
   [/^\/api\/plans$/, () => PLANS],
+  [/^\/api\/goals$/, () => GOALS],
 ]
 
 // A fake session, unsigned: the app reads it from storage and never checks
