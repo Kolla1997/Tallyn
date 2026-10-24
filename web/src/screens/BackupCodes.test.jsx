@@ -28,6 +28,7 @@ const Page = ({ children }) => <main>{children}</main>
 beforeEach(() => {
   api.mockReset()
   refreshSession.mockReset()
+  listFactors.mockReset()
   sessionStorage.clear()
 })
 
@@ -75,10 +76,12 @@ describe('SaveBackupCodes', () => {
     expect(screen.queryByRole('button', { name: 'Remind me next time' })).toBeNull()
   })
 
-  it('says when the code is too old to make codes', async () => {
+  it('code too old and authenticators can’t be read: says so, with Try again (#151)', async () => {
     api.mockRejectedValue(new Error('reauth_required'))
+    listFactors.mockRejectedValue(new Error('Failed to fetch'))
     await act(async () => render(<SaveBackupCodes onDone={() => {}} />))
-    expect(screen.getByRole('alert')).toHaveTextContent('That took a little long.')
+    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't make your codes.")
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
   })
 })
 
