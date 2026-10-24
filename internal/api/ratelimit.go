@@ -86,6 +86,7 @@ type limits struct {
 	invites  *limiter // creating invites
 	accepts  *limiter // accepting an invite link
 	recovery *limiter // backup-code tries (#23): each one guesses a code
+	exports  *limiter // data downloads (#54): each one is a full copy
 }
 
 func newLimits() limits {
@@ -95,5 +96,6 @@ func newLimits() limits {
 		invites:  newLimiter(20, time.Hour),
 		accepts:  newLimiter(10, 10*time.Minute),
 		recovery: newLimiter(5, 15*time.Minute),
+		exports:  newLimiter(3, time.Hour),
 	}
 }

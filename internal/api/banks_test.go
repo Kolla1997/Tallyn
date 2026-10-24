@@ -29,6 +29,9 @@ const (
 type stubStore struct{}
 
 func (stubStore) Me(context.Context, string) (db.Me, error) { return db.Me{}, errors.New("stub") }
+func (stubStore) Export(context.Context, string) (db.Export, error) {
+	return db.Export{}, errors.New("stub")
+}
 func (stubStore) CreateHousehold(context.Context, string, string, string) (db.MyHousehold, error) {
 	return db.MyHousehold{}, errors.New("stub")
 }

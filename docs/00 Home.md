@@ -2,7 +2,7 @@
 type: guide
 status: active
 owner: Dinesh
-updated: 2026-10-23
+updated: 2026-10-24
 tags: [home]
 ---
 
@@ -22,6 +22,7 @@ tags: [home]
 - [[Feature - Bank Sync]]: transactions, spending by category, time and location
 - [[Feature - Sharing]]: who sees whose money, by choice
 - [[Feature - Household Members]]: invitations, roles, leaving
+- [[Feature - Your Data]]: download everything Tallyn holds about you (#54)
 
 ## Brand
 - [[Brand Guide]]: positioning, personality, brand basics

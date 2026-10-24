@@ -2,7 +2,7 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-23
+updated: 2026-10-24
 issues: [111, 113]
 tags: [spec, tech, testing]
 ---
@@ -78,6 +78,9 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Rate limits per user and per route | P1 | — | Yes | — | `security_test.go` (`TestLimiter`, `TestInviteAcceptRateLimit`) |
 | Legal pages and consent versions match the documents | P1 | — | Yes | No | `consent_test.go` (`TestConsentVersionsMatchDocuments`) |
 | Terms and Privacy reachable in the signed-in app: profile menu, ☰ menu on phones, new tab; no footer (#122) | P1 | Yes | — | No (#117) | `Shell.test.jsx`; sizes checked in the browser (#122 PR) |
+| Download your data: only your own rows (never accounts or transactions shared with you), no Plaid tokens, cursors, encrypted values or code hashes (#54) | P0 | Yes | Yes | No | `db/export_test.go` (`TestExportOnlyYours`), `api/export_test.go` (`TestExportZip`) |
+| Download your data needs a fresh 2FA code and is limited to 3 an hour (#54) | P0 | — | Yes | No | `api/export_test.go` (`TestExportNeedsFreshCode`, `TestExportRateLimit`) |
+| Settings → Download your data asks for a code, then saves the ZIP (#54) | P1 | Yes | — | No | `Settings.test.jsx` (download) |
 
 ### Households, family and sharing (ADR 0007, 0008, 0009)
 | Use case | P | Unit | Integration | End-to-end | Tests today |

@@ -46,6 +46,7 @@ type Store interface {
 	UpdateBudget(ctx context.Context, userID, budgetID string, b db.NewBudget) error
 	DeleteBudget(ctx context.Context, userID, budgetID string) error
 	SetCountInBudgets(ctx context.Context, userID, householdID string, on bool) error
+	Export(ctx context.Context, userID string) (db.Export, error) // #54
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -84,6 +85,7 @@ func NewRouter(d Deps) http.Handler {
 	api := http.NewServeMux()
 	api.HandleFunc("GET /api/me", me(d.Store))
 	api.HandleFunc("PUT /api/me", setMe(d.Store))
+	api.HandleFunc("GET /api/me/export", exportData(d.Store, lim.exports)) // #54
 	api.HandleFunc("GET /api/consent", consent(d.Store))
 	api.HandleFunc("POST /api/consent", acceptConsent(d.Store))
 	api.HandleFunc("GET /api/sharing", sharing(d.Store))
