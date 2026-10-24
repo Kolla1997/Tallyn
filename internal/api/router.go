@@ -57,6 +57,12 @@ type Store interface {
 	SavePlan(ctx context.Context, userID, householdID string, p db.NewPlan) (string, error)
 	DeletePlan(ctx context.Context, userID, planID string) error
 	RenameHousehold(ctx context.Context, userID, householdID, name string) (string, error) // #53
+	// Savings goals (#14).
+	Goals(ctx context.Context, userID, householdID string) ([]db.Goal, error)
+	CreateGoal(ctx context.Context, userID, householdID string, g db.NewGoal) (string, error)
+	UpdateGoal(ctx context.Context, userID, goalID string, g db.NewGoal) error
+	SetGoalSaved(ctx context.Context, userID, goalID string, savedMinor int64, today time.Time) error
+	DeleteGoal(ctx context.Context, userID, goalID string) error
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -135,6 +141,11 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("GET /api/plans/suggestion", planSuggestion(d.Store))
 	api.HandleFunc("PUT /api/plans", savePlan(d.Store))
 	api.HandleFunc("DELETE /api/plans/{id}", deletePlan(d.Store))
+	api.HandleFunc("GET /api/goals", goals(d.Store)) // #14
+	api.HandleFunc("POST /api/goals", createGoal(d.Store))
+	api.HandleFunc("PUT /api/goals/{id}", updateGoal(d.Store))
+	api.HandleFunc("PUT /api/goals/{id}/saved", setGoalSaved(d.Store))
+	api.HandleFunc("DELETE /api/goals/{id}", deleteGoal(d.Store))
 	api.HandleFunc("/api/", func(w http.ResponseWriter, _ *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found")
 	})

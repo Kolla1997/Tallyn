@@ -1,0 +1,133 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Goals draft</title><link rel="stylesheet" href="/web/src/fonts.css"/><link rel="stylesheet" href="/web/src/styles.css"/>
+<style>
+:root { --color-clay: #C8553D;
+    --color-sage: #6F9575;
+    --color-clay-deep: #B04A34;
+    --color-sage-deep: #4F7355;
+    --color-sage-light: #A9C5AC;
+    --color-cocoa: #3B2F2F;
+    --color-cream: #F6F1E9;
+    --color-sand: #ECE5D6;
+    --color-white: #FFFFFF;
+    --color-text-secondary: #55494A;
+    --color-border: #DDD3C3;
+    --color-success: #267A4C;
+    --color-warning: #D9962B;
+    --color-error: #B93A32;
+    --font-heading: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Montserrat', system-ui, sans-serif;
+    --font-button: 'Bricolage Grotesque', system-ui, sans-serif;
+    --radius-card: 22px;
+    --radius-button: 999px;
+    --radius-input: 14px;
+    --space-s1: 4px;
+    --space-s2: 8px;
+    --space-s3: 12px;
+    --space-s4: 16px;
+    --space-s5: 24px;
+    --space-s6: 32px;
+    --space-s7: 48px;
+    --space-s8: 64px;
+    --glass-surface: rgba(255, 255, 255, 0.7);
+    --glass-surface-dark: rgba(59, 47, 47, 0.86);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --glass-blur: blur(18px) saturate(1.2);
+    --glow-opacity: 0.55;
+    --card-shade: 0 6px 20px rgba(59, 47, 47, 0.10), 0 1px 3px rgba(59, 47, 47, 0.08); }
+html, body { overflow-x: clip; }
+.link:focus-visible, .btn:focus-visible, .chip:focus-visible { outline: 2px solid var(--color-clay-deep); outline-offset: 2px; }
+.d-top { background: var(--color-sand); color: var(--color-text-secondary); padding: var(--space-s2) var(--space-s4); font-size: 13px; position: relative; z-index: 2; }
+.d-wrap { max-width: 1000px; margin: 0 auto; padding: var(--space-s6) var(--space-s4); position: relative; z-index: 1; }
+.d-opt { margin-bottom: var(--space-s7); } .d-h { font-size: 20px; overflow-wrap: break-word; min-width: 0; }
+.d-why { color: var(--color-text-secondary); margin: var(--space-s2) 0 var(--space-s4); }
+.d-frame { border: 1px dashed var(--color-border); border-radius: var(--radius-card); padding: var(--space-s4); }
+.g-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-s4); flex-wrap: wrap; }
+.g-answer { margin: 0; font-size: 22px; } .g-sub { margin: var(--space-s1) 0 0; }
+.g-gap { height: var(--space-s4); }
+.g-rows, .g-undated { list-style: none; margin: 0; padding: 0; }
+.g-row { padding: var(--space-s3) 0; border-top: 1px solid var(--color-border); display: flex; flex-direction: column; gap: var(--space-s1); }
+.g-row:first-child { border-top: 0; }
+.g-rowtop { display: flex; justify-content: space-between; gap: var(--space-s2); flex-wrap: wrap; align-items: center; }
+.g-name { font-weight: 700; }
+.g-row p { margin: 0; }
+.g-hint { color: var(--color-cocoa); }
+b { font-family: var(--font-heading); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.g-done { color: var(--color-sage-deep); }
+.g-bar { height: 10px; border-radius: 5px; overflow: hidden; background: var(--color-sand); }
+.g-bar i { display: block; height: 100%; background: var(--color-clay-deep); border-radius: 5px; }
+.g-bar-big { height: 16px; border-radius: 8px; }
+.g-note { margin: 0; }
+.g-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-s3); }
+.g-tile { flex-direction: row; align-items: center; gap: var(--space-s3); }
+.g-tile h3 { margin: 0 0 var(--space-s1); font-size: 15px; } .g-tile p { margin: var(--space-s1) 0 0; }
+.g-ringtext { font-family: var(--font-heading); font-weight: 700; font-size: 16px; fill: var(--color-cocoa); }
+.g-step { margin: var(--space-s3) 0 0; font-size: 15px; }
+.g-time { list-style: none; margin: 0; padding: 0 0 0 var(--space-s1); border-left: 2px solid var(--color-border); }
+.g-time li { display: grid; grid-template-columns: 120px 14px minmax(0, 1fr); gap: var(--space-s2); align-items: start; padding: var(--space-s2) 0; }
+.g-when { font-weight: 600; color: var(--color-text-secondary); }
+.g-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--color-clay-deep); margin-top: var(--space-s1); }
+.g-undated li { padding: var(--space-s2) 0; display: flex; gap: var(--space-s2); flex-wrap: wrap; align-items: baseline; }
+.g-next { background: color-mix(in srgb, var(--color-sand) 60%, var(--color-white)); border-radius: var(--radius-card); padding: var(--space-s4); display: flex; flex-direction: column; gap: var(--space-s2); }
+.g-next p { margin: 0; } .g-nextname { font-family: var(--font-heading); font-weight: 700; font-size: 18px; }
+.g-private .g-meta { font-style: normal; }
+.g-form { gap: var(--space-s3); } .g-form h2 { margin: 0; }
+.g-form label { display: flex; flex-direction: column; gap: var(--space-s1); }
+.g-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-s3); }
+.g-form fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-s2); }
+.g-form legend { font-weight: 600; margin-bottom: var(--space-s2); }
+.g-choice { flex-direction: row !important; align-items: center; gap: var(--space-s2) !important; flex-wrap: wrap; padding: var(--space-s3); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-white); }
+.g-choice.is-on { border: 2px solid var(--color-clay-deep); }
+@media (max-width: 640px) { .g-time li { grid-template-columns: 14px minmax(0, 1fr); } .g-when { grid-column: 2; } .g-dot { grid-row: 1 / span 2; } }
+</style></head><body>
+<div class="d-top">Draft for <strong>#14</strong>. Not production code. All names and amounts are made up (24 October 2026)</div>
+<div class="d-wrap">
+<h1>Savings goals (#14)</h1>
+<p class="muted">Answer first, then the logic, then the data, as for your plan. Every option shows a goal whose progress is private to you, and a goal in EUR.</p>
+<section class="d-opt" id="opt-A"><h2 class="d-h">Option A: Plain: answer, then a row per goal</h2><p class="d-why">The answer in one sentence, then one row per goal: a plain bar, what's left in words, where progress comes from, who sees it, and what it takes to get there on time. The same reading order as your plan (3A).</p><div class="d-frame"><section class="panel"><div class="g-head"><div><h2 class="g-answer">You've saved $7,782 of $12,000 across 3 goals.</h2>
+<p class="muted g-sub">The Beach trip needs $200 a month to make June. Plus 1 goal in EUR.</p></div>
+<button class="btn">New goal</button></div><ul class="g-rows"><li class="g-row"><div class="g-rowtop"><span class="g-name">Beach trip</span><b>$1,600 to go</b></div><div class="g-bar " aria-hidden="true"><i style="width:68%"></i></div>
+<p class="small muted g-meta">$3,400 of $5,000 by June 2027. You update this one. Shared with James.</p>
+<p class="small g-hint">Put aside <b>$200 a month</b> to get there by June 2027.</p></li><li class="g-row"><div class="g-rowtop"><span class="g-name">Emergency fund</span><b>$2,030 to go</b></div><div class="g-bar " aria-hidden="true"><i style="width:66%"></i></div>
+<p class="small muted g-meta">$3,970 of $6,000. Follows High-yield savings. Everyone in the household.</p>
+<p class="small g-hint">No date set: it fills as you save.</p></li><li class="g-row"><div class="g-rowtop"><span class="g-name">Leo's school fund</span><b>$588 to go</b></div><div class="g-bar " aria-hidden="true"><i style="width:41%"></i></div>
+<p class="small muted g-meta">$412 of $1,000 by September 2027. Follows Leo's Teen savings. Everyone in the household.</p>
+<p class="small g-hint">Put aside <b>$53 a month</b> to get there by September 2027.</p></li><li class="g-row"><div class="g-rowtop"><span class="g-name">Paris trip</span><b>€1,700 to go</b></div><div class="g-bar " aria-hidden="true"><i style="width:32%"></i></div>
+<p class="small muted g-meta">€800 of €2,500 by August 2027. You update this one. Only me.</p>
+<p class="small g-hint">Put aside <b>€170 a month</b> to get there by August 2027.</p></li><li class="g-row g-private"><div class="g-rowtop"><span class="g-name">Pat's car fund</span><span class="pace pace-full">Progress is private</span></div>
+<p class="small muted g-meta">Target $4,000. Follows Pat's savings, which Pat hasn't shared with you, so its progress stays private.</p></li></ul><p class="small muted g-note">Tallyn can't move money. Move it in your bank's app: goals that follow an account update at the next bank update; update the others yourself.</p></section></div></section><section class="d-opt" id="opt-B"><h2 class="d-h">Option B: Goal tiles with a ring</h2><p class="d-why">Each goal is a glass tile with a ring and its percent, like the tiles on Budgets. Quick to scan when there are a few goals; rings say less than words once there are many.</p><div class="d-frame"><section class="panel"><div class="g-head"><div><h2 class="g-answer">You've saved $7,782 of $12,000 across 3 goals.</h2>
+<p class="muted g-sub">The Beach trip needs $200 a month to make June. Plus 1 goal in EUR.</p></div>
+<button class="btn">New goal</button></div></section><div class="g-gap"></div><div class="g-tiles"><article class="budget-tile g-tile"><svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true"><circle cx="40" cy="40" r="34" fill="none" stroke="var(--color-sand)" stroke-width="9"/>
+<circle cx="40" cy="40" r="34" fill="none" stroke="var(--color-clay-deep)" stroke-width="9" stroke-linecap="round" stroke-dasharray="145.3 213.6" transform="rotate(-90 40 40)"/>
+<text x="40" y="45" text-anchor="middle" class="g-ringtext">68%</text></svg><div><h3>Beach trip</h3><b>$1,600 to go</b><p class="small muted">$3,400 of $5,000 by June 2027</p><p class="small g-hint">Put aside <b>$200 a month</b> to get there by June 2027.</p></div></article><article class="budget-tile g-tile"><svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true"><circle cx="40" cy="40" r="34" fill="none" stroke="var(--color-sand)" stroke-width="9"/>
+<circle cx="40" cy="40" r="34" fill="none" stroke="var(--color-clay-deep)" stroke-width="9" stroke-linecap="round" stroke-dasharray="141.4 213.6" transform="rotate(-90 40 40)"/>
+<text x="40" y="45" text-anchor="middle" class="g-ringtext">66%</text></svg><div><h3>Emergency fund</h3><b>$2,030 to go</b><p class="small muted">$3,970 of $6,000</p><p class="small g-hint">No date set: it fills as you save.</p></div></article><article class="budget-tile g-tile"><svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true"><circle cx="40" cy="40" r="34" fill="none" stroke="var(--color-sand)" stroke-width="9"/>
+<circle cx="40" cy="40" r="34" fill="none" stroke="var(--color-clay-deep)" stroke-width="9" stroke-linecap="round" stroke-dasharray="88.0 213.6" transform="rotate(-90 40 40)"/>
+<text x="40" y="45" text-anchor="middle" class="g-ringtext">41%</text></svg><div><h3>Leo's school fund</h3><b>$588 to go</b><p class="small muted">$412 of $1,000 by September 2027</p><p class="small g-hint">Put aside <b>$53 a month</b> to get there by September 2027.</p></div></article><article class="budget-tile g-tile"><svg viewBox="0 0 80 80" width="80" height="80" aria-hidden="true"><circle cx="40" cy="40" r="34" fill="none" stroke="var(--color-sand)" stroke-width="9"/>
+<circle cx="40" cy="40" r="34" fill="none" stroke="var(--color-clay-deep)" stroke-width="9" stroke-linecap="round" stroke-dasharray="68.4 213.6" transform="rotate(-90 40 40)"/>
+<text x="40" y="45" text-anchor="middle" class="g-ringtext">32%</text></svg><div><h3>Paris trip</h3><b>€1,700 to go</b><p class="small muted">€800 of €2,500 by August 2027</p><p class="small g-hint">Put aside <b>€170 a month</b> to get there by August 2027.</p></div></article><article class="budget-tile g-tile g-private"><div><h3>Pat's car fund</h3><span class="pace pace-full">Progress is private</span><p class="small muted">Target $4,000</p></div></article></div></div></section><section class="d-opt" id="opt-C"><h2 class="d-h">Option C: By date</h2><p class="d-why">Goals in the order they're due, along a simple timeline, then the ones with no date. Answers "what's coming up?" best; weaker at comparing sizes.</p><div class="d-frame"><section class="panel"><div class="g-head"><div><h2 class="g-answer">You've saved $7,782 of $12,000 across 3 goals.</h2>
+<p class="muted g-sub">The Beach trip needs $200 a month to make June. Plus 1 goal in EUR.</p></div>
+<button class="btn">New goal</button></div><h3 class="g-step">Coming up</h3><ol class="g-time"><li><span class="g-when">June 2027</span><span class="g-dot"></span><span class="g-what"><span class="g-name">Beach trip</span> <b>$1,600 to go</b><span class="small block g-hint">Put aside <b>$200 a month</b> to get there by June 2027.</span></span></li><li><span class="g-when">August 2027</span><span class="g-dot"></span><span class="g-what"><span class="g-name">Paris trip</span> <b>€1,700 to go</b><span class="small block g-hint">Put aside <b>€170 a month</b> to get there by August 2027.</span></span></li><li><span class="g-when">September 2027</span><span class="g-dot"></span><span class="g-what"><span class="g-name">Leo's school fund</span> <b>$588 to go</b><span class="small block g-hint">Put aside <b>$53 a month</b> to get there by September 2027.</span></span></li></ol><h3 class="g-step">Any time</h3><ul class="g-undated"><li><span class="g-name">Emergency fund</span> <b>$2,030 to go</b> <span class="small muted">no date</span></li><li><span class="g-name">Pat's car fund</span> <span class="pace pace-full">Progress is private</span></li></ul><p class="small muted g-note">Tallyn can't move money. Move it in your bank's app: goals that follow an account update at the next bank update; update the others yourself.</p></section></div></section><section class="d-opt" id="opt-D"><h2 class="d-h">Option D: Mix (recommended): A's answer, C's "next up", A's rows</h2><p class="d-why">The answer first (A), then the goal due soonest set big (from C's timeline), because that's the one to act on this month, then every goal as a plain row (A). Words carry the meaning; one bar per goal.</p><div class="d-frame"><section class="panel"><div class="g-head"><div><h2 class="g-answer">You've saved $7,782 of $12,000 across 3 goals.</h2>
+<p class="muted g-sub">The Beach trip needs $200 a month to make June. Plus 1 goal in EUR.</p></div>
+<button class="btn">New goal</button></div><div class="g-next"><p class="small muted">Next up</p><p class="g-nextname">Beach trip, by June 2027</p><div class="g-bar g-bar-big" aria-hidden="true"><i style="width:68%"></i></div>
+<p><b>$1,600 to go</b> <span class="muted">$3,400 of $5,000</span></p><p class="g-hint">Put aside <b>$200 a month</b> to get there by June 2027.</p></div><h3 class="g-step">All goals</h3><ul class="g-rows"><li class="g-row"><div class="g-rowtop"><span class="g-name">Beach trip</span><b>$1,600 to go</b></div><div class="g-bar " aria-hidden="true"><i style="width:68%"></i></div>
+<p class="small muted g-meta">$3,400 of $5,000 by June 2027. You update this one. Shared with James.</p>
+<p class="small g-hint">Put aside <b>$200 a month</b> to get there by June 2027.</p></li><li class="g-row"><div class="g-rowtop"><span class="g-name">Emergency fund</span><b>$2,030 to go</b></div><div class="g-bar " aria-hidden="true"><i style="width:66%"></i></div>
+<p class="small muted g-meta">$3,970 of $6,000. Follows High-yield savings. Everyone in the household.</p>
+<p class="small g-hint">No date set: it fills as you save.</p></li><li class="g-row"><div class="g-rowtop"><span class="g-name">Leo's school fund</span><b>$588 to go</b></div><div class="g-bar " aria-hidden="true"><i style="width:41%"></i></div>
+<p class="small muted g-meta">$412 of $1,000 by September 2027. Follows Leo's Teen savings. Everyone in the household.</p>
+<p class="small g-hint">Put aside <b>$53 a month</b> to get there by September 2027.</p></li><li class="g-row"><div class="g-rowtop"><span class="g-name">Paris trip</span><b>€1,700 to go</b></div><div class="g-bar " aria-hidden="true"><i style="width:32%"></i></div>
+<p class="small muted g-meta">€800 of €2,500 by August 2027. You update this one. Only me.</p>
+<p class="small g-hint">Put aside <b>€170 a month</b> to get there by August 2027.</p></li><li class="g-row g-private"><div class="g-rowtop"><span class="g-name">Pat's car fund</span><span class="pace pace-full">Progress is private</span></div>
+<p class="small muted g-meta">Target $4,000. Follows Pat's savings, which Pat hasn't shared with you, so its progress stays private.</p></li></ul><p class="small muted g-note">Tallyn can't move money. Move it in your bank's app: goals that follow an account update at the next bank update; update the others yourself.</p></section></div></section>
+<section class="d-opt" id="form"><h2 class="d-h">New goal (same in every option)</h2><p class="d-why">Name, target, an optional date, how it fills, and who can see it.</p><div class="d-frame"><section class="panel g-form"><h2>New goal</h2>
+<label>Name<input value="Beach trip"/></label>
+<div class="g-two"><label>Target<input value="5,000" inputmode="decimal"/></label><label>By (optional)<input value="June 2027"/></label></div>
+<fieldset><legend>How it fills</legend>
+<label class="g-choice is-on"><input type="radio" name="f" checked/> Follow a savings account <select><option>High-yield savings, USD</option><option>Euro savings, EUR</option></select></label>
+<label class="g-choice"><input type="radio" name="f"/> I'll update it myself</label></fieldset>
+<fieldset><legend>Who can see it</legend><div class="chips"><button class="chip" aria-pressed="false">Only me</button><button class="chip" aria-pressed="true">Me and James</button><button class="chip" aria-pressed="false">Everyone in the household</button></div>
+<p class="small muted">People who can't see that account's balance see the goal's name and target only.</p></fieldset>
+<div><button class="btn">Create goal</button></div></section></div></section>
+</div></body></html>

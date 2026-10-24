@@ -59,6 +59,10 @@ The app never logs in as `postgres` (ADR 0006). After running `migrations/0006_a
 3. For testing, `SYNC_EVERY=2m` in `.env` makes it sync more often (minimum 1m)
 4. A new link syncs within a minute or two; the log shows counts only (`sync: bank <id>: 16 added or changed, ...`)
 
+## Savings goals (#14)
+1. Run `migrations/0018_goals.sql` on the Supabase project, after 0001–0017
+2. Goals that follow an account get their monthly history from the bank sync's daily job, so `DATABASE_URL_SYNC` must be set where it should run. The forecast shows after a goal's second month
+
 ## Plan from your income (#133)
 1. Run `migrations/0017_income_plans.sql` on the Supabase project, after 0001–0016
 2. Budgets → Plan your month suggests an income from the last 3 full months of pay. Sandbox banks have little pay history, so expect "no suggestion" and type one in

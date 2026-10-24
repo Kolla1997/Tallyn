@@ -24,6 +24,7 @@ func TestExportOnlyYours(t *testing.T) {
 		values ($1, null, 'FOOD_AND_DRINK', 'month', 50000, 'USD', $2), ($1, $3, null, 'week', 2000, 'USD', $2)`, f.testHH, alice, carl)
 	mustExec(t, f.admin, `insert into consents (user_id, document, version) values ($1, 'terms', '2026-10-01'), ($2, 'terms', '2026-10-01')`, alice, carl)
 	mustExec(t, f.admin, `update profiles set display_name = 'Carl' where id = $1`, carl)
+	mustExec(t, f.admin, `insert into goals (household_id, owner_user_id, name, target_minor, currency, visibility, saved_minor) values ($1, $2, 'Beach trip', 500000, 'USD', 'everyone', 340000), ($1, $3, 'Carl''s laptop', 90000, 'USD', 'me', 0)`, f.testHH, alice, carl)
 
 	if n := f.count(t, alice, `select count(*) from transactions`); n != 2 {
 		t.Fatalf("setup: alice should be able to read 2 transactions (hers and Carl's), got %d", n)
@@ -47,6 +48,9 @@ func TestExportOnlyYours(t *testing.T) {
 	}
 	if len(e.Budgets) != 2 || e.Budgets[0].For != "household" || e.Budgets[1].For != "Carl" || e.Budgets[1].Category != nil {
 		t.Errorf("budgets = %+v", e.Budgets)
+	}
+	if len(e.Goals) != 1 || e.Goals[0].Name != "Beach trip" || e.Goals[0].SavedMinor != 340000 {
+		t.Errorf("goals = %+v, want only alice's own", e.Goals)
 	}
 	if len(e.Agreements) != 1 {
 		t.Errorf("agreements = %+v, want only alice's", e.Agreements)
