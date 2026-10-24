@@ -159,8 +159,8 @@ const exportReadme = `Your Tallyn data
 ================
 
 This is everything Tallyn holds about you: your own profile, banks, accounts,
-transactions, card and loan details, budgets you made, what you share and with
-whom, and the Terms and Privacy versions you agreed to.
+transactions, card and loan details, budgets you made, your savings goals,
+what you share and with whom, and the Terms and Privacy versions you agreed to.
 
 It never includes other people's money, even if they share it with you, the
 invites you sent (they hold other people's email addresses), or anything

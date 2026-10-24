@@ -23,6 +23,7 @@ type Export struct {
 	CreditCards  []ExportCreditCard  `json:"credit_cards"`
 	Loans        []ExportLoan        `json:"loans"`
 	Budgets      []ExportBudget      `json:"budgets"`
+	Goals        []ExportGoal        `json:"goals"`
 	Sharing      []ExportShare       `json:"sharing"`
 	Agreements   []ExportAgreement   `json:"agreements"`
 	BackupCodes  ExportBackupCodes   `json:"backup_codes"`
@@ -136,6 +137,17 @@ type ExportBudget struct {
 	CreatedAt   time.Time `json:"created_at"`
 }
 
+// ExportGoal is one of the person's own savings goals (#14).
+type ExportGoal struct {
+	Name        string  `json:"name"`
+	TargetMinor int64   `json:"target_minor"`
+	Currency    string  `json:"currency"`
+	By          *string `json:"by_month"`
+	Follows     *string `json:"follows_account"`
+	WhoSees     string  `json:"who_sees"` // me, member or everyone
+	SavedMinor  int64   `json:"saved_minor"`
+}
+
 // ExportShare is something the person shares with someone else.
 type ExportShare struct {
 	Household  string    `json:"household"`
@@ -221,6 +233,16 @@ func (d *DB) Export(ctx context.Context, userID string) (Export, error) {
 			join public.households h on h.id = b.household_id
 			left join public.profiles p on p.id = b.member_user_id
 			where b.created_by = $1 order by b.created_at`, userID)); err != nil {
+			return err
+		}
+		if e.Goals, err = collect[ExportGoal](tx.Query(ctx, `
+			select g.name, g.target_minor, g.currency, to_char(g.by_month, 'YYYY-MM'),
+			       case when a.id is null then null else a.name || coalesce(' ••' || a.mask, '') end,
+			       g.visibility, coalesce(p.saved_minor, 0)
+			from public.goals g
+			left join public.accounts a on a.id = g.account_id
+			left join lateral public.goal_progress(g.id) p on true
+			where g.owner_user_id = $1 order by g.created_at`, userID)); err != nil {
 			return err
 		}
 		if e.Sharing, err = collect[ExportShare](tx.Query(ctx, `

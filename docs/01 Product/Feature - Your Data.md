@@ -25,6 +25,7 @@ Anyone can download everything Tallyn holds about them from Settings, in one ste
 - Your banks (institution, status, linked and last-synced dates) and accounts (name, type, last 4 digits, currency, balances)
 - Your transactions, with their time and place; your card and loan details
 - Budgets you made, your "count my spending" choice per household
+- Your savings goals: name, target, currency, month, the account it follows, who sees it, amount saved (#14)
 - Who you share with and what (by their display name)
 - Your Terms and Privacy agreements (versions and dates)
 - Backup codes: how many are left and when they were made

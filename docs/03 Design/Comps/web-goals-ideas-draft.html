@@ -1,0 +1,167 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Goals draft 2</title><link rel="stylesheet" href="/web/src/fonts.css"/><link rel="stylesheet" href="/web/src/styles.css"/>
+<style>
+:root { --color-clay: #C8553D;
+    --color-sage: #6F9575;
+    --color-clay-deep: #B04A34;
+    --color-sage-deep: #4F7355;
+    --color-sage-light: #A9C5AC;
+    --color-cocoa: #3B2F2F;
+    --color-cream: #F6F1E9;
+    --color-sand: #ECE5D6;
+    --color-white: #FFFFFF;
+    --color-text-secondary: #55494A;
+    --color-border: #DDD3C3;
+    --color-success: #267A4C;
+    --color-warning: #D9962B;
+    --color-error: #B93A32;
+    --font-heading: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Montserrat', system-ui, sans-serif;
+    --font-button: 'Bricolage Grotesque', system-ui, sans-serif;
+    --radius-card: 22px;
+    --radius-button: 999px;
+    --radius-input: 14px;
+    --space-s1: 4px;
+    --space-s2: 8px;
+    --space-s3: 12px;
+    --space-s4: 16px;
+    --space-s5: 24px;
+    --space-s6: 32px;
+    --space-s7: 48px;
+    --space-s8: 64px;
+    --glass-surface: rgba(255, 255, 255, 0.7);
+    --glass-surface-dark: rgba(59, 47, 47, 0.86);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --glass-blur: blur(18px) saturate(1.2);
+    --glow-opacity: 0.55;
+    --card-shade: 0 6px 20px rgba(59, 47, 47, 0.10), 0 1px 3px rgba(59, 47, 47, 0.08); }
+html, body { overflow-x: clip; }
+.btn:focus-visible, .link:focus-visible { outline: 2px solid var(--color-clay-deep); outline-offset: 2px; }
+.d-top { background: var(--color-sand); color: var(--color-text-secondary); padding: var(--space-s2) var(--space-s4); font-size: 13px; position: relative; z-index: 2; }
+.d-wrap { max-width: 1100px; margin: 0 auto; padding: var(--space-s6) var(--space-s4); position: relative; z-index: 1; }
+.d-opt { margin-bottom: var(--space-s7); } .d-h { font-size: 20px; overflow-wrap: break-word; min-width: 0; }
+.d-why { max-width: 760px; color: var(--color-text-secondary); margin: var(--space-s2) 0 var(--space-s4); }
+.d-frame { border: 1px dashed var(--color-border); border-radius: var(--radius-card); padding: var(--space-s4); }
+.d-gap { height: var(--space-s4); }
+.d-rule { max-width: 860px; }
+.parts { width: 100%; border-collapse: collapse; font-size: 14px; margin: var(--space-s3) 0; }
+.parts th, .parts td { text-align: left; padding: var(--space-s2); border-bottom: 1px solid var(--color-border); vertical-align: top; }
+.parts-wrap { overflow-x: auto; }
+.g-h2, .g-answer h2 { margin: 0; font-size: 22px; }
+.g-answer p { margin: var(--space-s1) 0 0; }
+.g-step { margin: 0; font-size: 15px; }
+b { font-variant-numeric: tabular-nums; }
+/* E: pots */
+.pots { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-s3); }
+.pot { display: flex; flex-direction: column; gap: var(--space-s2); padding: var(--space-s3); border-radius: var(--radius-card); background: var(--glass-surface); border: 1px solid var(--glass-border); }
+.pot-jar { position: relative; height: 120px; border-radius: 18px 18px 26px 26px; overflow: hidden; background: color-mix(in srgb, var(--c, var(--color-sand)) 14%, var(--color-white)); border: 2px solid color-mix(in srgb, var(--c, var(--color-border)) 45%, var(--color-white)); }
+.pot-fill { position: absolute; left: 0; right: 0; bottom: 0; background: var(--c); }
+.pot-mark { position: absolute; left: 0; right: 0; border-top: 1px dashed color-mix(in srgb, var(--color-cocoa) 35%, transparent); }
+.pot-locked { background: repeating-linear-gradient(135deg, var(--color-sand) 0 8px, var(--color-white) 8px 16px); }
+.pot-text h3 { margin: 0; font-size: 15px; overflow-wrap: anywhere; }
+.pot-togo { margin: 0; font-size: 18px; font-family: var(--font-heading); }
+.pot-text p { margin: 0; }
+/* F: journey */
+.journey { padding: var(--space-s3) 0; border-top: 1px solid var(--color-border); }
+.journey:first-of-type { border-top: 0; }
+.j-head { display: flex; justify-content: space-between; gap: var(--space-s2); flex-wrap: wrap; }
+.j-head h3 { margin: 0; font-size: 15px; }
+.j-track { position: relative; height: 10px; border-radius: 5px; background: color-mix(in srgb, var(--c) 18%, var(--color-white)); margin: var(--space-s5) var(--space-s3) var(--space-s6); }
+.j-fill { position: absolute; inset: 0 auto 0 0; border-radius: 5px; background: var(--c); }
+.j-nodes { list-style: none; margin: 0; padding: 0; }
+.j-node { position: absolute; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; }
+.j-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--color-white); border: 3px solid color-mix(in srgb, var(--c) 40%, var(--color-white)); }
+.j-node.is-done .j-dot { background: var(--c); border-color: var(--c); }
+.j-label { position: absolute; top: 22px; white-space: nowrap; color: var(--color-text-secondary); }
+.j-you { position: absolute; top: -26px; transform: translateX(-50%); font-size: 12px; font-weight: 700; background: var(--color-cocoa); color: var(--color-cream); padding: 0 var(--space-s2); border-radius: var(--radius-button); }
+.j-next { margin: 0; }
+/* G: forecast */
+.f-answer h3 { margin: 0; font-size: 20px; }
+.f-answer p { margin: var(--space-s1) 0 0; }
+.f-chart { width: 100%; height: auto; display: block; margin: var(--space-s3) 0; }
+.f-line { fill: none; stroke: var(--color-clay-deep); stroke-width: 3; stroke-linejoin: round; }
+.f-proj { fill: none; stroke: var(--color-clay-deep); stroke-width: 2; stroke-dasharray: 5 6; }
+.f-target { stroke: var(--color-text-secondary); stroke-dasharray: 2 4; }
+.f-by { stroke: var(--color-border); }
+.f-dot { fill: var(--color-sage-deep); } .f-now { fill: var(--color-clay-deep); }
+.f-tick { font-size: 11px; fill: var(--color-text-secondary); }
+/* H: checklist */
+.c-list { list-style: none; margin: var(--space-s3) 0 0; padding: 0; }
+.c-row { display: flex; align-items: flex-start; gap: var(--space-s3); padding: var(--space-s3) 0; border-top: 1px solid var(--color-border); }
+.c-row:first-child { border-top: 0; }
+.c-check { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--color-border); margin-top: 2px; }
+.c-row.is-done .c-check { background: var(--color-sage-deep); border-color: var(--color-sage-deep); box-shadow: inset 0 0 0 4px var(--color-white); }
+.c-name { font-weight: 600; }
+.c-row.is-done .c-name { color: var(--color-text-secondary); }
+</style></head><body>
+<div class="d-top">Draft 2 for <strong>#14</strong>. Not production code. All names and amounts are made up (24 October 2026).</div>
+<div class="d-wrap">
+<h1>Goals: new ideas</h1>
+<section class="d-rule panel"><h2 class="g-h2">What "mix" means</h2>
+<p>A page has parts. A mix takes, <b>part by part</b>, the idea that does that part best, and says where each came from. So every option below differs in each part, and the mix picks per row:</p>
+<div class="parts-wrap"><table class="parts"><thead><tr><th>Part of the page</th><th>E Pots</th><th>F Journey</th><th>G Forecast</th><th>H This month</th><th>Mix takes</th></tr></thead><tbody>
+<tr><td>Summary</td><td>Total in a jar</td><td>Milestones reached</td><td>"Ahead or behind"</td><td><b>What to do this month</b></td><td>H</td></tr>
+<tr><td>The list of goals</td><td><b>A row of pots</b></td><td>A path per goal</td><td>A line per goal</td><td>Ticks only</td><td>E</td></tr>
+<tr><td>One goal up close</td><td>A big pot</td><td>Next milestone</td><td><b>Forecast</b></td><td>History of ticks</td><td>G, with F's next milestone</td></tr>
+<tr><td>Making a goal</td><td colspan="4">Same form in all: name, target, optional month, how it fills, who sees it</td><td>Same</td></tr></tbody></table></div>
+<p class="small muted">Patterns borrowed from big products (savings pots, milestone paths, trend charts, to-do lists), drawn in Tallyn's own colours, type and glass. Nothing copied.</p></section>
+<div class="d-gap"></div>
+<section class="d-opt" id="opt-E"><h2 class="d-h">Option E: Pots: every goal a jar that fills</h2><p class="d-why">Like savings pots and vaults in banking apps: each goal is a glass jar that fills from the bottom, with what's left in big type. The fastest thing to read on a phone; a goal you can't see the money for shows a locked jar.</p><div class="d-frame"><section class="panel"><h2 class="g-h2">You've saved $7,782 of $12,000.</h2><div class="pots"><article class="pot" style="--c:var(--color-clay-deep)">
+<div class="pot-jar" role="img" aria-label="Beach trip: 68% saved"><span class="pot-fill" style="height:68%"></span><span class="pot-mark" style="bottom:50%"></span></div>
+<div class="pot-text"><h3>Beach trip</h3><p class="pot-togo"><b>$1,600</b> to go</p>
+<p class="small muted">$3,400 of $5,000 by June 2027</p></div></article><article class="pot" style="--c:var(--color-sage-deep)">
+<div class="pot-jar" role="img" aria-label="Leo's school fund: 41% saved"><span class="pot-fill" style="height:41%"></span><span class="pot-mark" style="bottom:50%"></span></div>
+<div class="pot-text"><h3>Leo's school fund</h3><p class="pot-togo"><b>$588</b> to go</p>
+<p class="small muted">$412 of $1,000 by September 2027</p></div></article><article class="pot" style="--c:var(--color-cocoa)">
+<div class="pot-jar" role="img" aria-label="Paris trip: 15% saved"><span class="pot-fill" style="height:15%"></span><span class="pot-mark" style="bottom:50%"></span></div>
+<div class="pot-text"><h3>Paris trip</h3><p class="pot-togo"><b>€1,700</b> to go</p>
+<p class="small muted">€300 of €2,000 by August 2027</p></div></article><article class="pot" style="--c:var(--color-sage)">
+<div class="pot-jar" role="img" aria-label="Emergency fund: 66% saved"><span class="pot-fill" style="height:66%"></span><span class="pot-mark" style="bottom:50%"></span></div>
+<div class="pot-text"><h3>Emergency fund</h3><p class="pot-togo"><b>$2,030</b> to go</p>
+<p class="small muted">$3,970 of $6,000</p></div></article><article class="pot pot-private"><div class="pot-jar pot-locked" aria-hidden="true"></div><div class="pot-text"><h3>Pat's car fund</h3><p class="small muted">Target $8,000</p><span class="pace pace-full">Progress is private</span></div></article></div></section></div></section><section class="d-opt" id="opt-F"><h2 class="d-h">Option F: Journey: milestones to celebrate</h2><p class="d-why">Like milestone paths in fitness and learning apps: each goal is a path with a quarter, halfway, three quarters and there, and "You" on it. The next milestone is always close, which keeps people going.</p><div class="d-frame"><section class="panel"><h2 class="g-h2">Beach trip just passed halfway.</h2><article class="journey" style="--c:var(--color-clay-deep)"><div class="j-head"><h3>Beach trip</h3><span class="small muted">$3,400 of $5,000</span></div>
+<div class="j-track" aria-hidden="true"><span class="j-fill" style="width:68%"></span><ol class="j-nodes"><li class="j-node is-done" style="left:25%"><span class="j-dot"></span><span class="j-label small">A quarter</span></li><li class="j-node is-done" style="left:50%"><span class="j-dot"></span><span class="j-label small">Halfway</span></li><li class="j-node" style="left:75%"><span class="j-dot"></span><span class="j-label small">Three quarters</span></li><li class="j-node" style="left:100%"><span class="j-dot"></span><span class="j-label small">There</span></li></ol><span class="j-you" style="left:68%">You</span></div>
+<p class="j-next"><b>$350</b> to three quarters.</p></article><article class="journey" style="--c:var(--color-sage-deep)"><div class="j-head"><h3>Leo's school fund</h3><span class="small muted">$412 of $1,000</span></div>
+<div class="j-track" aria-hidden="true"><span class="j-fill" style="width:41%"></span><ol class="j-nodes"><li class="j-node is-done" style="left:25%"><span class="j-dot"></span><span class="j-label small">A quarter</span></li><li class="j-node" style="left:50%"><span class="j-dot"></span><span class="j-label small">Halfway</span></li><li class="j-node" style="left:75%"><span class="j-dot"></span><span class="j-label small">Three quarters</span></li><li class="j-node" style="left:100%"><span class="j-dot"></span><span class="j-label small">There</span></li></ol><span class="j-you" style="left:41%">You</span></div>
+<p class="j-next"><b>$88</b> to halfway.</p></article><article class="journey" style="--c:var(--color-cocoa)"><div class="j-head"><h3>Paris trip</h3><span class="small muted">€300 of €2,000</span></div>
+<div class="j-track" aria-hidden="true"><span class="j-fill" style="width:15%"></span><ol class="j-nodes"><li class="j-node" style="left:25%"><span class="j-dot"></span><span class="j-label small">A quarter</span></li><li class="j-node" style="left:50%"><span class="j-dot"></span><span class="j-label small">Halfway</span></li><li class="j-node" style="left:75%"><span class="j-dot"></span><span class="j-label small">Three quarters</span></li><li class="j-node" style="left:100%"><span class="j-dot"></span><span class="j-label small">There</span></li></ol><span class="j-you" style="left:15%">You</span></div>
+<p class="j-next"><b>€200</b> to a quarter.</p></article></section></div></section><section class="d-opt" id="opt-G"><h2 class="d-h">Option G: Forecast: where this pace lands</h2><p class="d-why">Like trend charts in analytics and health apps: what you've saved month by month, and a dotted line to where that pace reaches the target. Answers "will we make it?" in one sentence. Needs goal history (new: a monthly snapshot).</p><div class="d-frame"><section class="panel"><div class="f-answer"><h3>Beach trip: at this pace you'll be there in <b>March</b>, about 3 months early.</h3>
+<p class="small muted">You've added about $320 a month since May. June needs $200 a month.</p></div>
+<svg class="f-chart" viewBox="0 0 640 220" role="img" aria-label="Beach trip saved each month since May, and where this pace reaches the target">
+<line x1="30" x2="610" y1="42" y2="42" class="f-target"/><text x="30" y="36" class="f-tick">Target $5,000</text>
+<line x1="610" x2="610" y1="30" y2="190" class="f-by"/><text x="606" y="40" text-anchor="end" class="f-tick">By June</text>
+<polyline points="30,137 75,128 119,119 164,110 208,101 253,89" class="f-line"/><polyline points="253,89 476,42" class="f-proj"/><circle cx="476" cy="42" r="5" class="f-dot"/>
+<circle cx="253" cy="89" r="4" class="f-now"/><text x="30" y="212" text-anchor="middle" class="f-tick">May</text><text x="119" y="212" text-anchor="middle" class="f-tick">Jul</text><text x="208" y="212" text-anchor="middle" class="f-tick">Sep</text><text x="298" y="212" text-anchor="middle" class="f-tick">Nov</text><text x="387" y="212" text-anchor="middle" class="f-tick">Jan</text><text x="476" y="212" text-anchor="middle" class="f-tick">Mar</text><text x="565" y="212" text-anchor="middle" class="f-tick">May</text></svg>
+<p class="small muted">Solid: what you've saved. Dotted: where this pace goes. Needs a little history: a goal shows its forecast after its second month.</p></section></div></section><section class="d-opt" id="opt-H"><h2 class="d-h">Option H: This month: a checklist of set-asides</h2><p class="d-why">Like to-do lists and instalment plans: the month as a short list of "put aside $200 for Beach trip", ticked as money lands. Turns goals into one thing to do this month. Needs each account's balance on the 1st (new: a monthly snapshot).</p><div class="d-frame"><section class="panel"><div class="g-answer"><h2>2 of 3 set-asides are done this month.</h2>
+<p class="muted">Paris trip still needs <b>€170</b> by 31 October. You've saved $7,782 of $12,000 across your dollar goals, plus 1 goal in euros.</p></div><ul class="c-list"><li class="c-row is-done"><span class="c-check" aria-hidden="true"></span><span class="grow"><span class="block c-name">Put aside $200 for Beach trip</span>
+<span class="small muted">Done: $400 added this month</span></span><span class="small muted">by 31 Oct</span></li><li class="c-row is-done"><span class="c-check" aria-hidden="true"></span><span class="grow"><span class="block c-name">Put aside $53 for Leo's school fund</span>
+<span class="small muted">Done: $60 added this month</span></span><span class="small muted">by 31 Oct</span></li><li class="c-row"><span class="c-check" aria-hidden="true"></span><span class="grow"><span class="block c-name">Put aside €170 for Paris trip</span>
+<span class="small muted">Not yet this month. You update this one.</span></span><span class="small muted">by 31 Oct</span></li></ul><p class="small muted">Goals that follow an account tick themselves when the balance grows. Others tick when you update the amount.</p></section></div></section><section class="d-opt" id="opt-Mix"><h2 class="d-h">Mix (recommended): H's month, E's pots, G's forecast</h2><p class="d-why">Part by part: the summary is <b>H</b> (what to do this month, the most useful question), the list is <b>E</b> (pots read fastest), one goal up close is <b>G</b>'s forecast plus <b>F</b>'s next milestone (the honest answer, plus something close to aim for).</p><div class="d-frame"><section class="panel"><div class="g-answer"><h2>2 of 3 set-asides are done this month.</h2>
+<p class="muted">Paris trip still needs <b>€170</b> by 31 October. You've saved $7,782 of $12,000 across your dollar goals, plus 1 goal in euros.</p></div><ul class="c-list"><li class="c-row is-done"><span class="c-check" aria-hidden="true"></span><span class="grow"><span class="block c-name">Put aside $200 for Beach trip</span>
+<span class="small muted">Done: $400 added this month</span></span><span class="small muted">by 31 Oct</span></li><li class="c-row is-done"><span class="c-check" aria-hidden="true"></span><span class="grow"><span class="block c-name">Put aside $53 for Leo's school fund</span>
+<span class="small muted">Done: $60 added this month</span></span><span class="small muted">by 31 Oct</span></li><li class="c-row"><span class="c-check" aria-hidden="true"></span><span class="grow"><span class="block c-name">Put aside €170 for Paris trip</span>
+<span class="small muted">Not yet this month. You update this one.</span></span><span class="small muted">by 31 Oct</span></li></ul><p class="small muted">Goals that follow an account tick themselves when the balance grows. Others tick when you update the amount.</p></section><div class="d-gap"></div>
+<section class="panel"><h3 class="g-step">Your goals</h3><div class="pots"><article class="pot" style="--c:var(--color-clay-deep)">
+<div class="pot-jar" role="img" aria-label="Beach trip: 68% saved"><span class="pot-fill" style="height:68%"></span><span class="pot-mark" style="bottom:50%"></span></div>
+<div class="pot-text"><h3>Beach trip</h3><p class="pot-togo"><b>$1,600</b> to go</p>
+<p class="small muted">$3,400 of $5,000 by June 2027</p></div></article><article class="pot" style="--c:var(--color-sage-deep)">
+<div class="pot-jar" role="img" aria-label="Leo's school fund: 41% saved"><span class="pot-fill" style="height:41%"></span><span class="pot-mark" style="bottom:50%"></span></div>
+<div class="pot-text"><h3>Leo's school fund</h3><p class="pot-togo"><b>$588</b> to go</p>
+<p class="small muted">$412 of $1,000 by September 2027</p></div></article><article class="pot" style="--c:var(--color-cocoa)">
+<div class="pot-jar" role="img" aria-label="Paris trip: 15% saved"><span class="pot-fill" style="height:15%"></span><span class="pot-mark" style="bottom:50%"></span></div>
+<div class="pot-text"><h3>Paris trip</h3><p class="pot-togo"><b>€1,700</b> to go</p>
+<p class="small muted">€300 of €2,000 by August 2027</p></div></article><article class="pot" style="--c:var(--color-sage)">
+<div class="pot-jar" role="img" aria-label="Emergency fund: 66% saved"><span class="pot-fill" style="height:66%"></span><span class="pot-mark" style="bottom:50%"></span></div>
+<div class="pot-text"><h3>Emergency fund</h3><p class="pot-togo"><b>$2,030</b> to go</p>
+<p class="small muted">$3,970 of $6,000</p></div></article><article class="pot pot-private"><div class="pot-jar pot-locked" aria-hidden="true"></div><div class="pot-text"><h3>Pat's car fund</h3><p class="small muted">Target $8,000</p><span class="pace pace-full">Progress is private</span></div></article></div></section><div class="d-gap"></div>
+<section class="panel"><p class="small muted">Opened: Beach trip</p><div class="f-answer"><h3>Beach trip: at this pace you'll be there in <b>March</b>, about 3 months early.</h3>
+<p class="small muted">You've added about $320 a month since May. June needs $200 a month.</p></div>
+<svg class="f-chart" viewBox="0 0 640 220" role="img" aria-label="Beach trip saved each month since May, and where this pace reaches the target">
+<line x1="30" x2="610" y1="42" y2="42" class="f-target"/><text x="30" y="36" class="f-tick">Target $5,000</text>
+<line x1="610" x2="610" y1="30" y2="190" class="f-by"/><text x="606" y="40" text-anchor="end" class="f-tick">By June</text>
+<polyline points="30,137 75,128 119,119 164,110 208,101 253,89" class="f-line"/><polyline points="253,89 476,42" class="f-proj"/><circle cx="476" cy="42" r="5" class="f-dot"/>
+<circle cx="253" cy="89" r="4" class="f-now"/><text x="30" y="212" text-anchor="middle" class="f-tick">May</text><text x="119" y="212" text-anchor="middle" class="f-tick">Jul</text><text x="208" y="212" text-anchor="middle" class="f-tick">Sep</text><text x="298" y="212" text-anchor="middle" class="f-tick">Nov</text><text x="387" y="212" text-anchor="middle" class="f-tick">Jan</text><text x="476" y="212" text-anchor="middle" class="f-tick">Mar</text><text x="565" y="212" text-anchor="middle" class="f-tick">May</text></svg>
+<p class="small muted">Solid: what you've saved. Dotted: where this pace goes. Needs a little history: a goal shows its forecast after its second month.</p><article class="journey" style="--c:var(--color-clay-deep)"><div class="j-head"><h3>Beach trip</h3><span class="small muted">$3,400 of $5,000</span></div>
+<div class="j-track" aria-hidden="true"><span class="j-fill" style="width:68%"></span><ol class="j-nodes"><li class="j-node is-done" style="left:25%"><span class="j-dot"></span><span class="j-label small">A quarter</span></li><li class="j-node is-done" style="left:50%"><span class="j-dot"></span><span class="j-label small">Halfway</span></li><li class="j-node" style="left:75%"><span class="j-dot"></span><span class="j-label small">Three quarters</span></li><li class="j-node" style="left:100%"><span class="j-dot"></span><span class="j-label small">There</span></li></ol><span class="j-you" style="left:68%">You</span></div>
+<p class="j-next"><b>$350</b> to three quarters.</p></article></section></div></section>
+</div></body></html>

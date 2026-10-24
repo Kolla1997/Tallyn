@@ -25,6 +25,7 @@ tags: [home]
 - [[Feature - Your Data]]: download everything Tallyn holds about you (#54)
 - [[Feature - Close Account]]: close your account; what goes and what's kept (#56)
 - [[Feature - Budgets]]: category budgets and the plan from your income (#13, #133)
+- [[Feature - Goals]]: savings goals that follow an account or are updated by hand (#14)
 
 ## Brand
 - [[Brand Guide]]: positioning, personality, brand basics

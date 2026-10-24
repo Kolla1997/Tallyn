@@ -189,7 +189,8 @@ func getenv(key, fallback string) string {
 }
 
 // purgeClosingRecords deletes closing records older than db.ClosingRecordsKept
-// (#56, ADR 0015): once at start, then daily. It runs with the bank sync's
+// (#56, ADR 0015) and records this month's amount for goals that follow an
+// account (#14): once at start, then daily. It runs with the bank sync's
 // login, the only one allowed to.
 func purgeClosingRecords(ctx context.Context, system *db.System) {
 	t := time.NewTicker(24 * time.Hour)
@@ -199,6 +200,11 @@ func purgeClosingRecords(ctx context.Context, system *db.System) {
 			log.Printf("tallyn: purge closing records: %v", err)
 		} else if n > 0 {
 			log.Printf("tallyn: purged %d closing records older than 3 years", n)
+		}
+		// Savings goals (#14): this month's amount for goals that follow an
+		// account, for the forecast and "this month".
+		if _, err := system.SnapshotGoals(ctx, time.Now().UTC()); err != nil {
+			log.Printf("tallyn: goal snapshots: %v", err)
 		}
 		select {
 		case <-ctx.Done():

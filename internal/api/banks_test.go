@@ -52,6 +52,19 @@ func (stubStore) DeletePlan(context.Context, string, string) error { return erro
 func (stubStore) RenameHousehold(context.Context, string, string, string) (string, error) {
 	return "", errors.New("stub")
 }
+func (stubStore) Goals(context.Context, string, string) ([]db.Goal, error) {
+	return nil, errors.New("stub")
+}
+func (stubStore) CreateGoal(context.Context, string, string, db.NewGoal) (string, error) {
+	return "", errors.New("stub")
+}
+func (stubStore) UpdateGoal(context.Context, string, string, db.NewGoal) error {
+	return errors.New("stub")
+}
+func (stubStore) SetGoalSaved(context.Context, string, string, int64, time.Time) error {
+	return errors.New("stub")
+}
+func (stubStore) DeleteGoal(context.Context, string, string) error { return errors.New("stub") }
 func (stubStore) CreateHousehold(context.Context, string, string, string) (db.MyHousehold, error) {
 	return db.MyHousehold{}, errors.New("stub")
 }
