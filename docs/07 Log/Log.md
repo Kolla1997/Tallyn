@@ -10,6 +10,13 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-10-24
+- #153 #154 #155 #156 #157 #158 #159 #160 Audit paused (Dinesh): the feature backlog comes first; the audit then runs again on everything, new features included. Each ticket has a "paused" comment and keeps its priority.
+- #54 Download your data: `GET /api/me/export` returns a ZIP (`tallyn-data.json`, `transactions.csv`, `README.txt`) of only your own rows, read as you and filtered to what you own (owners can read their kids' money, which never belongs in the file). Fresh 2FA code, 3 downloads an hour. Settings → Your data → Download. Spec: [[Feature - Your Data]].
+- #56 Close your account (Dinesh picked B): Plaid unlinked first, then the closing record, then the Supabase sign-in, which deletes the rest. The record keeps user id, a keyed email hash, date and Terms/Privacy versions for 3 years (purged daily by the bank sync). Household budgets now outlive their creator. Type your email plus a fresh code. Migration 0016, [[0015-closing-an-account]], [[Feature - Close Account]].
+- #133 Plan from your income: drafts 1 (layouts), 2 (new chart types) and 3 (answer first); Dinesh picked 3A because people look for the logic first, then the data. One household plan and one per person (budget rules), 55/5/10/15/15, 50/30/20 or your own; card bills never count, mortgage is Essentials; income suggested from 3 months of pay. Migration 0017, [[Feature - Budgets]], Design System decision.
+- Open: run migrations 0016 and 0017 on tallyn-dev before trying closing and the plan; Privacy Policy wording for the closing record and backups waits for the lawyer review (#36); local work happens in temp clones until the repo leaves the iCloud Desktop.
+
 ## 2026-10-23 (UI audit)
 - #145 Full UI audit with the outside skills (#141): four read-only code audits (sign-in, money screens, family/settings/shell, app-wide CSS) and a live check at 375px and 1280px. About 110 findings in `docs/03 Design/UI Audit 2026-10.md`; follow-ups agreed and created as #151–#160. L5 ("two loaders") dropped as a false alarm. A7 corrected: with Confirm email on, sign-up doesn't reveal existing accounts.
 - #146 Budget amounts read the way people write them: "12,50" is 12.50 (it saved 1,250.00), currency signs and codes ignored, ambiguous amounts ("1.250") refused.
