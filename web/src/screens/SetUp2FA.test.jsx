@@ -52,9 +52,12 @@ describe('SetUp2FA', () => {
     expect(sessionStorage.getItem('tallyn.recoveredWithCode')).toBeNull()
   })
 
-  it('says so when setup can’t start', async () => {
+  it('says so calmly when setup can’t start, with Try again (#152)', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
     mfa.enroll.mockResolvedValue({ data: null, error: new Error('Enrollment is disabled') })
     await act(async () => render(<SetUp2FA onSignOut={() => {}} />))
-    expect(screen.getByRole('alert')).toHaveTextContent('Enrollment is disabled')
+    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't start setting up your authenticator. Try again in a moment.")
+    expect(screen.getByRole('alert')).not.toHaveTextContent('Enrollment is disabled')
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
   })
 })

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { MIN_PASSWORD, rememberPasswordChanged, rememberResetAsked } from '../lib/recovery.js'
 import { supabase } from '../lib/supabase.js'
+import { authMessage } from '../lib/authErrors.js'
 
 // Password reset (#22, Dinesh picked A): ask for a link, then (after the link
 // and the 2FA code) choose a new password.
@@ -124,7 +125,7 @@ export function ChoosePassword({ email, onDone }) {
       setBusy(false)
       if (error.code === 'same_password') setError("That's your current password. Choose a new one.")
       else if (error.code === 'weak_password') setError('Choose a longer or less common password.')
-      else setError(error.message)
+      else setError(authMessage(error))
       return
     }
     // Whoever might have the old password is signed out everywhere else.

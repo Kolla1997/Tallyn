@@ -57,6 +57,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 |---|---|---|---|---|---|
 | Sign up, confirm email, agree to Terms | P1 | Yes | Yes | No | `SignIn.test.jsx` (8-character rule, notes), `ConsentGate.test.jsx` (asks, records the versions, agreed at sign-up, changed documents, can't check); `consent_test.go` |
 | Sign in with password, then the 2FA code | P0 | Yes | Yes | Planned (#113) | `CodeForm.test.jsx`; `auth_test.go` (`aal2` required); `e2e-full/p0.spec.js` (sign in with password and 2FA code: a wrong code is refused) |
+| Sign-in, sign-up, reset and 2FA errors use Tallyn’s words, never Supabase’s text; sign-up never reveals an existing account (#152) | P0 | Yes | — | — | `authErrors.test.js`, `SignIn.errors.test.jsx`, `SetUp2FA.test.jsx` (`says so calmly when setup can’t start`) |
 | Set up 2FA (QR, then a code) | P0 | Yes | — | No (#113) | `SetUp2FA.test.jsx` (QR and key, half-finished setup cleared, backup codes next, after recovery), `CodeForm.test.jsx` |
 | Every `/api/` route refuses no token, a bad token, no 2FA | P0 | — | Yes | — | `router_test.go` (`TestAPIRequiresAuth`), `auth_test.go` |
 | Sign out after 30 minutes idle, warning at 29 (#91) | P1 | Yes | — | No | `idle.test.js`, `SignIn.test.jsx`, `IdleGuard.test.jsx` (warning, countdown, Stay, Esc, activity, after sleep) |
