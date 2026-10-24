@@ -2,7 +2,7 @@
 type: log
 status: active
 owner: Dinesh
-updated: 2026-10-23
+updated: 2026-10-24
 tags: [log]
 ---
 
@@ -18,6 +18,9 @@ Newest first. One entry per working session or decision.
 - Migrations 0016 and 0017 applied on tallyn-dev (Dinesh asked; same project as the app's `SUPABASE_URL`, each in one transaction, checked afterwards). Test plans made there: a household plan and a personal one, both $6,400 on 55/5/10/15/15.
 - #133 Bug found trying it on tallyn-dev: plan jobs showed alphabetically (Postgres sorts jsonb keys). Fixed in #172; the page orders jobs by the template.
 - #53 Owners can rename their household: `PUT /api/households/{id}`, owners only (RLS), the name trimmed and 1–80 characters, never blank; Rename in Settings → Household (no draft: reuses the profile name form). First CI run failed on a test whose fake API didn't answer the members request; fixed in the test.
+- #14 Savings goals: drafts 1 and 2 (E Pots, F Journey, G Forecast, H This month); Dinesh picked the mix, part by part: "This month" set-asides on top (H), goals as pots (E), one goal up close with its forecast (G), next milestone (F) and "put aside $X a month". Currency per goal, no conversion. A goal follows one of its owner's accounts or is kept by hand; people who can't see that balance see name and target only ("Progress is private"), enforced in SQL and checked to fail without the rule. Kids' goals follow the budget rules. Monthly history from hand updates and the daily snapshot. Download your data (#54) now includes your goals. Migration 0018, [[Feature - Goals]]. PRs #176 (data and API) and #177 (page and Home card).
+- #14 Goal month field (Dinesh picked the mix of the month draft): reads in words ("June 2027 · 8 months away") and opens quick picks over a month grid, the same in every browser (`web/src/components/MonthPicker.jsx`). "How it fills" radios fixed: they had picked up the text box padding.
+- Migration 0018 applied on tallyn-dev (Dinesh asked; one transaction, checked afterwards).
 - Open: a household plan with nobody opted in shows $0 and "You're on track"; a clearer message is a possible follow-up; Privacy Policy wording for the closing record and backups waits for the lawyer review (#36); local work happens in temp clones until the repo leaves the iCloud Desktop.
 
 ## 2026-10-23 (UI audit)
