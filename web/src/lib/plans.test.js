@@ -61,4 +61,17 @@ describe('plans', () => {
     expect(suggestionMonths('2026-10-24')).toBe('July to September')
     expect(suggestionMonths('2026-02-03')).toBe('November to January')
   })
+
+  it('keeps the template order whatever order the shares come back in (#133)', () => {
+    // As Postgres returns them: jsonb keys sorted.
+    const stored = { debt: 10, long_term: 15, essentials: 55, guilt_free: 5, short_term: 15 }
+    expect(jobs(plan('55-5-10-15-15', stored, draft), today).map((j) => j.name)).toEqual([
+      'Essentials',
+      'Guilt-free',
+      'Debt / Invest',
+      'Short-term goals',
+      'Long-term wealth',
+    ])
+    expect(jobs(plan('50-30-20', { save: 20, needs: 50, wants: 30 }, draft), today).map((j) => j.key)).toEqual(['needs', 'wants', 'save'])
+  })
 })
