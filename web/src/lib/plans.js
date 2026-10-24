@@ -35,12 +35,17 @@ export const JOBS = {
   },
 }
 
-// The jobs of a plan, in order, with what's planned and used this month and
-// their state: on, ahead, full or over (spending), done or tomove (moving).
-// A job with a 0% share is left out.
+// The order jobs always show in. The stored shares can come back in any
+// key order (Postgres sorts a jsonb object's keys), so never use theirs.
+const ORDER = [...BUCKETS, 'needs', 'wants', 'save']
+
+// The jobs of a plan, in the template's order, with what's planned and used
+// this month and their state: on, ahead, full or over (spending), done or
+// tomove (moving). A job with a 0% share is left out.
 export function jobs(plan, today) {
   const { elapsed } = periodInfo(plan, today)
   return Object.entries(plan.shares)
+    .sort(([a], [b]) => ORDER.indexOf(a) - ORDER.indexOf(b))
     .filter(([, share]) => share > 0)
     .map(([key, share]) => {
       const job = JOBS[key]
