@@ -74,3 +74,36 @@ func TestRemoveFactorsErrors(t *testing.T) {
 		}
 	}
 }
+
+func TestDeleteUser(t *testing.T) {
+	var calls []string
+	srv := fakeSupabase(t, http.StatusOK, &calls)
+	defer srv.Close()
+	c, _ := New(srv.URL, key)
+	if err := c.DeleteUser(context.Background(), user); err != nil {
+		t.Fatal(err)
+	}
+	if strings.Join(calls, "") != "DELETE /auth/v1/admin/users/"+user {
+		t.Fatalf("calls = %v", calls)
+	}
+	if err := c.DeleteUser(context.Background(), "../other"); err == nil {
+		t.Fatal("non-UUID user accepted")
+	}
+}
+
+// A retried closing finds the sign-in already gone: that's done, not an error.
+func TestDeleteUserAlreadyGone(t *testing.T) {
+	var calls []string
+	gone := fakeSupabase(t, http.StatusNotFound, &calls)
+	defer gone.Close()
+	c, _ := New(gone.URL, key)
+	if err := c.DeleteUser(context.Background(), user); err != nil {
+		t.Fatalf("already gone: %v", err)
+	}
+	broken := fakeSupabase(t, http.StatusInternalServerError, &calls)
+	defer broken.Close()
+	c, _ = New(broken.URL, key)
+	if err := c.DeleteUser(context.Background(), user); err == nil || strings.Contains(err.Error(), key) {
+		t.Fatalf("err = %v, want an error without the key", err)
+	}
+}

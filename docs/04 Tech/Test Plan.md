@@ -81,6 +81,10 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Download your data: only your own rows (never accounts or transactions shared with you), no Plaid tokens, cursors, encrypted values or code hashes (#54) | P0 | Yes | Yes | No | `db/export_test.go` (`TestExportOnlyYours`), `api/export_test.go` (`TestExportZip`) |
 | Download your data needs a fresh 2FA code and is limited to 3 an hour (#54) | P0 | — | Yes | No | `api/export_test.go` (`TestExportNeedsFreshCode`, `TestExportRateLimit`) |
 | Settings → Download your data asks for a code, then saves the ZIP (#54) | P1 | Yes | — | No | `Settings.test.jsx` (download) |
+| Close your account: your banks removed at Plaid first, then everything of yours deleted; household budgets you made, other members’ data and kids’ banks stay; households you’re alone in close with you (#56) | P0 | Yes | Yes | No | `db/close_test.go` (`TestClosingAnAccount`, `TestClosingBanksAreOnlyYours`, `TestClosingTakesYourEmptyHousehold`), `api/close_test.go` (`TestCloseAccount`) |
+| Closing refuses without a fresh code, a matching email, or another owner for a shared household; a Plaid failure stops before anything else is deleted; trying again finishes (#56) | P0 | Yes | Yes | No | `api/close_test.go` (`TestCloseAccountRefusals`, `TestCloseAccountStopsWhenPlaidFails`, `TestCloseAccountBankAlreadyGone`), `db/close_test.go` (`TestClosingNeedsAnotherOwner`) |
+| The closing record holds only id, email hash, date and versions; the app can’t read or purge it; records over 3 years old are purged (#56) | P0 | — | Yes | — | `db/close_test.go` (`TestClosingAnAccount`, `TestClosingRecordsArePurged`) |
+| Settings → Close account: type your email, fresh code, then the closed screen; the last owner is sent to Family (#56) | P1 | Yes | — | No | `Settings.test.jsx` (close account) |
 
 ### Households, family and sharing (ADR 0007, 0008, 0009)
 | Use case | P | Unit | Integration | End-to-end | Tests today |
