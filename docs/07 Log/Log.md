@@ -17,6 +17,7 @@ Newest first. One entry per working session or decision.
 - #133 Plan from your income: drafts 1 (layouts), 2 (new chart types) and 3 (answer first); Dinesh picked 3A because people look for the logic first, then the data. One household plan and one per person (budget rules), 55/5/10/15/15, 50/30/20 or your own; card bills never count, mortgage is Essentials; income suggested from 3 months of pay. Migration 0017, [[Feature - Budgets]], Design System decision.
 - Migrations 0016 and 0017 applied on tallyn-dev (Dinesh asked; same project as the app's `SUPABASE_URL`, each in one transaction, checked afterwards). Test plans made there: a household plan and a personal one, both $6,400 on 55/5/10/15/15.
 - #133 Bug found trying it on tallyn-dev: plan jobs showed alphabetically (Postgres sorts jsonb keys). Fixed in #172; the page orders jobs by the template.
+- #53 Owners can rename their household: `PUT /api/households/{id}`, owners only (RLS), the name trimmed and 1–80 characters, never blank; Rename in Settings → Household (no draft: reuses the profile name form). First CI run failed on a test whose fake API didn't answer the members request; fixed in the test.
 - Open: a household plan with nobody opted in shows $0 and "You're on track"; a clearer message is a possible follow-up; Privacy Policy wording for the closing record and backups waits for the lawyer review (#36); local work happens in temp clones until the repo leaves the iCloud Desktop.
 
 ## 2026-10-23 (UI audit)
