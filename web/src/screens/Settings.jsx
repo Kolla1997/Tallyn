@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import { PhoneIcon } from '../components/Icons.jsx'
-import { api } from '../lib/api.js'
+import { api, apiFile } from '../lib/api.js'
 import { LEGAL } from '../lib/legal.js'
 import { verifiedAuthenticators } from '../lib/mfa.js'
 import { Link } from '../lib/router.jsx'
@@ -479,7 +479,30 @@ function Household({ household }) {
   )
 }
 
+// Download your data (#54): a fresh code, then a ZIP of everything Tallyn
+// holds about you. The server checks the code was entered just now.
+const EXPORT_ERRORS = {
+  too_many_requests: 'You can download your data 3 times an hour. Try again later.',
+  reauth_required: 'That took a little long. Enter a new code and try again.',
+}
+
+async function downloadData() {
+  let file
+  try {
+    file = await apiFile('/api/me/export', `tallyn-data-${new Date().toISOString().slice(0, 10)}.zip`)
+  } catch (e) {
+    throw new Error(EXPORT_ERRORS[e.message] ?? "We couldn't make your download. Try again in a moment.")
+  }
+  const url = URL.createObjectURL(file.blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = file.name
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(url), 1000) // some browsers cancel the download if it goes at once
+}
+
 function YourData() {
+  const [confirming, setConfirming] = useState(false)
   return (
     <Section id="data-h" title="Your data">
       <p className="small muted">Tallyn reads balances and transactions from your banks. It can&apos;t move money.</p>
@@ -495,9 +518,19 @@ function YourData() {
           </Link>
         </Row>
         <Row label="Download your data" note="Everything Tallyn holds about you">
-          <Soon ticket={54} />
+          <button className="btn btn-secondary btn-small" onClick={() => setConfirming(true)}>
+            Download
+          </button>
         </Row>
       </ul>
+      {confirming && (
+        <ConfirmDialog title="Download your data?" action="Download" needsCode onConfirm={downloadData} onClose={() => setConfirming(false)}>
+          <p>
+            You&apos;ll get a ZIP with your profile, banks, accounts, transactions, budgets and sharing choices. Only your own data: nothing others share with
+            you. Keep it somewhere safe.
+          </p>
+        </ConfirmDialog>
+      )}
     </Section>
   )
 }
