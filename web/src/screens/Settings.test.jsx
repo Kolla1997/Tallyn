@@ -5,7 +5,8 @@ import Settings from './Settings.jsx'
 // Settings → Sign-in and security (#23, Dinesh picked A): your authenticators
 // (never remove the last), adding another, and backup codes.
 const api = vi.fn()
-vi.mock('../lib/api.js', () => ({ api: (...a) => api(...a) }))
+const apiFile = vi.fn()
+vi.mock('../lib/api.js', () => ({ api: (...a) => api(...a), apiFile: (...a) => apiFile(...a) }))
 const mfa = { listFactors: vi.fn(), enroll: vi.fn(), unenroll: vi.fn(), challengeAndVerify: vi.fn() }
 vi.mock('../lib/supabase.js', () => ({
   supabase: {
@@ -152,8 +153,47 @@ describe('Settings: profile, legal and coming soon (#114)', () => {
   })
 
   it('what isn’t built yet says so, without links to tickets', async () => {
-    await openSection('data')
+    await openSection('notifications')
     expect(screen.getAllByText('Coming soon').length).toBeGreaterThan(0)
     expect(document.querySelector('a[href*="github.com"]')).toBeNull()
+  })
+
+  // Download your data (#54): a fresh code first, then the ZIP from the server.
+  describe('download your data', () => {
+    const enterCode = async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Download' }))
+      const dialog = screen.getByRole('dialog', { name: 'Download your data?' })
+      expect(within(dialog).getByText(/Only your own data/)).toBeInTheDocument()
+      fireEvent.change(within(dialog).getByLabelText(/6-digit code/), { target: { value: '123456' } })
+      await act(async () => fireEvent.click(within(dialog).getByRole('button', { name: 'Download' })))
+      return dialog
+    }
+
+    beforeEach(() => {
+      apiFile.mockReset()
+      mfa.listFactors.mockResolvedValue({ data: { totp: [phone] } })
+      mfa.challengeAndVerify.mockResolvedValue({ error: null })
+      URL.createObjectURL = vi.fn(() => 'blob:fake')
+      URL.revokeObjectURL = vi.fn()
+    })
+
+    it('saves the ZIP after a fresh code', async () => {
+      const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+      apiFile.mockResolvedValue({ blob: new Blob(['zip']), name: 'tallyn-data-2026-10-24.zip' })
+      await openSection('data')
+      await enterCode()
+      expect(mfa.challengeAndVerify).toHaveBeenCalledWith({ factorId: 'f1', code: '123456' })
+      expect(apiFile).toHaveBeenCalledWith('/api/me/export', expect.stringMatching(/^tallyn-data-\d{4}-\d{2}-\d{2}\.zip$/))
+      expect(click).toHaveBeenCalled()
+      expect(screen.queryByRole('dialog', { name: 'Download your data?' })).not.toBeInTheDocument()
+      click.mockRestore()
+    })
+
+    it('says so calmly after 3 downloads an hour', async () => {
+      apiFile.mockRejectedValue(Object.assign(new Error('too_many_requests'), { status: 429 }))
+      await openSection('data')
+      const dialog = await enterCode()
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('You can download your data 3 times an hour. Try again later.')
+    })
   })
 })
