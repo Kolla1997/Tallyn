@@ -46,7 +46,7 @@ Agreed with Dinesh and created 2026-10-23. Ordered by what to do first.
 
 | Ticket | What | Findings | Kind | P |
 |---|---|---|---|---|
-| [#151](https://github.com/Kolla1997/Tallyn/issues/151) | Stuck and failed states: Try again instead of endless loaders, backup-code dead end, code form lock, Join keeps the invite | M1, F5, A1, A4, A14, L5 | inv + small vis (Try again button) | p1 |
+| [#151](https://github.com/Kolla1997/Tallyn/issues/151) | Stuck and failed states: Try again instead of endless loaders, backup-code dead end, code form lock, Join keeps the invite | M1, F5, A1, A4, A14 | inv + small vis (Try again button) | p1 |
 | [#152](https://github.com/Kolla1997/Tallyn/issues/152) | Calm error messages: map raw Supabase and network errors to Tallyn copy, neutral sign-up message | A7, A12, M11 | inv (copy from Voice and Tone) | p1 |
 | [#153](https://github.com/Kolla1997/Tallyn/issues/153) | Keyboard and screen readers: page titles, focus on navigation and view changes, dialog focus return, visible focus rings, ARIA fixes | L1, A8–A11, F1–F4, F7–F12, M7–M9, G1, G10, G13 | inv | p1 |
 | [#154](https://github.com/Kolla1997/Tallyn/issues/154) | Worst-case data: long text, emoji initials, blank names, double submits, races, Markdown hang, 0% rates, money edge cases | A5, A6, A13, F6, F13–F21, M4–M6, M10, L4 | inv | p1 |
@@ -152,7 +152,7 @@ Agreed with Dinesh and created 2026-10-23. Ordered by what to do first.
 | L2 | Home, Family | Text links ("All 28 accounts", "See all", "Manage", "Sharing") are 20px tall | M | vis |
 | L3 | Every screen, dev | Requests wait on each other: consent 2–3s → profile 2–3s → page data up to 6s. Home about 11s on a reload in dev | M | inv |
 | L4 | `BudgetsPage.jsx:248` | Screen-reader label "Change You's Food and drink budget" | L | inv |
-| L5 | `TallynLoader` | Two loaders: full mark with "Adding it all up..." and leaf only without "..." | L | vis |
+| ~~L5~~ | `TallynLoader` | Dropped (2026-10-23): the “two loaders” were one loader caught at the start of its own animation | — | — |
 | L6 | Accounts and Transactions at 375px | Long account names wrap to three lines and squeeze the amount; filter chips wrap to two rows | L | vis |
 
 ## Needs a rule change
