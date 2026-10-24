@@ -90,6 +90,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Use case | P | Unit | Integration | End-to-end | Tests today |
 |---|---|---|---|---|---|
 | Create a household | P1 | — | Yes | No | `db/banks_test.go`, `api/banks_test.go` (`TestCreateHousehold`) |
+| Rename a household: owners only; the name is trimmed, 1–80 characters, never blank; Settings shows Rename to owners only (#53) | P2 | Yes | Yes | No | `db/households_test.go` (`TestRenameHousehold`), `api/households_test.go`, `Settings.test.jsx` (rename) |
 | One household's data never reaches another | P0 | — | Yes | No | `db_test.go` (`TestHouseholdIsolation`, `TestEveryTableHasRLS`) |
 | Joining on a network error keeps the invite and offers Try again; a refused invite is cleared (#151) | P1 | Yes | — | — | `Join.test.jsx` |
 | Invite, accept, refuse, revoke | P0 | — | Yes | Planned (#113) | `invites_test.go`, `members_test.go` (`TestInviteRoutes`); `e2e-full/p0.spec.js` (invite a member, who accepts: link from the Family page, joined in a second browser) |

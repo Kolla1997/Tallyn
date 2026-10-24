@@ -4666,3 +4666,14 @@ h1[tabindex='-1']:focus {
   gap: var(--space-s2);
   flex-wrap: wrap;
 }
+
+/* Save and Cancel under an inline Settings form (#53). */
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s3);
+}
+
+.settings-actions .link {
+  align-self: center;
+}

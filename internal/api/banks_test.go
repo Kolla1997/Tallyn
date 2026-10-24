@@ -49,6 +49,9 @@ func (stubStore) SavePlan(context.Context, string, string, db.NewPlan) (string, 
 	return "", errors.New("stub")
 }
 func (stubStore) DeletePlan(context.Context, string, string) error { return errors.New("stub") }
+func (stubStore) RenameHousehold(context.Context, string, string, string) (string, error) {
+	return "", errors.New("stub")
+}
 func (stubStore) CreateHousehold(context.Context, string, string, string) (db.MyHousehold, error) {
 	return db.MyHousehold{}, errors.New("stub")
 }
