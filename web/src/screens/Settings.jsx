@@ -5,6 +5,7 @@ import { api, apiFile } from '../lib/api.js'
 import { LEGAL } from '../lib/legal.js'
 import { verifiedAuthenticators } from '../lib/mfa.js'
 import { Link } from '../lib/router.jsx'
+import { rememberSignOutNote, signOutHere } from '../lib/session.js'
 import { supabase } from '../lib/supabase.js'
 import { SaveBackupCodes } from './BackupCodes.jsx'
 import CodeForm from './CodeForm.jsx'
@@ -65,7 +66,7 @@ export default function Settings({ me, household, email, onSaved, onSignOut }) {
           {section === 'data' && <YourData />}
           {section === 'notifications' && <Notifications />}
           {section === 'legal' && <Legal />}
-          {section === 'leave' && <LeaveOrClose me={me} household={household} />}
+          {section === 'leave' && <LeaveOrClose me={me} household={household} email={email} />}
         </div>
       </div>
     </>
@@ -582,7 +583,27 @@ function Legal() {
   )
 }
 
-function LeaveOrClose({ me, household }) {
+// Close your account (#56, ADR 0015): type your email and a fresh code. The
+// server unlinks your banks at Plaid, then deletes everything of yours.
+const CLOSE_ERRORS = {
+  last_owner: "You're the only owner of a household with other people in it. In Family, make someone else an owner first.",
+  bank_service_error: "We couldn't disconnect one of your banks, so nothing else was deleted. Try again in a moment.",
+  reauth_required: 'That took a little long. Enter a new code and try again.',
+  email_mismatch: "That email doesn't match your account.",
+}
+
+async function closeAccount(email) {
+  try {
+    await api('/api/me/close', { method: 'POST', body: { email } })
+  } catch (e) {
+    throw new Error(CLOSE_ERRORS[e.message] ?? "We couldn't close your account. Try again in a moment.")
+  }
+  rememberSignOutNote('closed')
+  await signOutHere()
+}
+
+function LeaveOrClose({ me, household, email }) {
+  const [closing, setClosing] = useState(false)
   return (
     <Section id="leave-h" title="Leave or close">
       <ul className="rows">
@@ -594,9 +615,31 @@ function LeaveOrClose({ me, household }) {
           </Row>
         )}
         <Row label="Close your Tallyn account" note="Removes your banks, transactions and sign-in">
-          <Soon ticket={56} />
+          <button className="link small danger-link" onClick={() => setClosing(true)}>
+            Close account
+          </button>
         </Row>
       </ul>
+      {closing && (
+        <ConfirmDialog
+          title="Close your Tallyn account?"
+          action="Close account"
+          typeToConfirm={email}
+          needsCode
+          onConfirm={() => closeAccount(email)}
+          onClose={() => setClosing(false)}
+        >
+          <p>
+            Your banks are disconnected, and your accounts, transactions, sharing choices and sign-in are deleted. This can&apos;t be undone. Your household and
+            its budgets stay for the others.
+          </p>
+          <p>
+            <Link to="/settings?section=data" className="link small" onClick={() => setClosing(false)}>
+              Download your data first
+            </Link>
+          </p>
+        </ConfirmDialog>
+      )}
     </Section>
   )
 }

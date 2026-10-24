@@ -8,6 +8,7 @@ const api = vi.fn()
 const apiFile = vi.fn()
 vi.mock('../lib/api.js', () => ({ api: (...a) => api(...a), apiFile: (...a) => apiFile(...a) }))
 const mfa = { listFactors: vi.fn(), enroll: vi.fn(), unenroll: vi.fn(), challengeAndVerify: vi.fn() }
+const signOut = vi.fn()
 vi.mock('../lib/supabase.js', () => ({
   supabase: {
     auth: {
@@ -20,7 +21,7 @@ vi.mock('../lib/supabase.js', () => ({
               mfa[k](...a),
         },
       ),
-      signOut: vi.fn(),
+      signOut: (...a) => signOut(...a),
     },
   },
 }))
@@ -194,6 +195,48 @@ describe('Settings: profile, legal and coming soon (#114)', () => {
       await openSection('data')
       const dialog = await enterCode()
       expect(within(dialog).getByRole('alert')).toHaveTextContent('You can download your data 3 times an hour. Try again later.')
+    })
+  })
+
+  // Close your account (#56): type your email, a fresh code, then signed out
+  // with the "closed" note on the sign-in page.
+  describe('close your account', () => {
+    const confirmClose = async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Close account' }))
+      const dialog = screen.getByRole('dialog', { name: 'Close your Tallyn account?' })
+      expect(within(dialog).getByText(/can.t be undone/)).toBeInTheDocument()
+      expect(within(dialog).getByRole('link', { name: 'Download your data first' })).toHaveAttribute('href', '/settings?section=data')
+      const go = within(dialog).getByRole('button', { name: 'Close account' })
+      fireEvent.change(within(dialog).getByLabelText(/6-digit code/), { target: { value: '123456' } })
+      expect(go).toBeDisabled() // the email isn't typed yet
+      fireEvent.change(within(dialog).getByLabelText(/to confirm/), { target: { value: 'You@Example.com' } })
+      await act(async () => fireEvent.click(go))
+      return dialog
+    }
+
+    beforeEach(() => {
+      localStorage.clear()
+      signOut.mockReset()
+      signOut.mockResolvedValue({ error: null })
+      mfa.listFactors.mockResolvedValue({ data: { totp: [phone] } })
+      mfa.challengeAndVerify.mockResolvedValue({ error: null })
+    })
+
+    it('closes, signs out here and leaves the note for the sign-in page', async () => {
+      api.mockResolvedValue(null)
+      await openSection('leave')
+      await confirmClose()
+      expect(api).toHaveBeenCalledWith('/api/me/close', { method: 'POST', body: { email: 'you@example.com' } })
+      expect(signOut).toHaveBeenCalledWith({ scope: 'local' })
+      expect(localStorage.getItem('tallyn.signOutNote')).toBe('closed')
+    })
+
+    it('the only owner of a shared household is told to hand it over first', async () => {
+      api.mockRejectedValue(Object.assign(new Error('last_owner'), { status: 409 }))
+      await openSection('leave')
+      const dialog = await confirmClose()
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('make someone else an owner first')
+      expect(signOut).not.toHaveBeenCalled()
     })
   })
 })
