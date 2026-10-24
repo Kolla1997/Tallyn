@@ -243,7 +243,7 @@ describe('Settings: profile, legal and coming soon (#114)', () => {
   // Rename the household (#53): owners only.
   describe('rename the household', () => {
     it('an owner renames it, and the app reloads the name', async () => {
-      api.mockResolvedValue({ name: 'The Riveras' })
+      api.mockImplementation(async (path, opts) => (opts?.method === 'PUT' ? { name: 'The Riveras' } : { members: [] }))
       const onSaved = await openSection('household')
       fireEvent.click(screen.getByRole('button', { name: 'Rename' }))
       fireEvent.change(screen.getByLabelText('Household name'), { target: { value: '  The Riveras ' } })
