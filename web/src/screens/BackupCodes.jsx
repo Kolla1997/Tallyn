@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { LockIcon } from '../components/Icons.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import { TryAgain } from '../components/LoadFailed.jsx'
+import { verifiedAuthenticators } from '../lib/mfa.js'
+import CodeForm from './CodeForm.jsx'
 import { api } from '../lib/api.js'
 import { clearJustSetUp, codesFile, justSetUp, markRecovered, remindLater, remindedLater } from '../lib/backupCodes.js'
 import { totpAt } from '../lib/session.js'
@@ -19,22 +22,39 @@ export function SaveBackupCodes({ email, canDefer = false, newFeature = false, o
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [making, setMaking] = useState(false)
+  const [reauth, setReauth] = useState(null) // authenticator ids when a fresh code is needed (#151)
   const asked = useRef(false)
+
+  // Making them can fail (#151): Try again, or one more code first when the
+  // last one was too long ago.
+  function make() {
+    setMaking(true)
+    setError('')
+    return api('/api/backup-codes', { method: 'POST' })
+      .then(
+        (d) => {
+          setReauth(null)
+          setCodes(d.codes)
+        },
+        (e) =>
+          e.message === 'reauth_required'
+            ? verifiedAuthenticators().then(
+                (f) => setReauth(f.map((x) => x.id)),
+                () => setError("We couldn't make your codes. Try again in a moment."),
+              )
+            : setError("We couldn't make your codes. Try again in a moment."),
+      )
+      .finally(() => setMaking(false))
+  }
 
   useEffect(() => {
     // Once, even though StrictMode runs effects twice in development: a
     // second set would replace the one on screen.
     if (asked.current) return
     asked.current = true
-    api('/api/backup-codes', { method: 'POST' }).then(
-      (d) => setCodes(d.codes),
-      (e) =>
-        setError(
-          e.message === 'reauth_required'
-            ? 'That took a little long. Enter a new code from your app and try again.'
-            : "We couldn't make your codes. Try again in a moment.",
-        ),
-    )
+    make()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function copy() {
@@ -66,15 +86,23 @@ export function SaveBackupCodes({ email, canDefer = false, newFeature = false, o
         </p>
       )}
       <h1>Save your backup codes</h1>
-      <p className="muted">
-        If you lose your phone, each of these codes gets you in once. Keep them somewhere safe, like a password manager or a printed copy at home.
-      </p>
-      {error && (
-        <p className="error" role="alert">
-          {error}
+      {reauth ? (
+        <p className="muted">That took a little long, so we need one more code from your authenticator app before we make them.</p>
+      ) : (
+        <p className="muted">
+          If you lose your phone, each of these codes gets you in once. Keep them somewhere safe, like a password manager or a printed copy at home.
         </p>
       )}
-      {!codes && !error && <TallynLoader small text="Making your codes" />}
+      {error && (
+        <>
+          <p className="error" role="alert">
+            {error}
+          </p>
+          <TryAgain busy={making} onRetry={make} />
+        </>
+      )}
+      {reauth && !codes && <CodeForm factorIds={reauth} button="Make my codes" onVerified={make} />}
+      {!codes && !error && !reauth && <TallynLoader small text="Making your codes" />}
       {codes && (
         <>
           <ol className="codes-grid" aria-label="Your backup codes">

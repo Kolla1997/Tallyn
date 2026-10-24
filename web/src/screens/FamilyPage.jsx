@@ -10,6 +10,8 @@ import { isOwed } from '../lib/summary.js'
 import { Invite } from './Members.jsx'
 import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
+import { useRetry } from '../lib/retry.js'
 
 // Family (#39 step 4, #37, #38): everyone in the household on the left; pick
 // a person to see their money (what you may see of it), what you share with
@@ -61,11 +63,12 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
   const [invites, setInvites] = useState([])
   const [selected, setSelected] = useState(fromAddress)
   const [error, setError] = useState('')
+  const [failed, setFailed] = useState(false) // the last load failed (#151)
   const isOwner = household.role === 'owner'
 
   const load = useCallback(() => {
     const hh = encodeURIComponent(household.id)
-    Promise.all([
+    return Promise.all([
       api(`/api/households/${hh}/members`),
       api(`/api/sharing?household_id=${hh}`),
       api(`/api/banks?household_id=${hh}`),
@@ -76,12 +79,16 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
         setSharing(s)
         setBanks(b.banks)
         setInvites(i.invites)
+        setFailed(false)
       },
-      () => setError("We couldn't load your family. Try again in a moment."),
+      () => setFailed(true),
     )
   }, [household.id, isOwner])
 
-  useEffect(load, [load, refreshKey])
+  useEffect(() => {
+    load()
+  }, [load, refreshKey])
+  const [retrying, retry] = useRetry(load)
 
   // Pick someone sensible when nothing (or someone who left) is selected.
   const current = useMemo(() => {
@@ -125,8 +132,13 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
           {error}
         </p>
       )}
+      {failed && members && sharing && <StaleBanner what="your family" busy={retrying} onRetry={retry} />}
       {!members || !sharing ? (
-        <TallynLoader />
+        failed ? (
+          <LoadFailed what="your family" busy={retrying} onRetry={retry} />
+        ) : (
+          <TallynLoader />
+        )
       ) : (
         <div className="family-grid">
           <section className="panel family-list" aria-label="People in your household">

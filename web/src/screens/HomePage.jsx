@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import AccountIcon from '../components/AccountIcon.jsx'
 import { categoryPath } from '../components/TxIcon.jsx'
 import TransactionRow from '../components/TransactionRow.jsx'
@@ -13,6 +13,8 @@ import { useFadeOnChange } from '../lib/motion.js'
 import { LinkBank } from './Banks.jsx'
 import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
+import { useRetry } from '../lib/retry.js'
 
 // Home (#39 step 2), matching docs/03 Design/Comps/web-app-draft.html:
 // total balance and net worth, your accounts apart from money shared with you
@@ -32,11 +34,11 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
   const [spending, setSpending] = useState(null) // { yours, everyone } month summaries, one per currency
   const [scope, setScope] = useState('yours') // Home opens on your own money (#68)
   const [error, setError] = useState('')
+  const [failed, setFailed] = useState(false) // the last load failed (#151)
 
-  useEffect(() => {
+  const load = useCallback(() => {
     const hh = encodeURIComponent(household.id)
-    setError('')
-    Promise.all([
+    return Promise.all([
       api(`/api/banks?household_id=${hh}`),
       api(`/api/households/${hh}/members`),
       api(`/api/transactions?household_id=${hh}&limit=200`),
@@ -50,10 +52,17 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
         setTxs(t.transactions)
         setMine(y.transactions)
         setSpending({ yours: sy.summary, everyone: se.summary })
+        setFailed(false)
+        setError('')
       },
-      () => setError("We couldn't load your household's money. Try again in a moment."),
+      () => setFailed(true),
     )
-  }, [household.id, me.user_id, refreshKey])
+  }, [household.id, me.user_id])
+
+  useEffect(() => {
+    load()
+  }, [load, refreshKey])
+  const [retrying, retry] = useRetry(load)
 
   const people = useMemo(() => Object.fromEntries(members.map((m) => [m.user_id, m])), [members])
   const roles = useMemo(() => Object.fromEntries(members.map((m) => [m.user_id, m.role])), [members])
@@ -76,8 +85,13 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
           {error}
         </p>
       )}
+      {failed && banks && <StaleBanner busy={retrying} onRetry={retry} />}
       {!banks ? (
-        <TallynLoader />
+        failed ? (
+          <LoadFailed busy={retrying} onRetry={retry} />
+        ) : (
+          <TallynLoader />
+        )
       ) : (
         <HomeColumns
           wide={wide}

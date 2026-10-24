@@ -3,6 +3,8 @@ import AccountIcon from '../components/AccountIcon.jsx'
 import NotchGauge from '../components/NotchGauge.jsx'
 import RingChart from '../components/RingChart.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
+import { useRetry } from '../lib/retry.js'
 import { api } from '../lib/api.js'
 import { canAddCardDetails, dueState, shortDate, todayISO } from '../lib/cards.js'
 import { formatMoney } from '../lib/money.js'
@@ -66,19 +68,26 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
   const [members, setMembers] = useState([])
   const [who, setWho] = useState('yours')
   const [error, setError] = useState('')
+  const [failed, setFailed] = useState(false) // the last load failed (#151)
   const home = household.home_currency
   const money = useCallback((v) => formatMoney(v, home), [home])
 
-  useEffect(() => {
+  const load = useCallback(() => {
     const hh = encodeURIComponent(household.id)
-    Promise.all([api(`/api/banks?household_id=${hh}`), api(`/api/households/${hh}/members`)]).then(
+    return Promise.all([api(`/api/banks?household_id=${hh}`), api(`/api/households/${hh}/members`)]).then(
       ([b, m]) => {
         setBanks(b.banks)
         setMembers(m.members)
+        setFailed(false)
       },
-      () => setError("We couldn't load your debts. Try again in a moment."),
+      () => setFailed(true),
     )
-  }, [household.id, refreshKey])
+  }, [household.id])
+
+  useEffect(() => {
+    load()
+  }, [load, refreshKey])
+  const [retrying, retry] = useRetry(load)
 
   const people = useMemo(() => Object.fromEntries(members.map((m) => [m.user_id, m])), [members])
   const owners = [...new Set((banks ?? []).map((b) => b.owner_user_id))].filter((id) => id !== me.user_id)
@@ -130,8 +139,13 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
         </p>
       )}
 
+      {failed && banks && <StaleBanner busy={retrying} onRetry={retry} />}
       {!banks ? (
-        <TallynLoader />
+        failed ? (
+          <LoadFailed busy={retrying} onRetry={retry} />
+        ) : (
+          <TallynLoader />
+        )
       ) : debts.length === 0 ? (
         <section className="panel empty-state">
           <p className="muted">{who === 'yours' ? 'No credit cards or loans to show. Nice.' : 'No credit cards or loans to show here.'}</p>

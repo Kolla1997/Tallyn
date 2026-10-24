@@ -28,7 +28,15 @@ export default function CodeForm({ factorIds, button, onVerified, autoFocus = tr
     if (busy) return
     setError('')
     setBusy(true)
-    const ok = await verifyCode(value, factorIds)
+    let ok
+    try {
+      ok = await verifyCode(value, factorIds)
+    } catch {
+      // Couldn't reach Supabase (#151): keep the digits so they can send them again.
+      setBusy(false)
+      setError("We couldn't check the code. Try again.")
+      return
+    }
     setBusy(false)
     if (ok) onVerified?.()
     else {

@@ -74,4 +74,18 @@ describe('CodeForm', () => {
     expect(document.activeElement).toBe(boxes()[0])
     expect(screen.getByRole('button', { name: 'Turn on 2FA' })).toBeDisabled()
   })
+
+  it('not reaching Supabase says so, keeps the digits and doesn’t lock the form (#151)', async () => {
+    verify.mockResolvedValueOnce({ error: Object.assign(new Error('Failed to fetch'), { name: 'AuthRetryableFetchError' }) })
+    const onVerified = vi.fn()
+    render(<CodeForm factorIds={['f1']} button="Continue" onVerified={onVerified} />)
+    '123456'.split('').forEach((d, i) => type(i, d))
+    await act(async () => {})
+    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't check the code. Try again.")
+    expect(values()).toEqual(['1', '2', '3', '4', '5', '6'])
+    const go = screen.getByRole('button', { name: 'Continue' })
+    expect(go).toBeEnabled()
+    await act(async () => fireEvent.click(go))
+    expect(onVerified).toHaveBeenCalled()
+  })
 })

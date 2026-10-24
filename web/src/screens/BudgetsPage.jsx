@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BudgetsIcon } from '../components/Icons.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
+import { useRetry } from '../lib/retry.js'
 import { CategoryIcon } from '../components/TxIcon.jsx'
 import { api } from '../lib/api.js'
 import { BUDGET_CATEGORIES, coverChoices, fromMinor, pace, periodInfo, runningTotals, tone, toMinor } from '../lib/budgets.js'
@@ -88,17 +90,24 @@ export default function BudgetsPage({ me, household, refreshKey }) {
   const money = useCallback((v) => formatMoney(v, home), [home])
   const today = todayISO()
 
-  useEffect(() => {
+  const [failed, setFailed] = useState(false) // the last load failed (#151)
+  const load = useCallback(() => {
     const hh = encodeURIComponent(household.id)
-    Promise.all([api(`/api/budgets?household_id=${hh}&today=${today}`), api(`/api/households/${hh}/members`)]).then(
+    return Promise.all([api(`/api/budgets?household_id=${hh}&today=${today}`), api(`/api/households/${hh}/members`)]).then(
       ([b, m]) => {
         setData(b)
         setMembers(m.members)
         setError('')
+        setFailed(false)
       },
-      () => setError("We couldn't load your budgets. Try again in a moment."),
+      () => setFailed(true),
     )
-  }, [household.id, refreshKey, reload, today])
+  }, [household.id, today])
+
+  useEffect(() => {
+    load()
+  }, [load, refreshKey, reload])
+  const [retrying, retry] = useRetry(load)
 
   const people = useMemo(() => Object.fromEntries(members.map((m) => [m.user_id, m])), [members])
   const choices = coverChoices(household.role, me.user_id, members)
@@ -141,8 +150,13 @@ export default function BudgetsPage({ me, household, refreshKey }) {
           </p>
         )}
 
+        {failed && data && <StaleBanner busy={retrying} onRetry={retry} />}
         {!data ? (
-          <TallynLoader />
+          failed ? (
+            <LoadFailed busy={retrying} onRetry={retry} />
+          ) : (
+            <TallynLoader />
+          )
         ) : (
           <>
             <Counting counting={data.counting} people={people} me={me} />

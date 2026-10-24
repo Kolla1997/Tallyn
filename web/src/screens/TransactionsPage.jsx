@@ -7,6 +7,7 @@ import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useBusy, useFadeOnChange } from '../lib/motion.js'
 
 // All transactions (#42): switch between household members, search by
@@ -78,6 +79,8 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   const [loaded, setLoaded] = useState(0)
   const [dailyLoading, setDailyLoading] = useState(false)
   const [error, setError] = useState('')
+  const [failed, setFailed] = useState(false) // the last load failed (#151)
+  const [attempt, setAttempt] = useState(0) // Try again
   const request = useRef(0)
 
   useEffect(() => {
@@ -140,8 +143,9 @@ export default function TransactionsPage({ me, household, refreshKey }) {
           if (id !== request.current) return
           setList(d.transactions)
           setMore(d.more)
+          setFailed(false)
         },
-        () => id === request.current && setError("We couldn't load transactions. Try again in a moment."),
+        () => id === request.current && setFailed(true),
       )
       .finally(done)
     // Totals over every matching transaction, not just this page (#58).
@@ -152,7 +156,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
       )
       .finally(done)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [household.id, who, query, category, bank, month, day, refreshKey])
+  }, [household.id, who, query, category, bank, month, day, refreshKey, attempt])
 
   // The year of dots: this year's spending per day, for the same person,
   // search and category (not the month or day, which it's for choosing).
@@ -338,8 +342,13 @@ export default function TransactionsPage({ me, household, refreshKey }) {
 
       <div className={`tx-layout ${zone(busy, fading)}`} aria-busy={busy}>
         <div className="tx-main">
+          {failed && list && <StaleBanner what="your transactions" busy={loading} onRetry={() => setAttempt((n) => n + 1)} />}
           {!list ? (
-            <TallynLoader />
+            failed ? (
+              <LoadFailed what="your transactions" busy={loading} onRetry={() => setAttempt((n) => n + 1)} />
+            ) : (
+              <TallynLoader />
+            )
           ) : list.length === 0 ? (
             <section className="panel empty-state">
               <p className="muted">
