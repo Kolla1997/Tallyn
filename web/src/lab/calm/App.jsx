@@ -10,6 +10,7 @@ const PAGES = [
   ['budgets', 'Budgets', lazy(() => import('./Budgets.jsx'))],
   ['debts', 'Debts', lazy(() => import('./Debts.jsx'))],
   ['family', 'Family', lazy(() => import('./Family.jsx'))],
+  ['goals', 'Goals', lazy(() => import('./Goals.jsx'))],
 ]
 
 export default function App() {
