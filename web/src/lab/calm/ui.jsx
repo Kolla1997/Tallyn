@@ -15,6 +15,8 @@ import {
   Menu,
   ChevronsLeft,
   ChevronsRight,
+  Sun,
+  Moon,
 } from 'lucide-react'
 import * as D from '../home/data.js'
 import lockupLight from '../../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg?url'
@@ -281,16 +283,18 @@ export function Shell({ page, pages, go, dark, setDark, children, bare = false }
           </select>
         </label>
         <span>made-up names and amounts</span>
-        <span className="ml-auto flex gap-1">
+        <span role="group" aria-label="Theme" className="ml-auto flex gap-0.5 rounded-full border border-zinc-300 p-0.5 dark:border-zinc-700">
           {[false, true].map((v) => (
             <button
               key={String(v)}
               type="button"
               aria-pressed={v === dark}
+              aria-label={v ? 'Dark' : 'Light'}
+              title={v ? 'Dark' : 'Light'}
               onClick={() => setDark(v)}
-              className="rounded-full border border-zinc-300 px-3 py-1 font-semibold aria-pressed:border-zinc-900 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:border-zinc-700 dark:aria-pressed:border-white dark:aria-pressed:bg-white dark:aria-pressed:text-zinc-900"
+              className="flex size-8 items-center justify-center rounded-full text-zinc-500 hover:text-zinc-900 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:text-zinc-400 dark:hover:text-white dark:aria-pressed:bg-white dark:aria-pressed:text-zinc-900"
             >
-              {v ? 'Dark' : 'Light'}
+              {v ? <Moon className="size-4" aria-hidden="true" /> : <Sun className="size-4" aria-hidden="true" />}
             </button>
           ))}
         </span>
