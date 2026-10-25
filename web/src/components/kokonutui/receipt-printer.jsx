@@ -60,50 +60,69 @@ function turn(px, py, angle) {
   return [px * cos - py * sin, px * sin + py * cos]
 }
 
-function Receipt({ merchant, order, date, items, tax, currency }) {
-  const money = (n) => n.toFixed(2)
-  const subtotal = items.reduce((sum, i) => sum + i.quantity * i.price, 0)
+const money = (v) => v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+// Tallyn edit (#182): a ledger receipt. Signed lines in the figure font,
+// no tax or barcode unless asked, and a total label of your own.
+function Receipt({ merchant, date, order, items, tax, currency, totalLabel = 'Total', footer, plain }) {
+  const subtotal = items.reduce((sum, item) => sum + item.quantity * item.price, 0)
   const taxAmount = subtotal * tax
+  const sign = (v) => (v < 0 ? '\u2212' : '')
   return (
-    <div className="px-5 pt-6 pb-8 font-mono text-[11px] text-zinc-800 leading-[15px]">
-      <p className="text-center font-semibold text-xs tracking-[0.2em]">{merchant.toUpperCase()}</p>
-      <p className="text-center text-zinc-500">{date}</p>
-      <p className="text-center text-zinc-500">Order {order}</p>
-      <p aria-hidden="true" className="my-[7px] overflow-hidden whitespace-nowrap text-zinc-400">
+    <div className={cn('px-5 pt-6 pb-8 text-[12px] text-zinc-800 leading-[18px]', plain ? 'font-[family-name:var(--receipt-font)]' : 'font-mono')}>
+      <p className={cn('text-center font-semibold text-xs', !plain && 'tracking-[0.2em]')}>{plain ? merchant : merchant.toUpperCase()}</p>
+      <p className="text-center text-zinc-600">{date}</p>
+      {order && <p className="text-center text-zinc-600">{order}</p>}
+      <p aria-hidden="true" className="my-[7px] overflow-hidden whitespace-nowrap text-zinc-600">
         {'- '.repeat(40)}
       </p>
       {items.map((item) => (
-        <p className="flex justify-between gap-3" key={item.name}>
-          <span className="truncate">
-            {item.quantity} × {item.name}
+        <div className="flex justify-between gap-3 py-[2px]" key={item.name}>
+          <span className="min-w-0">
+            <span className="block truncate">
+              {plain ? `${item.price < 0 ? '\u2212' : '+'} ` : `${item.quantity} \u00d7 `}
+              {item.name}
+            </span>
+            {item.note && <span className="block truncate text-zinc-600">{item.note}</span>}
           </span>
-          <span className="tabular-nums">{money(item.quantity * item.price)}</span>
-        </p>
+          <span className="tabular-nums whitespace-nowrap">
+            {sign(item.price)}
+            {currency}
+            {money(Math.abs(item.quantity * item.price))}
+          </span>
+        </div>
       ))}
-      <p aria-hidden="true" className="my-[7px] overflow-hidden whitespace-nowrap text-zinc-400">
+      <p aria-hidden="true" className="my-[7px] overflow-hidden whitespace-nowrap text-zinc-600">
         {'- '.repeat(40)}
       </p>
-      <p className="flex justify-between text-zinc-500">
-        <span>Subtotal</span>
-        <span className="tabular-nums">{money(subtotal)}</span>
-      </p>
-      <p className="flex justify-between text-zinc-500">
-        <span>Tax {Math.round(tax * 100)}%</span>
-        <span className="tabular-nums">{money(taxAmount)}</span>
-      </p>
-      <p className="mt-1 flex justify-between font-semibold text-[13px]">
-        <span>Total</span>
+      {tax > 0 && (
+        <>
+          <p className="flex justify-between text-zinc-600">
+            <span>Subtotal</span>
+            <span className="tabular-nums">{money(subtotal)}</span>
+          </p>
+          <p className="flex justify-between text-zinc-600">
+            <span>Tax {Math.round(tax * 100)}%</span>
+            <span className="tabular-nums">{money(taxAmount)}</span>
+          </p>
+        </>
+      )}
+      <p className="mt-1 flex justify-between font-semibold text-[14px]">
+        <span>{totalLabel}</span>
         <span className="tabular-nums">
+          {sign(subtotal + taxAmount)}
           {currency}
-          {money(subtotal + taxAmount)}
+          {money(Math.abs(subtotal + taxAmount))}
         </span>
       </p>
-      <div aria-hidden="true" className="mt-4 flex h-9 justify-center gap-px">
-        {BARS.map((width, i) => (
-          <span className={i % 2 ? 'bg-transparent' : 'bg-zinc-800'} key={`bar-${i.toString()}`} style={{ width }} />
-        ))}
-      </div>
-      <p className="mt-3 text-center text-zinc-500">Thank you, come again</p>
+      {!plain && (
+        <div aria-hidden="true" className="mt-4 flex h-9 justify-center gap-px">
+          {BARS.map((width, i) => (
+            <span className={i % 2 ? 'bg-transparent' : 'bg-zinc-800'} key={`bar-${i.toString()}`} style={{ width }} />
+          ))}
+        </div>
+      )}
+      <p className="mt-3 text-center text-zinc-600">{footer ?? 'Thank you, come again'}</p>
     </div>
   )
 }
@@ -128,6 +147,10 @@ export default function ReceiptPrinter({
   onPrint,
   onTear,
   className,
+  totalLabel,
+  footer,
+  plain = false,
+  printLabel = 'Print receipt',
 }) {
   const [phase, setPhase] = useState('idle')
   const [torn, setTorn] = useState(false)
@@ -637,7 +660,17 @@ export default function ReceiptPrinter({
         >
           {/* Perforation along the slot, where the sheet tears off. */}
           {!torn && <span aria-hidden="true" className="absolute inset-x-1 top-1 border-zinc-300 border-t-2 border-dotted" />}
-          <Receipt currency={currency} date={date} items={items} merchant={merchant} order={order} tax={tax} />
+          <Receipt
+            currency={currency}
+            date={date}
+            footer={footer}
+            items={items}
+            merchant={merchant}
+            order={order}
+            plain={plain}
+            tax={tax}
+            totalLabel={totalLabel}
+          />
         </div>
       </div>
 
@@ -681,7 +714,7 @@ export default function ReceiptPrinter({
           tabIndex={phase === 'idle' ? 0 : -1}
           type="button"
         >
-          {torn ? 'Print another' : 'Print receipt'}
+          {torn ? 'Print another' : printLabel}
         </button>
       </div>
     </div>

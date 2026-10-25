@@ -5,9 +5,6 @@ import { createRoot } from 'react-dom/client'
 import '../fonts.css'
 import './lab.css'
 import Smoke from './Smoke.jsx'
+import HomeDrafts from './home/HomeDrafts.jsx'
 
-createRoot(document.getElementById('lab')).render(
-  <StrictMode>
-    <Smoke />
-  </StrictMode>,
-)
+createRoot(document.getElementById('lab')).render(<StrictMode>{new URLSearchParams(location.search).has('smoke') ? <Smoke /> : <HomeDrafts />}</StrictMode>)
