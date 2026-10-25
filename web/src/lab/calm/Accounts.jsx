@@ -1,9 +1,10 @@
 // Accounts, calm draft (#185). Same jobs as web/src/screens/AccountsPage.jsx: whose accounts
 // (Yours, each person, Everyone), net worth with have and owe, You have and You owe grouped by
 // kind, and Connected banks with status and actions (Reconnect, Unlink), plus Link a bank.
-// Four layouts to compare (draft only, ?l=a|b|c|d), all under the same summary strip:
-// A Ledger (one table, have then owe), B By bank (each bank heads its own accounts, so banks are
-// listed once), C Tiles (small account cards in a grid), D Mix (B's banks, A's columns).
+// Layouts to compare (draft only, ?l=b|c|e|f), all under the same summary strip: B By bank (each
+// bank heads its own accounts), C Tiles (small account cards), and two mixes of B and C that
+// Dinesh asked for: E Tiles with bank (C's tiles, each naming its bank and its state) and F Bank
+// bento (B's bank cards holding C's tiles, sized by how many accounts each bank has).
 // Made-up names and amounts.
 import { useState } from 'react'
 import { Link2, Wallet, PiggyBank, Globe, Users, CreditCard, Car } from 'lucide-react'
@@ -17,10 +18,10 @@ const WHO = [
   ['everyone', 'Everyone'],
 ]
 const LAYOUTS = [
-  ['a', 'A · Ledger'],
   ['b', 'B · By bank'],
   ['c', 'C · Tiles'],
-  ['d', 'D · Mix'],
+  ['e', 'E · Tiles with bank'],
+  ['f', 'F · Bank bento'],
 ]
 const ICON = {
   'Everyday checking': Wallet,
@@ -160,87 +161,6 @@ const BankActions = ({ b }) => (
     </Button>
   </span>
 )
-const Head = ({ children, right }) => (
-  <div className={`flex items-baseline justify-between border-b px-4 py-2.5 ${LINE}`}>
-    <h2 className="font-display text-[15px] font-semibold">{children}</h2>
-    {right}
-  </div>
-)
-const MoveNote = () => <Note className={`border-t px-4 py-2.5 ${LINE}`}>Tallyn reads balances and transactions. It can’t move money.</Note>
-
-// An account as a row: name and where it lives, the detail, the balance. `bank` adds a bank column.
-function AccountRow({ a, bank, showOwner }) {
-  return (
-    <li
-      className={`grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-5 gap-y-1.5 border-b px-4 py-2.5 last:border-b-0 ${LINE} ${
-        bank ? 'sm:grid-cols-[minmax(0,1.3fr)_minmax(0,0.8fr)_minmax(0,1.2fr)_120px]' : 'sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1.2fr)_120px]'
-      }`}
-    >
-      <span className="flex min-w-0 items-center gap-2.5">
-        <AccountIcon a={a} />
-        <span className="min-w-0">
-          <span className="block truncate text-sm font-semibold">{a.name}</span>
-          <span className={`block truncate text-[12px] ${MUTED}`}>
-            ··{a.last4}
-            {showOwner && `, ${OWNER[a.who]}`}
-          </span>
-        </span>
-      </span>
-      {bank && <span className={`hidden truncate text-[13px] sm:block ${MUTED}`}>{bank}</span>}
-      <span className="order-last col-span-2 min-w-0 sm:order-none sm:col-span-1">
-        <Detail a={a} />
-      </span>
-      <Balance a={a} className="text-right" />
-    </li>
-  )
-}
-
-// ── A · Ledger: one table, You have then You owe, banks listed below as rows.
-function Ledger({ haveList, oweList, have, owe, showOwner, visibleBanks }) {
-  const group = (list) =>
-    [...new Set(list.map(KIND))].map((k) => (
-      <div key={k}>
-        <p className={`border-b bg-zinc-50 px-4 py-1.5 text-[12px] font-semibold dark:bg-zinc-800/40 ${LINE} ${MUTED}`}>{k}</p>
-        <ul>
-          {list
-            .filter((a) => KIND(a) === k)
-            .map((a) => (
-              <AccountRow key={a.name} a={a} bank={BANKS.find((b) => b.key === a.bank).name} showOwner={showOwner} />
-            ))}
-        </ul>
-      </div>
-    ))
-  return (
-    <>
-      <section aria-label="Your accounts" className={`${CARD} overflow-hidden`}>
-        <Head right={<span className={`${NUM} text-sm`}>{usd(have)}</span>}>You have</Head>
-        {haveList.length ? group(haveList) : <Note className="px-4 py-2.5">No accounts yet.</Note>}
-        <div className={`border-t ${LINE}`} />
-        <Head right={<span className={`${NUM} text-sm text-[var(--owe-text)]`}>{usd(-owe)}</span>}>You owe</Head>
-        {oweList.length ? group(oweList) : <Note className="px-4 py-2.5">Nothing owed. Cards and loans show here when they have a balance.</Note>}
-      </section>
-      <section aria-label="Connected banks" className={`${CARD} overflow-hidden`}>
-        <Head right={<span className={`text-[13px] ${MUTED}`}>{visibleBanks.length} banks</span>}>Connected banks</Head>
-        <ul>
-          {visibleBanks.map(({ b, list }) => (
-            <li key={b.key} className={`flex flex-wrap items-center gap-x-4 gap-y-2 border-b px-4 py-2.5 last:border-b-0 ${LINE}`}>
-              <Badge text={b.initials} tone={b.status === 'ok' ? 'var(--grey-5)' : 'var(--accent)'} />
-              <span className="min-w-0 grow">
-                <span className="block text-sm font-semibold">{b.name}</span>
-                <span className={`block text-[12px] ${MUTED}`}>
-                  {list.length} {list.length === 1 ? 'account' : 'accounts'} in this view
-                </span>
-              </span>
-              <Status b={b} />
-              <BankActions b={b} />
-            </li>
-          ))}
-        </ul>
-        <MoveNote />
-      </section>
-    </>
-  )
-}
 
 // ── B · By bank: each bank heads its accounts; its status and actions sit in its header.
 function ByBank({ visibleBanks, showOwner }) {
@@ -337,45 +257,118 @@ function Tiles({ haveList, oweList, showOwner, visibleBanks }) {
   )
 }
 
-// ── D · Mix: B's banks (each bank once, heading its accounts, status and actions in the header)
-// laid out as A's single table with its columns, so it scans top to bottom.
-function Mix({ visibleBanks, showOwner }) {
+// One account as a small tile (C), used inside E and F.
+function Tile({ a, showOwner, bankLine }) {
   return (
-    <section aria-label="Your accounts by bank" className={`${CARD} overflow-hidden`}>
-      <div className={`hidden grid-cols-[minmax(0,1.3fr)_minmax(0,1.2fr)_120px] gap-x-5 border-b px-4 py-2 text-[12px] font-semibold sm:grid ${LINE} ${MUTED}`}>
-        <span>Account</span>
-        <span>Detail</span>
-        <span className="text-right">Balance</span>
-      </div>
-      {visibleBanks.map(({ b, list }) => (
-        <div key={b.key}>
-          <div className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b bg-zinc-50 px-4 py-2 dark:bg-zinc-800/40 ${LINE}`}>
-            <Badge text={b.initials} tone={b.status === 'ok' ? 'var(--grey-5)' : 'var(--accent)'} />
-            <span className="text-[13px] font-semibold">{b.name}</span>
-            <Status b={b} />
-            <span className="ml-auto">
+    <div className="grid gap-2">
+      <span className="flex min-w-0 items-center gap-2">
+        <AccountIcon a={a} />
+        <span className="min-w-0">
+          <span className="block truncate text-[13px] font-semibold">{a.name}</span>
+          <span className={`block truncate text-[12px] ${MUTED}`}>
+            {bankLine ?? KIND(a)} ··{a.last4}
+            {showOwner && `, ${OWNER[a.who]}`}
+          </span>
+        </span>
+      </span>
+      <Balance a={a} className="text-lg" />
+      <Detail a={a} />
+    </div>
+  )
+}
+const bankOf = (a) => BANKS.find((b) => b.key === a.bank)
+
+// ── E · Tiles that carry their bank: C's grid of account tiles under You have and You owe;
+// each tile names its bank and that bank's state (B), and a bank that needs you is outlined.
+function TilesWithBank({ haveList, oweList, showOwner }) {
+  const tiles = (list) => (
+    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {list.map((a) => {
+        const b = bankOf(a)
+        const ok = b.status === 'ok'
+        return (
+          <li key={a.name} className={`${CARD} flex flex-col gap-3 p-3 ${ok ? '' : 'ring-1 ring-[var(--accent)]'}`}>
+            <span className={`flex items-center gap-2 border-b pb-2 ${LINE}`}>
+              <Badge text={b.initials} tone={ok ? 'var(--grey-5)' : 'var(--accent)'} />
+              <span className="min-w-0 grow">
+                <span className="block truncate text-[12px] font-semibold">{b.name}</span>
+                <Status b={b} />
+              </span>
+            </span>
+            <Tile a={a} showOwner={showOwner} />
+            <span className="mt-auto flex justify-end">
               <BankActions b={b} />
             </span>
-          </div>
-          <ul>
-            {list.map((a) => (
-              <AccountRow key={a.name} a={a} showOwner={showOwner} />
-            ))}
-          </ul>
-        </div>
-      ))}
-      <MoveNote />
-    </section>
+          </li>
+        )
+      })}
+    </ul>
+  )
+  return (
+    <>
+      {haveList.length > 0 && (
+        <section aria-label="You have">
+          <h2 className={`mb-2 text-[13px] font-semibold ${MUTED}`}>You have</h2>
+          {tiles(haveList)}
+        </section>
+      )}
+      {oweList.length > 0 && (
+        <section aria-label="You owe">
+          <h2 className={`mb-2 text-[13px] font-semibold ${MUTED}`}>You owe</h2>
+          {tiles(oweList)}
+        </section>
+      )}
+      <Note>Tallyn reads balances and transactions. It can’t move money.</Note>
+    </>
   )
 }
 
-const VIEWS = { a: Ledger, b: ByBank, c: Tiles, d: Mix }
+// ── F · Bank bento: one card per bank (B) holding its accounts as tiles (C). A card grows with
+// its number of accounts, and cards wrap and stretch so every row is filled.
+function Bento({ visibleBanks, showOwner }) {
+  return (
+    <>
+      <ul className="flex flex-wrap gap-3">
+        {visibleBanks.map(({ b, list }) => {
+          const ok = b.status === 'ok'
+          return (
+            <li
+              key={b.key}
+              aria-label={b.name}
+              className={`${CARD} flex min-w-[280px] flex-col overflow-hidden ${ok ? '' : 'ring-1 ring-[var(--accent)]'}`}
+              style={{ flex: `${list.length} 1 ${list.length * 320}px` }}
+            >
+              <div className={`flex items-center gap-2.5 border-b px-3 py-2 ${LINE}`}>
+                <Badge text={b.initials} tone={ok ? 'var(--grey-5)' : 'var(--accent)'} />
+                <span className="min-w-0 grow truncate text-[13px] font-semibold">{b.name}</span>
+              </div>
+              <div className={`grid grow divide-x ${LINE}`} style={{ gridTemplateColumns: `repeat(${list.length}, minmax(0, 1fr))` }}>
+                {list.map((a) => (
+                  <div key={a.name} className={`p-3 ${LINE}`}>
+                    <Tile a={a} showOwner={showOwner} />
+                  </div>
+                ))}
+              </div>
+              <div className={`mt-auto flex flex-wrap items-center justify-between gap-2 border-t px-3 py-2 ${LINE}`}>
+                <Status b={b} />
+                <BankActions b={b} />
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+      <Note>Tallyn reads balances and transactions. It can’t move money.</Note>
+    </>
+  )
+}
+
+const VIEWS = { b: ByBank, c: Tiles, e: TilesWithBank, f: Bento }
 
 export default function Accounts() {
   const [who, setWho] = useState('yours')
   const [layout, setLayout] = useState(() => {
     const l = new URLSearchParams(location.search).get('l')
-    return VIEWS[l] ? l : 'd'
+    return VIEWS[l] ? l : 'f'
   })
   const pick = (l) => {
     setLayout(l)
