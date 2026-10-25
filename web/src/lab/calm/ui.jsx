@@ -1,7 +1,7 @@
 // Shared pieces for the calm drafts of every screen (#185), taken from the calm Home (#182).
 // Red, green, white, black; the original sidebar and phone tab bar; Tallyn's fonts and logo.
 // Kokonut UI and Bklit components are used by the pages; anime.js only for press feedback.
-import { createContext, useContext, useLayoutEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { animate } from 'animejs'
 import {
   Home as HomeIcon,
@@ -204,16 +204,7 @@ function Sidebar({ dark, collapsed, onToggle, page, go }) {
 }
 
 // The signed-in shell: draft bar (page switcher, Light/Dark), sidebar, phone header and tab bar.
-// Draft size (#185): A as built, B compact type and spacing, C compact plus trimmed visuals and width caps.
-export const SizeContext = createContext('a')
-export const useSize = () => useContext(SizeContext)
-export const SIZES = [
-  ['a', 'A · Now'],
-  ['b', 'B · Compact'],
-  ['c', 'C · Compact + trimmed'],
-]
-
-export function Shell({ page, pages, go, dark, setDark, size = 'a', setSize, children, bare = false }) {
+export function Shell({ page, pages, go, dark, setDark, children, bare = false }) {
   const q = new URLSearchParams(location.search)
   const [collapsed, setCollapsed] = useState(q.get('nav') === 'collapsed')
   useLayoutEffect(() => {
@@ -223,7 +214,7 @@ export function Shell({ page, pages, go, dark, setDark, size = 'a', setSize, chi
   return (
     <div
       style={THEME[dark ? 'dark' : 'light']}
-      data-size={size}
+      data-compact
       className="min-h-svh bg-zinc-50 font-[family-name:Montserrat] text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
     >
       <div className="sticky top-0 z-50 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-200 bg-white/90 px-4 py-2 text-[13px] text-zinc-600 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90 dark:text-zinc-400">
@@ -255,22 +246,6 @@ export function Shell({ page, pages, go, dark, setDark, size = 'a', setSize, chi
             </button>
           ))}
         </span>
-        {setSize && (
-          <span role="group" aria-label="Size" className="flex items-center gap-1">
-            <span className="mr-1">Size</span>
-            {SIZES.map(([k, label]) => (
-              <button
-                key={k}
-                type="button"
-                aria-pressed={k === size}
-                onClick={() => setSize(k)}
-                className="rounded-full border border-zinc-300 px-3 py-1 font-semibold aria-pressed:border-zinc-900 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:border-zinc-700 dark:aria-pressed:border-white dark:aria-pressed:bg-white dark:aria-pressed:text-zinc-900"
-              >
-                {label}
-              </button>
-            ))}
-          </span>
-        )}
         <span>made-up names and amounts</span>
       </div>
 

@@ -9,7 +9,7 @@ import { Ring } from '@/components/charts/ring'
 import { RingCenter } from '@/components/charts/ring-center'
 import { Gauge } from '@/components/charts/gauge'
 import * as D from '../home/data.js'
-import { Panel, Note, Chips, PageHead, usd, useSize } from './ui.jsx'
+import { Panel, Note, Chips, PageHead, usd } from './ui.jsx'
 
 // The debts behind the accounts in data.js, with the details the banks share (made up).
 const amex = D.accounts.find((a) => a.bank === 'Amex')
@@ -108,7 +108,6 @@ function DebtCard({ d }) {
 
 export default function Debts() {
   const [who, setWho] = useState('everyone')
-  const trim = useSize() === 'c'
   const debts = DEBTS.filter((d) => who === 'everyone' || (who === 'yours' ? d.who === 'maya' : d.who === 'joint'))
   const groups = GROUPS.map(([key, label, color]) => ({ key, label, color, list: debts.filter((d) => d.group === key) }))
     .filter((g) => g.list.length)
@@ -139,10 +138,10 @@ export default function Debts() {
                 <RingChart
                   key={who}
                   data={groups.map((g) => ({ label: g.label, value: g.value, maxValue: g.max }))}
-                  size={trim ? 160 : 200}
-                  strokeWidth={trim ? 12 : 14}
-                  ringGap={trim ? 5 : 6}
-                  baseInnerRadius={trim ? 44 : 58}
+                  size={160}
+                  strokeWidth={12}
+                  ringGap={5}
+                  baseInnerRadius={44}
                 >
                   {groups.map((g, i) => (
                     <Ring key={g.key} index={i} color={g.color} showGlow={false} />

@@ -10,7 +10,6 @@
 //   2 Spending (8)               | Recent transactions (4)
 //   3 Your accounts (4) | Credit card + Shared with you (4) | Family + Goals (4)
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { useSize } from '../calm/ui.jsx'
 import { animate } from 'animejs'
 import {
   Home as HomeIcon,
@@ -219,7 +218,6 @@ function OpensOver({ children }) {
 
 // ---- Row 1 ----
 function Total({ scope, setScope }) {
-  const trim = useSize() === 'c'
   const s = scopeOf(scope)
   return (
     <section
@@ -248,7 +246,7 @@ function Total({ scope, setScope }) {
         </div>
       </div>
       <div className="overflow-x-auto">
-        <SplitFlapText text={usd(s.have)} className={trim ? 'text-2xl md:text-4xl' : 'text-3xl md:text-5xl'} />
+        <SplitFlapText text={usd(s.have)} className="text-2xl md:text-4xl" />
       </div>
       <p className="text-[13px] text-zinc-400">
         Net worth <span className="text-white">{usd(s.net)}</span> after {usd(s.owe)} owed on cards and loans. Includes £2,150.00 and €1,480.00.

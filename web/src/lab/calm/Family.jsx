@@ -7,7 +7,7 @@
 import { useState } from 'react'
 import { UserPlus, Mail, Check } from 'lucide-react'
 import * as D from '../home/data.js'
-import { Panel, Rows, Row, Note, Sub, PageHead, Button, Money, Owed, usd, useSize } from './ui.jsx'
+import { Panel, Rows, Row, Note, Sub, PageHead, Button, Money, Owed, usd } from './ui.jsx'
 
 const ROLES = [
   ['owner', 'Owner'],
@@ -271,7 +271,6 @@ function Pending({ inv }) {
 
 export default function Family() {
   const [selected, setSelected] = useState('maya')
-  const trim = useSize() === 'c'
   const [sharing, setSharing] = useState({ james: ['balances', 'transactions'] })
   const person = PEOPLE.find((p) => p.id === selected)
   const invite = INVITES.find((i) => `invite-${i.id}` === selected)
@@ -327,7 +326,7 @@ export default function Family() {
             {PEOPLE.length} people · {usd(D.total)} you can see together
           </Note>
         </nav>
-        <div className={`lg:col-span-8 ${trim ? 'max-w-[640px]' : ''}`}>
+        <div className="max-w-[640px] lg:col-span-8">
           {selected === 'invite' ? (
             <InviteForm />
           ) : invite ? (

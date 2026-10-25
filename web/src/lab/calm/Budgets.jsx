@@ -11,7 +11,7 @@ import { LineChart } from '@/components/charts/line-chart'
 import { Line } from '@/components/charts/line'
 import { pace, tone } from '../../lib/budgets.js'
 import * as D from '../home/data.js'
-import { Panel, Note, Chips, PageHead, Button, usd, useSize } from './ui.jsx'
+import { Panel, Note, Chips, PageHead, Button, usd } from './ui.jsx'
 
 const PACE = { on: 'On pace', ahead: 'Ahead of pace', over: 'Over budget', full: 'All used' }
 const elapsed = D.today / D.days
@@ -107,7 +107,6 @@ function dailyFor(name, total) {
 
 // October 1 to today only: spent so far (solid) against an even pace so far (dashed).
 function PaceChart({ name, planned, spent }) {
-  const trim = useSize() === 'c'
   const data = useMemo(() => {
     const days = dailyFor(name, spent)
     const cum = days.reduce((acc, d) => [...acc, (acc.at(-1) ?? 0) + d], [])
@@ -117,7 +116,7 @@ function PaceChart({ name, planned, spent }) {
   const warn = ['ahead', 'over'].includes(pace(spent, planned, elapsed))
   return (
     <div className="mt-2">
-      <LineChart data={data} aspectRatio={trim ? '3 / 1' : '5 / 2'} margin={{ left: 0, right: 0, top: 4, bottom: 4 }}>
+      <LineChart data={data} aspectRatio="3 / 1" margin={{ left: 0, right: 0, top: 4, bottom: 4 }}>
         <Line dataKey="even" curve={curveLinear} fadeEdges={false} stroke="#a1a1aa" strokeWidth={1.5} dashFromIndex={0} showHighlight={false} animate={false} />
         <Line dataKey="spent" curve={curveLinear} fadeEdges={false} stroke={warn ? 'var(--accent)' : '#52525b'} strokeWidth={2} animate={false} />
       </LineChart>

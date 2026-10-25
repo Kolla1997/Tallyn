@@ -10,7 +10,7 @@ import { LineChart } from '@/components/charts/line-chart'
 import { Line } from '@/components/charts/line'
 import { XAxis } from '@/components/charts/x-axis'
 import * as D from '../home/data.js'
-import { Panel, Note, Chips, PageHead, Button, useSize } from './ui.jsx'
+import { Panel, Note, Chips, PageHead, Button } from './ui.jsx'
 
 const fmt = (v, cur = 'USD', d = 0) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: cur, minimumFractionDigits: d, maximumFractionDigits: d }).format(v)
@@ -93,20 +93,13 @@ function forecastOf(g) {
 }
 
 function Pot({ g, selected, onPick }) {
-  const trim = useSize() === 'c'
   if (g.private) {
     return (
       <li>
         <div className="flex h-full flex-col gap-2 rounded-2xl border border-dashed border-zinc-300 p-3 dark:border-zinc-700">
-          {trim ? (
-            <span className="block h-2 rounded-full bg-zinc-100 dark:bg-zinc-800" aria-hidden="true" />
-          ) : (
-            <div className="flex h-14 items-center justify-center rounded-xl bg-zinc-100 text-zinc-500 dark:bg-zinc-800">
-              <Lock className="size-5" aria-hidden="true" />
-            </div>
-          )}
+          <span className="block h-2 rounded-full bg-zinc-100 dark:bg-zinc-800" aria-hidden="true" />
           <span className="flex items-center gap-1.5 text-sm font-semibold">
-            {trim && <Lock className="size-3.5 text-zinc-500" aria-hidden="true" />}
+            <Lock className="size-3.5 text-zinc-500" aria-hidden="true" />
             {g.name}
           </span>
           <Note>Target {fmt(g.target, g.cur)}</Note>
@@ -126,11 +119,8 @@ function Pot({ g, selected, onPick }) {
         onClick={onPick}
         className="flex h-full w-full flex-col gap-2 rounded-2xl border border-zinc-200 bg-white p-3 text-left transition-[border-color,transform] duration-150 ease-out active:scale-[0.98] aria-pressed:border-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:aria-pressed:border-white"
       >
-        <span className={`relative block overflow-hidden bg-zinc-100 dark:bg-zinc-800 ${trim ? 'h-2 rounded-full' : 'h-14 rounded-xl'}`} aria-hidden="true">
-          <span
-            className="absolute bottom-0 left-0 block"
-            style={trim ? { top: 0, width: `${share * 100}%`, background: 'var(--in)' } : { right: 0, height: `${share * 100}%`, background: 'var(--in)' }}
-          />
+        <span className="relative block h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800" aria-hidden="true">
+          <span className="absolute inset-y-0 left-0 block" style={{ width: `${share * 100}%`, background: 'var(--in)' }} />
         </span>
         <span className="text-sm font-semibold">{g.name}</span>
         <span className="font-[family-name:'Space_Grotesk'] text-sm font-semibold tabular-nums">
@@ -147,7 +137,6 @@ function Pot({ g, selected, onPick }) {
 }
 
 function Detail({ g, onUpdate, onEdit }) {
-  const trim = useSize() === 'c'
   const f = forecastOf(g)
   const data = useMemo(() => {
     const rows = g.history.map((v, i) => ({ date: new Date(2026, i, 28), saved: v }))
@@ -163,7 +152,7 @@ function Detail({ g, onUpdate, onEdit }) {
       <p className="font-[family-name:'Space_Grotesk'] text-lg font-semibold">{f.words}</p>
       <Note>You’ve added about {fmt(pace(g), g.cur)} a month since January.</Note>
       <div className="mt-3">
-        <LineChart data={data} aspectRatio={trim ? '3 / 1' : '5 / 2'} margin={{ left: 8, right: 8, top: 8, bottom: 24 }}>
+        <LineChart data={data} aspectRatio="3 / 1" margin={{ left: 8, right: 8, top: 8, bottom: 24 }}>
           <Line
             dataKey="target"
             curve={curveLinear}
