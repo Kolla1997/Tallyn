@@ -23,6 +23,25 @@ const PALETTES = {
   clay: { name: 'Sage & Clay', accent: '#C8553D', button: '#B04A34', second: '#6F9575', note: "Tallyn's brand colours" },
   ocean: { name: 'Ocean', accent: '#2563eb', button: '#1d4ed8', second: '#14b8a6', note: 'Blue and teal' },
   orchid: { name: 'Orchid', accent: '#a21caf', button: '#a21caf', second: '#f59e0b', note: 'Violet and amber' },
+  // Red, green, white and black: Light/Dark gives the white or black ground; these pick which colour leads.
+  green: {
+    name: 'RGWB · green lead',
+    accent: '#16a34a',
+    button: '#15803d',
+    second: '#6b7280',
+    owe: '#dc2626',
+    chart: ['#16a34a', '#6b7280', '#22c55e', '#9ca3af', '#15803d'],
+    note: 'Green for actions and money, red only for what you owe',
+  },
+  red: {
+    name: 'RGWB · red lead',
+    accent: '#dc2626',
+    button: '#b91c1c',
+    second: '#16a34a',
+    owe: '#dc2626',
+    chart: ['#dc2626', '#6b7280', '#16a34a', '#9ca3af', '#b91c1c'],
+    note: 'Red as the brand colour, green for money in',
+  },
 }
 
 const money = (v) => D.usd(v)
@@ -59,7 +78,7 @@ const bills = D.due.map((d, i) => {
     body: `From ${d.from}${d.inDays <= 5 ? `, in ${d.inDays} days` : ''}.`,
     time: d.when,
     icon: (
-      <span className="flex size-8 items-center justify-center rounded-lg text-white" style={{ background: 'var(--accent)' }}>
+      <span className="flex size-8 items-center justify-center rounded-lg text-white" style={{ background: d.inDays <= 5 ? 'var(--owe)' : 'var(--accent)' }}>
         <I className="size-4" />
       </span>
     ),
@@ -340,9 +359,9 @@ export default function BoldHome() {
         '--button': P.button,
         '--accent': P.accent,
         '--second': P.second,
-        '--chart-1': P.accent,
-        '--chart-2': P.second,
+        '--owe': P.owe || P.accent,
         '--chart-line-primary': P.accent,
+        ...(P.chart ? Object.fromEntries(P.chart.map((c, i) => [`--chart-${i + 1}`, c])) : { '--chart-1': P.accent, '--chart-2': P.second }),
       }}
     >
       <div className="sticky top-0 z-50 flex flex-wrap items-center gap-x-4 gap-y-2 bg-zinc-200 px-4 py-2 text-[13px] text-zinc-700">
@@ -386,7 +405,10 @@ export default function BoldHome() {
               title={p.note}
               className="inline-flex items-center gap-1.5 rounded-full border border-zinc-300 bg-white px-3 py-1 font-semibold aria-pressed:border-zinc-900 aria-pressed:bg-zinc-900 aria-pressed:text-white"
             >
-              <i className="size-2.5 rounded-full" style={{ background: p.accent }} />
+              <i
+                className="size-2.5 rounded-full"
+                style={{ background: p.owe && p.owe !== p.accent ? `linear-gradient(90deg, ${p.accent} 50%, ${p.owe} 50%)` : p.accent }}
+              />
               {p.name}
             </button>
           ))}
