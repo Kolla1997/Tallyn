@@ -11,6 +11,7 @@ export const accounts = [
   { who: 'maya', name: 'Euro account', bank: 'Wise', last4: '5527', cur: 'EUR', bal: 1480.0 },
   { who: 'maya', name: 'Credit card', bank: 'Amex', last4: '3006', cur: 'USD', bal: -1286.4, note: 'due Oct 28' },
   { who: 'joint', name: 'Joint checking', bank: 'Chase', last4: '7713', cur: 'USD', bal: 3912.55 },
+  { who: 'joint', name: 'Car loan', bank: 'Ally', last4: '5512', cur: 'USD', bal: -14200.0, note: '$386 a month', kind: 'loan' },
   { who: 'leo', name: 'Teen savings', bank: 'Chase', last4: '2209', cur: 'USD', bal: 412.0 },
 ].map((a) => ({ ...a, usd: cents(a.bal * rates[a.cur]), rate: rates[a.cur] }))
 
@@ -68,7 +69,7 @@ export const finding = {
   rest: ` with ${days - today} days to go. $${left.toLocaleString('en-US')} left in October's plan in all.`,
 }
 
-console.assert(total === 32071.73, 'total', total)
+console.assert(total === 17871.73, 'total', total)
 console.assert(cents(byCur.reduce((s, c) => s + c.usd, 0)) === total, 'currencies sum to the total')
 console.assert(series[today - 1].spent === spent, 'daily spending sums to the categories')
 console.assert(planned === 4600 && spent === 3486 && left === 1114, 'plan')

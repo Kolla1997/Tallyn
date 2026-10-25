@@ -249,7 +249,7 @@ function Total({ scope, setScope }) {
         <SplitFlapText text={usd(s.have)} className="text-3xl md:text-5xl" />
       </div>
       <p className="text-[13px] text-zinc-400">
-        Net worth <span className="text-white">{usd(s.net)}</span> after {usd(s.owe)} owed on the Amex card. Includes £2,150.00 and €1,480.00.
+        Net worth <span className="text-white">{usd(s.net)}</span> after {usd(s.owe)} owed on cards and loans. Includes £2,150.00 and €1,480.00.
       </p>
     </section>
   )
@@ -535,6 +535,73 @@ function Sidebar({ dark, collapsed, onToggle }) {
   )
 }
 
+// The page itself, without the shell, so the all-screens drafts (#185) can reuse it.
+export function HomeBody({ scope: outerScope, setScope: outerSet }) {
+  const [own, setOwn] = useState('everyone')
+  const scope = outerScope ?? own
+  const setScope = outerSet ?? setOwn
+  return (
+    <>
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-[family-name:'Space_Grotesk'] text-2xl font-bold tracking-tight">The Rivera family</h1>
+          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+            Evening, Maya. <b className="font-semibold text-zinc-900 dark:text-white">{D.finding.strong}</b>
+            {D.finding.rest}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={press}
+            className="inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-sm font-semibold text-white"
+            style={{ background: 'var(--button)' }}
+          >
+            <Link2 className="size-4" aria-hidden="true" />
+            Link a bank
+          </button>
+          <a
+            href="#"
+            onClick={press}
+            className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-300 px-3.5 text-sm font-semibold dark:border-zinc-700"
+          >
+            <Users className="size-4" aria-hidden="true" />
+            Family and sharing
+          </a>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-12 [&>*]:min-w-0">
+        <div className="md:col-span-2 lg:col-span-8">
+          <Total scope={scope} setScope={setScope} />
+        </div>
+        <div className="md:col-span-2 lg:col-span-4">
+          <OpensOver>
+            <ComingUp />
+          </OpensOver>
+        </div>
+        <div className="md:col-span-2 lg:col-span-8">
+          <Spending />
+        </div>
+        <div className="md:col-span-2 lg:col-span-4">
+          <Recent scope={scope} />
+        </div>
+        <div className="lg:col-span-4">
+          <Accounts scope={scope} />
+        </div>
+        <div className="grid content-start gap-3 lg:col-span-4">
+          <Card />
+          <Shared />
+        </div>
+        <div className="grid content-start gap-3 md:col-span-2 lg:col-span-4">
+          <Family />
+          <Goals />
+        </div>
+      </div>
+    </>
+  )
+}
+
 export default function CalmHome() {
   const q = new URLSearchParams(location.search)
   const [dark, setDark] = useState(q.get('t') === 'dark')
@@ -578,62 +645,7 @@ export default function CalmHome() {
 
       <main className={`px-4 pt-5 pb-24 transition-[padding] duration-200 ease-out md:px-6 lg:pb-12 lg:pr-6 ${collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}>
         <div className="mx-auto max-w-[1180px]">
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h1 className="font-[family-name:'Space_Grotesk'] text-2xl font-bold tracking-tight">The Rivera family</h1>
-              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-                Evening, Maya. <b className="font-semibold text-zinc-900 dark:text-white">{D.finding.strong}</b>
-                {D.finding.rest}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={press}
-                className="inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-sm font-semibold text-white"
-                style={{ background: 'var(--button)' }}
-              >
-                <Link2 className="size-4" aria-hidden="true" />
-                Link a bank
-              </button>
-              <a
-                href="#"
-                onClick={press}
-                className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-300 px-3.5 text-sm font-semibold dark:border-zinc-700"
-              >
-                <Users className="size-4" aria-hidden="true" />
-                Family and sharing
-              </a>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-12 [&>*]:min-w-0">
-            <div className="md:col-span-2 lg:col-span-8">
-              <Total scope={scope} setScope={setScope} />
-            </div>
-            <div className="md:col-span-2 lg:col-span-4">
-              <OpensOver>
-                <ComingUp />
-              </OpensOver>
-            </div>
-            <div className="md:col-span-2 lg:col-span-8">
-              <Spending />
-            </div>
-            <div className="md:col-span-2 lg:col-span-4">
-              <Recent scope={scope} />
-            </div>
-            <div className="lg:col-span-4">
-              <Accounts scope={scope} />
-            </div>
-            <div className="grid content-start gap-3 lg:col-span-4">
-              <Card />
-              <Shared />
-            </div>
-            <div className="grid content-start gap-3 md:col-span-2 lg:col-span-4">
-              <Family />
-              <Goals />
-            </div>
-          </div>
+          <HomeBody scope={scope} setScope={setScope} />
         </div>
       </main>
 
