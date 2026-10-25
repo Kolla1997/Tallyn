@@ -12,6 +12,7 @@ const PAGES = [
   ['family', 'Family', lazy(() => import('./Family.jsx'))],
   ['goals', 'Goals', lazy(() => import('./Goals.jsx'))],
   ['settings', 'Settings', lazy(() => import('./Settings.jsx'))],
+  ['signin', 'Sign-in and setup', lazy(() => import('./SignIn.jsx')), true],
 ]
 
 export default function App() {
@@ -30,9 +31,9 @@ export default function App() {
   }, [page])
   const Page = PAGES.find(([k]) => k === page)[2]
   return (
-    <Shell page={page} pages={PAGES} go={go} dark={dark} setDark={setDark}>
+    <Shell page={page} pages={PAGES} go={go} dark={dark} setDark={setDark} bare={PAGES.find(([k]) => k === page)[3]}>
       <Suspense fallback={null}>
-        <Page />
+        <Page dark={dark} />
       </Suspense>
     </Shell>
   )
