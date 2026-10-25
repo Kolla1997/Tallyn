@@ -726,7 +726,7 @@ export default function ActivityTerrain({ data = DEFAULT_DATA, endDate = '2026-1
                 'rounded-full px-3 py-1 font-medium outline-none transition-colors duration-200 ease-out focus-visible:ring-2 focus-visible:ring-zinc-400',
                 flat === value
                   ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-50'
-                  : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100',
+                  : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100',
               )}
               key={name}
               onClick={() => flat !== value && setView(value)}

@@ -442,7 +442,7 @@ export default function SmoothTab({
                 aria-selected={isSelected}
                 className={cn(
                   'relative flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium text-sm',
-                  'text-zinc-500 transition-colors duration-150 ease-out hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100',
+                  'text-zinc-600 transition-colors duration-150 ease-out hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100',
                   'outline-none focus-visible:outline-2 focus-visible:outline-zinc-400 focus-visible:outline-offset-2',
                 )}
                 id={tabId(i)}

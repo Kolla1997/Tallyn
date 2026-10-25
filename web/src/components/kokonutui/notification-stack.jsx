@@ -593,7 +593,7 @@ function NotificationContent({ item, muted, tabbable, onDismiss }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
             <p className="truncate font-medium text-sm text-zinc-900 dark:text-zinc-100">{item.title}</p>
-            <span className="shrink-0 text-xs text-zinc-400 tabular-nums">{item.time}</span>
+            <span className="shrink-0 text-xs text-zinc-500 tabular-nums dark:text-zinc-400">{item.time}</span>
           </div>
           <p className="line-clamp-2 text-sm text-zinc-500 dark:text-zinc-400">{item.body}</p>
         </div>
