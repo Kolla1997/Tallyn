@@ -2,10 +2,10 @@
 // search merchants, category, month and bank filters; spending by day (a day filters the list);
 // the list grouped by day with day totals and Show more; a side panel with the summary (money in,
 // spent, top merchants, by category) or, once a transaction is picked, its details.
-// Spending by day: four forms to compare (SpendingForms.jsx). Made-up names and amounts.
+// Spending by day is SpendingByDay.jsx (Dinesh picked the Mix). Made-up names and amounts.
 import { useState } from 'react'
 import { Search, ShoppingBasket, Utensils, Bus, Baby, Zap, PartyPopper, Banknote, ArrowLeftRight, ArrowLeft, MapPin } from 'lucide-react'
-import SpendingByDay from './SpendingForms.jsx'
+import SpendingByDay from './SpendingByDay.jsx'
 import * as D from '../home/data.js'
 import { Panel, Rows, Note, Chips, PageHead, Button, See, usd } from './ui.jsx'
 

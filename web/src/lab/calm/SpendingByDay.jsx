@@ -1,0 +1,148 @@
+// Spending by day (#185), Dinesh picked 4 · Mix: one bar per October day in the red scale,
+// a dashed daily average, the amount of the day you point at, and three facts beside it. A day
+// filters the list below; picking it again clears. Oct 1's bills bar is capped and labelled so it
+// doesn't flatten the rest. The days add up to $3,486 (data.js) and match the list's day totals.
+import { useState } from 'react'
+import * as D from '../home/data.js'
+import { usd } from './ui.jsx'
+
+const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+// October 2026, day by day so far (Oct 1 carries the month's bills).
+const OCT = D.series.slice(0, D.today).map((r, i, a) => ({ day: i + 1, amount: Math.round((r.spent - (i ? a[i - 1].spent : 0)) * 100) / 100 }))
+console.assert(Math.abs(OCT.reduce((s, d) => s + d.amount, 0) - D.spent) < 0.01, 'October days add up to spent')
+const date = (day) => new Date(Date.UTC(2026, 9, day))
+const label = (d) => `${DOW[(d.getUTCDay() + 6) % 7]}, ${MON[d.getUTCMonth()]} ${d.getUTCDate()}`
+const avg = Math.round(D.spent / D.today)
+const iso = (d) => d.toISOString().slice(0, 10)
+const SEL = 'ring-2 ring-zinc-900 ring-offset-1 dark:ring-white dark:ring-offset-zinc-900'
+const biggest = OCT.reduce((a, b) => (b.amount > a.amount ? b : a))
+const quietest = OCT.reduce((a, b) => (b.amount < a.amount ? b : a))
+
+// 0 nothing, then up to $60, $100, $200, and more. Text colour flips where the red gets deep.
+const level = (v) => (v <= 0 ? 0 : v < 60 ? 1 : v < 100 ? 2 : v < 200 ? 3 : 4)
+const FILL = [
+  'bg-zinc-100 dark:bg-zinc-800',
+  'bg-[#fecaca] dark:bg-[#3b1414]',
+  'bg-[#f87171] dark:bg-[#6b1d1d]',
+  'bg-[#dc2626] dark:bg-[#b91c1c]',
+  'bg-[#7f1d1d] dark:bg-[#f87171]',
+]
+
+function Legend() {
+  return (
+    <div className="flex items-center gap-1 text-[12px] text-zinc-500 dark:text-zinc-400">
+      <span className="mr-1">Less</span>
+      {FILL.map((f, i) => (
+        <span key={i} className={`size-2.5 rounded-[3px] ${f}`} />
+      ))}
+      <span className="ml-1">More</span>
+    </div>
+  )
+}
+const Readout = ({ pick }) => (
+  <p aria-live="polite" className="text-[13px] text-zinc-500 tabular-nums dark:text-zinc-400">
+    {pick ? (
+      <>
+        <b className="font-semibold text-zinc-900 dark:text-white">{label(pick.d)}</b> · {usd(pick.amount, 0)} spent
+      </>
+    ) : (
+      `${usd(D.spent, 0)} spent in October so far · redder days spent more`
+    )}
+  </p>
+)
+
+function Mix({ sel, onPick }) {
+  const [pick, setPick] = useState(null)
+  const CAP = 300 // Oct 1's bills ($1,495) would flatten every other day, so its bar is capped and labelled.
+  return (
+    <div className="grid gap-4 sm:grid-cols-[1fr_168px]">
+      <div className="min-w-0">
+        <Readout pick={pick} />
+        <div className="relative mt-6 flex h-28 items-end gap-[3px]" onMouseLeave={() => setPick(null)}>
+          <span
+            className="pointer-events-none absolute inset-x-0 border-t border-dashed border-zinc-400 dark:border-zinc-500"
+            style={{ bottom: `${(avg / CAP) * 100}%` }}
+            aria-hidden="true"
+          />
+          <span
+            className="pointer-events-none absolute right-0 translate-y-full pt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400"
+            style={{ bottom: `${(avg / CAP) * 100}%` }}
+            aria-hidden="true"
+          >
+            avg {usd(avg, 0)}
+          </span>
+          {Array.from({ length: D.days }, (_, i) => {
+            const x = OCT[i]
+            const capped = x && x.amount > CAP
+            return (
+              <button
+                type="button"
+                key={i}
+                disabled={!x}
+                aria-label={x ? `${label(date(i + 1))}: ${usd(x.amount, 0)}` : `Oct ${i + 1}: still to come`}
+                aria-pressed={x ? sel === iso(date(i + 1)) : undefined}
+                onMouseEnter={() => x && setPick({ d: date(i + 1), amount: x.amount })}
+                onFocus={() => x && setPick({ d: date(i + 1), amount: x.amount })}
+                onClick={() => onPick(iso(date(i + 1)))}
+                className="relative flex h-full flex-1 items-end"
+              >
+                {capped && (
+                  <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 -translate-y-full font-[family-name:'Space_Grotesk'] text-[10px] font-semibold whitespace-nowrap tabular-nums">
+                    {usd(x.amount, 0)}
+                  </span>
+                )}
+                <span
+                  className={`block w-full rounded-t-[3px] ${x ? FILL[level(x.amount)] : 'h-1 bg-zinc-100 dark:bg-zinc-800'} ${x && sel === iso(date(i + 1)) ? SEL : ''} ${capped ? 'bg-[repeating-linear-gradient(0deg,transparent_0_6px,rgb(255_255_255/.35)_6px_8px)]' : ''}`}
+                  style={x ? { height: `${Math.max(4, (Math.min(x.amount, CAP) / CAP) * 100)}%` } : undefined}
+                />
+              </button>
+            )
+          })}
+        </div>
+        <div className="mt-1 flex text-[11px] text-zinc-500 dark:text-zinc-400">
+          {Array.from({ length: D.days }, (_, i) => (
+            <span key={i} className="flex-1 whitespace-nowrap">
+              {[1, 8, 15, 22, 29].includes(i + 1) ? `Oct ${i + 1}` : ''}
+            </span>
+          ))}
+        </div>
+      </div>
+      <dl className="grid content-start gap-2.5 text-[13px] sm:border-l sm:border-zinc-100 sm:pl-4 dark:sm:border-zinc-800">
+        <div>
+          <dt className="text-zinc-500 dark:text-zinc-400">A day, on average</dt>
+          <dd className="font-[family-name:'Space_Grotesk'] text-base font-semibold tabular-nums">{usd(avg, 0)}</dd>
+        </div>
+        <div>
+          <dt className="text-zinc-500 dark:text-zinc-400">Biggest day</dt>
+          <dd className="font-semibold tabular-nums" style={{ color: 'var(--owe-text)' }}>
+            {usd(biggest.amount, 0)} <span className="font-normal text-zinc-500 dark:text-zinc-400">· {label(date(biggest.day))}, bills</span>
+          </dd>
+        </div>
+        <div>
+          <dt className="text-zinc-500 dark:text-zinc-400">Quietest day</dt>
+          <dd className="font-semibold tabular-nums">
+            {usd(quietest.amount, 0)} <span className="font-normal text-zinc-500 dark:text-zinc-400">· {label(date(quietest.day))}</span>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  )
+}
+
+export default function SpendingByDay({ sel = '', onPick = () => {} }) {
+  return (
+    <section aria-labelledby="spend-day-h" className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <h2 id="spend-day-h" className="mb-1 font-[family-name:'Space_Grotesk'] text-[15px] font-semibold">
+        Spending by day
+      </h2>
+      <Mix sel={sel} onPick={(d) => onPick(d === sel ? '' : d)} />
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[12px] text-zinc-500 dark:text-zinc-400">
+          {sel ? 'Showing that day below. Pick it again to see every day.' : 'Pick a day to see its spending below.'}
+        </p>
+        <Legend />
+      </div>
+    </section>
+  )
+}
