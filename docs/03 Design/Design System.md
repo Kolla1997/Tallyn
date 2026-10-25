@@ -69,6 +69,35 @@ AA contrast: 4.5:1 for text under 18.66px bold. Clay with white is 4.4:1 (large 
 ## Motion
 See [[Animation Guide]]. UI transitions are 200 to 300ms, ease-out. Respect reduced motion.
 
+## Designing a screen
+How to design or redesign any Tallyn screen ([#180](https://github.com/Kolla1997/Tallyn/issues/180)). It borrows the app-screen method from taste-skill (`.claude/skills/design-taste-frontend/`, `references/app-screens.md`) but keeps Tallyn's look. Follow the steps in order; when they disagree, the earlier step wins.
+
+**1. Tallyn decides the look.** Colours, type, spacing and shape come from `design-tokens.json`, this note (glass finish, density, components), the [[Brand Guide]], the [[Logo Guide]], [[Voice and Tone]] and [[UI Patterns]]. Nothing from an outside skill changes them.
+
+**2. Plan the content before drawing.** These come from taste-skill and suit a money app:
+
+| Step | What it means in Tallyn |
+|---|---|
+| Know the data and the people | List what the screen shows (accounts, transactions, budgets, goals), with realistic amounts and currencies, and who opens it: you, a partner, a parent, a teen |
+| One question per screen | Name the question the screen answers ("Are we on track this month?"). The biggest block answers it; everything else supports it or moves elsewhere |
+| Honest numbers | Totals add up from the rounded amounts shown. A fact shown twice (a total, a date range) comes from one value. Every relative figure says what it's compared with ("£40 less than last month") |
+| The main job is one click away | Name the most frequent next step (add a goal, check a budget, invite a partner) and put it within reach |
+| Every state | Design the empty, loading and error states with the screen, following [[UI Patterns]] and the 2026-10-23 load-error decision below |
+| One colour for the data that matters | The main data gets one chart colour, the rest stay neutral; status colours keep their meaning (red only for what you owe or an over-budget) |
+| People stay themselves | Each family member keeps the same initial and tint everywhere |
+
+**3. Outside layouts are references only.** When drafting options, taste-skill's `library/app.json` shells and patterns can suggest structure. Dress every option in Tallyn's glass and tokens. Its palettes, fonts, photos, section blueprints and direction deal (`draw.mjs`, `scenes.mjs`) stay off, and `assets.mjs` is never run.
+
+**4. Check the draft.** Run both, then fix what they find before showing Dinesh:
+- `node .claude/skills/design-taste-frontend/scripts/lint.mjs <files>` on the source.
+- `node .claude/skills/design-taste-frontend/scripts/inspect.mjs <url> --app --allow glass,gradient,shadow,heavy-shadow,button-fx,palette-terracotta,palette-cream` on the built page (`npm run build && npm run preview` in `web/`, not the dev server). Needs Node 22+ and Chrome.
+- Hallmark's Floor and `sloplint` (CLAUDE.md §6).
+
+> [!warning] Rules that clash with Tallyn
+> The `--allow` list above turns off the inspector's rules against the glass finish (#61), the soft glow and card shade, and Tallyn's Clay and Cream palette. Never remove glass, glow or Clay because a check flagged it. Everything else it reports (contrast, cut-off or covered text, sideways scroll, tiny text, number alignment, tabular figures, chart colours, placeholder data) is worth fixing.
+
+Then draft 2–3 options with at least one mix, as CLAUDE.md §0 asks.
+
 ## Reference
 Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy alongside). Screens: [[Design Comps]]. Patterns: [[UI Patterns]].
 
@@ -102,3 +131,4 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-24 | Plan from your income reads answer first (a sentence), then the logic (a labelled split bar), then the data (a plain bar and words per job). No chart key to learn (#133) | Dinesh picked 3A: people look for the logic first, then the numbers; the waffle, flow, bullet, treemap and waterfall drafts read slower |
 | 2026-10-24 | Goals: "This month" checklist on top, goals as glass pots that fill, and one goal up close as a forecast with its next milestone (#14) | Dinesh picked the mix of draft 2, part by part: each part answers a different question (what to do this month; how are my goals; will this one make it) |
 | 2026-10-24 | Month fields: a field in words ("June 2027 · 8 months away") opening quick picks (No date, 6 months, 1 year, 2 years) over a year-by-year month grid; past months off (`web/src/components/MonthPicker.jsx`, #14) | Dinesh picked the mix of the month draft (`docs/03 Design/Comps/web-goals-month-draft.html`): the browser's month box looks different everywhere and offers days a goal doesn't need |
+| 2026-10-24 | Screens are designed by [[#Designing a screen]]: Tallyn's look first, then taste-skill's app-screen method for content, its layouts as references only, and its checks with the glass, glow and palette rules allowed (#180) | Dinesh: use taste-skill as a reference while the Tallyn design doc stays in charge; layered, not merged, so the pinned copy stays unchanged |
