@@ -285,7 +285,7 @@ function Breakdown({ segments, parts, focus, label, format, onChoose }) {
                 <span className={cn('size-2 shrink-0 rounded-full', swatch(i))} />
                 <span className="flex-1 truncate text-zinc-600 dark:text-zinc-300">{name}</span>
                 <span className="font-medium tabular-nums">{format(parts[i] ?? 0)}</span>
-                <span className="w-10 text-right text-zinc-400 tabular-nums dark:text-zinc-500">{share.toFixed(0)}%</span>
+                <span className="w-10 text-right text-zinc-500 tabular-nums dark:text-zinc-400">{share.toFixed(0)}%</span>
               </button>
             </li>
           )
@@ -308,6 +308,8 @@ function keyStep(key, last) {
 
 export default function MetricCard({
   label = 'Revenue',
+  // Tallyn edit (#182): for spending or costs, a rise is bad news, so it is not shown in green.
+  upIsGood = true,
   segments = ['Plans', 'Usage', 'Services'],
   data = DEFAULT_DATA,
   events = DEFAULT_EVENTS,
@@ -542,7 +544,7 @@ export default function MetricCard({
         <RollingNumber value={formatted} />
       </p>
       <div className="mt-1.5 flex min-h-5 items-center gap-2 text-sm tabular-nums">
-        <span className={cn('shrink-0 font-medium', up ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400')}>
+        <span className={cn('shrink-0 font-medium', up === upIsGood ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400')}>
           {up ? '▲' : '▼'} {Math.abs(delta * 100).toFixed(1)}%
         </span>
         <span aria-live="polite" className="truncate text-zinc-500 dark:text-zinc-400">
@@ -667,7 +669,7 @@ export default function MetricCard({
         />
       </div>
 
-      <div className="mt-2 flex justify-between text-xs text-zinc-400 tabular-nums dark:text-zinc-500">
+      <div className="mt-2 flex justify-between text-xs text-zinc-500 tabular-nums dark:text-zinc-400">
         <span>{firstDay ? formatShort(firstDay.date) : ''}</span>
         <span className="flex items-center gap-1.5">
           <span className="h-px w-3 border-zinc-300 border-t border-dashed dark:border-zinc-700" />

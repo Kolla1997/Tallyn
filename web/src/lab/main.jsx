@@ -1,6 +1,6 @@
 // Draft lab (#183): a page for design drafts built with Tailwind, shadcn,
 // Bklit charts, Kokonut UI and anime.js. Dev only: the build ships index.html.
-// ?smoke: library check · ?round1, ?round2: earlier Home drafts · default: the Home redesign (#182)
+// ?smoke: library check · ?round1, ?round2, ?round3: earlier Home drafts · default: the calm Home (#182)
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import '../fonts.css'
@@ -14,7 +14,9 @@ const Page = lazy(() =>
       ? import('./home/HomeDrafts.jsx')
       : q.has('round2')
         ? import('./home/BoldHome.jsx')
-        : import('./home/RedesignHome.jsx'),
+        : q.has('round3')
+          ? import('./home/RedesignHome.jsx')
+          : import('./home/CalmHome.jsx'),
 )
 
 createRoot(document.getElementById('lab')).render(
