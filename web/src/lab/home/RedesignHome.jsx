@@ -9,7 +9,7 @@
 //   2 How is this month going?                   Categories + plan gauge       | Recent transactions
 //   3 Where is the money, and whose?             Sankey (is the accounts list) | Family deck + shared
 //   4 How did we spend, what do we save for?     Day-by-day terrain            | Goals
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { animate, stagger } from 'animejs'
 import {
   Home as HomeIcon,
@@ -222,6 +222,32 @@ function Total({ scope, setScope }) {
   )
 }
 
+// Opens over the page instead of pushing it (Dinesh): the slot keeps the card's resting height, and
+// when the stack expands the card grows downwards on top of the cards below, like a dropdown.
+function Overlay({ children }) {
+  const slot = useRef(null)
+  const card = useRef(null)
+  const [h, setH] = useState(null)
+  const [open, setOpen] = useState(false)
+  useLayoutEffect(() => {
+    if (card.current && h == null) setH(card.current.offsetHeight)
+  }, [h])
+  useEffect(() => {
+    const el = card.current
+    if (!el || h == null) return
+    const ro = new ResizeObserver(() => setOpen(el.offsetHeight > h + 4))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [h])
+  return (
+    <div ref={slot} className="relative" style={h == null ? undefined : { height: h }}>
+      <div ref={card} className={h == null ? '' : `absolute inset-x-0 top-0 ${open ? 'z-30 rounded-3xl shadow-2xl shadow-black/30' : 'z-10'}`}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 function Bills() {
   const ICON = { 'Amex card': CreditCard, 'Car loan': Car, "Leo's allowance": PiggyBank }
   const items = D.due.map((d, i) => {
@@ -347,20 +373,23 @@ function Recent({ scope }) {
   )
   return (
     <Panel id="tx-h" title={scope === 'yours' ? 'Your recent transactions' : 'Recent transactions'} meta={<See>See all</See>}>
-      <SmoothTab
-        label="Kind of transaction"
-        activeColor="bg-zinc-900 dark:bg-white"
-        activeTextColor="text-white dark:text-zinc-900"
-        items={[
-          { id: 'spending', title: 'Spending', content: list('spending') },
-          {
-            id: 'transfers',
-            title: 'Transfers',
-            content: list('transfers', 'Card payments and moves between your own accounts sit here, so they don’t look like spending.'),
-          },
-          { id: 'income', title: 'Income', content: list('income') },
-        ]}
-      />
+      {/* The tab track slides sideways: clip it to the card */}
+      <div className="overflow-hidden">
+        <SmoothTab
+          label="Kind of transaction"
+          activeColor="bg-zinc-900 dark:bg-white"
+          activeTextColor="text-white dark:text-zinc-900"
+          items={[
+            { id: 'spending', title: 'Spending', content: list('spending') },
+            {
+              id: 'transfers',
+              title: 'Transfers',
+              content: list('transfers', 'Card payments and moves between your own accounts sit here, so they don’t look like spending.'),
+            },
+            { id: 'income', title: 'Income', content: list('income') },
+          ]}
+        />
+      </div>
     </Panel>
   )
 }
@@ -633,12 +662,14 @@ export default function RedesignHome() {
             </div>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-12">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 [&>*]:min-w-0">
             <div className="lg:col-span-8">
               <Total scope={scope} setScope={setScope} />
             </div>
             <div className="grid content-start gap-4 lg:col-span-4">
-              <Bills />
+              <Overlay>
+                <Bills />
+              </Overlay>
               <Cards />
             </div>
             <div className="lg:col-span-8">
