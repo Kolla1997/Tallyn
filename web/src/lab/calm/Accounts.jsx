@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { Link2, Wallet, PiggyBank, Globe, Users, CreditCard, Car } from 'lucide-react'
 import { Gauge } from '@/components/charts/gauge'
 import * as D from '../home/data.js'
-import { Panel, Rows, Row, Sub, Note, Money, Owed, Chips, Button, PageHead, Badge, usd } from './ui.jsx'
+import { Panel, Rows, Row, Sub, Note, Money, Owed, Chips, Button, PageHead, Badge, usd, useSize } from './ui.jsx'
 
 const WHO = [
   ['yours', 'Yours'],
@@ -38,12 +38,13 @@ const BANKS = [
 ]
 
 function NetWorth({ have, owe }) {
+  const trim = useSize() === 'c'
   const net = have - owe
   const pct = have + owe > 0 ? Math.round((have / (have + owe)) * 100) : 0
   return (
     <section aria-label="Net worth" className="rounded-2xl bg-zinc-950 p-5 text-white dark:bg-black dark:ring-1 dark:ring-zinc-800">
       <p className="text-[13px] text-zinc-400">Net worth · in US dollars</p>
-      <p className="mt-1 font-[family-name:'Space_Grotesk'] text-4xl font-bold tabular-nums">{usd(net)}</p>
+      <p className={`mt-1 font-[family-name:'Space_Grotesk'] font-bold tabular-nums ${trim ? 'text-3xl' : 'text-4xl'}`}>{usd(net)}</p>
       <div className="mt-4 flex h-2 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
         <span className="h-full" style={{ width: `${pct}%`, background: 'var(--in)' }} />
         <span className="h-full" style={{ width: `${100 - pct}%`, background: 'var(--accent)' }} />

@@ -8,7 +8,7 @@
 import { useState } from 'react'
 import { User, ShieldCheck, Home, Database, Bell, FileText, LogOut, Smartphone, ChevronRight, X, Check, Plus } from 'lucide-react'
 import * as D from '../home/data.js'
-import { Panel, Note, PageHead, Button } from './ui.jsx'
+import { Panel, Note, PageHead, Button, useSize } from './ui.jsx'
 
 const EMAIL = 'maya.rivera@fastmail.com'
 const HOUSEHOLD = 'The Rivera family'
@@ -451,6 +451,7 @@ const VIEWS = { profile: Profile, security: Security, household: Household, data
 
 export default function Settings() {
   const [section, setSection] = useState('security')
+  const trim = useSize() === 'c'
   const View = VIEWS[section]
   return (
     <>
@@ -477,7 +478,7 @@ export default function Settings() {
             ))}
           </ul>
         </nav>
-        <div className="lg:col-span-8">
+        <div className={`lg:col-span-8 ${trim ? 'max-w-[640px]' : ''}`}>
           <View />
         </div>
       </div>

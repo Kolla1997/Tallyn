@@ -180,3 +180,62 @@
   --chart-segment-background: oklch(0.41 0.0127 248.14 / 0.25);
   --chart-segment-line: oklch(1 0 0 / 0.25);
 }
+
+/* Draft sizes (#185). B and C: compact type, spacing and controls inside the page (draft bar and
+   sidebar keep theirs). Type and controls shrink from 1024px only, so phones stay comfortable and
+   keep their tap sizes; spacing tightens everywhere. C's trimmed visuals live in the pages. */
+:is([data-size='b'], [data-size='c']) main .py-3 {
+  padding-block: 8px;
+}
+:is([data-size='b'], [data-size='c']) main .py-2 {
+  padding-block: 6px;
+}
+:is([data-size='b'], [data-size='c']) main .p-4 {
+  padding: 14px;
+}
+:is([data-size='b'], [data-size='c']) main .gap-3 {
+  gap: 10px;
+}
+:is([data-size='b'], [data-size='c']) main .mb-4 {
+  margin-bottom: 12px;
+}
+@media (min-width: 1024px) {
+  :is([data-size='b'], [data-size='c']) main .text-sm {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+  :is([data-size='b'], [data-size='c']) main .text-\[13px\] {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  :is([data-size='b'], [data-size='c']) main .text-\[15px\] {
+    font-size: 14px;
+  }
+  :is([data-size='b'], [data-size='c']) main .text-lg {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+  :is([data-size='b'], [data-size='c']) main .text-xl {
+    font-size: 17px;
+    line-height: 1.35;
+  }
+  :is([data-size='b'], [data-size='c']) main .text-2xl {
+    font-size: 22px;
+  }
+  :is([data-size='b'], [data-size='c']) main .h-10 {
+    height: 36px;
+  }
+  :is([data-size='b'], [data-size='c']) main .h-9 {
+    height: 32px;
+  }
+  :is([data-size='b'], [data-size='c']) main .h-8 {
+    height: 28px;
+  }
+  :is([data-size='b'], [data-size='c']) main .h-12 {
+    height: 44px;
+  }
+  :is([data-size='b'], [data-size='c']) main svg.size-4 {
+    width: 14px;
+    height: 14px;
+  }
+}

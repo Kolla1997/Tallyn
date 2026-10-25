@@ -9,7 +9,7 @@ import lockupLight from '../../../../brand/logo/svg/tallyn-lockup-horizontal-lig
 import lockupDark from '../../../../brand/logo/svg/tallyn-lockup-horizontal-dark.svg?url'
 import wordLight from '../../../../brand/logo/svg/tallyn-wordmark-light.svg?url'
 import wordDark from '../../../../brand/logo/svg/tallyn-wordmark-dark.svg?url'
-import { Note, Chips, press } from './ui.jsx'
+import { Note, Chips, press, useSize } from './ui.jsx'
 
 const EMAIL = 'maya.rivera@fastmail.com'
 const CODES = ['k7m2-9pqx', 'r4tz-h8wd', 'b3nf-6ycu', 'q9vj-2mle', 'x5sa-7kro', 'd8ge-4hwt', 'p2ux-3zbn', 'm6cy-9fqa', 'w4lr-5jte', 'h7do-8vsk']
@@ -483,6 +483,7 @@ export default function SignIn({ dark }) {
     history.replaceState(null, '', u)
   }
   const Card = CARDS[screen]
+  const trim = useSize() === 'c'
   const centred = ['code', 'backup', 'setup', 'codes'].includes(screen)
   return (
     <div className="flex min-h-[calc(100svh-120px)] flex-col items-center">
@@ -492,7 +493,10 @@ export default function SignIn({ dark }) {
       </div>
       <div className={`flex w-full grow flex-col items-center ${centred ? 'justify-center' : ''}`}>
         <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="mb-6 h-8" />
-        <section key={screen} className="grid w-full max-w-[380px] gap-4 rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <section
+          key={screen}
+          className={`grid w-full gap-4 rounded-2xl border border-zinc-200 bg-white ${trim ? 'max-w-[360px] p-5' : 'max-w-[380px] p-6'} dark:border-zinc-800 dark:bg-zinc-900`}
+        >
           <Card go={go} />
         </section>
       </div>
