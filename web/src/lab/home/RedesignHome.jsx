@@ -1,14 +1,19 @@
-// Tallyn's Home, redesigned (#182, round 3). Same jobs as web/src/screens/HomePage.jsx (total with
-// Yours/Everyone, your accounts, credit cards, spending this month, recent transactions with kinds,
-// shared with you, family, goals), rebuilt with Kokonut UI, Bklit charts and anime.js.
+// Tallyn's Home, redesigned (#182, round 3b). Same jobs as web/src/screens/HomePage.jsx (total with
+// Yours/Everyone, accounts, credit cards, spending this month, recent transactions by kind, shared
+// with you, family, goals), rebuilt with Kokonut UI, Bklit charts and anime.js.
 // Palette: red, green, white, black, red lead (Dinesh, 2026-10-25). Fonts and logo: Tallyn's.
 // Motion follows the animate and emil-design-eng skills. All names and amounts are made up.
+//
+// Layout: four rows, each an 8 + 4 pair on a 12-column grid with one 16px gutter.
+//   1 How much do we have, and what's due?      Total (flip board)            | Coming up + credit card
+//   2 How is this month going?                   Categories + plan gauge       | Recent transactions
+//   3 Where is the money, and whose?             Sankey (is the accounts list) | Family deck + shared
+//   4 How did we spend, what do we save for?     Day-by-day terrain            | Goals
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { animate, stagger } from 'animejs'
 import {
   Home as HomeIcon,
   Landmark,
-  ArrowLeftRight as TxIcon,
   PieChart,
   Link2,
   Users,
@@ -50,7 +55,7 @@ const PAL = {
   '--chart-5': '#b91c1c',
   '--chart-line-primary': '#dc2626',
 }
-// Text needs AA: deeper red and green on white, lighter on black (set per theme below).
+// Text needs AA: deeper red and green on white, lighter on black. Bright ones stay on fills and charts.
 const TEXT = { light: { '--in-text': '#15803d', '--owe-text': '#b91c1c' }, dark: { '--in-text': '#4ade80', '--owe-text': '#f87171' } }
 const EASE = 'cubicBezier(0.23, 1, 0.32, 1)' // emil-design-eng: strong ease-out for UI
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -85,8 +90,8 @@ const scopeData = (scope) => {
   return { people, accts, have, owe, net: Math.round((have - owe) * 100) / 100, byCur }
 }
 
-// ---- Motion helpers (animate skill: purpose first) ----
-// Arrival: rare (once per session) → allowed. Purpose: spatial order of the screen.
+// ---- Motion (animate skill: purpose first) ----
+// Arrival: once per session (rare tier). Purpose: the order of the screen.
 function useArrival(ref) {
   useEffect(() => {
     if (!ref.current || reduced() || sessionStorage.getItem('tallyn-home-r3')) return
@@ -100,7 +105,7 @@ function useArrival(ref) {
     })
   }, [ref])
 }
-// Count-up on scope change: state indication. 260ms, under the 300ms UI ceiling.
+// Count-up on scope change: state indication, 260ms.
 function Count({ value }) {
   const el = useRef(null)
   const prev = useRef(value)
@@ -124,10 +129,10 @@ const Panel = ({ title, meta, children, className = '', id }) => (
   <section
     data-arrive
     aria-labelledby={id}
-    className={`min-w-0 rounded-3xl border border-zinc-200 bg-white p-5 md:p-6 dark:border-zinc-800 dark:bg-zinc-900 ${className}`}
+    className={`h-full min-w-0 rounded-3xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900 ${className}`}
   >
     {title && (
-      <header className="mb-4 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+      <header className="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 id={id} className="font-[family-name:'Space_Grotesk'] text-[17px] font-semibold text-zinc-900 dark:text-white">
           {title}
         </h2>
@@ -146,14 +151,20 @@ const See = ({ children }) => (
     {children}
   </a>
 )
+const IconBox = ({ icon: I }) => (
+  <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+    <I className="size-4" aria-hidden="true" />
+  </span>
+)
 
+// Row 1 ------------------------------------------------------------------
 function Total({ scope, setScope }) {
   const s = useMemo(() => scopeData(scope), [scope])
   return (
     <section
       data-arrive
       aria-label={scope === 'yours' ? 'Your balance' : 'Total balance'}
-      className="rounded-3xl bg-zinc-950 p-5 text-white md:p-8 dark:bg-black dark:ring-1 dark:ring-zinc-800"
+      className="flex h-full flex-col justify-between gap-5 rounded-3xl bg-zinc-950 p-5 text-white md:p-7 dark:bg-black dark:ring-1 dark:ring-zinc-800"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-zinc-400">{scope === 'yours' ? 'Your balance · US dollars' : 'Total balance · US dollars · everything you can see'}</p>
@@ -174,13 +185,19 @@ function Total({ scope, setScope }) {
           ))}
         </div>
       </div>
-      <div className="mt-5 overflow-x-auto pb-1">
-        <SplitFlapText text={usd(s.have)} className="text-4xl md:text-6xl" />
+      <div>
+        <div className="overflow-x-auto pb-1">
+          <SplitFlapText text={usd(s.have)} className="text-4xl md:text-6xl" />
+        </div>
+        <p className="mt-2 text-sm text-zinc-400">
+          <span className="text-zinc-200">−{usd(D.spent)}</span> spent this month · net worth{' '}
+          <span className="text-zinc-200">
+            <Count value={s.net} />
+          </span>{' '}
+          after {usd(s.owe)} owed on cards
+        </p>
       </div>
-      <p className="mt-2 text-sm text-zinc-400">
-        <span className="text-zinc-200">−{usd(D.spent)}</span> spent this month · net worth <Count value={s.net} /> after {usd(s.owe)} owed on cards
-      </p>
-      <div className="mt-6 grid gap-2 text-sm sm:grid-cols-3">
+      <div className="grid gap-2 text-sm sm:grid-cols-3">
         {s.byCur
           .filter((c) => c.native !== 0)
           .map((c) => (
@@ -197,84 +214,6 @@ function Total({ scope, setScope }) {
   )
 }
 
-function Flow({ scope }) {
-  const data = useMemo(() => {
-    const s = scopeData(scope)
-    const nodes = []
-    const links = []
-    const idx = (name, source) => {
-      let i = nodes.findIndex((n) => n.name === name)
-      if (i < 0) i = nodes.push(source ? { name, category: 'source' } : { name }) - 1
-      return i
-    }
-    const pos = s.accts.filter((a) => a.usd > 0)
-    for (const a of pos)
-      links.push({ source: idx(`${a.name} (${a.cur})`, true), target: idx(D.people.find((p) => p.id === a.who).name), value: Math.round(a.usd) })
-    for (const p of s.people) {
-      const g = pos.filter((a) => a.who === p.id).reduce((x, a) => x + a.usd, 0)
-      if (g > 0) links.push({ source: idx(p.name), target: idx(scope === 'yours' ? 'Your total' : 'The Riveras'), value: Math.round(g) })
-    }
-    return { nodes, links }
-  }, [scope])
-  return (
-    <Panel id="flow-h" title="Where it all comes from" meta="Each account flows into its owner, every owner into the family">
-      <SankeyChart key={scope} data={data} aspectRatio="21 / 8" nodeWidth={12} nodePadding={18}>
-        <SankeyLink />
-        <SankeyNode formatValue={(v) => usd(v, 0)} />
-        <SankeyTooltip />
-      </SankeyChart>
-    </Panel>
-  )
-}
-
-function Accounts({ scope }) {
-  const s = scopeData(scope)
-  const rows = [...s.accts].filter((a) => a.usd > 0).sort((a, b) => b.usd - a.usd)
-  return (
-    <Panel id="acc-h" title={scope === 'yours' ? 'Your accounts' : 'Everyone’s accounts'} meta={<See>All accounts</See>}>
-      <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
-        {rows.map((a) => (
-          <li key={a.name} className="flex items-center justify-between gap-3 py-3">
-            <span className="min-w-0">
-              <span className="block font-semibold">{a.name}</span>
-              <span className="block text-sm text-zinc-500 dark:text-zinc-400">
-                {a.bank} ··{a.last4}
-                {a.cur !== 'USD' && ` · ${D.native(a)}`}
-              </span>
-            </span>
-            <Money v={a.usd} />
-          </li>
-        ))}
-      </ul>
-    </Panel>
-  )
-}
-
-function Cards() {
-  const used = Math.round((-amex.bal / CARD_LIMIT) * 100)
-  return (
-    <Panel id="cards-h" title="Credit cards" meta={<See>Debts</See>}>
-      <div className="flex items-start justify-between gap-3">
-        <span>
-          <span className="block font-semibold">Amex ··{amex.last4}</span>
-          <span className="block text-sm text-zinc-500 dark:text-zinc-400">
-            {usd(CARD_LIMIT - -amex.bal, 0)} available of {usd(CARD_LIMIT, 0)}
-          </span>
-        </span>
-        <span className="text-right">
-          <span className="block font-[family-name:'Space_Grotesk'] font-semibold tabular-nums" style={{ color: 'var(--owe-text)' }}>
-            −{usd(-amex.bal)}
-          </span>
-          <span className="mt-1 inline-flex rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">
-            Due Oct 28 · 4 days
-          </span>
-        </span>
-      </div>
-      <Gauge orientation="linear" value={used} totalNotches={30} activeFill="var(--owe)" defaultLabel="Limit used" suffix="%" />
-    </Panel>
-  )
-}
-
 function Bills() {
   const ICON = { 'Amex card': CreditCard, 'Car loan': Car, "Leo's allowance": PiggyBank }
   const items = D.due.map((d, i) => {
@@ -283,7 +222,7 @@ function Bills() {
       id: `b${i}`,
       app: `Due ${d.when}`,
       title: `${d.name} · ${usd(d.amt)}`,
-      body: `From ${d.from}${d.inDays <= 5 ? `, in ${d.inDays} days` : `, in ${d.inDays} days`}.`,
+      body: `From ${d.from}, in ${d.inDays} days.`,
       time: d.when,
       icon: (
         <span className="flex size-8 items-center justify-center rounded-lg text-white" style={{ background: d.inDays <= 5 ? 'var(--owe)' : '#3f3f46' }}>
@@ -299,66 +238,73 @@ function Bills() {
   )
 }
 
+function Cards() {
+  const used = Math.round((-amex.bal / CARD_LIMIT) * 100)
+  return (
+    <Panel id="cards-h" title="Credit card" meta={<See>Debts</See>}>
+      <div className="flex items-start justify-between gap-3">
+        <span>
+          <span className="block font-semibold">Amex ··{amex.last4}</span>
+          <span className="block text-sm text-zinc-500 dark:text-zinc-400">
+            {usd(CARD_LIMIT + amex.bal, 0)} available of {usd(CARD_LIMIT, 0)}
+          </span>
+        </span>
+        <span className="text-right">
+          <span className="block font-[family-name:'Space_Grotesk'] font-semibold tabular-nums" style={{ color: 'var(--owe-text)' }}>
+            −{usd(-amex.bal)}
+          </span>
+          <span className="block text-sm text-zinc-500 dark:text-zinc-400">{used}% of the limit</span>
+        </span>
+      </div>
+      <div className="mt-3">
+        <Gauge orientation="linear" value={used} totalNotches={30} activeFill="var(--owe)" defaultLabel="Limit used" suffix="%" minWidth={160} />
+      </div>
+    </Panel>
+  )
+}
+
+// Row 2 ------------------------------------------------------------------
 function Spending({ scope }) {
-  const terrain = useMemo(() => {
-    const out = []
-    let seed = 11
-    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647
-    for (let i = 0; i < 13 * 7 - D.today; i++) out.push(Math.round(20 + rnd() * 120))
-    let prev = 0
-    for (const r of D.series.slice(0, D.today)) {
-      out.push(r.spent - prev)
-      prev = r.spent
-    }
-    return out.map((v) => Math.min(9, Math.round(v / 40)))
-  }, [])
   const ICON = { Bills: Zap, Groceries: ShoppingBasket, Kids: Baby, 'Eating out': Utensils, Transport: Bus, Fun: PartyPopper }
   return (
-    <Panel id="sp-h" title={scope === 'yours' ? 'Your spending in October' : 'Spending in October'} meta={<Money v={D.spent} />}>
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px]">
-        <ActivityTerrain data={terrain} endDate="2026-10-24" title="Day by day" />
-        <div className="flex flex-col items-center justify-center">
-          <Gauge
-            value={Math.round((D.spent / D.planned) * 100)}
-            centerValue={D.left}
-            prefix="$"
-            defaultLabel="Left to spend"
-            activeFill="var(--accent)"
-            totalNotches={36}
-            minWidth={180}
-          />
+    <Panel
+      id="sp-h"
+      title={scope === 'yours' ? 'Your spending in October' : 'Spending in October'}
+      meta={`${usd(D.spent, 0)} of ${usd(D.planned, 0)} · day ${D.today} of ${D.days}`}
+    >
+      <div className="grid items-start gap-5 md:grid-cols-[minmax(0,1fr)_auto]">
+        <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          {D.cats.map((c) => {
+            const pct = (c.spent / c.planned) * 100
+            return (
+              <li key={c.name}>
+                <a href="#" className="flex items-center gap-3 py-2.5 transition-transform duration-150 ease-out active:scale-[0.99]">
+                  <IconBox icon={ICON[c.name]} />
+                  <span className="min-w-0 grow">
+                    <span className="flex justify-between gap-2">
+                      <span className="font-semibold">{c.name}</span>
+                      <Money v={c.spent} />
+                    </span>
+                    <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                      <span
+                        className="block h-full rounded-full"
+                        style={{ width: `${Math.min(100, pct)}%`, background: pct >= 90 ? 'var(--accent)' : '#71717a' }}
+                      />
+                    </span>
+                    <span className="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">
+                      {Math.round(pct)}% of {usd(c.planned, 0)}
+                      {pct >= 90 && ' · nearly used'}
+                    </span>
+                  </span>
+                </a>
+              </li>
+            )
+          })}
+        </ul>
+        <div className="flex justify-center">
+          <LiquidGauge value={Math.round((D.spent / D.planned) * 100)} readOnly label="October plan used" total={D.planned} unit="USD" warnAt={95} />
         </div>
       </div>
-      <ul className="mt-4 divide-y divide-zinc-100 dark:divide-zinc-800">
-        {D.cats.map((c) => {
-          const I = ICON[c.name]
-          const pct = (c.spent / c.planned) * 100
-          return (
-            <li key={c.name}>
-              <a href="#" className="flex items-center gap-3 py-2.5 transition-transform duration-150 ease-out active:scale-[0.99]">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                  <I className="size-4" aria-hidden="true" />
-                </span>
-                <span className="min-w-0 grow">
-                  <span className="flex justify-between gap-2">
-                    <span className="font-semibold">{c.name}</span>
-                    <Money v={c.spent} />
-                  </span>
-                  <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-                    <span
-                      className="block h-full rounded-full"
-                      style={{ width: `${Math.min(100, pct)}%`, background: pct >= 90 ? 'var(--accent)' : '#71717a' }}
-                    />
-                  </span>
-                  <span className="mt-1 block text-xs text-zinc-500 dark:text-zinc-400">
-                    {Math.round(pct)}% of {usd(c.planned, 0)}
-                  </span>
-                </span>
-              </a>
-            </li>
-          )
-        })}
-      </ul>
     </Panel>
   )
 }
@@ -370,9 +316,7 @@ function Recent({ scope }) {
       <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
         {pick(kind).map((t) => (
           <li key={t.name + t.when} className="flex items-center gap-3 py-2.5">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-              <t.icon className="size-4" aria-hidden="true" />
-            </span>
+            <IconBox icon={t.icon} />
             <span className="min-w-0 grow">
               <span className="block truncate font-semibold">{t.name}</span>
               <span className="block truncate text-sm text-zinc-500 dark:text-zinc-400">
@@ -410,21 +354,36 @@ function Recent({ scope }) {
   )
 }
 
-function Shared() {
-  const joint = D.accounts.find((a) => a.who === 'joint')
+// Row 3 ------------------------------------------------------------------
+function Flow({ scope }) {
+  const data = useMemo(() => {
+    const s = scopeData(scope)
+    const nodes = []
+    const links = []
+    const idx = (name, source) => {
+      let i = nodes.findIndex((n) => n.name === name)
+      if (i < 0) i = nodes.push(source ? { name, category: 'source' } : { name }) - 1
+      return i
+    }
+    const pos = s.accts.filter((a) => a.usd > 0)
+    for (const a of pos)
+      links.push({ source: idx(`${a.name} (${a.cur})`, true), target: idx(D.people.find((p) => p.id === a.who).name), value: Math.round(a.usd) })
+    for (const p of s.people) {
+      const g = pos.filter((a) => a.who === p.id).reduce((x, a) => x + a.usd, 0)
+      if (g > 0) links.push({ source: idx(p.name), target: idx(scope === 'yours' ? 'Your total' : 'The Riveras'), value: Math.round(g) })
+    }
+    return { nodes, links }
+  }, [scope])
   return (
-    <Panel id="shared-h" title="Shared with you" meta={<See>Family</See>}>
-      <div className="flex items-center gap-3 rounded-2xl border border-dashed border-zinc-300 p-4 dark:border-zinc-700">
-        <span className="flex size-10 items-center justify-center rounded-full bg-zinc-900 text-sm font-bold text-white dark:bg-white dark:text-zinc-900">
-          J
-        </span>
-        <span className="min-w-0 grow">
-          <span className="block font-semibold">Joint checking</span>
-          <span className="block text-sm text-zinc-500 dark:text-zinc-400">James shares this with you · Chase ··{joint.last4}</span>
-        </span>
-        <Money v={joint.usd} />
-      </div>
-      <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">James keeps his own accounts private. Only what he shares shows here.</p>
+    <Panel id="flow-h" title="Where it all comes from" meta={<See>All accounts</See>}>
+      <SankeyChart key={scope} data={data} aspectRatio="16 / 8.5" nodeWidth={12} nodePadding={26}>
+        <SankeyLink />
+        <SankeyNode formatValue={(v) => usd(v, 0)} />
+        <SankeyTooltip />
+      </SankeyChart>
+      <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+        Every account flows into its owner, every owner into the family. The Amex card isn’t a flow: its {usd(-amex.bal)} comes off the net worth above.
+      </p>
     </Panel>
   )
 }
@@ -448,22 +407,47 @@ function Family() {
     price: usd(p.total),
   }))
   return (
-    <Panel id="fam-h" title="Family" meta="Swipe through">
-      <CardStack cards={deck} accent="#dc2626" actionLabel="Open accounts" />
+    <Panel id="fam-h" title="Family" meta={<See>Family and sharing</See>} className="flex flex-col">
+      <CardStack cards={deck} accent="#dc2626" actionLabel="Open accounts" className="min-h-0 py-1" />
+      <p className="mt-auto rounded-2xl border border-dashed border-zinc-300 px-4 py-3 text-sm text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
+        James shares <b className="font-semibold text-zinc-900 dark:text-white">Joint checking</b> with you and keeps his own accounts private.
+      </p>
+    </Panel>
+  )
+}
+
+// Row 4 ------------------------------------------------------------------
+function Terrain() {
+  const data = useMemo(() => {
+    const out = []
+    let seed = 11
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647
+    for (let i = 0; i < 13 * 7 - D.today; i++) out.push(Math.round(20 + rnd() * 120))
+    let prev = 0
+    for (const r of D.series.slice(0, D.today)) {
+      out.push(r.spent - prev)
+      prev = r.spent
+    }
+    return out.map((v) => Math.min(9, Math.round(v / 40)))
+  }, [])
+  return (
+    <Panel id="days-h" title="Spending, day by day" meta="Last 13 weeks · drag to tilt">
+      <ActivityTerrain data={data} endDate="2026-10-24" title="Daily spending" />
+      <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">The two tall days in October are the bills on the 1st and the 12th.</p>
     </Panel>
   )
 }
 
 function Goals() {
-  const g = D.goals[0]
+  const [trip, fund] = D.goals
   return (
     <Panel id="goals-h" title="Goals" meta={<See>All goals</See>}>
       <BoardingPass
         flight={{
           airline: 'Tallyn Goals',
           number: 'Beach trip',
-          from: { code: 'NOW', city: `${usd(g.saved, 0)} saved`, time: 'Oct 24' },
-          to: { code: 'SUN', city: `${usd(g.target, 0)} goal`, time: 'Jun 27' },
+          from: { code: 'NOW', city: `${usd(trip.saved, 0)} saved`, time: 'Oct 24' },
+          to: { code: 'SUN', city: `${usd(trip.target, 0)} goal`, time: 'Jun 27' },
           date: 'June 2027',
           gate: '68%',
           boards: '$200',
@@ -475,14 +459,19 @@ function Goals() {
         }}
       />
       <div className="mt-4">
-        <LiquidGauge
-          value={Math.round((D.goals[1].saved / D.goals[1].target) * 100)}
-          readOnly
-          label="Leo’s school fund"
-          total={D.goals[1].target}
-          unit="USD"
-          warnAt={101}
-        />
+        <div className="flex justify-between gap-3">
+          <span>
+            <span className="block font-semibold">Leo’s school fund</span>
+            <span className="block text-sm text-zinc-500 dark:text-zinc-400">By September 2027 · follows Teen savings</span>
+          </span>
+          <span className="text-right">
+            <Money v={fund.saved} />
+            <span className="block text-sm text-zinc-500 dark:text-zinc-400">of {usd(fund.target, 0)}</span>
+          </span>
+        </div>
+        <span className="mt-2 block h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+          <span className="block h-full rounded-full" style={{ width: `${(fund.saved / fund.target) * 100}%`, background: 'var(--in)' }} />
+        </span>
       </div>
     </Panel>
   )
@@ -524,7 +513,7 @@ export default function RedesignHome() {
         </span>
       </div>
 
-      <header className="mx-auto flex max-w-[1320px] flex-wrap items-center gap-x-8 gap-y-3 px-4 pt-6 md:px-8">
+      <header className="mx-auto flex max-w-[1320px] flex-wrap items-center gap-x-8 gap-y-3 px-4 pt-5 md:px-8">
         <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-7" />
         <nav aria-label="Main" className="hidden flex-wrap gap-5 text-sm font-semibold text-zinc-500 lg:flex dark:text-zinc-400">
           {['Home', 'Accounts', 'Transactions', 'Budgets', 'Debts', 'Goals', 'Family'].map((n) => (
@@ -541,8 +530,8 @@ export default function RedesignHome() {
         <span className="ml-auto flex size-9 items-center justify-center rounded-full bg-zinc-200 text-sm font-bold dark:bg-zinc-800">M</span>
       </header>
 
-      <main className="mx-auto max-w-[1320px] px-4 pt-6 pb-28 md:px-8 lg:pb-20">
-        <div data-arrive className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <main className="mx-auto max-w-[1320px] px-4 pt-5 pb-28 md:px-8 lg:pb-16">
+        <div data-arrive className="mb-4 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-[family-name:'Space_Grotesk'] text-3xl font-bold tracking-tight">The Rivera family</h1>
             <p className="mt-1 text-zinc-500 dark:text-zinc-400">
@@ -550,52 +539,46 @@ export default function RedesignHome() {
               {D.finding.rest}
             </p>
           </div>
-          <div className="flex gap-2">
-            <a
-              href="#"
-              onClick={press}
-              className="inline-flex h-10 items-center gap-2 rounded-full border border-zinc-300 px-4 text-sm font-semibold dark:border-zinc-700"
-            >
-              <Users className="size-4" aria-hidden="true" />
-              Family and sharing
-            </a>
-            <button
-              type="button"
-              onClick={press}
-              className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold text-white"
-              style={{ background: 'var(--button)' }}
-            >
-              <Link2 className="size-4" aria-hidden="true" />
-              Link a bank
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={press}
+            className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold text-white"
+            style={{ background: 'var(--button)' }}
+          >
+            <Link2 className="size-4" aria-hidden="true" />
+            Link a bank
+          </button>
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[1.7fr_1fr]">
-          <Total scope={scope} setScope={setScope} />
-          <Bills />
-        </div>
-        <div className="mt-6">
-          <Flow scope={scope} />
-        </div>
-        <div className="mt-6 grid items-start gap-6 lg:grid-cols-2 2xl:grid-cols-3">
-          <div className="grid gap-6">
-            <Accounts scope={scope} />
+        <div className="grid gap-4 lg:grid-cols-12">
+          <div className="lg:col-span-8">
+            <Total scope={scope} setScope={setScope} />
+          </div>
+          <div className="grid content-start gap-4 lg:col-span-4">
+            <Bills />
             <Cards />
           </div>
-          <div className="grid gap-6">
+          <div className="lg:col-span-8">
             <Spending scope={scope} />
+          </div>
+          <div className="lg:col-span-4">
             <Recent scope={scope} />
           </div>
-          <div className="grid gap-6 lg:col-span-2 lg:grid-cols-2 2xl:col-span-1 2xl:grid-cols-1">
-            <div className="grid content-start gap-6">
-              <Shared />
-              <Goals />
-            </div>
+          <div className="lg:col-span-8">
+            <Flow scope={scope} />
+          </div>
+          <div className="lg:col-span-4">
             <Family />
+          </div>
+          <div className="lg:col-span-8">
+            <Terrain />
+          </div>
+          <div className="lg:col-span-4">
+            <Goals />
           </div>
         </div>
       </main>
+
       {/* Phones and tablets: Tallyn's bottom tab bar (Design System) */}
       <nav
         aria-label="Main"
@@ -604,7 +587,7 @@ export default function RedesignHome() {
         {[
           ['Home', HomeIcon],
           ['Accounts', Landmark],
-          ['Activity', TxIcon],
+          ['Activity', ArrowLeftRight],
           ['Budgets', PieChart],
           ['Family', Users],
         ].map(([n, I]) => (
