@@ -166,20 +166,46 @@ const Rows = ({ children }) => <ul className="divide-y divide-zinc-100 dark:divi
 // below instead of pushing them. Re-measures whenever it is closed, so wraps and font loads follow.
 function OpensOver({ children }) {
   const card = useRef(null)
+  const rest = useRef({ h: null, w: null })
   const [h, setH] = useState(null)
   const [open, setOpen] = useState(false)
   useLayoutEffect(() => {
     const el = card.current
     if (!el) return
+    // The resting height is measured only while closed and only when the width changes (or fonts
+    // load), never mid-animation: the stack reports "collapsed" before its height has finished
+    // shrinking, and measuring then made the whole row jump.
+    const measure = () => {
+      const expanded = el.querySelector('[aria-expanded="true"]') != null
+      if (expanded) return
+      rest.current = { h: el.offsetHeight, w: el.offsetWidth }
+      setH(el.offsetHeight)
+    }
+    let wasOpen = false
+    let settle
+    // Once the card has settled (after mount, and after each close animation), take its true resting height.
+    const later = () => {
+      clearTimeout(settle)
+      settle = setTimeout(measure, 350)
+    }
     const read = () => {
       const expanded = el.querySelector('[aria-expanded="true"]') != null
-      setOpen(expanded)
-      if (!expanded) setH(el.offsetHeight)
+      // Stay on top until the card has fully closed again.
+      const isOpen = expanded || (rest.current.h != null && el.offsetHeight > rest.current.h + 1)
+      setOpen(isOpen)
+      if (wasOpen && !expanded) later()
+      wasOpen = expanded
+      if (el.offsetWidth !== rest.current.w) measure()
     }
-    read()
+    measure()
+    later()
+    document.fonts?.ready.then(later)
     const ro = new ResizeObserver(read)
     ro.observe(el)
-    return () => ro.disconnect()
+    return () => {
+      ro.disconnect()
+      clearTimeout(settle)
+    }
   }, [])
   return (
     <div className="relative" style={h == null ? undefined : { height: h }}>
