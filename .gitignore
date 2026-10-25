@@ -34,3 +34,5 @@ __pycache__/
 
 # Hallmark skill working files: log, screenshots, image cache (#141)
 .hallmark/
+# design-taste-frontend skill working files: screenshots, reports (#141)
+.taste-skill/
