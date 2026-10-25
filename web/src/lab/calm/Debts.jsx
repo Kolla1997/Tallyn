@@ -2,9 +2,8 @@
 // by kind with You owe, three facts (payments due this month, interest paid this year, overdue),
 // then each debt grouped by kind with its details and how far along it is (limit used for cards,
 // paid off for loans), and the note when a bank shares no details.
-// Second round, led by ui-ux-pro-max's chart and table guidance (draft only, ?l=d|e|f):
-// D Ledger (a waffle for the split, Dinesh's pick of five forms; bullet bars per debt), E Table (Swiss columns, figures in a
-// strip), F Mix (E's table, D's waffle and bullets). Numbers always sit beside the marks.
+// Layout (Dinesh picked F, the Mix): a summary strip with a waffle for the split and the four
+// figures, then a table of debts with a bullet bar each. Numbers always sit beside the marks.
 // Made-up names and amounts.
 import { useState } from 'react'
 import * as D from '../home/data.js'
@@ -54,11 +53,6 @@ const WHO = [
   ['yours', 'Yours'],
   ['joint', 'With James'],
   ['everyone', 'Everyone'],
-]
-const LAYOUTS = [
-  ['d', 'D · Ledger'],
-  ['e', 'E · Table'],
-  ['f', 'F · Mix'],
 ]
 const NUM = "font-[family-name:'Space_Grotesk'] font-semibold tabular-nums"
 const CARD = 'rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900'
@@ -170,69 +164,8 @@ function Figures({ owe, facts }) {
   )
 }
 
-// ── D · Ledger: the waffle and the facts in one strip, then rows with bullet bars.
-function Ledger({ groups, owe, facts }) {
-  return (
-    <div className="grid gap-3">
-      <section aria-label="What you owe" className={`${CARD} flex flex-wrap items-center justify-between gap-x-8 gap-y-4 p-4`}>
-        <div>
-          <Note>You owe</Note>
-          <p className={`${NUM} mb-2 text-2xl`} style={{ color: 'var(--owe-text)' }}>
-            {usd(-owe)}
-          </p>
-          <Waffle groups={groups} owe={owe} />
-        </div>
-        <dl className="grid gap-2 text-[13px] sm:min-w-[230px]">
-          {facts.map(([k, v, note, tone]) => (
-            <div key={k} className="flex items-baseline justify-between gap-4">
-              <dt className={MUTED}>{k}</dt>
-              <dd className={`${NUM} text-sm`} style={tone ? { color: tone } : undefined}>
-                {v}
-                <span className="sr-only"> · {note}</span>
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-      <section aria-label="Your debts" className={`${CARD} px-4 pb-1`}>
-        {groups.map((g) => (
-          <div key={g.key}>
-            <h2 className={`flex justify-between border-b border-zinc-100 pt-3 pb-1.5 text-[13px] font-semibold dark:border-zinc-800 ${MUTED}`}>
-              {g.label}
-              <span className="tabular-nums">{usd(-g.value)}</span>
-            </h2>
-            <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {g.list.map((d) => {
-                const p = progress(d)
-                return (
-                  <li key={d.id} className="grid gap-x-6 gap-y-2 py-3 sm:grid-cols-[minmax(0,1fr)_260px_auto] sm:items-center">
-                    <div className="min-w-0">
-                      <h3 className="truncate text-sm font-semibold">
-                        {d.name} <span className={`font-normal ${MUTED}`}>··{d.mask}</span>
-                      </h3>
-                      <p className={`mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] ${MUTED}`}>
-                        <span>{d.rate}</span>
-                        <Next n={d.next} />
-                        {d.extra && <span>{d.extra}</span>}
-                      </p>
-                    </div>
-                    <Bullet d={d} p={p} />
-                    <span className={`${NUM} text-base sm:text-right`} style={{ color: 'var(--owe-text)' }}>
-                      {usd(-d.owed)}
-                    </span>
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        ))}
-      </section>
-    </div>
-  )
-}
-
-// The table, shared by E and F. `bullets` swaps E's plain percentage for D's bullet bar.
-function DebtTable({ groups, owe, bullets }) {
+// Every debt as a table row: name, rate, next payment, a bullet bar, the balance.
+function DebtTable({ groups, owe }) {
   return (
     <section aria-label="Your debts" className={`${CARD} overflow-x-auto`}>
       <table className="w-full min-w-[640px] text-left text-[13px]">
@@ -277,14 +210,7 @@ function DebtTable({ groups, owe, bullets }) {
                     <span className={`block text-[12px] ${MUTED}`}>{d.next.note}</span>
                   </td>
                   <td className="py-3 pr-6">
-                    {bullets ? (
-                      <Bullet d={d} p={p} />
-                    ) : (
-                      <>
-                        <span className="font-semibold">{p.main}</span>
-                        <span className={`block text-[12px] ${MUTED}`}>{p.side}</span>
-                      </>
-                    )}
+                    <Bullet d={d} p={p} />
                   </td>
                   <td className={`${NUM} py-3 pr-4 text-right text-sm`} style={{ color: 'var(--owe-text)' }}>
                     {usd(-d.owed)}
@@ -309,20 +235,8 @@ function DebtTable({ groups, owe, bullets }) {
   )
 }
 
-// ── E · Table: the four figures in one strip, then the table.
-function TableView({ groups, owe, facts }) {
-  return (
-    <div className="grid gap-3">
-      <section aria-label="What you owe" className={`${CARD} p-4`}>
-        <Figures owe={owe} facts={facts} />
-      </section>
-      <DebtTable groups={groups} owe={owe} />
-    </div>
-  )
-}
-
-// ── F · Mix: E's figures and table, D's waffle beside the figures and bullets in the table.
-function MixView({ groups, owe, facts }) {
+// The summary strip (waffle and figures), then the table.
+function Summary({ groups, owe, facts }) {
   return (
     <div className="grid gap-3">
       <section aria-label="What you owe" className={`${CARD} grid gap-5 p-4 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center`}>
@@ -331,48 +245,17 @@ function MixView({ groups, owe, facts }) {
         </div>
         <Figures owe={owe} facts={facts} />
       </section>
-      <DebtTable groups={groups} owe={owe} bullets />
+      <DebtTable groups={groups} owe={owe} />
     </div>
   )
 }
 
-const VIEWS = { d: Ledger, e: TableView, f: MixView }
-
 export default function Debts() {
   const [who, setWho] = useState('everyone')
-  const [layout, setLayout] = useState(() => {
-    const l = new URLSearchParams(location.search).get('l')
-    return VIEWS[l] ? l : 'f'
-  })
-  const pick = (l) => {
-    setLayout(l)
-    const u = new URL(location.href)
-    u.searchParams.set('l', l)
-    history.replaceState(null, '', u)
-  }
   const data = useDebts(who)
-  const View = VIEWS[layout]
   return (
     <div className="mx-auto max-w-[1040px]">
-      <PageHead title="Debts" sub="Everything you owe, in one place">
-        <span
-          role="group"
-          aria-label="Draft: layout"
-          className="flex gap-1 rounded-full border border-dashed border-zinc-300 p-0.5 text-[12px] dark:border-zinc-700"
-        >
-          {LAYOUTS.map(([k, name]) => (
-            <button
-              key={k}
-              type="button"
-              aria-pressed={k === layout}
-              onClick={() => pick(k)}
-              className="rounded-full px-2.5 py-0.5 font-semibold text-zinc-600 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:text-zinc-300 dark:aria-pressed:bg-white dark:aria-pressed:text-zinc-900"
-            >
-              {name}
-            </button>
-          ))}
-        </span>
-      </PageHead>
+      <PageHead title="Debts" sub="Everything you owe, in one place" />
       <div className="mb-3">
         <Chips label="Whose debts" options={WHO} value={who} onChange={setWho} />
       </div>
@@ -381,7 +264,7 @@ export default function Debts() {
           <Note>Nothing owed here. Cards and loans show up when your banks share them.</Note>
         </Panel>
       ) : (
-        <View key={`${layout}-${who}`} {...data} />
+        <Summary key={who} {...data} />
       )}
     </div>
   )
