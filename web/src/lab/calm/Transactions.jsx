@@ -290,6 +290,7 @@ export default function Transactions() {
               endDate="2026-10-24"
               title="Spending by day"
               defaultFlat
+              canvasClassName="h-52"
               // Spending reads in red (#185): empty days stay grey, more spent is a deeper red.
               className="[--terrain-0:#f4f4f5] [--terrain-1:#fecaca] [--terrain-2:#f87171] [--terrain-3:#dc2626] [--terrain-4:#7f1d1d] [--terrain-accent:#18181b] dark:[--terrain-0:#27272a] dark:[--terrain-1:#3b1414] dark:[--terrain-2:#6b1d1d] dark:[--terrain-3:#b91c1c] dark:[--terrain-4:#f87171] dark:[--terrain-accent:#fafafa]"
               caption={`${usd(D.spent, 0)} spent in October so far · redder days spent more`}

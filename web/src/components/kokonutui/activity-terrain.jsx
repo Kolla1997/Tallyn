@@ -218,6 +218,7 @@ export default function ActivityTerrain({
   title = 'Activity',
   defaultFlat = false,
   className,
+  canvasClassName, // Tallyn edit (#185): set the canvas height; the grid scales to fit it.
   caption,
   describeDay = (count, day) => `${count} ${count === 1 ? 'contribution' : 'contributions'} on ${day}`,
 }) {
@@ -753,6 +754,7 @@ export default function ActivityTerrain({
         className={cn(
           'block h-72 w-full touch-pan-y rounded-b-3xl outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-inset',
           dragging ? 'cursor-grabbing' : 'cursor-grab',
+          canvasClassName,
         )}
         onBlur={() => {
           // Keyboard reading ends with focus; don't leave a day lit.
