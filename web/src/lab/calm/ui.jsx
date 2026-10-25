@@ -169,14 +169,14 @@ function Sidebar({ dark, collapsed, onToggle, page, go }) {
           {collapsed ? <ChevronsRight className="size-4" aria-hidden="true" /> : <ChevronsLeft className="size-4" aria-hidden="true" />}
         </button>
       </div>
-      <nav className="flex flex-col gap-1">
+      <nav className="flex flex-col gap-0.5">
         {SIDEBAR.map(([key, label, I]) => (
           <a
             key={key}
             href={`?p=${key}`}
             onClick={(e) => (e.preventDefault(), go(key))}
             aria-current={key === page ? 'page' : undefined}
-            className={`group relative flex h-10 items-center gap-3 rounded-xl text-[13px] outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-white font-semibold text-zinc-600 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 aria-[current=page]:bg-zinc-100 aria-[current=page]:text-[var(--owe-text)] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:bg-zinc-800 ${collapsed ? 'w-[42px] justify-center' : 'px-3'}`}
+            className={`group relative flex h-8 items-center gap-3 rounded-xl text-[13px] outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-white font-semibold text-zinc-600 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 aria-[current=page]:bg-zinc-100 aria-[current=page]:text-[var(--owe-text)] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:bg-zinc-800 ${collapsed ? 'w-[42px] justify-center' : 'px-3'}`}
           >
             <I className="size-[18px] shrink-0" aria-hidden="true" />
             {collapsed ? (
