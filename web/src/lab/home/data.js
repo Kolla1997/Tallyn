@@ -30,7 +30,8 @@ export const byCur = ['USD', 'GBP', 'EUR'].map((cur) => {
 // October: day 24 of 31. Bills on Oct 1 ($1,495) and Oct 12 ($145).
 export const today = 24
 export const days = 31
-const daily = [1495, 62, 48, 90, 35, 170, 40, 55, 70, 30, 85, 240, 60, 160, 45, 72, 88, 64, 180, 52, 78, 96, 84, 87]
+// Oct 20–24 match the Transactions list's day totals; Oct 6, 9, 12, 14 and 19 give up the difference.
+const daily = [1495, 62, 48, 90, 35, 120, 40, 55, 37.68, 30, 85, 170, 60, 110, 45, 72, 88, 64, 130, 75.2, 157.4, 145.23, 136.99, 134.5]
 export const cats = [
   { name: 'Bills', planned: 1700, spent: 1640 },
   { name: 'Groceries', planned: 900, spent: 812 },

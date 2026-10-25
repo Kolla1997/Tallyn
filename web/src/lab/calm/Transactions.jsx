@@ -2,10 +2,10 @@
 // search merchants, category, month and bank filters; spending by day (a day filters the list);
 // the list grouped by day with day totals and Show more; a side panel with the summary (money in,
 // spent, top merchants, by category) or, once a transaction is picked, its details.
-// Spending by day is Kokonut's activity grid in its flat mode. Made-up names and amounts.
-import { useMemo, useState } from 'react'
+// Spending by day: four forms to compare (SpendingForms.jsx). Made-up names and amounts.
+import { useState } from 'react'
 import { Search, ShoppingBasket, Utensils, Bus, Baby, Zap, PartyPopper, Banknote, ArrowLeftRight, ArrowLeft, MapPin } from 'lucide-react'
-import ActivityTerrain from '@/components/kokonutui/activity-terrain'
+import SpendingByDay from './SpendingForms.jsx'
 import * as D from '../home/data.js'
 import { Panel, Rows, Note, Chips, PageHead, Button, See, usd } from './ui.jsx'
 
@@ -52,20 +52,6 @@ const dayLabel = (d) => {
       : new Date(`${d}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
 }
 const signed = (v) => `${v > 0 ? '+' : '−'}${usd(Math.abs(v))}`
-
-// 13 weeks of daily spending for the grid; October is the draft's data, earlier weeks made up.
-function gridDays() {
-  const out = []
-  let seed = 7
-  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647
-  for (let i = 0; i < 13 * 7 - D.today; i++) out.push(Math.round(20 + rnd() * 120))
-  let prev = 0
-  for (const r of D.series.slice(0, D.today)) {
-    out.push(r.spent - prev)
-    prev = r.spent
-  }
-  return out.map((v) => Math.min(9, Math.round(v / 40)))
-}
 
 const Select = ({ label, value, onChange, children }) => (
   <label className="min-w-0">
@@ -208,8 +194,6 @@ export default function Transactions() {
   const [day, setDay] = useState('')
   const [picked, setPicked] = useState(null)
   const [more, setMore] = useState(false)
-  const grid = useMemo(() => gridDays(), [])
-
   const list = TXS.filter(
     (t) =>
       (who === 'everyone' || (who === 'yours' ? t.who === 'You' : t.who === who)) &&
@@ -284,19 +268,9 @@ export default function Transactions() {
         </section>
 
         <div className="lg:col-span-7">
-          <section aria-label="Spending by day" className="mb-3">
-            <ActivityTerrain
-              data={grid}
-              endDate="2026-10-24"
-              title="Spending by day"
-              defaultFlat
-              canvasClassName="h-52"
-              // Spending reads in red (#185): empty days stay grey, more spent is a deeper red.
-              className="[--terrain-0:#f4f4f5] [--terrain-1:#fecaca] [--terrain-2:#f87171] [--terrain-3:#dc2626] [--terrain-4:#7f1d1d] [--terrain-accent:#18181b] dark:[--terrain-0:#27272a] dark:[--terrain-1:#3b1414] dark:[--terrain-2:#6b1d1d] dark:[--terrain-3:#b91c1c] dark:[--terrain-4:#f87171] dark:[--terrain-accent:#fafafa]"
-              caption={`${usd(D.spent, 0)} spent in October so far · redder days spent more`}
-              describeDay={(level, d) => (level === 0 ? `${d}: no spending` : `${d}: about ${usd(level * 40, 0)}`)}
-            />
-          </section>
+          <div className="mb-3">
+            <SpendingByDay sel={day} onPick={setDay} />
+          </div>
           {list.length === 0 ? (
             <Panel id="tx-empty-h">
               <Note>
