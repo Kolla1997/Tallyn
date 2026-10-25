@@ -1,6 +1,6 @@
 # Outside skills (#141)
 
-Pinned copies of third-party Claude Code skills. Claude loads one on its own when a task matches its description. Tallyn's own rules win over them (CLAUDE.md §6).
+Pinned copies of third-party Claude Code skills. Tallyn's own `tallyn-design` skill (#180) isn't one of them: it points to Design System → Designing a screen, which says how these are used for Tallyn screens. Claude loads one on its own when a task matches its description. Tallyn's own rules win over them (CLAUDE.md §6).
 
 To update: re-copy from the source at a newer commit, read the diff, and bump the commit here. Never pull automatically.
 

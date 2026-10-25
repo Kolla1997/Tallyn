@@ -11,6 +11,8 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-24
+- #141 Added taste-skill (`design-taste-frontend`) as a pinned copy at `12af471`, checks only (PR #179). Its house style bans glass, glows and Clay/Cream, so it never picks Tallyn's look.
+- #180 Design System → Designing a screen: Tallyn's look first, then taste-skill's app-screen method (one question per screen, honest numbers, every state), its layouts as references only, and its checks with the clashing rules allowed. Layered, not merged; `tallyn-design` skill points to it. Hallmark stays separate.
 - #153 #154 #155 #156 #157 #158 #159 #160 Audit paused (Dinesh): the feature backlog comes first; the audit then runs again on everything, new features included. Each ticket has a "paused" comment and keeps its priority.
 - #54 Download your data: `GET /api/me/export` returns a ZIP (`tallyn-data.json`, `transactions.csv`, `README.txt`) of only your own rows, read as you and filtered to what you own (owners can read their kids' money, which never belongs in the file). Fresh 2FA code, 3 downloads an hour. Settings → Your data → Download. Spec: [[Feature - Your Data]].
 - #56 Close your account (Dinesh picked B): Plaid unlinked first, then the closing record, then the Supabase sign-in, which deletes the rest. The record keeps user id, a keyed email hash, date and Terms/Privacy versions for 3 years (purged daily by the bank sync). Household budgets now outlive their creator. Type your email plus a fresh code. Migration 0016, [[0015-closing-an-account]], [[Feature - Close Account]].
