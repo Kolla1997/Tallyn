@@ -33,7 +33,6 @@ kanban-plugin: board
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#182 Home: explore bolder directions with taste-skill](https://github.com/Kolla1997/Tallyn/issues/182) #type/design #area/design #priority/p2
-- [ ] [#183 Add shadcn, Bklit charts, Kokonut UI (free) and anime.js to web/ for drafts](https://github.com/Kolla1997/Tallyn/issues/183) #type/tech-debt #area/frontend #priority/p2
 
 
 ## Review
@@ -43,6 +42,7 @@ kanban-plugin: board
 - [ ] [#147 Home's this-month figure only counts recent transactions](https://github.com/Kolla1997/Tallyn/issues/147) #type/bug #area/frontend #priority/p1
 - [ ] [#151 Stuck and failed states: Try again instead of endless loaders](https://github.com/Kolla1997/Tallyn/issues/151) #type/bug #area/design #area/frontend #priority/p1
 - [ ] [#180 Tallyn design skill: Tallyn rules plus taste-skill's app-screen method](https://github.com/Kolla1997/Tallyn/issues/180) #type/docs #area/design #priority/p2
+- [ ] [#183 Add shadcn, Bklit charts, Kokonut UI (free) and anime.js to web/ for drafts](https://github.com/Kolla1997/Tallyn/issues/183) #type/tech-debt #area/frontend #priority/p2
 
 
 ## Blocked
