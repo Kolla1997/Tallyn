@@ -555,18 +555,18 @@ export function HomeBody({ scope: outerScope, setScope: outerSet }) {
           <button
             type="button"
             onClick={press}
-            className="inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-sm font-semibold text-white"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[0.8125rem] font-semibold text-white"
             style={{ background: 'var(--button)' }}
           >
-            <Link2 className="size-4" aria-hidden="true" />
+            <Link2 className="size-3.5" aria-hidden="true" />
             Link a bank
           </button>
           <a
             href="#"
             onClick={press}
-            className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-300 px-3.5 text-sm font-semibold dark:border-zinc-700"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full border border-zinc-300 px-3 text-[0.8125rem] font-semibold dark:border-zinc-700"
           >
-            <Users className="size-4" aria-hidden="true" />
+            <Users className="size-3.5" aria-hidden="true" />
             Family and sharing
           </a>
         </div>

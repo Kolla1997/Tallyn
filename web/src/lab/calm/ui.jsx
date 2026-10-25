@@ -159,12 +159,12 @@ export const Button = ({ children, icon: I, quiet, danger, onClick, small }) => 
   <button
     type="button"
     onClick={(e) => (press(e), onClick?.(e))}
-    className={`inline-flex ${small ? 'h-8 px-3 text-[13px]' : 'h-9 px-3.5 text-sm'} items-center gap-2 rounded-full font-semibold ${
+    className={`inline-flex ${small ? 'h-8 px-2.5 text-[0.75rem]' : 'h-9 px-3 text-[0.8125rem]'} items-center gap-1.5 rounded-full font-semibold ${
       quiet ? 'border border-zinc-300 dark:border-zinc-700' : danger ? 'border border-red-300 text-[var(--owe-text)] dark:border-red-900' : 'text-white'
     }`}
     style={quiet || danger ? undefined : { background: 'var(--button)' }}
   >
-    {I && <I className="size-4" aria-hidden="true" />}
+    {I && <I className="size-3.5" aria-hidden="true" />}
     {children}
   </button>
 )
