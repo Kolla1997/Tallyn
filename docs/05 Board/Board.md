@@ -27,7 +27,6 @@ kanban-plugin: board
 - [ ] [#158 Tap areas and control contrast](https://github.com/Kolla1997/Tallyn/issues/158) #type/design #area/design #area/frontend #priority/p2
 - [ ] [#159 Load speed: requests wait on each other](https://github.com/Kolla1997/Tallyn/issues/159) #type/tech-debt #area/frontend #area/backend #priority/p2
 - [ ] [#160 CSS cleanup and tokens](https://github.com/Kolla1997/Tallyn/issues/160) #type/tech-debt #area/design #area/frontend #priority/p3
-- [ ] [#180 Tallyn design skill: Tallyn rules plus taste-skill's app-screen method](https://github.com/Kolla1997/Tallyn/issues/180) #type/docs #area/design #priority/p2
 
 
 ## In Progress
@@ -41,6 +40,7 @@ kanban-plugin: board
 - [ ] [#146 Budget amounts with a comma decimal save 100x too big](https://github.com/Kolla1997/Tallyn/issues/146) #type/bug #area/frontend #priority/p1
 - [ ] [#147 Home's this-month figure only counts recent transactions](https://github.com/Kolla1997/Tallyn/issues/147) #type/bug #area/frontend #priority/p1
 - [ ] [#151 Stuck and failed states: Try again instead of endless loaders](https://github.com/Kolla1997/Tallyn/issues/151) #type/bug #area/design #area/frontend #priority/p1
+- [ ] [#180 Tallyn design skill: Tallyn rules plus taste-skill's app-screen method](https://github.com/Kolla1997/Tallyn/issues/180) #type/docs #area/design #priority/p2
 
 
 ## Blocked
