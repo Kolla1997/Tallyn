@@ -181,48 +181,41 @@
   --chart-segment-line: oklch(1 0 0 / 0.25);
 }
 
-/* Compact size (#185, Dinesh picked C): compact type, spacing and controls inside the page (draft
-   bar and sidebar keep theirs). Type and controls shrink from 1024px only, so phones stay
-   comfortable and keep their tap sizes; spacing tightens everywhere. The trimmed visuals and width
-   caps live in the pages. */
+/* Page size (#185): Dinesh picked C (compact controls, trimmed visuals, width caps), then asked
+   for Debts' one-size-up type and spacing everywhere. Type and spacing apply at every width;
+   controls stay compact from 1024px. The draft bar and sidebar keep their own sizes. */
 [data-compact] main .py-3 {
-  padding-block: 8px;
-}
-[data-compact] main .py-2 {
-  padding-block: 6px;
+  padding-block: 14px;
 }
 [data-compact] main .p-4 {
-  padding: 14px;
+  padding: 18px;
 }
-[data-compact] main .gap-3 {
-  gap: 10px;
+[data-compact] main .text-\[11px\] {
+  font-size: 12px;
 }
-[data-compact] main .mb-4 {
-  margin-bottom: 12px;
+[data-compact] main .text-\[12px\] {
+  font-size: 13px;
+}
+[data-compact] main .text-\[13px\] {
+  font-size: 14px;
+  line-height: 1.45;
+}
+[data-compact] main .text-sm {
+  font-size: 15px;
+  line-height: 1.45;
+}
+[data-compact] main .text-xl {
+  font-size: 22px;
+  line-height: 1.3;
+}
+[data-compact] main .text-2xl {
+  font-size: 26px;
+  line-height: 1.25;
+}
+[data-compact] main h1.text-2xl {
+  font-size: 24px;
 }
 @media (min-width: 1024px) {
-  [data-compact] main .text-sm {
-    font-size: 13px;
-    line-height: 1.45;
-  }
-  [data-compact] main .text-\[13px\] {
-    font-size: 12px;
-    line-height: 1.45;
-  }
-  [data-compact] main .text-\[15px\] {
-    font-size: 14px;
-  }
-  [data-compact] main .text-lg {
-    font-size: 16px;
-    line-height: 1.35;
-  }
-  [data-compact] main .text-xl {
-    font-size: 17px;
-    line-height: 1.35;
-  }
-  [data-compact] main .text-2xl {
-    font-size: 22px;
-  }
   [data-compact] main .h-10 {
     height: 36px;
   }
@@ -231,12 +224,5 @@
   }
   [data-compact] main .h-8 {
     height: 28px;
-  }
-  [data-compact] main .h-12 {
-    height: 44px;
-  }
-  [data-compact] main svg.size-4 {
-    width: 14px;
-    height: 14px;
   }
 }
