@@ -10,6 +10,9 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-10-25
+- #183 Draft lab in `web/`: Tailwind v4 + shadcn (scoped to `lab.html`, never shipped), Bklit charts, free Kokonut UI and anime.js, installed with the shadcn CLI. Dinesh chose `web/` over a separate lab, free Kokonut only, Tallyn's fonts. [[0016-ui-libraries-in-a-draft-lab]]. npm 10 needed npm 11 for one install (`edgesOut` bug).
+
 ## 2026-10-24
 - #141 Added taste-skill (`design-taste-frontend`) as a pinned copy at `12af471`, checks only (PR #179). Its house style bans glass, glows and Clay/Cream, so it never picks Tallyn's look.
 - #180 Design System → Designing a screen: Tallyn's look first, then taste-skill's app-screen method (one question per screen, honest numbers, every state), its layouts as references only, and its checks with the clashing rules allowed. Layered, not merged; `tallyn-design` skill points to it. Hallmark stays separate.
