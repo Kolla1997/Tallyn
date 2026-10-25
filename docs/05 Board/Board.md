@@ -33,6 +33,7 @@ kanban-plugin: board
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#182 Home: explore bolder directions with taste-skill](https://github.com/Kolla1997/Tallyn/issues/182) #type/design #area/design #priority/p2
+- [ ] [#183 Add shadcn, Bklit charts, Kokonut UI (free) and anime.js to web/ for drafts](https://github.com/Kolla1997/Tallyn/issues/183) #type/tech-debt #area/frontend #priority/p2
 
 
 ## Review
