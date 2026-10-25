@@ -6,6 +6,7 @@ import { Shell } from './ui.jsx'
 const PAGES = [
   ['home', 'Home', lazy(() => import('./HomeBody.jsx'))],
   ['accounts', 'Accounts', lazy(() => import('./Accounts.jsx'))],
+  ['transactions', 'Transactions', lazy(() => import('./Transactions.jsx'))],
 ]
 
 export default function App() {

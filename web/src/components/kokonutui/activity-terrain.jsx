@@ -210,7 +210,17 @@ const formatDay = (date) =>
   })
 const formatMonth = (date) => date.toLocaleDateString('en-US', { month: 'short', timeZone: 'UTC' })
 
-export default function ActivityTerrain({ data = DEFAULT_DATA, endDate = '2026-10-11', title = 'Activity', defaultFlat = false, className }) {
+// Tallyn edit (#185): `caption` and `describeDay` replace the contributions wording, so the grid can
+// show money (or anything else) in the caller's words.
+export default function ActivityTerrain({
+  data = DEFAULT_DATA,
+  endDate = '2026-10-11',
+  title = 'Activity',
+  defaultFlat = false,
+  className,
+  caption,
+  describeDay = (count, day) => `${count} ${count === 1 ? 'contribution' : 'contributions'} on ${day}`,
+}) {
   const cells = useMemo(() => buildCells(data, endDate), [data, endDate])
   const weeks = (cells.at(-1)?.col ?? 0) + 1
   const total = useMemo(() => data.reduce((sum, n) => sum + n, 0), [data])
@@ -696,8 +706,8 @@ export default function ActivityTerrain({ data = DEFAULT_DATA, endDate = '2026-1
   }
 
   const readout = active
-    ? `${active.count} ${active.count === 1 ? 'contribution' : 'contributions'} on ${formatDay(active.date)}`
-    : `${total.toLocaleString('en-US')} contributions in the last ${weeks} weeks`
+    ? describeDay(active.count, formatDay(active.date))
+    : (caption ?? `${total.toLocaleString('en-US')} contributions in the last ${weeks} weeks`)
 
   return (
     <div
@@ -739,7 +749,7 @@ export default function ActivityTerrain({ data = DEFAULT_DATA, endDate = '2026-1
       </div>
 
       <canvas
-        aria-label={`${title}: ${total.toLocaleString('en-US')} contributions over ${weeks} weeks. Use the arrow keys to read each day.`}
+        aria-label={`${title}: ${caption ?? `${total.toLocaleString('en-US')} contributions over ${weeks} weeks`}. Use the arrow keys to read each day.`}
         className={cn(
           'block h-72 w-full touch-pan-y rounded-b-3xl outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-inset',
           dragging ? 'cursor-grabbing' : 'cursor-grab',
