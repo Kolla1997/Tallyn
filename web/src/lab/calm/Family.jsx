@@ -31,8 +31,8 @@ const isKid = (r) => r === 'teen' || r === 'child'
 
 const PEOPLE = [
   { id: 'maya', name: 'Maya Rivera', short: 'You', role: 'owner', you: true, tone: 'var(--accent)', initial: 'M' },
-  { id: 'james', name: 'James Rivera', short: 'James', role: 'adult', tone: '#3f3f46', initial: 'J', givesYou: ['balances'], accounts: ['joint'] },
-  { id: 'leo', name: 'Leo Rivera', short: 'Leo', role: 'teen', tone: '#16a34a', initial: 'L', accounts: ['leo'] },
+  { id: 'james', name: 'James Rivera', short: 'James', role: 'adult', tone: 'var(--grey-5)', initial: 'J', givesYou: ['balances'], accounts: ['joint'] },
+  { id: 'leo', name: 'Leo Rivera', short: 'Leo', role: 'teen', tone: 'var(--in)', initial: 'L', accounts: ['leo'] },
 ]
 const INVITES = [{ id: 'rosa', email: 'rosa.martinez@fastmail.com', role: 'viewer', sent: 'Oct 22', expires: 'Oct 29' }]
 
@@ -104,7 +104,7 @@ function Person({ p, sharing, setSharing }) {
         <div className="flex flex-wrap items-center gap-3">
           <Avatar p={p} size="size-12" />
           <div className="min-w-0 grow">
-            <h2 id={`person-${p.id}`} className="font-[family-name:'Space_Grotesk'] text-lg font-semibold">
+            <h2 id={`person-${p.id}`} className="font-display text-lg font-semibold">
               {p.you ? `${p.name} (you)` : p.name}
             </h2>
             <Note>

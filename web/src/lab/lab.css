@@ -61,6 +61,8 @@
 }
 
 @theme inline {
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: Montserrat, ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -225,4 +227,14 @@
   [data-compact] main .h-8 {
     height: 28px;
   }
+}
+
+/* Hallmark Floor (#185): no sideways scroll, and a focus ring on every control that shows at once. */
+html,
+body {
+  overflow-x: clip;
+}
+[data-compact] :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }

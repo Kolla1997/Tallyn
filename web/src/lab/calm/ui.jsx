@@ -28,8 +28,47 @@ export const usd = D.usd
 // One accent: red for the one action and for what is owed. Green for money in and progress.
 // Text shades pass AA on their ground.
 export const THEME = {
-  light: { '--accent': '#dc2626', '--button': '#b91c1c', '--owe-text': '#b91c1c', '--in-text': '#15803d', '--in': '#16a34a', '--track': '#e4e4e7' },
-  dark: { '--accent': '#dc2626', '--button': '#b91c1c', '--owe-text': '#f87171', '--in-text': '#4ade80', '--in': '#16a34a', '--track': '#3f3f46' },
+  // Every colour the pages use goes through these (Hallmark Floor 1). Spend 1–4: the red scale for spending.
+  light: {
+    '--accent': '#dc2626',
+    '--button': '#b91c1c',
+    '--owe-text': '#b91c1c',
+    '--in-text': '#15803d',
+    '--in': '#16a34a',
+    '--track': '#e4e4e7',
+    '--grey-1': '#d4d4d8',
+    '--grey-2': '#a1a1aa',
+    '--grey-3': '#71717a',
+    '--grey-4': '#52525b',
+    '--grey-5': '#3f3f46',
+    '--ink': '#18181b',
+    '--page': '#fafafa',
+    '--focus': '#18181b',
+    '--spend-1': '#fecaca',
+    '--spend-2': '#f87171',
+    '--spend-3': '#dc2626',
+    '--spend-4': '#7f1d1d',
+  },
+  dark: {
+    '--accent': '#dc2626',
+    '--button': '#b91c1c',
+    '--owe-text': '#f87171',
+    '--in-text': '#4ade80',
+    '--in': '#16a34a',
+    '--track': '#3f3f46',
+    '--grey-1': '#d4d4d8',
+    '--grey-2': '#a1a1aa',
+    '--grey-3': '#71717a',
+    '--grey-4': '#52525b',
+    '--grey-5': '#3f3f46',
+    '--ink': '#e4e4e7',
+    '--page': '#09090b',
+    '--focus': '#ffffff',
+    '--spend-1': '#3b1414',
+    '--spend-2': '#6b1d1d',
+    '--spend-3': '#b91c1c',
+    '--spend-4': '#f87171',
+  },
 }
 const EASE = 'cubicBezier(0.23, 1, 0.32, 1)'
 const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -43,7 +82,7 @@ export const Panel = ({ title, meta, children, id, className = '' }) => (
   >
     {title && (
       <header className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 id={id} className="font-[family-name:'Space_Grotesk'] text-[15px] font-semibold text-zinc-900 dark:text-white">
+        <h2 id={id} className="font-display text-[15px] font-semibold text-zinc-900 dark:text-white">
           {title}
         </h2>
         {meta && <span className="text-[13px] text-zinc-500 dark:text-zinc-400">{meta}</span>}
@@ -61,7 +100,7 @@ export const See = ({ children, href = '#' }) => (
   </a>
 )
 export const Money = ({ v, className = '', style, digits = 2 }) => (
-  <span className={`shrink-0 font-[family-name:'Space_Grotesk'] font-semibold whitespace-nowrap tabular-nums ${className}`} style={style}>
+  <span className={`shrink-0 font-display font-semibold whitespace-nowrap tabular-nums ${className}`} style={style}>
     {usd(v, digits)}
   </span>
 )
@@ -72,7 +111,10 @@ export const Icon = ({ icon: I }) => (
   </span>
 )
 export const Badge = ({ text, tone }) => (
-  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold text-white" style={{ background: tone || '#3f3f46' }}>
+  <span
+    className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[11px] font-bold text-white"
+    style={{ background: tone || 'var(--grey-5)' }}
+  >
     {text}
   </span>
 )
@@ -127,7 +169,7 @@ export const Button = ({ children, icon: I, quiet, danger, onClick, small }) => 
 export const PageHead = ({ title, sub, children }) => (
   <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
     <div>
-      <h1 className="font-[family-name:'Space_Grotesk'] text-2xl font-bold tracking-tight">{title}</h1>
+      <h1 className="font-display text-2xl font-bold tracking-tight">{title}</h1>
       {sub && <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">{sub}</p>}
     </div>
     {children && <div className="flex flex-wrap gap-2">{children}</div>}
@@ -216,14 +258,10 @@ export function Shell({ page, pages, go, dark, setDark, children, bare = false }
   const [collapsed, setCollapsed] = useState(q.get('nav') !== 'expanded')
   useLayoutEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
-    document.body.style.background = dark ? '#09090b' : '#fafafa'
+    document.body.style.background = dark ? THEME.dark['--page'] : THEME.light['--page']
   }, [dark])
   return (
-    <div
-      style={THEME[dark ? 'dark' : 'light']}
-      data-compact
-      className="min-h-svh bg-zinc-50 font-[family-name:Montserrat] text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
-    >
+    <div style={THEME[dark ? 'dark' : 'light']} data-compact className="min-h-svh bg-zinc-50 font-body text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       <div className="sticky top-0 z-50 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-200 bg-white/90 px-4 py-2 text-[13px] text-zinc-600 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90 dark:text-zinc-400">
         <b className="text-zinc-900 dark:text-white">Draft for #185 · calm screens</b>
         <label className="flex items-center gap-2">
@@ -272,7 +310,7 @@ export function Shell({ page, pages, go, dark, setDark, children, bare = false }
             </button>
           </header>
           <main className={`px-4 pt-5 pb-24 md:px-6 lg:pb-12 lg:pr-6 ${collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}>
-            <div className="mx-auto max-w-[1180px]">{children}</div>
+            <div className="mx-auto max-w-[1280px]">{children}</div>
           </main>
           <nav
             aria-label="Main"

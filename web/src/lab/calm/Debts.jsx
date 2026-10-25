@@ -45,16 +45,16 @@ const DEBTS = [
 ]
 const GROUPS = [
   ['card', 'Credit cards', 'var(--accent)'],
-  ['student', 'Student loans', '#d4d4d8'],
-  ['mortgage', 'Mortgages', '#a1a1aa'],
-  ['other', 'Other loans', '#71717a'], // mid grey: shows on white and on black
+  ['student', 'Student loans', 'var(--grey-1)'],
+  ['mortgage', 'Mortgages', 'var(--grey-2)'],
+  ['other', 'Other loans', 'var(--grey-3)'], // mid grey: shows on white and on black
 ]
 const WHO = [
   ['yours', 'Yours'],
   ['joint', 'With James'],
   ['everyone', 'Everyone'],
 ]
-const NUM = "font-[family-name:'Space_Grotesk'] font-semibold tabular-nums"
+const NUM = 'font-display font-semibold tabular-nums'
 const CARD = 'rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900'
 const MUTED = 'text-zinc-500 dark:text-zinc-400'
 
@@ -297,7 +297,7 @@ export default function Debts() {
   const [who, setWho] = useState('everyone')
   const data = useDebts(who)
   return (
-    <div className="mx-auto max-w-[1040px]">
+    <>
       <PageHead title="Debts" sub="Everything you owe, in one place" />
       <div className="mb-3">
         <Chips label="Whose debts" options={WHO} value={who} onChange={setWho} />
@@ -309,6 +309,6 @@ export default function Debts() {
       ) : (
         <Summary key={who} {...data} />
       )}
-    </div>
+    </>
   )
 }

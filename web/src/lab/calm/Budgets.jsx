@@ -28,7 +28,7 @@ const PLAN = [
 ].map((j) => ({ ...j, planned: (INCOME * j.share) / 100 }))
 // Essentials = Bills $1,640 + Groceries $812 + Kids $420 + Transport $190 = $3,062; Guilt-free = Eating out $264 + Fun $160.
 console.assert(PLAN[0].used === 1640 + 812 + 420 + 190 && PLAN[1].used === 264 + 160, 'plan uses the October spending')
-const JOB_TONE = ['#18181b', '#dc2626', '#71717a', '#16a34a', '#a1a1aa']
+const JOB_TONE = ['var(--ink)', 'var(--accent)', 'var(--grey-3)', 'var(--in)', 'var(--grey-2)']
 
 function Plan() {
   const [whose, setWhose] = useState('household')
@@ -45,7 +45,7 @@ function Plan() {
         value={whose}
         onChange={setWhose}
       />
-      <p className="mt-3 font-[family-name:'Space_Grotesk'] text-xl font-semibold">{answer}</p>
+      <p className="mt-3 font-display text-xl font-semibold">{answer}</p>
       <Note>
         {usd(INCOME, 0)} a month from your income. {over.map((j) => `${j.name} is ${usd(j.used - j.planned, 0)} over`).join('; ')}.
       </Note>
@@ -71,14 +71,14 @@ function Plan() {
             <li key={j.key} className="rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/60">
               <div className="flex justify-between gap-2 text-sm">
                 <span className="font-semibold">{j.name}</span>
-                <span className="font-[family-name:'Space_Grotesk'] font-semibold tabular-nums" style={isOver ? { color: 'var(--owe-text)' } : undefined}>
+                <span className="font-display font-semibold tabular-nums" style={isOver ? { color: 'var(--owe-text)' } : undefined}>
                   {usd(j.used, 0)}
                 </span>
               </div>
               <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
                 <span
                   className="block h-full rounded-full"
-                  style={{ width: `${Math.min(100, (j.used / j.planned) * 100)}%`, background: isOver ? 'var(--accent)' : '#71717a' }}
+                  style={{ width: `${Math.min(100, (j.used / j.planned) * 100)}%`, background: isOver ? 'var(--accent)' : 'var(--grey-3)' }}
                 />
               </span>
               <Note className="mt-1">
@@ -118,7 +118,7 @@ function PaceChart({ name, planned, spent }) {
     <div className="mt-2">
       <LineChart data={data} aspectRatio="3 / 1" margin={{ left: 0, right: 0, top: 4, bottom: 4 }}>
         <Line dataKey="even" curve={curveLinear} fadeEdges={false} stroke="#a1a1aa" strokeWidth={1.5} dashFromIndex={0} showHighlight={false} animate={false} />
-        <Line dataKey="spent" curve={curveLinear} fadeEdges={false} stroke={warn ? 'var(--accent)' : '#52525b'} strokeWidth={2} animate={false} />
+        <Line dataKey="spent" curve={curveLinear} fadeEdges={false} stroke={warn ? 'var(--accent)' : 'var(--grey-4)'} strokeWidth={2} animate={false} />
       </LineChart>
     </div>
   )
@@ -181,7 +181,7 @@ function PersonBudget({ b, onChange }) {
           <span
             key={i}
             className={`h-6 grow rounded-[3px] ${i + 1 === D.today ? 'ring-2 ring-zinc-900 ring-offset-1 dark:ring-white dark:ring-offset-zinc-900' : ''} ${i < filled ? '' : 'bg-zinc-200 dark:bg-zinc-700'}`}
-            style={i < filled ? { background: t === 'ok' ? '#52525b' : 'var(--accent)' } : undefined}
+            style={i < filled ? { background: t === 'ok' ? 'var(--grey-4)' : 'var(--accent)' } : undefined}
           />
         ))}
       </div>
@@ -210,7 +210,7 @@ function BudgetDialog({ budget, onClose }) {
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="dlg-h">
       <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl dark:bg-zinc-900">
         <div className="mb-4 flex items-center justify-between">
-          <h2 id="dlg-h" className="font-[family-name:'Space_Grotesk'] text-lg font-semibold">
+          <h2 id="dlg-h" className="font-display text-lg font-semibold">
             {budget?.name ? `Change the ${budget.name} budget` : 'Add a budget'}
           </h2>
           <button
@@ -311,7 +311,7 @@ export default function Budgets() {
               <input type="checkbox" role="switch" checked={counted} onChange={(e) => setCounted(e.target.checked)} className="peer sr-only" />
               <span
                 aria-hidden="true"
-                className="relative h-5 w-9 rounded-full bg-zinc-300 transition-colors duration-150 peer-checked:bg-[var(--in)] peer-focus-visible:ring-2 peer-focus-visible:ring-zinc-400 after:absolute after:top-0.5 after:left-0.5 after:size-4 after:rounded-full after:bg-white after:transition-transform after:duration-150 peer-checked:after:translate-x-4 dark:bg-zinc-700"
+                className="relative h-5 w-9 rounded-full bg-zinc-300 transition-colors duration-150 peer-checked:bg-[var(--in)] peer-focus-visible:ring-2 peer-focus-visible:ring-zinc-400 after:absolute after:top-0.5 after:left-0.5 after:size-4 after:rounded-full after:bg-white after:transition-transform after:duration-150 peer-checked:after:translate-x-4 dark:bg-zinc-700 dark:peer-checked:bg-[var(--in)]"
               />
               Count my spending in household budgets (totals only)
             </label>
@@ -319,7 +319,7 @@ export default function Budgets() {
         </Panel>
         <section aria-labelledby="budgets-household">
           <div className="mt-1 mb-2 flex flex-wrap items-baseline justify-between gap-2">
-            <h2 id="budgets-household" className="font-[family-name:'Space_Grotesk'] text-[15px] font-semibold">
+            <h2 id="budgets-household" className="font-display text-[15px] font-semibold">
               Household budgets
             </h2>
             <Note>Oct 1 to today · solid: spent · dashed: an even pace</Note>
@@ -332,7 +332,7 @@ export default function Budgets() {
         </section>
         <section aria-labelledby="budgets-person">
           <div className="mt-1 mb-2 flex flex-wrap items-baseline justify-between gap-2">
-            <h2 id="budgets-person" className="font-[family-name:'Space_Grotesk'] text-[15px] font-semibold">
+            <h2 id="budgets-person" className="font-display text-[15px] font-semibold">
               Budgets for one person
             </h2>
             <Note>One notch per day · outlined: today</Note>

@@ -141,7 +141,7 @@ const Panel = ({ title, meta, children, className = '', id }) => (
   >
     {title && (
       <header className="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 id={id} className="font-[family-name:'Space_Grotesk'] text-[17px] font-semibold text-zinc-900 dark:text-white">
+        <h2 id={id} className="font-display text-[17px] font-semibold text-zinc-900 dark:text-white">
           {title}
         </h2>
         {meta && <span className="text-sm text-zinc-500 dark:text-zinc-400">{meta}</span>}
@@ -150,7 +150,7 @@ const Panel = ({ title, meta, children, className = '', id }) => (
     {children}
   </section>
 )
-const Money = ({ v, className = '' }) => <span className={`font-[family-name:'Space_Grotesk'] font-semibold tabular-nums ${className}`}>{usd(v)}</span>
+const Money = ({ v, className = '' }) => <span className={`font-display font-semibold tabular-nums ${className}`}>{usd(v)}</span>
 const See = ({ children }) => (
   <a
     href="#"
@@ -284,7 +284,7 @@ function Cards() {
           </span>
         </span>
         <span className="text-right">
-          <span className="block font-[family-name:'Space_Grotesk'] font-semibold tabular-nums" style={{ color: 'var(--owe-text)' }}>
+          <span className="block font-display font-semibold tabular-nums" style={{ color: 'var(--owe-text)' }}>
             −{usd(-amex.bal)}
           </span>
           <span className="block text-sm text-zinc-500 dark:text-zinc-400">{used}% of the limit</span>
@@ -358,10 +358,7 @@ function Recent({ scope }) {
                 {scope === 'everyone' && ` · ${t.who}`}
               </span>
             </span>
-            <span
-              className="shrink-0 font-[family-name:'Space_Grotesk'] font-semibold whitespace-nowrap tabular-nums"
-              style={t.amt > 0 ? { color: 'var(--in-text)' } : undefined}
-            >
+            <span className="shrink-0 font-display font-semibold whitespace-nowrap tabular-nums" style={t.amt > 0 ? { color: 'var(--in-text)' } : undefined}>
               {t.amt > 0 ? '+' : '−'}
               {usd(Math.abs(t.amt))}
             </span>
@@ -435,7 +432,7 @@ function Family() {
     subtitle: p.sub,
     art: (
       <div className="flex size-full items-center justify-center" style={{ background: ['#dc2626', '#18181b', '#16a34a'][i] }}>
-        <span className="font-[family-name:'Space_Grotesk'] text-6xl font-bold text-white">{p.initial}</span>
+        <span className="font-display text-6xl font-bold text-white">{p.initial}</span>
       </div>
     ),
     description: p.accounts.map((a) => `${a.name} ${usd(a.usd)}`).join(' · '),
@@ -601,7 +598,7 @@ export default function RedesignHome() {
     <div
       ref={root}
       style={{ ...PAL, ...TEXT[dark ? 'dark' : 'light'] }}
-      className="min-h-svh bg-zinc-50 font-[family-name:Montserrat] text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
+      className="min-h-svh bg-zinc-50 font-body text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
     >
       <div className="sticky top-0 z-50 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 bg-white/90 px-4 py-2 text-[13px] text-zinc-600 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90 dark:text-zinc-400">
         <span>
@@ -635,7 +632,7 @@ export default function RedesignHome() {
         <div className="mx-auto max-w-[1240px]">
           <div data-arrive className="mb-4 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 className="font-[family-name:'Space_Grotesk'] text-3xl font-bold tracking-tight">The Rivera family</h1>
+              <h1 className="font-display text-3xl font-bold tracking-tight">The Rivera family</h1>
               <p className="mt-1 text-zinc-500 dark:text-zinc-400">
                 Evening, Maya. <b className="font-semibold text-zinc-900 dark:text-white">{D.finding.strong}</b>
                 {D.finding.rest}

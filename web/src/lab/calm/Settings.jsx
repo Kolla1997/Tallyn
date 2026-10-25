@@ -53,7 +53,7 @@ function Dialog({ title, children, onClose, wide }) {
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="sdlg-h">
       <div className={`max-h-[90svh] w-full ${wide ? 'max-w-lg' : 'max-w-md'} overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl dark:bg-zinc-900`}>
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 id="sdlg-h" className="font-[family-name:'Space_Grotesk'] text-lg font-semibold">
+          <h2 id="sdlg-h" className="font-display text-lg font-semibold">
             {title}
           </h2>
           <button
@@ -73,7 +73,7 @@ function Dialog({ title, children, onClose, wide }) {
 const CodeField = () => (
   <label className="grid gap-1">
     <span className="font-semibold text-zinc-900 dark:text-white">6-digit code from your authenticator</span>
-    <input inputMode="numeric" autoComplete="one-time-code" maxLength={6} className={`${input} font-[family-name:'Space_Grotesk'] tracking-[0.3em]`} />
+    <input inputMode="numeric" autoComplete="one-time-code" maxLength={6} className={`${input} font-display tracking-[0.3em]`} />
   </label>
 )
 const Actions = ({ onClose, action, danger, onAction }) => (
@@ -271,9 +271,7 @@ function AddAuthenticator({ onClose, onAdded }) {
             <FakeQR />
             <div className="min-w-0">
               <Note>Can’t scan it? Enter this key instead:</Note>
-              <p className="mt-1 font-[family-name:'Space_Grotesk'] text-[13px] font-semibold tracking-wider break-all text-zinc-900 dark:text-white">
-                JBSW Y3DP EHPK 3PXP
-              </p>
+              <p className="mt-1 font-display text-[13px] font-semibold tracking-wider break-all text-zinc-900 dark:text-white">JBSW Y3DP EHPK 3PXP</p>
             </div>
           </div>
           <p>Then enter the 6-digit code it shows.</p>
@@ -296,7 +294,7 @@ function NewCodes({ onClose }) {
   ) : (
     <Dialog title="Your backup codes" onClose={onClose}>
       <p>Each one works once, for when you can’t use your authenticator. Save them somewhere safe: you won’t see them again.</p>
-      <ol className="grid grid-cols-2 gap-x-6 gap-y-1.5 rounded-xl bg-zinc-50 p-4 font-[family-name:'Space_Grotesk'] text-sm font-semibold tabular-nums dark:bg-zinc-800/60">
+      <ol className="grid grid-cols-2 gap-x-6 gap-y-1.5 rounded-xl bg-zinc-50 p-4 font-display text-sm font-semibold tabular-nums dark:bg-zinc-800/60">
         {CODES.map((c, i) => (
           <li key={c} className="flex gap-2">
             <span className="w-5 text-right font-normal text-zinc-400">{i + 1}</span>

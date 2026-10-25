@@ -124,7 +124,7 @@ const scopeOf = (scope) => {
 const Panel = ({ title, meta, children, id, className = '' }) => (
   <section aria-labelledby={id} className={`min-w-0 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 ${className}`}>
     <header className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-      <h2 id={id} className="font-[family-name:'Space_Grotesk'] text-[15px] font-semibold text-zinc-900 dark:text-white">
+      <h2 id={id} className="font-display text-[15px] font-semibold text-zinc-900 dark:text-white">
         {title}
       </h2>
       {meta && <span className="text-[13px] text-zinc-500 dark:text-zinc-400">{meta}</span>}
@@ -141,7 +141,7 @@ const See = ({ children }) => (
   </a>
 )
 const Money = ({ v, className = '', style }) => (
-  <span className={`shrink-0 font-[family-name:'Space_Grotesk'] font-semibold whitespace-nowrap tabular-nums ${className}`} style={style}>
+  <span className={`shrink-0 font-display font-semibold whitespace-nowrap tabular-nums ${className}`} style={style}>
     {usd(v)}
   </span>
 )
@@ -310,7 +310,7 @@ function Recent({ scope }) {
       {TXS.filter((t) => t.kind === kind && (scope === 'everyone' || t.who === 'You')).map((t) => (
         <Row key={t.name + t.when} icon={t.icon} name={t.name} sub={`${t.cat} · ${t.when}${scope === 'everyone' ? ` · ${t.who}` : ''}`}>
           <span
-            className="shrink-0 font-[family-name:'Space_Grotesk'] text-sm font-semibold whitespace-nowrap tabular-nums"
+            className="shrink-0 font-display text-sm font-semibold whitespace-nowrap tabular-nums"
             style={t.amt > 0 ? { color: 'var(--in-text)' } : undefined}
           >
             {t.amt > 0 ? '+' : '−'}
@@ -442,9 +442,8 @@ function Goals() {
             <li key={g.name}>
               <div className="flex items-baseline justify-between gap-3">
                 <span className="text-sm font-semibold">{g.name}</span>
-                <span className="font-[family-name:'Space_Grotesk'] text-sm font-semibold tabular-nums">
-                  {usd(g.saved, 0)}{' '}
-                  <span className="font-[family-name:Montserrat] text-[13px] font-normal text-zinc-500 dark:text-zinc-400">of {usd(g.target, 0)}</span>
+                <span className="font-display text-sm font-semibold tabular-nums">
+                  {usd(g.saved, 0)} <span className="font-body text-[13px] font-normal text-zinc-500 dark:text-zinc-400">of {usd(g.target, 0)}</span>
                 </span>
               </div>
               <p className="text-[13px] text-zinc-500 dark:text-zinc-400">
@@ -546,7 +545,7 @@ export function HomeBody({ scope: outerScope, setScope: outerSet }) {
     <>
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-[family-name:'Space_Grotesk'] text-2xl font-bold tracking-tight">The Rivera family</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight">The Rivera family</h1>
           <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
             Evening, Maya. <b className="font-semibold text-zinc-900 dark:text-white">{D.finding.strong}</b>
             {D.finding.rest}
@@ -614,10 +613,7 @@ export default function CalmHome() {
     document.body.style.background = dark ? '#09090b' : '#fafafa'
   }, [dark])
   return (
-    <div
-      style={THEME[dark ? 'dark' : 'light']}
-      className="min-h-svh bg-zinc-50 font-[family-name:Montserrat] text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
-    >
+    <div style={THEME[dark ? 'dark' : 'light']} className="min-h-svh bg-zinc-50 font-body text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       <div className="sticky top-0 z-50 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 bg-white/90 px-4 py-2 text-[13px] text-zinc-600 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90 dark:text-zinc-400">
         <span>
           <b className="text-zinc-900 dark:text-white">Draft for #182 · calm Home, full</b> · Kokonut, Bklit and anime.js only · made-up names and amounts

@@ -104,7 +104,7 @@ const beachPass = {
 function Initial({ letter, tone }) {
   return (
     <div className="flex size-full items-center justify-center" style={{ background: tone }}>
-      <span className="font-[family-name:'Space_Grotesk'] text-6xl font-bold text-white/95">{letter}</span>
+      <span className="font-display text-6xl font-bold text-white/95">{letter}</span>
     </div>
   )
 }
@@ -354,7 +354,7 @@ export default function BoldHome() {
   return (
     <div
       ref={root}
-      className="min-h-svh bg-zinc-50 font-[family-name:Montserrat] text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
+      className="min-h-svh bg-zinc-50 font-body text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
       style={{
         '--button': P.button,
         '--accent': P.accent,

@@ -28,7 +28,7 @@ const SCREENS = [
 ]
 const input = 'h-10 w-full rounded-xl border border-zinc-300 bg-white px-3 text-sm dark:border-zinc-700 dark:bg-zinc-950'
 
-const H = ({ children }) => <h1 className="font-[family-name:'Space_Grotesk'] text-xl font-bold tracking-tight">{children}</h1>
+const H = ({ children }) => <h1 className="font-display text-xl font-bold tracking-tight">{children}</h1>
 const Field = ({ label, aside, children }) => (
   <div className="grid gap-1 text-sm">
     <div className="flex items-baseline justify-between gap-2">
@@ -131,7 +131,7 @@ function CodeBoxes({ button, onDone }) {
               onChange={(e) => set(i, e.target.value)}
               onKeyDown={(e) => e.key === 'Backspace' && !d && i > 0 && boxes.current[i - 1]?.focus()}
               onFocus={(e) => e.target.select()}
-              className={`h-12 w-full min-w-0 rounded-xl border bg-white text-center font-[family-name:'Space_Grotesk'] text-xl font-semibold dark:bg-zinc-950 ${i === 2 ? 'mr-2' : ''} ${d ? 'border-zinc-900 dark:border-white' : 'border-zinc-300 dark:border-zinc-700'}`}
+              className={`h-12 w-full min-w-0 rounded-xl border bg-white text-center font-display text-xl font-semibold dark:bg-zinc-950 ${i === 2 ? 'mr-2' : ''} ${d ? 'border-zinc-900 dark:border-white' : 'border-zinc-300 dark:border-zinc-700'}`}
             />
           ))}
         </div>
@@ -230,7 +230,7 @@ function BackupCard({ go }) {
           placeholder="xxxx-xxxx"
           autoComplete="off"
           spellCheck={false}
-          className={`${input} font-[family-name:'Space_Grotesk'] tracking-widest`}
+          className={`${input} font-display tracking-widest`}
         />
       </Field>
       <Primary disabled={!ok} onClick={() => go('setup')}>
@@ -281,7 +281,7 @@ function SetupCard({ go }) {
       <Note>Tallyn asks for a code from an authenticator app each time you sign in, so your password alone can’t open your family’s money.</Note>
       <ol className="grid gap-1 text-sm">
         <li className="flex gap-2">
-          <b className="font-[family-name:'Space_Grotesk']">1</b> In your authenticator app, add an account and scan this code.
+          <b className="font-display">1</b> In your authenticator app, add an account and scan this code.
         </li>
       </ol>
       <div className="flex justify-center">
@@ -289,10 +289,10 @@ function SetupCard({ go }) {
       </div>
       <div className="text-center">
         <Note>Can’t scan it? Enter this key instead:</Note>
-        <p className="mt-0.5 font-[family-name:'Space_Grotesk'] text-sm font-semibold tracking-wider">JBSW Y3DP EHPK 3PXP</p>
+        <p className="mt-0.5 font-display text-sm font-semibold tracking-wider">JBSW Y3DP EHPK 3PXP</p>
       </div>
       <p className="flex gap-2 text-sm">
-        <b className="font-[family-name:'Space_Grotesk']">2</b> Then enter the 6-digit code it shows.
+        <b className="font-display">2</b> Then enter the 6-digit code it shows.
       </p>
       <CodeBoxes button="Turn on 2FA" onDone={() => go('codes')} />
       <Note>Then you’ll save backup codes, for when you can’t use your phone.</Note>
@@ -311,7 +311,7 @@ function CodesCard({ go }) {
       <Note>Each one works once, for when you can’t use your authenticator app.</Note>
       <ol
         aria-label="Your backup codes"
-        className="grid grid-cols-2 gap-x-5 gap-y-1.5 rounded-xl bg-zinc-50 p-4 font-[family-name:'Space_Grotesk'] text-sm font-semibold tabular-nums dark:bg-zinc-800/60"
+        className="grid grid-cols-2 gap-x-5 gap-y-1.5 rounded-xl bg-zinc-50 p-4 font-display text-sm font-semibold tabular-nums dark:bg-zinc-800/60"
       >
         {CODES.map((c, i) => (
           <li key={c} className="flex gap-2">

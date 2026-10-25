@@ -21,13 +21,7 @@ const quietest = OCT.reduce((a, b) => (b.amount < a.amount ? b : a))
 
 // 0 nothing, then up to $60, $100, $200, and more. Text colour flips where the red gets deep.
 const level = (v) => (v <= 0 ? 0 : v < 60 ? 1 : v < 100 ? 2 : v < 200 ? 3 : 4)
-const FILL = [
-  'bg-zinc-100 dark:bg-zinc-800',
-  'bg-[#fecaca] dark:bg-[#3b1414]',
-  'bg-[#f87171] dark:bg-[#6b1d1d]',
-  'bg-[#dc2626] dark:bg-[#b91c1c]',
-  'bg-[#7f1d1d] dark:bg-[#f87171]',
-]
+const FILL = ['bg-zinc-100 dark:bg-zinc-800', 'bg-[var(--spend-1)]', 'bg-[var(--spend-2)]', 'bg-[var(--spend-3)]', 'bg-[var(--spend-4)]']
 
 function Legend() {
   return (
@@ -88,7 +82,7 @@ function Mix({ sel, onPick }) {
                 className="relative flex h-full flex-1 items-end"
               >
                 {capped && (
-                  <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 -translate-y-full font-[family-name:'Space_Grotesk'] text-[10px] font-semibold whitespace-nowrap tabular-nums">
+                  <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 -translate-y-full font-display text-[10px] font-semibold whitespace-nowrap tabular-nums">
                     {usd(x.amount, 0)}
                   </span>
                 )}
@@ -111,7 +105,7 @@ function Mix({ sel, onPick }) {
       <dl className="grid content-start gap-2.5 text-[13px] sm:border-l sm:border-zinc-100 sm:pl-4 dark:sm:border-zinc-800">
         <div>
           <dt className="text-zinc-500 dark:text-zinc-400">A day, on average</dt>
-          <dd className="font-[family-name:'Space_Grotesk'] text-base font-semibold tabular-nums">{usd(avg, 0)}</dd>
+          <dd className="font-display text-base font-semibold tabular-nums">{usd(avg, 0)}</dd>
         </div>
         <div>
           <dt className="text-zinc-500 dark:text-zinc-400">Biggest day</dt>
@@ -133,7 +127,7 @@ function Mix({ sel, onPick }) {
 export default function SpendingByDay({ sel = '', onPick = () => {} }) {
   return (
     <section aria-labelledby="spend-day-h" className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-      <h2 id="spend-day-h" className="mb-1 font-[family-name:'Space_Grotesk'] text-[15px] font-semibold">
+      <h2 id="spend-day-h" className="mb-1 font-display text-[15px] font-semibold">
         Spending by day
       </h2>
       <Mix sel={sel} onPick={(d) => onPick(d === sel ? '' : d)} />

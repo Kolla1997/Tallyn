@@ -87,13 +87,13 @@ function Summary({ list, scopeLabel, wholeMonth }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Note>Money in</Note>
-              <p className="font-[family-name:'Space_Grotesk'] text-xl font-semibold tabular-nums" style={{ color: 'var(--in-text)' }}>
+              <p className="font-display text-xl font-semibold tabular-nums" style={{ color: 'var(--in-text)' }}>
                 +{usd(moneyIn)}
               </p>
             </div>
             <div>
               <Note>Spent</Note>
-              <p className="font-[family-name:'Space_Grotesk'] text-xl font-semibold tabular-nums">−{usd(spent)}</p>
+              <p className="font-display text-xl font-semibold tabular-nums">−{usd(spent)}</p>
             </div>
           </div>
         )}
@@ -106,7 +106,7 @@ function Summary({ list, scopeLabel, wholeMonth }) {
             {byMerchant.map(([n, v]) => (
               <li key={n} className="flex justify-between gap-3 py-2 text-sm">
                 <span className="truncate font-semibold">{n}</span>
-                <span className="font-[family-name:'Space_Grotesk'] font-semibold tabular-nums">{usd(v)}</span>
+                <span className="font-display font-semibold tabular-nums">{usd(v)}</span>
               </li>
             ))}
           </Rows>
@@ -118,7 +118,7 @@ function Summary({ list, scopeLabel, wholeMonth }) {
             <li key={c}>
               <div className="flex justify-between text-sm">
                 <span className="font-semibold">{c}</span>
-                <span className="font-[family-name:'Space_Grotesk'] font-semibold tabular-nums">{usd(v)}</span>
+                <span className="font-display font-semibold tabular-nums">{usd(v)}</span>
               </div>
               <span className="mt-1 block h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
                 <span className="block h-full rounded-full bg-zinc-500" style={{ width: `${(v / top) * 100}%` }} />
@@ -147,10 +147,10 @@ function Details({ tx, onBack, onMerchant }) {
         <span className="flex size-10 items-center justify-center rounded-xl bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
           <I className="size-5" aria-hidden="true" />
         </span>
-        <h2 id="tx-details-h" className="grow font-[family-name:'Space_Grotesk'] text-lg font-semibold">
+        <h2 id="tx-details-h" className="grow font-display text-lg font-semibold">
           {tx.name}
         </h2>
-        <span className="font-[family-name:'Space_Grotesk'] text-lg font-semibold tabular-nums" style={tx.amt > 0 ? { color: 'var(--in-text)' } : undefined}>
+        <span className="font-display text-lg font-semibold tabular-nums" style={tx.amt > 0 ? { color: 'var(--in-text)' } : undefined}>
           {signed(tx.amt)}
         </span>
       </div>
@@ -316,7 +316,7 @@ export default function Transactions() {
                               </span>
                             </span>
                             <span
-                              className="shrink-0 font-[family-name:'Space_Grotesk'] text-sm font-semibold whitespace-nowrap tabular-nums"
+                              className="shrink-0 font-display text-sm font-semibold whitespace-nowrap tabular-nums"
                               style={t.amt > 0 ? { color: 'var(--in-text)' } : undefined}
                             >
                               {signed(t.amt)}

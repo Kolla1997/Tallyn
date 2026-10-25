@@ -123,9 +123,8 @@ function Pot({ g, selected, onPick }) {
           <span className="absolute inset-y-0 left-0 block" style={{ width: `${share * 100}%`, background: 'var(--in)' }} />
         </span>
         <span className="text-sm font-semibold">{g.name}</span>
-        <span className="font-[family-name:'Space_Grotesk'] text-sm font-semibold tabular-nums">
-          {fmt(saved(g), g.cur)}{' '}
-          <span className="font-[family-name:Montserrat] text-[13px] font-normal text-zinc-500 dark:text-zinc-400">of {fmt(g.target, g.cur)}</span>
+        <span className="font-display text-sm font-semibold tabular-nums">
+          {fmt(saved(g), g.cur)} <span className="font-body text-[13px] font-normal text-zinc-500 dark:text-zinc-400">of {fmt(g.target, g.cur)}</span>
         </span>
         <Note>
           {g.target - saved(g) > 0 ? `${fmt(g.target - saved(g), g.cur)} to go` : 'Reached'}
@@ -149,7 +148,7 @@ function Detail({ g, onUpdate, onEdit }) {
   const each = g.monthsLeft ? Math.ceil((g.target - saved(g)) / g.monthsLeft) : null
   return (
     <Panel id="goal-detail-h" title={g.name} meta={fmt(saved(g), g.cur) + ' of ' + fmt(g.target, g.cur)}>
-      <p className="font-[family-name:'Space_Grotesk'] text-lg font-semibold">{f.words}</p>
+      <p className="font-display text-lg font-semibold">{f.words}</p>
       <Note>You’ve added about {fmt(pace(g), g.cur)} a month since January.</Note>
       <div className="mt-3">
         <LineChart data={data} aspectRatio="3 / 1" margin={{ left: 8, right: 8, top: 8, bottom: 24 }}>
@@ -171,13 +170,13 @@ function Detail({ g, onUpdate, onEdit }) {
       <ul className="mt-3 grid gap-1.5 text-sm">
         {next && (
           <li>
-            <b className="font-[family-name:'Space_Grotesk'] tabular-nums">{fmt(next - saved(g), g.cur)}</b> to{' '}
+            <b className="font-display tabular-nums">{fmt(next - saved(g), g.cur)}</b> to{' '}
             {next === g.target ? 'the goal' : `${Math.round((next / g.target) * 100)}%`}.
           </li>
         )}
         {each && (
           <li>
-            Put aside <b className="font-[family-name:'Space_Grotesk'] tabular-nums">{fmt(each, g.cur)} a month</b> to get there by {g.by}.
+            Put aside <b className="font-display tabular-nums">{fmt(each, g.cur)} a month</b> to get there by {g.by}.
           </li>
         )}
         <li className="text-zinc-600 dark:text-zinc-300">{g.fills === 'hand' ? 'Updated by hand.' : `Follows ${g.fills}: updates at each bank update.`}</li>
@@ -203,7 +202,7 @@ function GoalDialog({ goal, update, onClose }) {
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="gdlg-h">
       <div className="max-h-[90svh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl dark:bg-zinc-900">
         <div className="mb-4 flex items-center justify-between">
-          <h2 id="gdlg-h" className="font-[family-name:'Space_Grotesk'] text-lg font-semibold">
+          <h2 id="gdlg-h" className="font-display text-lg font-semibold">
             {update ? `Update ${goal.name}` : goal ? 'Change goal' : 'New goal'}
           </h2>
           <button
@@ -334,7 +333,7 @@ export default function Goals() {
       </PageHead>
       <div className="grid gap-3">
         <Panel id="goals-month-h">
-          <h2 id="goals-month-h" className="font-[family-name:'Space_Grotesk'] text-lg font-semibold">
+          <h2 id="goals-month-h" className="font-display text-lg font-semibold">
             Put aside {fmt(usdDue)} this month
             {otherDue.length > 0 && `, plus ${otherDue.map((g) => fmt(g.month.due, g.cur)).join(' and ')} in another currency`}.
           </h2>
@@ -372,7 +371,7 @@ export default function Goals() {
         </Panel>
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 [&>*]:min-w-0">
           <section aria-labelledby="goals-pots-h" className="lg:col-span-7">
-            <h2 id="goals-pots-h" className="mb-2 font-[family-name:'Space_Grotesk'] text-[15px] font-semibold">
+            <h2 id="goals-pots-h" className="mb-2 font-display text-[15px] font-semibold">
               Your goals
             </h2>
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
