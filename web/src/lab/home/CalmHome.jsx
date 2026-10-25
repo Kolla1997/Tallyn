@@ -1,12 +1,14 @@
-// Tallyn Home, calm draft (#182, round 4). Dinesh: the bold drafts felt overwhelming; use only the
-// newly installed libraries. Built from Kokonut UI (split-flap text, notification stack, metric card,
-// smooth tab) and Bklit (linear gauge), with anime.js only for press feedback (animate skill: nothing
-// moves on load on a screen opened daily). Red, green, white, black; the original sidebar; Tallyn's
-// fonts and logo. All names and amounts are made up.
+// Tallyn Home, calm full draft (#182, round 5). Dinesh liked the calm approach: now the whole Home,
+// one size smaller. Every job of web/src/screens/HomePage.jsx is here (total with Yours/Everyone,
+// your accounts, credit card, spending, recent transactions by kind, shared with you, family, goals)
+// plus Coming up. Built from Kokonut UI (split-flap text, notification stack, metric card, smooth tab)
+// and Bklit (linear gauge); anime.js only for press feedback (animate skill: nothing moves on load).
+// Red, green, white, black; the original sidebar; Tallyn's fonts and logo. Made-up names and amounts.
 //
-// Five blocks, two rows on a 12-column grid, 16px gutter:
-//   1 Total (8)            | Coming up (4)
-//   2 Spending (8)         | Recent transactions + Goals (4)
+// 12-column grid, 12px gutter:
+//   1 Total (8)                  | Coming up (4)
+//   2 Spending (8)               | Recent transactions (4)
+//   3 Your accounts (4) | Credit card + Shared with you (4) | Family + Goals (4)
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { animate } from 'animejs'
 import {
@@ -22,15 +24,18 @@ import {
   Utensils,
   Bus,
   Baby,
-  Zap,
   ArrowLeftRight,
   Banknote,
+  Zap,
   Receipt as DebtsIcon,
   Target,
   Settings as SettingsIcon,
   Menu,
   ChevronsLeft,
   ChevronsRight,
+  Wallet,
+  PiggyBank as Savings,
+  Globe,
 } from 'lucide-react'
 import SplitFlapText from '@/components/kokonutui/split-flap-text'
 import NotificationStack from '@/components/kokonutui/notification-stack'
@@ -43,8 +48,8 @@ import lockupDark from '../../../../brand/logo/svg/tallyn-lockup-horizontal-dark
 import markLight from '../../../../brand/logo/svg/tallyn-mark-light.svg?url'
 import markDark from '../../../../brand/logo/svg/tallyn-mark-dark.svg?url'
 
-// One accent: red for the one action and for what is owed. Green only for money in. Everything else
-// is black, white and grey. Text shades pass AA on their ground.
+// One accent: red for the one action and for what is owed. Green only for money in and goal progress.
+// Everything else is black, white and grey. Text shades pass AA on their ground.
 const THEME = {
   light: { '--accent': '#dc2626', '--button': '#b91c1c', '--owe-text': '#b91c1c', '--in-text': '#15803d', '--in': '#16a34a' },
   dark: { '--accent': '#dc2626', '--button': '#b91c1c', '--owe-text': '#f87171', '--in-text': '#4ade80', '--in': '#16a34a' },
@@ -55,8 +60,7 @@ const press = (e) => !reduced() && animate(e.currentTarget, { scale: [1, 0.97, 1
 const usd = D.usd
 
 // ---- Data for the metric card: 90 days of spending in three parts, ending today ----
-// October is the draft's real data (Bills $1,640, Kids $420, Everyday $1,426 = $3,486); earlier days
-// are made up at a similar level.
+// October is the draft's data (Bills $1,640, Kids $420, Everyday $1,426 = $3,486); earlier days are made up.
 const SEGMENTS = ['Bills', 'Everyday', 'Kids and family']
 function spendingDays() {
   const out = []
@@ -64,8 +68,7 @@ function spendingDays() {
   const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647
   const end = Date.UTC(2026, 9, 24)
   const day = 86400000
-  const before = 90 - D.today
-  for (let i = 0; i < before; i++) {
+  for (let i = 0; i < 90 - D.today; i++) {
     const t = end - (90 - 1 - i) * day
     const dom = new Date(t).getUTCDate()
     out.push({
@@ -93,23 +96,38 @@ const TXS = [
   { kind: 'spending', name: 'Shell', cat: 'Transport', icon: Bus, when: 'Today', who: 'You and James', amt: -48.1 },
   { kind: 'spending', name: 'Little Sprouts', cat: 'Kids', icon: Baby, when: 'Yesterday', who: 'You and James', amt: -120.0 },
   { kind: 'spending', name: 'Nando’s', cat: 'Eating out', icon: Utensils, when: 'Oct 22', who: 'You', amt: -38.75 },
+  { kind: 'spending', name: 'Con Edison', cat: 'Bills', icon: Zap, when: 'Oct 21', who: 'You and James', amt: -145.0 },
+  { kind: 'spending', name: 'Trader Joe’s', cat: 'Groceries', icon: ShoppingBasket, when: 'Oct 20', who: 'You', amt: -64.3 },
   { kind: 'income', name: 'Payroll · Harlow & Co', cat: 'Pay', icon: Banknote, when: 'Oct 15', who: 'You', amt: 4210.0 },
   { kind: 'income', name: 'James · to Joint', cat: 'From James', icon: Banknote, when: 'Oct 15', who: 'You and James', amt: 1800.0 },
   { kind: 'transfers', name: 'Amex payment', cat: 'Card payment', icon: ArrowLeftRight, when: 'Oct 3', who: 'You', amt: -1102.55 },
   { kind: 'transfers', name: 'To High-yield savings', cat: 'Between your accounts', icon: ArrowLeftRight, when: 'Oct 1', who: 'You', amt: -500.0 },
 ]
 
-const have = D.accounts.filter((a) => a.usd > 0).reduce((s, a) => s + a.usd, 0)
-const owe = -D.accounts.filter((a) => a.usd < 0).reduce((s, a) => s + a.usd, 0)
+const amex = D.accounts.find((a) => a.bank === 'Amex')
+const CARD_LIMIT = 5000 // made up
+const MEMBERS = [
+  { initial: 'M', name: 'Maya Rivera', role: 'Owner · you', note: '5 accounts, 3 currencies', tone: 'var(--accent)' },
+  { initial: 'J', name: 'James Rivera', role: 'Partner', note: 'Shares Joint checking', tone: '#3f3f46' },
+  { initial: 'L', name: 'Leo Rivera', role: 'Teen, 15', note: 'Teen savings · allowance $40 a month', tone: '#16a34a' },
+]
 
-// ---- Building blocks ----
+// Yours: Maya's own accounts. Everyone: everything she can see (hers, Joint, Leo's).
+const scopeOf = (scope) => {
+  const accts = scope === 'yours' ? D.accounts.filter((a) => a.who === 'maya') : D.accounts
+  const have = accts.filter((a) => a.usd > 0).reduce((s, a) => s + a.usd, 0)
+  const owe = -accts.filter((a) => a.usd < 0).reduce((s, a) => s + a.usd, 0)
+  return { accts, have, owe, net: Math.round((have - owe) * 100) / 100 }
+}
+
+// ---- Building blocks (one size smaller than round 4) ----
 const Panel = ({ title, meta, children, id, className = '' }) => (
-  <section aria-labelledby={id} className={`min-w-0 rounded-3xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900 ${className}`}>
-    <header className="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-      <h2 id={id} className="font-[family-name:'Space_Grotesk'] text-[17px] font-semibold text-zinc-900 dark:text-white">
+  <section aria-labelledby={id} className={`min-w-0 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900 ${className}`}>
+    <header className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+      <h2 id={id} className="font-[family-name:'Space_Grotesk'] text-[15px] font-semibold text-zinc-900 dark:text-white">
         {title}
       </h2>
-      {meta && <span className="text-sm text-zinc-500 dark:text-zinc-400">{meta}</span>}
+      {meta && <span className="text-[13px] text-zinc-500 dark:text-zinc-400">{meta}</span>}
     </header>
     {children}
   </section>
@@ -117,11 +135,32 @@ const Panel = ({ title, meta, children, id, className = '' }) => (
 const See = ({ children }) => (
   <a
     href="#"
-    className="text-sm font-semibold text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-900 dark:text-white dark:decoration-zinc-600"
+    className="text-[13px] font-semibold text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-900 dark:text-white dark:decoration-zinc-600"
   >
     {children}
   </a>
 )
+const Money = ({ v, className = '', style }) => (
+  <span className={`shrink-0 font-[family-name:'Space_Grotesk'] font-semibold whitespace-nowrap tabular-nums ${className}`} style={style}>
+    {usd(v)}
+  </span>
+)
+const Icon = ({ icon: I }) => (
+  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+    <I className="size-4" aria-hidden="true" />
+  </span>
+)
+const Row = ({ icon, name, sub, children }) => (
+  <li className="flex items-center gap-3 py-2">
+    {icon && <Icon icon={icon} />}
+    <span className="min-w-0 grow">
+      <span className="block truncate text-sm font-semibold">{name}</span>
+      {sub && <span className="block truncate text-[13px] text-zinc-500 dark:text-zinc-400">{sub}</span>}
+    </span>
+    {children}
+  </li>
+)
+const Rows = ({ children }) => <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">{children}</ul>
 
 // The card keeps its resting height in the layout; when its list expands it grows over the cards
 // below instead of pushing them. Re-measures whenever it is closed, so wraps and font loads follow.
@@ -144,26 +183,47 @@ function OpensOver({ children }) {
   }, [])
   return (
     <div className="relative" style={h == null ? undefined : { height: h }}>
-      <div ref={card} className={`${h == null ? '' : 'absolute inset-x-0 top-0'} ${open ? 'z-30 rounded-3xl shadow-2xl shadow-black/30' : ''}`}>
+      <div ref={card} className={`${h == null ? '' : 'absolute inset-x-0 top-0'} ${open ? 'z-30 rounded-2xl shadow-2xl shadow-black/30' : ''}`}>
         {children}
       </div>
     </div>
   )
 }
 
-// ---- The five blocks ----
-function Total() {
+// ---- Row 1 ----
+function Total({ scope, setScope }) {
+  const s = scopeOf(scope)
   return (
     <section
-      aria-label="Total balance"
-      className="flex h-full flex-col justify-center gap-4 rounded-3xl bg-zinc-950 p-6 text-white md:p-8 dark:bg-black dark:ring-1 dark:ring-zinc-800"
+      aria-label={scope === 'yours' ? 'Your balance' : 'Total balance'}
+      className="flex h-full flex-col justify-center gap-3 rounded-2xl bg-zinc-950 p-5 text-white dark:bg-black dark:ring-1 dark:ring-zinc-800"
     >
-      <p className="text-sm text-zinc-400">The Rivera family · everything, in US dollars</p>
-      <div className="overflow-x-auto">
-        <SplitFlapText text={usd(have)} className="text-4xl md:text-6xl" />
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[13px] text-zinc-400">
+          {scope === 'yours' ? 'Your balance · in US dollars' : 'The Rivera family · everything you can see, in US dollars'}
+        </p>
+        <div role="group" aria-label="Show on Home" className="flex rounded-full bg-white/10 p-0.5 text-[13px] font-semibold">
+          {[
+            ['yours', 'Yours'],
+            ['everyone', 'Everyone'],
+          ].map(([k, label]) => (
+            <button
+              key={k}
+              type="button"
+              aria-pressed={scope === k}
+              onClick={() => setScope(k)}
+              className="rounded-full px-3 py-1 text-zinc-300 transition-[background-color,color,transform] duration-150 ease-out active:scale-[0.97] aria-pressed:bg-white aria-pressed:text-zinc-950"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
-      <p className="text-sm text-zinc-400">
-        Net worth <span className="text-white">{usd(D.total)}</span> after {usd(owe)} owed on the Amex card. Includes £2,150.00 and €1,480.00.
+      <div className="overflow-x-auto">
+        <SplitFlapText text={usd(s.have)} className="text-3xl md:text-5xl" />
+      </div>
+      <p className="text-[13px] text-zinc-400">
+        Net worth <span className="text-white">{usd(s.net)}</span> after {usd(s.owe)} owed on the Amex card. Includes £2,150.00 and €1,480.00.
       </p>
     </section>
   )
@@ -193,6 +253,7 @@ function ComingUp() {
   )
 }
 
+// ---- Row 2 ----
 function Spending() {
   const data = useMemo(() => spendingDays(), [])
   return (
@@ -205,45 +266,36 @@ function Spending() {
         periods={[7, 30, 90]}
         defaultPeriod={30}
         format="currency"
-        upIsGood={false}
         currency="USD"
+        upIsGood={false}
         className="w-full max-w-none"
       />
-      <p className="mt-2 px-1 text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mt-1.5 px-1 text-[13px] text-zinc-500 dark:text-zinc-400">
         October so far: <b className="font-semibold text-zinc-900 dark:text-white">{usd(D.spent, 0)}</b> of the {usd(D.planned, 0)} plan, {usd(D.left, 0)} left
-        with {D.days - D.today} days to go.
+        with {D.days - D.today} days to go. <See>Budgets</See>
       </p>
     </section>
   )
 }
 
-function Recent() {
+function Recent({ scope }) {
   const list = (kind) => (
-    <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
-      {TXS.filter((t) => t.kind === kind).map((t) => (
-        <li key={t.name + t.when} className="flex items-center gap-3 py-2.5">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-            <t.icon className="size-4" aria-hidden="true" />
-          </span>
-          <span className="min-w-0 grow">
-            <span className="block truncate font-semibold">{t.name}</span>
-            <span className="block truncate text-sm text-zinc-500 dark:text-zinc-400">
-              {t.cat} · {t.when}
-            </span>
-          </span>
+    <Rows>
+      {TXS.filter((t) => t.kind === kind && (scope === 'everyone' || t.who === 'You')).map((t) => (
+        <Row key={t.name + t.when} icon={t.icon} name={t.name} sub={`${t.cat} · ${t.when}${scope === 'everyone' ? ` · ${t.who}` : ''}`}>
           <span
-            className="shrink-0 font-[family-name:'Space_Grotesk'] font-semibold whitespace-nowrap tabular-nums"
+            className="shrink-0 font-[family-name:'Space_Grotesk'] text-sm font-semibold whitespace-nowrap tabular-nums"
             style={t.amt > 0 ? { color: 'var(--in-text)' } : undefined}
           >
             {t.amt > 0 ? '+' : '−'}
             {usd(Math.abs(t.amt))}
           </span>
-        </li>
+        </Row>
       ))}
-    </ul>
+    </Rows>
   )
   return (
-    <Panel id="tx-h" title="Recent transactions" meta={<See>See all</See>}>
+    <Panel id="tx-h" title={scope === 'yours' ? 'Your recent transactions' : 'Recent transactions'} meta={<See>See all</See>} className="h-full">
       <div className="overflow-hidden">
         <SmoothTab
           label="Kind of transaction"
@@ -260,25 +312,118 @@ function Recent() {
   )
 }
 
+// ---- Row 3 ----
+function Accounts({ scope }) {
+  const s = scopeOf(scope)
+  const ICON = {
+    'Everyday checking': Wallet,
+    'High-yield savings': Savings,
+    'UK current account': Globe,
+    'Euro account': Globe,
+    'Joint checking': Users,
+    'Teen savings': PiggyBank,
+  }
+  const rows = s.accts.filter((a) => a.usd > 0).sort((a, b) => b.usd - a.usd)
+  return (
+    <Panel id="acc-h" title={scope === 'yours' ? 'Your accounts' : 'Everyone’s accounts'} meta={<See>All accounts</See>} className="h-full">
+      <Rows>
+        {rows.map((a) => (
+          <Row key={a.name} icon={ICON[a.name] || Landmark} name={a.name} sub={`${a.bank} ··${a.last4}${a.cur !== 'USD' ? ` · ${D.native(a)}` : ''}`}>
+            <Money v={a.usd} className="text-sm" />
+          </Row>
+        ))}
+      </Rows>
+    </Panel>
+  )
+}
+
+function Card() {
+  const used = Math.round((-amex.bal / CARD_LIMIT) * 100)
+  return (
+    <Panel id="card-h" title="Credit card" meta={<See>Debts</See>}>
+      <div className="flex items-start justify-between gap-3">
+        <span>
+          <span className="block text-sm font-semibold">Amex ··{amex.last4}</span>
+          <span className="block text-[13px] text-zinc-500 dark:text-zinc-400">
+            {usd(CARD_LIMIT + amex.bal, 0)} available of {usd(CARD_LIMIT, 0)}
+          </span>
+        </span>
+        <span className="text-right">
+          <Money v={amex.bal} className="block text-sm" style={{ color: 'var(--owe-text)' }} />
+          <span className="block text-[13px] text-zinc-500 dark:text-zinc-400">Due Oct 28</span>
+        </span>
+      </div>
+      <div className="mt-2">
+        <Gauge
+          orientation="linear"
+          value={used}
+          totalNotches={28}
+          activeFill="var(--accent)"
+          defaultLabel="Limit used"
+          suffix="%"
+          minWidth={160}
+          linearHeight={16}
+        />
+      </div>
+    </Panel>
+  )
+}
+
+function Shared() {
+  const joint = D.accounts.find((a) => a.who === 'joint')
+  return (
+    <Panel id="shared-h" title="Shared with you" meta={<See>Family</See>}>
+      <Rows>
+        <Row icon={Users} name="Joint checking" sub={`From James · Chase ··${joint.last4}`}>
+          <Money v={joint.usd} className="text-sm" />
+        </Row>
+      </Rows>
+      <p className="mt-1 text-[13px] text-zinc-500 dark:text-zinc-400">James keeps his own accounts private.</p>
+    </Panel>
+  )
+}
+
+function Family() {
+  return (
+    <Panel id="fam-h" title="Family" meta={<See>Family and sharing</See>}>
+      <Rows>
+        {MEMBERS.map((m) => (
+          <li key={m.name} className="flex items-center gap-3 py-2">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white" style={{ background: m.tone }}>
+              {m.initial}
+            </span>
+            <span className="min-w-0 grow">
+              <span className="block truncate text-sm font-semibold">{m.name}</span>
+              <span className="block truncate text-[13px] text-zinc-500 dark:text-zinc-400">
+                {m.role} · {m.note}
+              </span>
+            </span>
+          </li>
+        ))}
+      </Rows>
+    </Panel>
+  )
+}
+
 function Goals() {
   return (
     <Panel id="goals-h" title="Goals" meta={<See>All goals</See>}>
-      <ul className="grid gap-4">
+      <ul className="grid gap-3">
         {D.goals.map((g) => {
           const pct = Math.round((g.saved / g.target) * 100)
           return (
             <li key={g.name}>
               <div className="flex items-baseline justify-between gap-3">
-                <span className="font-semibold">{g.name}</span>
-                <span className="font-[family-name:'Space_Grotesk'] font-semibold tabular-nums">
+                <span className="text-sm font-semibold">{g.name}</span>
+                <span className="font-[family-name:'Space_Grotesk'] text-sm font-semibold tabular-nums">
                   {usd(g.saved, 0)}{' '}
-                  <span className="font-[family-name:Montserrat] text-sm font-normal text-zinc-500 dark:text-zinc-400">of {usd(g.target, 0)}</span>
+                  <span className="font-[family-name:Montserrat] text-[13px] font-normal text-zinc-500 dark:text-zinc-400">of {usd(g.target, 0)}</span>
                 </span>
               </div>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="text-[13px] text-zinc-500 dark:text-zinc-400">
                 By {g.by} · {pct}%
               </p>
-              <div className="mt-2">
+              <div className="mt-1.5">
                 <Gauge
                   orientation="linear"
                   value={pct}
@@ -287,7 +432,7 @@ function Goals() {
                   defaultLabel={g.name}
                   suffix="%"
                   minWidth={160}
-                  linearHeight={18}
+                  linearHeight={14}
                 />
               </div>
             </li>
@@ -368,6 +513,7 @@ export default function CalmHome() {
   const q = new URLSearchParams(location.search)
   const [dark, setDark] = useState(q.get('t') === 'dark')
   const [collapsed, setCollapsed] = useState(q.get('nav') === 'collapsed')
+  const [scope, setScope] = useState(q.get('s') === 'yours' ? 'yours' : 'everyone')
   useLayoutEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
     document.body.style.background = dark ? '#09090b' : '#fafafa'
@@ -379,7 +525,7 @@ export default function CalmHome() {
     >
       <div className="sticky top-0 z-50 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-200 bg-white/90 px-4 py-2 text-[13px] text-zinc-600 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90 dark:text-zinc-400">
         <span>
-          <b className="text-zinc-900 dark:text-white">Draft for #182 · calm Home</b> · Kokonut, Bklit and anime.js only · made-up names and amounts
+          <b className="text-zinc-900 dark:text-white">Draft for #182 · calm Home, full</b> · Kokonut, Bklit and anime.js only · made-up names and amounts
         </span>
         <span className="flex gap-1">
           {[false, true].map((v) => (
@@ -404,12 +550,12 @@ export default function CalmHome() {
         </button>
       </header>
 
-      <main className={`px-4 pt-6 pb-28 transition-[padding] duration-200 ease-out md:px-8 lg:pb-16 lg:pr-8 ${collapsed ? 'lg:pl-[96px]' : 'lg:pl-[244px]'}`}>
+      <main className={`px-4 pt-5 pb-24 transition-[padding] duration-200 ease-out md:px-6 lg:pb-12 lg:pr-6 ${collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}>
         <div className="mx-auto max-w-[1180px]">
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <div>
-              <h1 className="font-[family-name:'Space_Grotesk'] text-3xl font-bold tracking-tight">The Rivera family</h1>
-              <p className="mt-1 text-zinc-500 dark:text-zinc-400">
+              <h1 className="font-[family-name:'Space_Grotesk'] text-2xl font-bold tracking-tight">The Rivera family</h1>
+              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
                 Evening, Maya. <b className="font-semibold text-zinc-900 dark:text-white">{D.finding.strong}</b>
                 {D.finding.rest}
               </p>
@@ -418,7 +564,7 @@ export default function CalmHome() {
               <button
                 type="button"
                 onClick={press}
-                className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold text-white"
+                className="inline-flex h-9 items-center gap-2 rounded-full px-3.5 text-sm font-semibold text-white"
                 style={{ background: 'var(--button)' }}
               >
                 <Link2 className="size-4" aria-hidden="true" />
@@ -427,7 +573,7 @@ export default function CalmHome() {
               <a
                 href="#"
                 onClick={press}
-                className="inline-flex h-10 items-center gap-2 rounded-full border border-zinc-300 px-4 text-sm font-semibold dark:border-zinc-700"
+                className="inline-flex h-9 items-center gap-2 rounded-full border border-zinc-300 px-3.5 text-sm font-semibold dark:border-zinc-700"
               >
                 <Users className="size-4" aria-hidden="true" />
                 Family and sharing
@@ -435,20 +581,30 @@ export default function CalmHome() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 [&>*]:min-w-0">
-            <div className="lg:col-span-8">
-              <Total />
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-12 [&>*]:min-w-0">
+            <div className="md:col-span-2 lg:col-span-8">
+              <Total scope={scope} setScope={setScope} />
             </div>
-            <div className="lg:col-span-4">
+            <div className="md:col-span-2 lg:col-span-4">
               <OpensOver>
                 <ComingUp />
               </OpensOver>
             </div>
-            <div className="lg:col-span-8">
+            <div className="md:col-span-2 lg:col-span-8">
               <Spending />
             </div>
-            <div className="grid content-start gap-4 lg:col-span-4">
-              <Recent />
+            <div className="md:col-span-2 lg:col-span-4">
+              <Recent scope={scope} />
+            </div>
+            <div className="lg:col-span-4">
+              <Accounts scope={scope} />
+            </div>
+            <div className="grid content-start gap-3 lg:col-span-4">
+              <Card />
+              <Shared />
+            </div>
+            <div className="grid content-start gap-3 md:col-span-2 lg:col-span-4">
+              <Family />
               <Goals />
             </div>
           </div>
