@@ -151,7 +151,7 @@ function Sidebar({ dark, collapsed, onToggle, page, go }) {
   return (
     <aside
       aria-label="Main"
-      className={`fixed top-[52px] bottom-3 left-3 z-40 hidden flex-col rounded-3xl border border-zinc-200 bg-white p-3 transition-[width] duration-200 ease-out lg:flex dark:border-zinc-800 dark:bg-zinc-900 ${collapsed ? 'w-[60px] items-center' : 'w-[208px]'}`}
+      className={`fixed top-[52px] bottom-3 left-3 z-40 hidden flex-col rounded-3xl border border-zinc-200 bg-white p-3 lg:flex dark:border-zinc-800 dark:bg-zinc-900 ${collapsed ? 'w-[60px] items-center' : 'w-[208px]'}`}
     >
       <div className={`mb-4 flex items-center ${collapsed ? 'flex-col gap-2' : 'justify-between pl-2'}`}>
         {collapsed ? (
@@ -175,12 +175,18 @@ function Sidebar({ dark, collapsed, onToggle, page, go }) {
             key={key}
             href={`?p=${key}`}
             onClick={(e) => (e.preventDefault(), go(key))}
-            title={collapsed ? label : undefined}
             aria-current={key === page ? 'page' : undefined}
-            className={`flex h-10 items-center gap-3 rounded-xl text-sm font-semibold text-zinc-600 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 aria-[current=page]:bg-zinc-100 aria-[current=page]:text-[var(--owe-text)] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:bg-zinc-800 ${collapsed ? 'w-[42px] justify-center' : 'px-3'}`}
+            className={`group relative flex h-10 items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 dark:focus-visible:ring-white text-sm font-semibold text-zinc-600 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 aria-[current=page]:bg-zinc-100 aria-[current=page]:text-[var(--owe-text)] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:bg-zinc-800 ${collapsed ? 'w-[42px] justify-center' : 'px-3'}`}
           >
             <I className="size-[18px] shrink-0" aria-hidden="true" />
-            <span className={collapsed ? 'sr-only' : undefined}>{label}</span>
+            {collapsed ? (
+              // A label you can always get at: on hover and on keyboard focus, beside the icon.
+              <span className="pointer-events-none absolute left-full z-50 ml-3 rounded-md bg-zinc-900 px-2 py-1 text-[12px] whitespace-nowrap text-white opacity-0 transition-opacity duration-100 group-hover:opacity-100 group-focus-visible:opacity-100 dark:bg-white dark:text-zinc-900">
+                {label}
+              </span>
+            ) : (
+              <span>{label}</span>
+            )}
           </a>
         ))}
       </nav>
@@ -203,10 +209,95 @@ function Sidebar({ dark, collapsed, onToggle, page, go }) {
   )
 }
 
+const NAVS = [
+  ['rail', 'Rail'],
+  ['labels', 'Labelled rail'],
+  ['top', 'Top bar'],
+]
+const NAV_ITEM =
+  'outline-none transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-2 focus-visible:ring-zinc-900 aria-[current=page]:bg-zinc-100 aria-[current=page]:text-[var(--owe-text)] dark:hover:bg-zinc-800 dark:hover:text-white dark:focus-visible:ring-white dark:aria-[current=page]:bg-zinc-800'
+const Avatar = ({ size = 'size-7' }) => (
+  <span className={`flex ${size} shrink-0 items-center justify-center rounded-full text-xs font-bold text-white`} style={{ background: 'var(--accent)' }}>
+    M
+  </span>
+)
+
+// Labelled rail: 88px, every icon keeps a short label under it, so nothing hides behind a hover.
+function LabelRail({ dark, page, go }) {
+  return (
+    <aside
+      aria-label="Main"
+      className="fixed top-[52px] bottom-3 left-3 z-40 hidden w-[88px] flex-col items-center rounded-3xl border border-zinc-200 bg-white py-3 lg:flex dark:border-zinc-800 dark:bg-zinc-900"
+    >
+      <img src={dark ? markDark : markLight} alt="Tallyn" className="mb-3 size-8" />
+      <nav className="flex flex-col items-center gap-0.5">
+        {SIDEBAR.map(([key, label, I]) => (
+          <a
+            key={key}
+            href={`?p=${key}`}
+            onClick={(e) => (e.preventDefault(), go(key))}
+            aria-current={key === page ? 'page' : undefined}
+            className={`flex h-[50px] w-[76px] flex-col items-center justify-center gap-1 rounded-xl text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 ${NAV_ITEM}`}
+          >
+            <I className="size-[18px]" aria-hidden="true" />
+            <span className="leading-none">{label}</span>
+          </a>
+        ))}
+      </nav>
+      <button
+        type="button"
+        aria-label="Maya Rivera, owner of The Rivera family. Open profile menu"
+        className={`mt-auto flex size-11 items-center justify-center rounded-full ${NAV_ITEM}`}
+      >
+        <Avatar size="size-8" />
+      </button>
+    </aside>
+  )
+}
+
+// Top bar: the logo, every page in one row, you at the right. The content gets the full width.
+function TopNav({ dark, page, go }) {
+  return (
+    <header className="mx-3 mt-3 hidden h-14 items-center gap-4 rounded-2xl border border-zinc-200 bg-white px-4 lg:flex dark:border-zinc-800 dark:bg-zinc-900">
+      <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-6" />
+      <nav aria-label="Main" className="flex grow items-center justify-center gap-0.5">
+        {SIDEBAR.map(([key, label, I]) => (
+          <a
+            key={key}
+            href={`?p=${key}`}
+            onClick={(e) => (e.preventDefault(), go(key))}
+            aria-current={key === page ? 'page' : undefined}
+            className={`flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold text-zinc-600 dark:text-zinc-400 ${NAV_ITEM}`}
+          >
+            <I className="hidden size-4 xl:block" aria-hidden="true" />
+            {label}
+          </a>
+        ))}
+      </nav>
+      <button
+        type="button"
+        aria-label="Maya Rivera, owner of The Rivera family. Open profile menu"
+        className={`flex h-10 items-center gap-2 rounded-full pr-3 pl-1.5 ${NAV_ITEM}`}
+      >
+        <Avatar />
+        <span className="text-[13px] font-semibold">Maya</span>
+      </button>
+    </header>
+  )
+}
+
 // The signed-in shell: draft bar (page switcher, Light/Dark), sidebar, phone header and tab bar.
 export function Shell({ page, pages, go, dark, setDark, children, bare = false }) {
   const q = new URLSearchParams(location.search)
-  const [collapsed, setCollapsed] = useState(q.get('nav') === 'collapsed')
+  // Nav drafts (#185): rail (collapsed by default), labelled rail, or a top bar. ?n= picks one.
+  const [collapsed, setCollapsed] = useState(q.get('nav') !== 'expanded')
+  const [nav, setNavState] = useState(NAVS.some(([k]) => k === q.get('n')) ? q.get('n') : 'rail')
+  const setNav = (n) => {
+    setNavState(n)
+    const u = new URL(location.href)
+    u.searchParams.set('n', n)
+    history.replaceState(null, '', u)
+  }
   useLayoutEffect(() => {
     document.documentElement.classList.toggle('dark', dark)
     document.body.style.background = dark ? '#09090b' : '#fafafa'
@@ -233,7 +324,24 @@ export function Shell({ page, pages, go, dark, setDark, children, bare = false }
             ))}
           </select>
         </label>
-        <span className="flex gap-1">
+        {!bare && (
+          <span role="group" aria-label="Draft: navigation" className="flex items-center gap-1">
+            <span className="mr-1">Nav</span>
+            {NAVS.map(([k, label]) => (
+              <button
+                key={k}
+                type="button"
+                aria-pressed={k === nav}
+                onClick={() => setNav(k)}
+                className="rounded-full border border-zinc-300 px-3 py-1 font-semibold aria-pressed:border-zinc-900 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:border-zinc-700 dark:aria-pressed:border-white dark:aria-pressed:bg-white dark:aria-pressed:text-zinc-900"
+              >
+                {label}
+              </button>
+            ))}
+          </span>
+        )}
+        <span>made-up names and amounts</span>
+        <span className="ml-auto flex gap-1">
           {[false, true].map((v) => (
             <button
               key={String(v)}
@@ -246,14 +354,15 @@ export function Shell({ page, pages, go, dark, setDark, children, bare = false }
             </button>
           ))}
         </span>
-        <span>made-up names and amounts</span>
       </div>
 
       {bare ? (
         <main className="px-4 py-10">{children}</main>
       ) : (
         <>
-          <Sidebar dark={dark} collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} page={page} go={go} />
+          {nav === 'rail' && <Sidebar dark={dark} collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} page={page} go={go} />}
+          {nav === 'labels' && <LabelRail dark={dark} page={page} go={go} />}
+          {nav === 'top' && <TopNav dark={dark} page={page} go={go} />}
           <header className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 lg:hidden dark:border-zinc-800">
             <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-7" />
             <button
@@ -265,7 +374,7 @@ export function Shell({ page, pages, go, dark, setDark, children, bare = false }
             </button>
           </header>
           <main
-            className={`px-4 pt-5 pb-24 transition-[padding] duration-200 ease-out md:px-6 lg:pb-12 lg:pr-6 ${collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}
+            className={`px-4 pt-5 pb-24 md:px-6 lg:pb-12 lg:pr-6 ${nav === 'top' ? 'lg:pl-6' : nav === 'labels' ? 'lg:pl-[116px]' : collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}
           >
             <div className="mx-auto max-w-[1180px]">{children}</div>
           </main>

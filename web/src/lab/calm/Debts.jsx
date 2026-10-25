@@ -104,10 +104,10 @@ function Waffle({ groups, owe }) {
     <div className="flex items-center gap-4">
       <span className="grid shrink-0 grid-cols-10 gap-[2px]" aria-hidden="true">
         {cells.map((c, i) => (
-          <i key={i} className="size-[7px] rounded-[1.5px]" style={{ background: c }} />
+          <i key={i} className="size-[8px] rounded-[1.5px]" style={{ background: c }} />
         ))}
       </span>
-      <ul className="grid gap-1.5 text-[13px]">
+      <ul className="grid gap-1.5 text-[0.875rem]">
         {groups.map((g) => (
           <li key={g.key} className="flex items-center gap-2">
             <i className="size-2 shrink-0 rounded-[2px]" style={{ background: g.color }} />
@@ -121,15 +121,137 @@ function Waffle({ groups, owe }) {
   )
 }
 
+// The split of what you owe, five ways to draw it (draft: ?s=waffle|bar|tally|blocks|tape).
+const SPLITS = [
+  ['waffle', 'Waffle'],
+  ['bar', 'Split bar'],
+  ['tally', 'Tally'],
+  ['blocks', 'Blocks'],
+  ['tape', 'Mix · tally tape'],
+]
+const share = (g, owe) => Math.round((g.value / owe) * 100)
+// Each group's share as whole percent, adding up to 100.
+function cellsOf(groups, owe) {
+  const out = []
+  groups.forEach((g, i) => {
+    const n = i === groups.length - 1 ? 100 - out.length : share(g, owe)
+    for (let k = 0; k < n; k++) out.push(g.color)
+  })
+  return out
+}
+const Legend = ({ groups, owe }) => (
+  <ul className="grid gap-1.5 text-[0.875rem]">
+    {groups.map((g) => (
+      <li key={g.key} className="flex items-center gap-2">
+        <i className="size-2.5 shrink-0 rounded-[2px]" style={{ background: g.color }} />
+        <span>{g.label}</span>
+        <b className={`${NUM} ml-auto pl-4`}>{usd(g.value)}</b>
+        <span className={`w-10 text-right tabular-nums ${MUTED}`}>{share(g, owe)}%</span>
+      </li>
+    ))}
+  </ul>
+)
+// Labels sit over each part of a bar, so the colours never carry the meaning alone.
+const BarLabels = ({ groups, owe }) => (
+  <div className="mb-1.5 flex justify-between gap-4 text-[0.8125rem]">
+    {groups.map((g) => (
+      <span key={g.key} className="whitespace-nowrap">
+        <b className="font-semibold">{g.label}</b> <span className={MUTED}>{share(g, owe)}%</span>
+      </span>
+    ))}
+  </div>
+)
+
+function Split({ kind, groups, owe }) {
+  const cells = cellsOf(groups, owe)
+  if (kind === 'bar')
+    return (
+      <div className="w-[300px] max-w-full">
+        <BarLabels groups={groups} owe={owe} />
+        <span className="flex h-3 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
+          {groups.map((g) => (
+            <span key={g.key} style={{ width: `${share(g, owe)}%`, background: g.color }} />
+          ))}
+        </span>
+        <p className={`mt-1.5 flex justify-between text-[0.8125rem] tabular-nums ${MUTED}`}>
+          {groups.map((g) => (
+            <span key={g.key}>{usd(g.value)}</span>
+          ))}
+        </p>
+      </div>
+    )
+  if (kind === 'tally')
+    // Tallyn's own mark: every stroke is 1% of what you owe, bundled in fives like a tally.
+    return (
+      <div className="flex items-center gap-5">
+        <svg viewBox="0 0 150 46" className="w-[160px] shrink-0" aria-hidden="true">
+          {Array.from({ length: 20 }, (_, gi) => {
+            const x0 = (gi % 10) * 15
+            const y0 = Math.floor(gi / 10) * 25
+            return (
+              <g key={gi} strokeWidth="1.6" strokeLinecap="round">
+                {[0, 1, 2, 3].map((k) => (
+                  <line key={k} x1={x0 + 1 + k * 3} y1={y0 + 2} x2={x0 + 1 + k * 3} y2={y0 + 19} style={{ stroke: cells[gi * 5 + k] }} />
+                ))}
+                <line x1={x0 - 0.5} y1={y0 + 16} x2={x0 + 11.5} y2={y0 + 5} style={{ stroke: cells[gi * 5 + 4] }} />
+              </g>
+            )
+          })}
+        </svg>
+        <Legend groups={groups} owe={owe} />
+      </div>
+    )
+  if (kind === 'blocks')
+    // Areas in proportion: the big block is what most of the debt is.
+    return (
+      <div className="flex items-center gap-5">
+        <div className="flex h-[72px] w-[200px] shrink-0 gap-0.5 overflow-hidden rounded-xl" aria-hidden="true">
+          {[...groups].reverse().map((g) => (
+            <span
+              key={g.key}
+              className="flex items-end p-1.5 text-[0.75rem] font-semibold text-white"
+              style={{ width: `${share(g, owe)}%`, background: g.color }}
+            >
+              {share(g, owe) >= 20 && `${share(g, owe)}%`}
+            </span>
+          ))}
+        </div>
+        <Legend groups={groups} owe={owe} />
+      </div>
+    )
+  if (kind === 'tape')
+    // Mix: the split bar's labels over a tally tape, 100 strokes in bundles of five.
+    return (
+      <div className="w-[320px] max-w-full">
+        <BarLabels groups={groups} owe={owe} />
+        <span className="flex h-6 items-stretch gap-[3px]" aria-hidden="true">
+          {Array.from({ length: 20 }, (_, gi) => (
+            <span key={gi} className="flex flex-1 gap-[1.5px]">
+              {[0, 1, 2, 3, 4].map((k) => (
+                <i key={k} className="w-full rounded-full" style={{ background: cells[gi * 5 + k] }} />
+              ))}
+            </span>
+          ))}
+        </span>
+        <p className={`mt-1.5 flex justify-between text-[0.8125rem] tabular-nums ${MUTED}`}>
+          {groups.map((g) => (
+            <span key={g.key}>{usd(g.value)}</span>
+          ))}
+        </p>
+      </div>
+    )
+  return <Waffle groups={groups} owe={owe} />
+}
+
 // A bullet bar: the track, how far along, and (for a loan) a tick where the schedule expects it.
 function Bullet({ d, p }) {
   return (
     <div>
-      <span className="relative block h-2 rounded-full" style={{ background: 'var(--track)' }} aria-hidden="true">
+      <span className="relative block h-2.5 rounded-full" style={{ background: 'var(--track)' }} aria-hidden="true">
         <span className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${p.pct}%`, background: p.color }} />
         {d.expected != null && <span className="absolute -inset-y-1 w-0.5 rounded-full bg-zinc-900 dark:bg-white" style={{ left: `${d.expected}%` }} />}
       </span>
-      <p className={`mt-1 flex flex-wrap justify-between gap-x-3 text-[12px] ${MUTED}`}>
+      <p className={`mt-1 flex flex-wrap justify-between gap-x-3 text-[0.8125rem] ${MUTED}`}>
         <span className="font-semibold text-zinc-700 dark:text-zinc-200">{p.main}</span>
         <span>{p.schedule ?? p.side}</span>
       </p>
@@ -139,7 +261,7 @@ function Bullet({ d, p }) {
 
 const Next = ({ n }) =>
   n.soon ? (
-    <span className="rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">
+    <span className="rounded-full bg-red-50 px-2 py-0.5 text-[0.75rem] font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">
       {usd(n.amount)} due {n.when}
     </span>
   ) : (
@@ -148,22 +270,22 @@ const Next = ({ n }) =>
     </span>
   )
 
-function Figures({ owe, facts }) {
+function Figures({ owe, facts, two }) {
   return (
-    <dl className="grid grid-cols-2 gap-y-3 sm:grid-cols-4 sm:divide-x sm:divide-zinc-100 dark:sm:divide-zinc-800">
-      <div className="sm:pr-4">
-        <dt className={`text-[13px] ${MUTED}`}>You owe</dt>
-        <dd className={`${NUM} text-xl`} style={{ color: 'var(--owe-text)' }}>
+    <dl className={`grid grid-cols-2 gap-y-3 ${two ? 'gap-x-6' : 'sm:grid-cols-4 sm:divide-x sm:divide-zinc-100 dark:sm:divide-zinc-800'}`}>
+      <div className={two ? '' : 'sm:pr-4'}>
+        <dt className={`text-[0.875rem] ${MUTED}`}>You owe</dt>
+        <dd className={`${NUM} text-[1.375rem]`} style={{ color: 'var(--owe-text)' }}>
           {usd(-owe)}
         </dd>
       </div>
       {facts.map(([k, v, note, tone]) => (
-        <div key={k} className="sm:px-4">
-          <dt className={`text-[13px] ${MUTED}`}>{k}</dt>
-          <dd className={`${NUM} text-xl`} style={tone ? { color: tone } : undefined}>
+        <div key={k} className={two ? '' : 'sm:px-4'}>
+          <dt className={`text-[0.875rem] ${MUTED}`}>{k}</dt>
+          <dd className={`${NUM} text-[1.375rem]`} style={tone ? { color: tone } : undefined}>
             {v}
           </dd>
-          <dd className={`text-[12px] ${MUTED}`}>{note}</dd>
+          <dd className={`text-[0.8125rem] ${MUTED}`}>{note}</dd>
         </div>
       ))}
     </dl>
@@ -171,22 +293,22 @@ function Figures({ owe, facts }) {
 }
 
 // ── D · Ledger: the waffle and the facts in one strip, then rows with bullet bars.
-function Ledger({ groups, owe, facts }) {
+function Ledger({ groups, owe, facts, split }) {
   return (
     <div className="grid gap-3">
-      <section aria-label="What you owe" className={`${CARD} flex flex-wrap items-center justify-between gap-x-8 gap-y-4 p-4`}>
+      <section aria-label="What you owe" className={`${CARD} flex flex-wrap items-center justify-between gap-x-8 gap-y-4 p-[18px]`}>
         <div>
           <Note>You owe</Note>
-          <p className={`${NUM} mb-2 text-2xl`} style={{ color: 'var(--owe-text)' }}>
+          <p className={`${NUM} mb-2 text-[1.625rem]`} style={{ color: 'var(--owe-text)' }}>
             {usd(-owe)}
           </p>
-          <Waffle groups={groups} owe={owe} />
+          <Split kind={split} groups={groups} owe={owe} />
         </div>
-        <dl className="grid gap-2 text-[13px] sm:min-w-[230px]">
+        <dl className="grid gap-2 text-[0.875rem] sm:min-w-[230px]">
           {facts.map(([k, v, note, tone]) => (
             <div key={k} className="flex items-baseline justify-between gap-4">
               <dt className={MUTED}>{k}</dt>
-              <dd className={`${NUM} text-sm`} style={tone ? { color: tone } : undefined}>
+              <dd className={`${NUM} text-[0.9375rem]`} style={tone ? { color: tone } : undefined}>
                 {v}
                 <span className="sr-only"> · {note}</span>
               </dd>
@@ -197,7 +319,7 @@ function Ledger({ groups, owe, facts }) {
       <section aria-label="Your debts" className={`${CARD} px-4 pb-1`}>
         {groups.map((g) => (
           <div key={g.key}>
-            <h2 className={`flex justify-between border-b border-zinc-100 pt-3 pb-1.5 text-[13px] font-semibold dark:border-zinc-800 ${MUTED}`}>
+            <h2 className={`flex justify-between border-b border-zinc-100 pt-3 pb-1.5 text-[0.875rem] font-semibold dark:border-zinc-800 ${MUTED}`}>
               {g.label}
               <span className="tabular-nums">{usd(-g.value)}</span>
             </h2>
@@ -205,12 +327,12 @@ function Ledger({ groups, owe, facts }) {
               {g.list.map((d) => {
                 const p = progress(d)
                 return (
-                  <li key={d.id} className="grid gap-x-6 gap-y-2 py-3 sm:grid-cols-[minmax(0,1fr)_240px_auto] sm:items-center">
+                  <li key={d.id} className="grid gap-x-6 gap-y-2 py-3.5 sm:grid-cols-[minmax(0,1fr)_260px_auto] sm:items-center">
                     <div className="min-w-0">
-                      <h3 className="truncate text-sm font-semibold">
+                      <h3 className="truncate text-[0.9375rem] font-semibold">
                         {d.name} <span className={`font-normal ${MUTED}`}>··{d.mask}</span>
                       </h3>
-                      <p className={`mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] ${MUTED}`}>
+                      <p className={`mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.875rem] ${MUTED}`}>
                         <span>{d.rate}</span>
                         <Next n={d.next} />
                         {d.extra && <span>{d.extra}</span>}
@@ -235,7 +357,7 @@ function Ledger({ groups, owe, facts }) {
 function DebtTable({ groups, owe, bullets }) {
   return (
     <section aria-label="Your debts" className={`${CARD} overflow-x-auto`}>
-      <table className="w-full min-w-[640px] text-left text-[13px]">
+      <table className="w-full min-w-[640px] text-left text-[0.875rem]">
         <thead>
           <tr className={`border-b border-zinc-200 dark:border-zinc-800 ${MUTED}`}>
             <th scope="col" className="py-2.5 pl-4 font-semibold">
@@ -247,7 +369,7 @@ function DebtTable({ groups, owe, bullets }) {
             <th scope="col" className="py-2.5 font-semibold">
               Next payment
             </th>
-            <th scope="col" className="w-[220px] py-2.5 font-semibold">
+            <th scope="col" className="w-[240px] py-2.5 font-semibold">
               Progress
             </th>
             <th scope="col" className="py-2.5 pr-4 text-right font-semibold">
@@ -258,35 +380,35 @@ function DebtTable({ groups, owe, bullets }) {
         {groups.map((g) => (
           <tbody key={g.key} className="divide-y divide-zinc-100 dark:divide-zinc-800">
             <tr className="bg-zinc-50 dark:bg-zinc-800/40">
-              <th scope="rowgroup" colSpan={4} className={`py-1.5 pl-4 text-[12px] font-semibold ${MUTED}`}>
+              <th scope="rowgroup" colSpan={4} className={`py-1.5 pl-4 text-[0.8125rem] font-semibold ${MUTED}`}>
                 {g.label}
               </th>
-              <td className={`py-1.5 pr-4 text-right text-[12px] font-semibold tabular-nums ${MUTED}`}>{usd(-g.value)}</td>
+              <td className={`py-1.5 pr-4 text-right text-[0.8125rem] font-semibold tabular-nums ${MUTED}`}>{usd(-g.value)}</td>
             </tr>
             {g.list.map((d) => {
               const p = progress(d)
               return (
                 <tr key={d.id} className="align-middle">
-                  <th scope="row" className="py-3 pl-4 font-semibold">
+                  <th scope="row" className="py-3.5 pl-4 font-semibold">
                     {d.name} <span className={`font-normal ${MUTED}`}>··{d.mask}</span>
-                    {d.extra && <span className={`block text-[12px] font-normal ${MUTED}`}>{d.extra}</span>}
+                    {d.extra && <span className={`block text-[0.8125rem] font-normal ${MUTED}`}>{d.extra}</span>}
                   </th>
-                  <td className="py-3 tabular-nums">{d.rate}</td>
-                  <td className="py-3">
+                  <td className="py-3.5 tabular-nums">{d.rate}</td>
+                  <td className="py-3.5">
                     <Next n={d.next} />
-                    <span className={`block text-[12px] ${MUTED}`}>{d.next.note}</span>
+                    <span className={`block text-[0.8125rem] ${MUTED}`}>{d.next.note}</span>
                   </td>
-                  <td className="py-3 pr-6">
+                  <td className="py-3.5 pr-6">
                     {bullets ? (
                       <Bullet d={d} p={p} />
                     ) : (
                       <>
                         <span className="font-semibold">{p.main}</span>
-                        <span className={`block text-[12px] ${MUTED}`}>{p.side}</span>
+                        <span className={`block text-[0.8125rem] ${MUTED}`}>{p.side}</span>
                       </>
                     )}
                   </td>
-                  <td className={`${NUM} py-3 pr-4 text-right text-sm`} style={{ color: 'var(--owe-text)' }}>
+                  <td className={`${NUM} py-3.5 pr-4 text-right text-[0.9375rem]`} style={{ color: 'var(--owe-text)' }}>
                     {usd(-d.owed)}
                   </td>
                 </tr>
@@ -299,7 +421,7 @@ function DebtTable({ groups, owe, bullets }) {
             <th scope="row" colSpan={4} className="py-2.5 pl-4 font-semibold">
               You owe
             </th>
-            <td className={`${NUM} py-2.5 pr-4 text-right text-sm`} style={{ color: 'var(--owe-text)' }}>
+            <td className={`${NUM} py-2.5 pr-4 text-right text-[0.9375rem]`} style={{ color: 'var(--owe-text)' }}>
               {usd(-owe)}
             </td>
           </tr>
@@ -313,7 +435,7 @@ function DebtTable({ groups, owe, bullets }) {
 function TableView({ groups, owe, facts }) {
   return (
     <div className="grid gap-3">
-      <section aria-label="What you owe" className={`${CARD} p-4`}>
+      <section aria-label="What you owe" className={`${CARD} p-[18px]`}>
         <Figures owe={owe} facts={facts} />
       </section>
       <DebtTable groups={groups} owe={owe} />
@@ -322,14 +444,14 @@ function TableView({ groups, owe, facts }) {
 }
 
 // ── F · Mix: E's figures and table, D's waffle beside the figures and bullets in the table.
-function MixView({ groups, owe, facts }) {
+function MixView({ groups, owe, facts, split }) {
   return (
     <div className="grid gap-3">
-      <section aria-label="What you owe" className={`${CARD} grid gap-5 p-4 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center`}>
+      <section aria-label="What you owe" className={`${CARD} grid gap-5 p-[18px] lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center`}>
         <div className="lg:border-r lg:border-zinc-100 lg:pr-6 dark:lg:border-zinc-800">
-          <Waffle groups={groups} owe={owe} />
+          <Split kind={split} groups={groups} owe={owe} />
         </div>
-        <Figures owe={owe} facts={facts} />
+        <Figures owe={owe} facts={facts} two />
       </section>
       <DebtTable groups={groups} owe={owe} bullets />
     </div>
@@ -350,6 +472,16 @@ export default function Debts() {
     u.searchParams.set('l', l)
     history.replaceState(null, '', u)
   }
+  const [split, setSplit] = useState(() => {
+    const v = new URLSearchParams(location.search).get('s')
+    return SPLITS.some(([k]) => k === v) ? v : 'tally'
+  })
+  const pickSplit = (v) => {
+    setSplit(v)
+    const u = new URL(location.href)
+    u.searchParams.set('s', v)
+    history.replaceState(null, '', u)
+  }
   const data = useDebts(who)
   const View = VIEWS[layout]
   return (
@@ -358,7 +490,7 @@ export default function Debts() {
         <span
           role="group"
           aria-label="Draft: layout"
-          className="flex gap-1 rounded-full border border-dashed border-zinc-300 p-0.5 text-[12px] dark:border-zinc-700"
+          className="flex gap-1 rounded-full border border-dashed border-zinc-300 p-0.5 text-[0.8125rem] dark:border-zinc-700"
         >
           {LAYOUTS.map(([k, name]) => (
             <button
@@ -373,15 +505,34 @@ export default function Debts() {
           ))}
         </span>
       </PageHead>
-      <div className="mb-3">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <Chips label="Whose debts" options={WHO} value={who} onChange={setWho} />
+        {layout !== 'e' && (
+          <span
+            role="group"
+            aria-label="Draft: split"
+            className="flex flex-wrap gap-1 rounded-full border border-dashed border-zinc-300 p-0.5 text-[0.75rem] dark:border-zinc-700"
+          >
+            {SPLITS.map(([k, name]) => (
+              <button
+                key={k}
+                type="button"
+                aria-pressed={k === split}
+                onClick={() => pickSplit(k)}
+                className="rounded-full px-2.5 py-0.5 font-semibold text-zinc-600 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:text-zinc-300 dark:aria-pressed:bg-white dark:aria-pressed:text-zinc-900"
+              >
+                {name}
+              </button>
+            ))}
+          </span>
+        )}
       </div>
       {data.debts.length === 0 ? (
         <Panel id="debts-empty-h">
           <Note>Nothing owed here. Cards and loans show up when your banks share them.</Note>
         </Panel>
       ) : (
-        <View key={`${layout}-${who}`} {...data} />
+        <View key={`${layout}-${who}`} {...data} split={split} />
       )}
     </div>
   )
