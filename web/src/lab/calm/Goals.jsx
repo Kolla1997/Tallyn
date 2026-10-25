@@ -165,7 +165,7 @@ function Detail({ g, onUpdate, onEdit }) {
           <Line dataKey="saved" curve={curveLinear} fadeEdges={false} stroke="var(--in)" strokeWidth={2} dashFromIndex={9} animate={false} />
           <XAxis labels={data.map((r) => `${MONTHS[r.date.getMonth()]} ${String(r.date.getFullYear()).slice(2)}`)} />
         </LineChart>
-        <Note className="mt-1">Solid: saved so far · dotted: where this pace goes · grey: the target</Note>
+        <Note className="mt-1">Solid: saved so far. Dotted: where this pace goes. Grey: the target.</Note>
       </div>
       <ul className="mt-3 grid gap-1.5 text-sm">
         {next && (

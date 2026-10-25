@@ -311,7 +311,7 @@ export default function Budgets() {
               <input type="checkbox" role="switch" checked={counted} onChange={(e) => setCounted(e.target.checked)} className="peer sr-only" />
               <span
                 aria-hidden="true"
-                className="relative h-5 w-9 rounded-full bg-zinc-300 transition-colors duration-150 peer-checked:bg-[var(--in)] peer-focus-visible:ring-2 peer-focus-visible:ring-zinc-400 after:absolute after:top-0.5 after:left-0.5 after:size-4 after:rounded-full after:bg-white after:transition-transform after:duration-150 peer-checked:after:translate-x-4 dark:bg-zinc-700 dark:peer-checked:bg-[var(--in)]"
+                className="relative h-5 w-9 rounded-full bg-zinc-300 transition-colors duration-150 peer-checked:bg-[var(--in)] peer-focus-visible:ring-2 peer-focus-visible:ring-zinc-400 after:absolute after:top-0.5 after:left-0.5 after:size-4 after:rounded-full after:bg-white after:transition-transform after:duration-150 after:motion-reduce:transition-none peer-checked:after:translate-x-4 dark:bg-zinc-700 dark:peer-checked:bg-[var(--in)]"
               />
               Count my spending in household budgets (totals only)
             </label>
@@ -322,7 +322,7 @@ export default function Budgets() {
             <h2 id="budgets-household" className="font-display text-[15px] font-semibold">
               Household budgets
             </h2>
-            <Note>Oct 1 to today · solid: spent · dashed: an even pace</Note>
+            <Note>Oct 1 to today. Solid line: spent. Dashed: an even pace.</Note>
           </div>
           <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {household.map((b) => (

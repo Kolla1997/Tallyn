@@ -87,7 +87,7 @@ function Mix({ sel, onPick }) {
                   </span>
                 )}
                 <span
-                  className={`block w-full rounded-t-[3px] ${x ? FILL[level(x.amount)] : 'h-1 bg-zinc-100 dark:bg-zinc-800'} ${x && sel === iso(date(i + 1)) ? SEL : ''} ${capped ? 'bg-[repeating-linear-gradient(0deg,transparent_0_6px,rgb(255_255_255/.35)_6px_8px)]' : ''}`}
+                  className={`block w-full rounded-t-[3px] ${x ? FILL[level(x.amount)] : 'h-1 bg-zinc-100 dark:bg-zinc-800'} ${x && sel === iso(date(i + 1)) ? SEL : ''} ${capped ? 'bg-[image:var(--hatch)]' : ''}`}
                   style={x ? { height: `${Math.max(4, (Math.min(x.amount, CAP) / CAP) * 100)}%` } : undefined}
                 />
               </button>

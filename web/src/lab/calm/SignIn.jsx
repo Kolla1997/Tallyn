@@ -289,7 +289,7 @@ function SetupCard({ go }) {
       </div>
       <div className="text-center">
         <Note>Can’t scan it? Enter this key instead:</Note>
-        <p className="mt-0.5 font-display text-sm font-semibold tracking-wider">JBSW Y3DP EHPK 3PXP</p>
+        <p className="mt-0.5 font-display text-sm font-semibold">JBSW Y3DP EHPK 3PXP</p>
       </div>
       <p className="flex gap-2 text-sm">
         <b className="font-display">2</b> Then enter the 6-digit code it shows.

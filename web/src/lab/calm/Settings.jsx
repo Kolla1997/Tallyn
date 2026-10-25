@@ -271,7 +271,7 @@ function AddAuthenticator({ onClose, onAdded }) {
             <FakeQR />
             <div className="min-w-0">
               <Note>Can’t scan it? Enter this key instead:</Note>
-              <p className="mt-1 font-display text-[13px] font-semibold tracking-wider break-all text-zinc-900 dark:text-white">JBSW Y3DP EHPK 3PXP</p>
+              <p className="mt-1 font-display text-[13px] font-semibold break-all text-zinc-900 dark:text-white">JBSW Y3DP EHPK 3PXP</p>
             </div>
           </div>
           <p>Then enter the 6-digit code it shows.</p>
