@@ -32,7 +32,7 @@ const OWNER = { maya: 'You', joint: 'You and James', leo: 'Leo' }
 const BANKS = [
   { name: 'Chase', initials: 'CH', accounts: 3, whose: 'yours, James and Leo', status: 'ok', synced: '2 hours ago', canUnlink: true },
   { name: 'Ally', initials: 'AL', accounts: 2, whose: 'yours and James', status: 'ok', synced: '2 hours ago', canUnlink: true },
-  { name: 'American Express', initials: 'AX', accounts: 1, whose: 'yours', status: 'ok', synced: '3 hours ago', canUnlink: true, cardsWithoutDetails: 1 },
+  { name: 'American Express', initials: 'AX', accounts: 1, whose: 'yours', status: 'ok', synced: '3 hours ago', canUnlink: true },
   { name: 'Monzo', initials: 'MZ', accounts: 1, whose: 'yours', status: 'needs_reauth', canUnlink: true },
   { name: 'Wise', initials: 'WI', accounts: 1, whose: 'yours', status: 'ok', synced: 'yesterday', canUnlink: true },
 ]
@@ -98,6 +98,7 @@ function Column({ id, title, total, accounts, owed, showOwner }) {
                   <div key={a.name + 'limit'} className="mt-1">
                     <Gauge
                       orientation="linear"
+                      inactiveFill="var(--track)"
                       value={Math.round((-a.bal / 5000) * 100)}
                       totalNotches={28}
                       activeFill="var(--accent)"

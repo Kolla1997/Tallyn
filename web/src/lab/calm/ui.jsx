@@ -28,8 +28,8 @@ export const usd = D.usd
 // One accent: red for the one action and for what is owed. Green for money in and progress.
 // Text shades pass AA on their ground.
 export const THEME = {
-  light: { '--accent': '#dc2626', '--button': '#b91c1c', '--owe-text': '#b91c1c', '--in-text': '#15803d', '--in': '#16a34a' },
-  dark: { '--accent': '#dc2626', '--button': '#b91c1c', '--owe-text': '#f87171', '--in-text': '#4ade80', '--in': '#16a34a' },
+  light: { '--accent': '#dc2626', '--button': '#b91c1c', '--owe-text': '#b91c1c', '--in-text': '#15803d', '--in': '#16a34a', '--track': '#e4e4e7' },
+  dark: { '--accent': '#dc2626', '--button': '#b91c1c', '--owe-text': '#f87171', '--in-text': '#4ade80', '--in': '#16a34a', '--track': '#3f3f46' },
 }
 const EASE = 'cubicBezier(0.23, 1, 0.32, 1)'
 const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
