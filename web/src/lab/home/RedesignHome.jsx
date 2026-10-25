@@ -28,6 +28,12 @@ import {
   PartyPopper,
   ArrowLeftRight,
   Banknote,
+  Receipt as DebtsIcon,
+  Target,
+  Settings as SettingsIcon,
+  Menu,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'lucide-react'
 import SplitFlapText from '@/components/kokonutui/split-flap-text'
 import BoardingPass from '@/components/kokonutui/boarding-pass'
@@ -41,6 +47,8 @@ import { Gauge } from '@/components/charts/gauge'
 import * as D from './data.js'
 import lockupLight from '../../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg?url'
 import lockupDark from '../../../../brand/logo/svg/tallyn-lockup-horizontal-dark.svg?url'
+import markLight from '../../../../brand/logo/svg/tallyn-mark-light.svg?url'
+import markDark from '../../../../brand/logo/svg/tallyn-mark-dark.svg?url'
 
 // Red lead. Red is the brand and the one action; green is money in; red also marks what is owed.
 const PAL = {
@@ -324,7 +332,10 @@ function Recent({ scope }) {
                 {scope === 'everyone' && ` · ${t.who}`}
               </span>
             </span>
-            <span className="font-[family-name:'Space_Grotesk'] font-semibold tabular-nums" style={t.amt > 0 ? { color: 'var(--in-text)' } : undefined}>
+            <span
+              className="shrink-0 font-[family-name:'Space_Grotesk'] font-semibold whitespace-nowrap tabular-nums"
+              style={t.amt > 0 ? { color: 'var(--in-text)' } : undefined}
+            >
               {t.amt > 0 ? '+' : '−'}
               {usd(Math.abs(t.amt))}
             </span>
@@ -477,10 +488,79 @@ function Goals() {
   )
 }
 
+// The original sidebar (Shell.jsx, #64, #122): floating 12px in from the edges, logo with « at the
+// top, Home · Accounts · Transactions · Budgets · Debts · Family · Goals · Settings, the profile card at
+// the bottom. 208px expanded, 60px collapsed with 42px icon buttons. Only the colours are new.
+const SIDEBAR = [
+  ['Home', HomeIcon],
+  ['Accounts', Landmark],
+  ['Transactions', ArrowLeftRight],
+  ['Budgets', PieChart],
+  ['Debts', DebtsIcon],
+  ['Family', Users],
+  ['Goals', Target],
+  ['Settings', SettingsIcon],
+]
+function Sidebar({ dark, collapsed, onToggle }) {
+  return (
+    <aside
+      aria-label="Main"
+      className={`fixed top-[52px] bottom-3 left-3 z-40 hidden flex-col rounded-3xl border border-zinc-200 bg-white p-3 transition-[width] duration-200 ease-out lg:flex dark:border-zinc-800 dark:bg-zinc-900 ${collapsed ? 'w-[60px] items-center' : 'w-[208px]'}`}
+    >
+      <div className={`mb-4 flex items-center ${collapsed ? 'flex-col gap-2' : 'justify-between pl-2'}`}>
+        {collapsed ? (
+          <img src={dark ? markDark : markLight} alt="Tallyn" className="size-8" />
+        ) : (
+          <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-7" />
+        )}
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={!collapsed}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          className="flex size-8 items-center justify-center rounded-lg text-zinc-500 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+        >
+          {collapsed ? <ChevronsRight className="size-4" aria-hidden="true" /> : <ChevronsLeft className="size-4" aria-hidden="true" />}
+        </button>
+      </div>
+      <nav className="flex flex-col gap-1">
+        {SIDEBAR.map(([label, I]) => (
+          <a
+            key={label}
+            href="#"
+            title={collapsed ? label : undefined}
+            aria-current={label === 'Home' ? 'page' : undefined}
+            className={`flex h-10 items-center gap-3 rounded-xl text-sm font-semibold text-zinc-600 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 aria-[current=page]:bg-zinc-100 aria-[current=page]:text-[var(--owe-text)] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white dark:aria-[current=page]:bg-zinc-800 ${collapsed ? 'w-[42px] justify-center' : 'px-3'}`}
+          >
+            <I className="size-[18px] shrink-0" aria-hidden="true" />
+            <span className={collapsed ? 'sr-only' : undefined}>{label}</span>
+          </a>
+        ))}
+      </nav>
+      <button
+        type="button"
+        className={`mt-auto flex h-12 items-center gap-2.5 rounded-2xl text-left transition-colors duration-150 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${collapsed ? 'w-[42px] justify-center' : 'px-2'}`}
+        aria-label="Maya Rivera, owner of The Rivera family. Open profile menu"
+      >
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white" style={{ background: 'var(--accent)' }}>
+          M
+        </span>
+        {!collapsed && (
+          <span className="min-w-0 leading-tight">
+            <span className="block truncate text-sm font-semibold">Maya Rivera</span>
+            <span className="block truncate text-xs text-zinc-500 dark:text-zinc-400">Owner · The Rivera family</span>
+          </span>
+        )}
+      </button>
+    </aside>
+  )
+}
+
 export default function RedesignHome() {
   const q = new URLSearchParams(location.search)
   const [dark, setDark] = useState(q.get('t') === 'dark')
   const [scope, setScope] = useState(q.get('s') === 'yours' ? 'yours' : 'everyone')
+  const [collapsed, setCollapsed] = useState(q.get('nav') === 'collapsed')
   const root = useRef(null)
   useArrival(root)
   useEffect(() => {
@@ -513,68 +593,72 @@ export default function RedesignHome() {
         </span>
       </div>
 
-      <header className="mx-auto flex max-w-[1320px] flex-wrap items-center gap-x-8 gap-y-3 px-4 pt-5 md:px-8">
+      <Sidebar dark={dark} collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
+      {/* Phones: the original header, logo and ☰ menu */}
+      <header className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 lg:hidden dark:border-zinc-800">
         <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-7" />
-        <nav aria-label="Main" className="hidden flex-wrap gap-5 text-sm font-semibold text-zinc-500 lg:flex dark:text-zinc-400">
-          {['Home', 'Accounts', 'Transactions', 'Budgets', 'Debts', 'Goals', 'Family'].map((n) => (
-            <a
-              key={n}
-              href="#"
-              aria-current={n === 'Home' ? 'page' : undefined}
-              className="transition-colors duration-150 hover:text-zinc-900 aria-[current=page]:text-zinc-900 dark:hover:text-white dark:aria-[current=page]:text-white"
-            >
-              {n}
-            </a>
-          ))}
-        </nav>
-        <span className="ml-auto flex size-9 items-center justify-center rounded-full bg-zinc-200 text-sm font-bold dark:bg-zinc-800">M</span>
+        <button type="button" aria-label="Menu" className="flex size-10 items-center justify-center rounded-full border border-zinc-300 dark:border-zinc-700">
+          <Menu className="size-5" aria-hidden="true" />
+        </button>
       </header>
 
-      <main className="mx-auto max-w-[1320px] px-4 pt-5 pb-28 md:px-8 lg:pb-16">
-        <div data-arrive className="mb-4 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="font-[family-name:'Space_Grotesk'] text-3xl font-bold tracking-tight">The Rivera family</h1>
-            <p className="mt-1 text-zinc-500 dark:text-zinc-400">
-              Evening, Maya. <b className="font-semibold text-zinc-900 dark:text-white">{D.finding.strong}</b>
-              {D.finding.rest}
-            </p>
+      <main className={`px-4 pt-6 pb-28 transition-[padding] duration-200 ease-out md:px-8 lg:pb-16 ${collapsed ? 'lg:pl-[96px]' : 'lg:pl-[244px]'} lg:pr-8`}>
+        <div className="mx-auto max-w-[1240px]">
+          <div data-arrive className="mb-4 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h1 className="font-[family-name:'Space_Grotesk'] text-3xl font-bold tracking-tight">The Rivera family</h1>
+              <p className="mt-1 text-zinc-500 dark:text-zinc-400">
+                Evening, Maya. <b className="font-semibold text-zinc-900 dark:text-white">{D.finding.strong}</b>
+                {D.finding.rest}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={press}
+                className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold text-white"
+                style={{ background: 'var(--button)' }}
+              >
+                <Link2 className="size-4" aria-hidden="true" />
+                Link a bank
+              </button>
+              <a
+                href="#"
+                onClick={press}
+                className="inline-flex h-10 items-center gap-2 rounded-full border border-zinc-300 px-4 text-sm font-semibold dark:border-zinc-700"
+              >
+                <Users className="size-4" aria-hidden="true" />
+                Family and sharing
+              </a>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={press}
-            className="inline-flex h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold text-white"
-            style={{ background: 'var(--button)' }}
-          >
-            <Link2 className="size-4" aria-hidden="true" />
-            Link a bank
-          </button>
-        </div>
 
-        <div className="grid gap-4 lg:grid-cols-12">
-          <div className="lg:col-span-8">
-            <Total scope={scope} setScope={setScope} />
-          </div>
-          <div className="grid content-start gap-4 lg:col-span-4">
-            <Bills />
-            <Cards />
-          </div>
-          <div className="lg:col-span-8">
-            <Spending scope={scope} />
-          </div>
-          <div className="lg:col-span-4">
-            <Recent scope={scope} />
-          </div>
-          <div className="lg:col-span-8">
-            <Flow scope={scope} />
-          </div>
-          <div className="lg:col-span-4">
-            <Family />
-          </div>
-          <div className="lg:col-span-8">
-            <Terrain />
-          </div>
-          <div className="lg:col-span-4">
-            <Goals />
+          <div className="grid gap-4 lg:grid-cols-12">
+            <div className="lg:col-span-8">
+              <Total scope={scope} setScope={setScope} />
+            </div>
+            <div className="grid content-start gap-4 lg:col-span-4">
+              <Bills />
+              <Cards />
+            </div>
+            <div className="lg:col-span-8">
+              <Spending scope={scope} />
+            </div>
+            <div className="lg:col-span-4">
+              <Recent scope={scope} />
+            </div>
+            <div className="lg:col-span-8">
+              <Flow scope={scope} />
+            </div>
+            <div className="lg:col-span-4">
+              <Family />
+            </div>
+            <div className="lg:col-span-8">
+              <Terrain />
+            </div>
+            <div className="lg:col-span-4">
+              <Goals />
+            </div>
           </div>
         </div>
       </main>
@@ -587,7 +671,7 @@ export default function RedesignHome() {
         {[
           ['Home', HomeIcon],
           ['Accounts', Landmark],
-          ['Activity', ArrowLeftRight],
+          ['Transactions', ArrowLeftRight],
           ['Budgets', PieChart],
           ['Family', Users],
         ].map(([n, I]) => (
