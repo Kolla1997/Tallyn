@@ -133,7 +133,7 @@ function Bullet({ d, p }) {
 
 const Next = ({ n }) =>
   n.soon ? (
-    <span className="rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">
+    <span className="rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap text-red-700 dark:bg-red-950 dark:text-red-300">
       {usd(n.amount)} due {n.when}
     </span>
   ) : (
@@ -164,10 +164,52 @@ function Figures({ owe, facts }) {
   )
 }
 
+// Phones (under 640px): the same debts as stacked rows, so nothing scrolls sideways.
+function DebtList({ groups, owe }) {
+  return (
+    <section aria-label="Your debts" className={`${CARD} px-4 pb-1 sm:hidden`}>
+      {groups.map((g) => (
+        <div key={g.key}>
+          <h2 className={`flex justify-between border-b border-zinc-100 pt-3 pb-1.5 text-[12px] font-semibold dark:border-zinc-800 ${MUTED}`}>
+            {g.label}
+            <span className="tabular-nums">{usd(-g.value)}</span>
+          </h2>
+          <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+            {g.list.map((d) => (
+              <li key={d.id} className="grid gap-2 py-3">
+                <div className="flex items-baseline justify-between gap-3">
+                  <h3 className="min-w-0 truncate text-sm font-semibold">
+                    {d.name} <span className={`font-normal ${MUTED}`}>··{d.mask}</span>
+                  </h3>
+                  <span className={`${NUM} text-sm`} style={{ color: 'var(--owe-text)' }}>
+                    {usd(-d.owed)}
+                  </span>
+                </div>
+                <p className={`flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] ${MUTED}`}>
+                  <span>{d.rate}</span>
+                  <Next n={d.next} />
+                  {d.extra && <span>{d.extra}</span>}
+                </p>
+                <Bullet d={d} p={progress(d)} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <p className="flex justify-between border-t border-zinc-200 py-3 text-sm font-semibold dark:border-zinc-800">
+        You owe
+        <span className={NUM} style={{ color: 'var(--owe-text)' }}>
+          {usd(-owe)}
+        </span>
+      </p>
+    </section>
+  )
+}
+
 // Every debt as a table row: name, rate, next payment, a bullet bar, the balance.
 function DebtTable({ groups, owe }) {
   return (
-    <section aria-label="Your debts" className={`${CARD} overflow-x-auto`}>
+    <section aria-label="Your debts" className={`${CARD} hidden overflow-x-auto sm:block`}>
       <table className="w-full min-w-[640px] text-left text-[13px]">
         <thead>
           <tr className={`border-b border-zinc-200 dark:border-zinc-800 ${MUTED}`}>
@@ -246,6 +288,7 @@ function Summary({ groups, owe, facts }) {
         <Figures owe={owe} facts={facts} />
       </section>
       <DebtTable groups={groups} owe={owe} />
+      <DebtList groups={groups} owe={owe} />
     </div>
   )
 }
