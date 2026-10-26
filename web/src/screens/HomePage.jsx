@@ -18,6 +18,7 @@ import NotificationStack from '@/components/kokonutui/notification-stack'
 import MetricCard from '@/components/kokonutui/metric-card'
 import SmoothTab from '@/components/kokonutui/smooth-tab'
 import { Gauge } from '@/components/charts/gauge'
+import OpensOver from '../components/calm/OpensOver.jsx'
 
 // Home in the calm redesign (#187), built from the #185/#182 draft (web/src/lab/home/CalmHome.jsx):
 // a 12-column grid with
@@ -128,7 +129,9 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
             <Total banks={banks} me={me} roles={roles} home={home} scope={scope} onScope={setScope} spent={summary?.spent_minor ?? 0} />
           </div>
           <div className="md:col-span-2 lg:col-span-4">
-            <ComingUp banks={shown} home={home} />
+            <OpensOver>
+              <ComingUp banks={shown} home={home} />
+            </OpensOver>
           </div>
           <div className="md:col-span-2 lg:col-span-8">
             <Spending days={daily[scope]} summary={summary} home={home} everyone={everyone} />
