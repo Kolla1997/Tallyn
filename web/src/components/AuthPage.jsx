@@ -2,12 +2,12 @@ import logo from '../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg'
 import wordmark from '../../../brand/logo/svg/tallyn-wordmark-light.svg'
 import { Link } from '../lib/router.jsx'
 
-// Centered single-card layout with the logo: sign-in, 2FA, joining a
+// Centered single-card layout with the logo (the calm look, #187, from app.css .calm-auth): sign-in, 2FA, joining a
 // household, creating your first household, and full-page errors.
 // `centred` puts the card in the middle of the page (the 2FA screens, #108).
 export default function AuthPage({ children, wide = false, centred = false }) {
   return (
-    <main className={`page${wide ? ' page-wide' : ''}${centred ? ' page-centred' : ''}`}>
+    <main className={`page calm-page calm-auth${wide ? ' page-wide' : ''}${centred ? ' page-centred' : ''}`}>
       <img className="logo" src={logo} alt="Tallyn" />
       {children}
       <SiteFooter />
@@ -25,9 +25,8 @@ export function SiteFooter() {
         <img src={wordmark} alt="Tallyn" height="20" />
         <span>· It all adds up.</span>
       </span>
-      <nav aria-label="Legal">
+      <nav aria-label="Legal" className="flex gap-3">
         <Link to="/terms">Terms of Service</Link>
-        <span aria-hidden="true"> · </span>
         <Link to="/privacy">Privacy Policy</Link>
       </nav>
     </footer>

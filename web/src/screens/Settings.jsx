@@ -357,7 +357,7 @@ function CodesDialog({ email, onClose }) {
     return () => d.open && d.close()
   }, [])
   return (
-    <dialog ref={ref} className={`${DIALOG} max-w-lg`} aria-label="Your backup codes" onCancel={(e) => e.preventDefault()}>
+    <dialog ref={ref} className={`${DIALOG} calm-auth max-w-lg`} aria-label="Your backup codes" onCancel={(e) => e.preventDefault()}>
       <SaveBackupCodes email={email} done="Done" onDone={onClose} />
     </dialog>
   )

@@ -133,6 +133,228 @@ body:has(.calm-page) {
   }
 }
 
+/* Sign-in and setup (#187, the #185 draft): the logo, one centred white card, the footer. The
+   screens keep their markup; these rules give it the draft's look over the old stylesheet. */
+@layer components {
+  .calm-auth.page {
+    padding: 48px 16px 24px;
+    gap: 24px;
+  }
+  .calm-auth .logo {
+    width: auto;
+    height: 32px;
+    margin: 0;
+  }
+  .calm-auth .card {
+    max-width: 360px;
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid var(--color-zinc-200);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    color: var(--color-zinc-900);
+    font-size: 14px;
+  }
+  .calm-auth .card h1 {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .calm-auth .card :is(.muted, .small.muted) {
+    color: var(--color-zinc-500);
+    font-size: 13px;
+    font-weight: 400;
+  }
+  .calm-auth .card form {
+    gap: 16px;
+  }
+  .calm-auth .card :is(label, .field) {
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .calm-auth .card :is(input:not([type='checkbox']):not([type='radio']), select) {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--color-zinc-300);
+    border-radius: 12px;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .calm-auth .card .btn {
+    height: 40px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--color-redesign-button);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .calm-auth .card .btn:disabled,
+  .calm-auth .card .btn.btn-waiting:disabled {
+    opacity: 0.4;
+    background: var(--color-redesign-button);
+    color: #fff;
+  }
+  .calm-auth .card .btn-secondary {
+    border: 1px solid var(--color-zinc-300);
+    background: #fff;
+    color: var(--color-zinc-900);
+  }
+  .calm-auth .card .btn-small {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+  .calm-auth .card :is(.link, .link-quiet, .switch-link, a) {
+    color: var(--color-zinc-600);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--color-zinc-300);
+    text-underline-offset: 4px;
+  }
+  .calm-auth .card :is(.link, .link-quiet, .switch-link, a):hover {
+    color: var(--color-zinc-900);
+    text-decoration-color: currentColor;
+  }
+  .calm-auth .card .agree a {
+    color: var(--color-zinc-900);
+    text-underline-offset: 2px;
+  }
+  .calm-auth .card .switch-link {
+    color: var(--color-zinc-900);
+    font-size: 14px;
+    text-decoration: none;
+  }
+  .calm-auth .card .or-divider {
+    color: var(--color-zinc-500);
+  }
+  .calm-auth .card .or-divider::before,
+  .calm-auth .card .or-divider::after {
+    background: var(--color-zinc-200);
+  }
+  .calm-auth .card :is(.info-note, .warn-note) {
+    margin: 0;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--color-zinc-50);
+    color: var(--color-zinc-700);
+    font-size: 13px;
+  }
+  .calm-auth .card .info-note svg {
+    color: var(--color-zinc-700);
+  }
+  .calm-auth .card .error {
+    color: var(--color-redesign-owe-text);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .calm-auth .card .code-label {
+    font-weight: 600;
+  }
+  .calm-auth .card .code-boxes {
+    gap: 6px;
+  }
+  .calm-auth .card .code-box {
+    height: 48px;
+    padding: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .calm-auth .card .code-box.is-filled {
+    border-color: var(--color-zinc-900);
+  }
+  .calm-auth .card .code-boxes-error .code-box {
+    border-color: var(--color-redesign-owe-text);
+  }
+  .calm-auth .card .card-links {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .calm-auth .card .password-rule {
+    margin: -8px 0 0;
+    color: var(--color-zinc-500);
+  }
+  .calm-auth .card .password-rule-ok {
+    color: var(--color-redesign-in-text);
+    font-weight: 600;
+  }
+  .calm-auth .card .password-show {
+    color: var(--color-zinc-500);
+    text-decoration-color: var(--color-zinc-300);
+  }
+  .calm-auth .card .agree {
+    gap: 10px;
+    color: var(--color-zinc-700);
+    font-size: 13px;
+    font-weight: 400;
+  }
+  .calm-auth .card .agree input {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--color-redesign-button);
+  }
+  .calm-auth .card .reset-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--color-zinc-100);
+    color: var(--color-zinc-900);
+  }
+  .calm-auth .card .qr {
+    width: 160px;
+    height: 160px;
+    padding: 10px;
+    border: 1px solid var(--color-zinc-200);
+    border-radius: 12px;
+  }
+  .calm-auth .card .secret {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    word-break: break-all;
+  }
+  .calm-auth .card ol:not(.codes-grid) {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .calm-auth .card .codes-grid {
+    gap: 6px 20px;
+    padding: 16px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--color-zinc-50);
+  }
+  .calm-auth .card .codes-grid li::before {
+    color: var(--color-zinc-400);
+  }
+  .calm-auth .card .codes-grid code {
+    font-size: 14px;
+    letter-spacing: 0;
+  }
+  .calm-auth .site-footer {
+    max-width: 768px;
+    padding-top: 16px;
+    border-top-color: var(--color-zinc-200);
+    color: var(--color-zinc-500);
+  }
+  .calm-auth .site-footer a {
+    color: var(--color-zinc-500);
+  }
+  .calm-auth .site-footer a:hover {
+    color: var(--color-zinc-900);
+  }
+}
+
 /* Tailwind's reset, scoped to rebuilt screens (#187): the libraries' components and the rebuilt
    pages expect it; screens that haven't moved keep the old base rules. Zero specificity, so
    utilities still win. */
