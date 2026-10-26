@@ -186,7 +186,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
 
       <nav
         aria-label="Main"
-        className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-center justify-around border-t border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/90 backdrop-blur lg:hidden"
+        className="tabbar fixed inset-x-0 bottom-0 z-40 flex h-16 items-center justify-around border-t border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/90 backdrop-blur lg:hidden"
       >
         {NAV.map(([to, label, Icon]) => (
           <Link
@@ -247,7 +247,7 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
     <div className="relative" ref={box}>
       <button
         ref={button}
-        className={`flex h-12 items-center gap-2.5 rounded-2xl border-0 bg-transparent p-0 text-left text-zinc-900 dark:text-white transition-colors duration-150 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${collapsed ? 'w-[42px] justify-center' : 'w-full px-2'}`}
+        className={`profile-card flex h-12 items-center gap-2.5 rounded-2xl border-0 bg-transparent p-0 text-left text-zinc-900 dark:text-white transition-colors duration-150 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${collapsed ? 'w-[42px] justify-center' : 'w-full px-2'}`}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={collapsed ? `${name}, ${summary}. Open menu` : undefined}

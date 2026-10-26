@@ -56,15 +56,15 @@ const PAGES = [
     '/accounts',
     (p) => [
       p.getByRole('region', { name: 'Net worth' }),
-      p.getByRole('region', { name: /^You have/ }),
-      p.getByRole('region', { name: /^You owe/ }),
+      p.getByRole('region', { name: 'Net worth' }).getByText('You have', { exact: true }),
+      p.getByRole('region', { name: 'Net worth' }).getByText('You owe', { exact: true }),
       p.getByRole('region', { name: 'Connected banks' }),
     ],
   ],
   [
     'Transactions',
     '/transactions',
-    (p) => [p.getByRole('list', { name: /categories/i }), p.getByRole('group', { name: /Your spending by day/ }), p.getByText('Corner Cafe').first()],
+    (p) => [p.getByRole('list', { name: /categories/i }), p.getByRole('region', { name: 'Spending by day' }), p.getByText('Corner Cafe').first()],
   ],
   [
     'Budgets',
@@ -76,7 +76,7 @@ const PAGES = [
       p.getByText('Count my spending in household budgets'),
     ],
   ],
-  ['Debts', '/debts', (p) => [p.getByRole('region', { name: 'What you owe by kind' }), p.getByRole('region', { name: 'Payments, interest and overdue' })]],
+  ['Debts', '/debts', (p) => [p.getByRole('region', { name: 'What you owe by kind' }), p.getByRole('region', { name: 'Your debts' })]],
   ['Family', '/family', (p) => [p.getByRole('region', { name: 'People in your household' }), p.getByRole('heading', { name: 'Pat Example', exact: true })]],
   ['Goals', '/goals', (p) => [p.getByRole('heading', { name: /set-asides|Nothing to put aside/ }), p.getByRole('region', { name: 'Your goals' })]],
   ...[
