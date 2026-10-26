@@ -349,7 +349,8 @@ export default function SpendingRing({ title = 'October spending', categories = 
 
   const current = categories[selected]
   const share = total && current ? (current.amount / total) * 100 : 0
-  const change = current?.change ?? 0
+  // Tallyn edit (#182): no comparison line when there is no last month to compare with.
+  const change = current?.change
 
   return (
     <div
@@ -414,16 +415,18 @@ export default function SpendingRing({ title = 'October spending', categories = 
             </p>
             <p className="mt-0.5 font-semibold text-2xl tabular-nums tracking-tight">{current ? money.format(current.amount) : ''}</p>
             <p className="mt-0.5 text-xs text-zinc-500 tabular-nums dark:text-zinc-400">{share.toFixed(0)}% of total</p>
-            <p
-              className={cn(
-                'mt-0.5 text-xs tabular-nums',
-                change > 0 && 'text-rose-600 dark:text-rose-400',
-                change < 0 && 'text-emerald-600 dark:text-emerald-400',
-                change === 0 && 'text-zinc-400 dark:text-zinc-500',
-              )}
-            >
-              {change === 0 ? 'Same as last month' : `${change > 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(1)}% vs last month`}
-            </p>
+            {change != null && (
+              <p
+                className={cn(
+                  'mt-0.5 text-xs tabular-nums',
+                  change > 0 && 'text-rose-600 dark:text-rose-400',
+                  change < 0 && 'text-emerald-600 dark:text-emerald-400',
+                  change === 0 && 'text-zinc-400 dark:text-zinc-500',
+                )}
+              >
+                {change === 0 ? 'Same as last month' : `${change > 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(1)}% vs last month`}
+              </p>
+            )}
           </div>
         </div>
       </div>
