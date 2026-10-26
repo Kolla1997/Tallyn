@@ -69,7 +69,7 @@ describe('Settings: authenticators', () => {
     await openSecurity([phone])
     mfa.enroll.mockResolvedValue({ data: { id: 'f9', totp: { qr_code: 'data:image/svg+xml;utf-8,<svg/>', secret: 'FAKESECRET' } }, error: null })
     mfa.unenroll.mockResolvedValue({ error: null })
-    fireEvent.click(screen.getByRole('button', { name: '+ Add another' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add another' }))
     const dialog = screen.getByRole('dialog', { name: 'Add another authenticator' })
     fireEvent.change(within(dialog).getByLabelText('Give it a name'), { target: { value: 'iphone' } })
     await act(async () => fireEvent.click(within(dialog).getByRole('button', { name: 'Show the QR code' })))
