@@ -57,4 +57,18 @@ describe('Shell', () => {
     renderShell()
     expect(screen.getByRole('button', { name: /Collapse sidebar|Expand sidebar/ })).toBeInTheDocument()
   })
+
+  // The calm redesign (#187): the rail starts collapsed without a saved choice; every page keeps
+  // its name for screen readers and on hover; the choice is remembered.
+  it('starts collapsed, keeps page names, and remembers opening', () => {
+    localStorage.clear()
+    renderShell()
+    const sidebar = screen.getByRole('complementary', { name: 'Main' })
+    for (const name of ['Home', 'Accounts', 'Transactions', 'Budgets', 'Debts', 'Family', 'Goals', 'Settings']) {
+      expect(within(sidebar).getByRole('link', { name })).toBeInTheDocument()
+    }
+    fireEvent.click(screen.getByRole('button', { name: 'Expand sidebar' }))
+    expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toBeInTheDocument()
+    expect(localStorage.getItem('tallyn.sidebar')).toBe('expanded')
+  })
 })

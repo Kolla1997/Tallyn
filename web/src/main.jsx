@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { applyTokens } from './lib/tokens.js'
 import { captureInviteFromURL } from './lib/invite.js'
 import './fonts.css'
-import './styles.css'
+import './app.css' // styles.css inside, in a lower layer (#187)
 import App from './App.jsx'
 
 applyTokens()
