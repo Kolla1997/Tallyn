@@ -125,7 +125,7 @@ test.describe('signed out', () => {
     await prepare(page, null)
     await page.goto('/')
     await reallyVisible(page.getByRole('heading', { name: 'Welcome back' }), 'sign-in heading')
-    await reallyVisible(page.getByLabel('Password'), 'password field')
+    await reallyVisible(page.getByLabel('Password', { exact: true }), 'password field')
     await reallyVisible(page.getByRole('link', { name: 'Terms of Service' }), 'footer Terms')
     await noSidewaysScroll(page)
     await page.getByRole('button', { name: 'Forgot password?' }).click()

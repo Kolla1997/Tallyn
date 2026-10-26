@@ -315,10 +315,6 @@ body:has(.calm-page) {
     color: var(--color-redesign-in-text);
     font-weight: 600;
   }
-  .calm-auth .card .password-show {
-    color: var(--color-zinc-500);
-    text-decoration-color: var(--color-zinc-300);
-  }
   .calm-auth .card .agree {
     gap: 10px;
     color: var(--color-zinc-700);
