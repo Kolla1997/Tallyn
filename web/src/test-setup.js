@@ -30,3 +30,18 @@ if (!window.matchMedia) {
     removeListener() {},
   })
 }
+
+// jsdom has no ResizeObserver; the redesign's charts (Bklit, Kokonut, #187) measure themselves with
+// it. A stand-in that never fires is enough for tests, which check words and roles, not sizes.
+if (!globalThis.ResizeObserver) {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+}
+
+// jsdom has no document.fonts; Kokonut's tabs wait for fonts before measuring.
+if (!document.fonts) {
+  Object.defineProperty(document, 'fonts', { value: { ready: Promise.resolve() } })
+}

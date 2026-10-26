@@ -88,14 +88,6 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
-.code-input {
-  font-family: var(--font-heading);
-  font-variant-numeric: tabular-nums;
-  font-size: 22px;
-  letter-spacing: 0.3em;
-  text-align: center;
-}
-
 .btn {
   font-family: var(--font-button);
   font-weight: 700;
@@ -215,12 +207,6 @@ select:focus-visible {
   gap: var(--space-s3);
 }
 
-.confirm-actions {
-  display: flex;
-  gap: var(--space-s2);
-  flex-wrap: wrap;
-}
-
 /* Spending and transactions (#9) */
 .small {
   font-size: 13px;
@@ -234,29 +220,6 @@ select:focus-visible {
   display: flex;
   flex-direction: column;
   gap: var(--space-s3);
-}
-
-.spending-row,
-.tx-main {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-s3);
-}
-
-.tx-merchant {
-  overflow-wrap: anywhere;
-}
-
-.tx-meta {
-  font-size: 13px;
-}
-
-.money-out {
-  color: var(--color-error);
-}
-
-.money-in {
-  color: var(--color-success);
 }
 
 /* Sharing (#28) */
@@ -292,22 +255,11 @@ fieldset.share label {
   font-weight: 400;
 }
 
-.small-heading {
-  font-family: var(--font-heading);
-  font-size: 15px;
-  margin: 0;
-}
-
 .saved {
   color: var(--color-success);
 }
 
 /* Members and invites (#12) */
-.home-sections {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s4);
-}
 
 .invite-form {
   display: flex;
@@ -318,11 +270,6 @@ fieldset.share label {
 
 /* App layout (#39): sidebar on web, tab bar on phones.
    Matches docs/03 Design/Comps/web-*-draft.html. */
-.app-shell {
-  display: grid;
-  grid-template-columns: 248px minmax(0, 1fr);
-  min-height: 100vh;
-}
 
 .skip-link {
   position: absolute;
@@ -348,11 +295,6 @@ fieldset.share label {
   position: sticky;
   top: 0;
   height: 100vh;
-}
-
-.sidebar-logo {
-  width: 132px;
-  margin: var(--space-s2) var(--space-s2) var(--space-s3);
 }
 
 .nav {
@@ -383,28 +325,9 @@ fieldset.share label {
   color: var(--color-clay-deep);
 }
 
-.nav a:focus-visible,
-.tabbar a:focus-visible,
-.me-chip:focus-visible {
+.nav a:focus-visible {
   outline: 2px solid var(--color-clay-deep);
   outline-offset: 2px;
-}
-
-.sidebar-bottom {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s3);
-}
-
-.me-chip {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-  color: var(--color-cocoa);
-  text-decoration: none;
-  border-radius: var(--radius-input);
-  padding: var(--space-s1);
 }
 
 .avatar {
@@ -423,14 +346,6 @@ fieldset.share label {
 
 .block {
   display: block;
-}
-
-.app-main {
-  min-width: 0;
-}
-
-.mobile-header {
-  display: none;
 }
 
 .content {
@@ -455,13 +370,6 @@ fieldset.share label {
   display: flex;
   gap: var(--space-s2);
   flex-wrap: wrap;
-}
-
-.cols {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: var(--space-s5);
-  align-items: start;
 }
 
 .col {
@@ -500,81 +408,16 @@ fieldset.share label {
   text-align: right;
 }
 
-.status-on {
-  color: var(--color-success);
-  font-weight: 500;
-}
-
-.center-note {
-  text-align: center;
-  padding: var(--space-s7);
-}
-
-.tabbar {
-  display: none;
-}
-
 /* Two columns only where there's room for both. */
-@media (max-width: 1279px) {
-  .cols {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 
 /* Phones and small tablets: header and bottom tab bar instead of the sidebar. */
 @media (max-width: 1023px) {
-  .app-shell {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .sidebar {
     display: none;
   }
 
-  .mobile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-s4) var(--space-s4) 0;
-  }
-
-  .mobile-header img {
-    width: 104px;
-  }
-
   .content {
     padding: var(--space-s4) var(--space-s4) 112px;
-  }
-
-  .tabbar {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 86px;
-    background: var(--color-white);
-    border-top: 1px solid var(--color-border);
-    padding: var(--space-s2) var(--space-s2) var(--space-s4);
-    z-index: 5;
-  }
-
-  .tabbar a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-s1);
-    color: var(--color-cocoa);
-    text-decoration: none;
-    font-family: var(--font-button);
-    font-weight: 700;
-    font-size: 12px;
-  }
-
-  .tabbar a[aria-current='page'] {
-    color: var(--color-clay-deep);
   }
 }
 
@@ -593,77 +436,6 @@ fieldset.share label {
 /* Others' money (#37): white like every card, the dashed border sets it apart. */
 .panel-shared {
   border-style: dashed;
-}
-
-.total-card {
-  background: var(--color-cocoa);
-  color: var(--color-cream);
-  border: none;
-}
-
-.total-label,
-.total-note,
-.total-split span:first-child,
-.total-networth div span:first-child,
-.total-networth p {
-  color: var(--color-sage-light);
-}
-
-.total-label {
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.total-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: var(--space-s4);
-  flex-wrap: wrap;
-}
-
-.total-big {
-  font-size: 44px;
-  line-height: 1.1;
-  color: var(--color-cream);
-}
-
-.total-split {
-  display: flex;
-  gap: var(--space-s5);
-  flex-wrap: wrap;
-}
-
-.total-split div {
-  display: flex;
-  flex-direction: column;
-}
-
-.total-split span:first-child {
-  font-size: 12px;
-}
-
-.total-networth {
-  border-top: 1px solid rgba(246, 241, 233, 0.18);
-  padding-top: var(--space-s3);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.total-networth div {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-s3);
-}
-
-.total-networth div span:first-child {
-  font-size: 13px;
-}
-
-.total-networth .amount {
-  font-size: 22px;
 }
 
 .rows {
@@ -701,18 +473,6 @@ fieldset.share label {
   width: 18px;
   height: 18px;
   font-size: 10px;
-}
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 2px 10px;
-  border-radius: var(--radius-button);
-  background: var(--color-sand);
-  color: var(--color-cocoa);
-  white-space: nowrap;
 }
 
 .chips {
@@ -763,12 +523,6 @@ a.btn {
   align-self: flex-start;
 }
 
-@media (max-width: 1023px) {
-  .total-big {
-    font-size: 36px;
-  }
-}
-
 /* Transactions (#42) */
 .sr-only {
   position: absolute;
@@ -779,53 +533,7 @@ a.btn {
   white-space: nowrap;
 }
 
-.tx-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  flex: none;
-  overflow: hidden;
-}
-
-.tx-logo {
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
 /* The logo fills its circle exactly, whatever size the circle is. */
-.tx-logo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.tone-clay {
-  background: #f6e2dc;
-  color: var(--color-clay-deep);
-}
-
-.tone-sage {
-  background: #e3ece3;
-  color: var(--color-sage-deep);
-}
-
-.tone-sand {
-  background: var(--color-sand);
-  color: var(--color-cocoa);
-}
-
-.tx-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 2px 6px;
-}
 
 .tx-owner {
   display: inline-flex;
@@ -842,294 +550,18 @@ a.btn {
   font-weight: 400;
 }
 
-.tx-filters {
-  min-width: 0;
-}
-
-.filter-row {
-  display: flex;
-  gap: var(--space-s3);
-  flex-wrap: wrap;
-}
-
-.filter-row .grow {
-  flex: 1;
-  min-width: 160px; /* three across on web: category, month, bank (#83) */
-}
-
-.filter-row input,
-.filter-row select {
-  width: 100%;
-}
-
-.tx-days {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s4);
-  max-width: 820px;
-}
-
-.day-heading {
-  font-size: 15px;
-  color: var(--color-text-secondary);
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-s3);
-  margin: 0 0 var(--space-s1);
-}
-
-.show-more {
-  align-self: center;
-}
-
-@media (max-width: 1023px) {
-  .tabbar a {
-    font-size: 11px;
-  }
-}
-
 /* Collapsible sidebar (#39): a 72px icon rail when collapsed. */
-.app-shell {
-  transition: grid-template-columns 240ms ease-out;
-}
-
-@media (min-width: 1024px) {
-  .app-shell.is-collapsed {
-    grid-template-columns: 72px minmax(0, 1fr);
-  }
-}
-
-.app-shell.is-collapsed .sidebar {
-  padding: var(--space-s5) var(--space-s2);
-  align-items: center;
-}
-
-.sidebar-mark {
-  width: 32px;
-  height: 32px;
-  margin: var(--space-s2) 0 var(--space-s3);
-}
-
-.app-shell.is-collapsed .nav a {
-  justify-content: center;
-  padding: var(--space-s3);
-  width: 48px;
-  height: 48px;
-}
-
-.app-shell.is-collapsed .sidebar-bottom {
-  align-items: center;
-}
-
-.sidebar-toggle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s2);
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  font: inherit;
-  font-size: 14px;
-  padding: var(--space-s2) var(--space-s3);
-  border-radius: var(--radius-button);
-  cursor: pointer;
-}
-
-.sidebar-toggle:hover {
-  background: var(--color-cream);
-  color: var(--color-cocoa);
-}
-
-.sidebar-toggle:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
 
 /* Tooltips for the icon rail, on hover and keyboard focus. */
 [data-tip] {
   position: relative;
 }
 
-.app-shell.is-collapsed [data-tip]:hover::after,
-.app-shell.is-collapsed [data-tip]:focus-visible::after {
-  content: attr(data-tip);
-  position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--color-cocoa);
-  color: var(--color-cream);
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: 13px;
-  white-space: nowrap;
-  padding: 4px 10px;
-  border-radius: var(--radius-input);
-  pointer-events: none;
-  z-index: 20;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .app-shell {
-    transition: none;
-  }
-}
-
 /* Spending card (#39): one bar split by category, then a row per category. */
-.spend-bar {
-  display: flex;
-  gap: 2px;
-  height: 12px;
-  border-radius: var(--radius-button);
-  overflow: hidden;
-  margin-bottom: var(--space-s3);
-}
-
-.spend-bar > span {
-  flex-basis: 0;
-  min-width: 4px;
-}
-
-.spend-rows > li {
-  padding: 0;
-}
-
-.spend-rows > li:first-child {
-  padding-top: 0;
-}
-
-.spend-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-  width: calc(100% + 2 * var(--space-s2));
-  padding: var(--space-s3) var(--space-s2);
-  margin: 0 calc(-1 * var(--space-s2));
-  border-radius: var(--radius-input);
-  color: inherit;
-  text-decoration: none;
-}
-
-.spend-row:hover {
-  background: var(--color-cream);
-}
-
-.spend-row:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
-
-.spend-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  flex: none;
-}
-
-.spend-clay {
-  background: var(--color-clay);
-  color: var(--color-white);
-}
-
-.spend-sage {
-  background: var(--color-sage);
-  color: var(--color-white);
-}
-
-.spend-cocoa {
-  background: var(--color-cocoa);
-  color: var(--color-cream);
-}
-
-.spend-sage-light {
-  background: var(--color-sage-light);
-  color: var(--color-cocoa);
-}
-
-.spend-sand {
-  background: var(--color-sand);
-  color: var(--color-cocoa);
-}
 
 /* Your accounts on Home (#39): what you have and owe, side by side. */
-.have-owe {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-s3);
-  margin-bottom: var(--space-s4);
-}
-
-.have-owe > a,
-.have-owe > div {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--space-s3) var(--space-s4);
-  border-radius: var(--radius-input);
-}
-
-.have-owe .amount {
-  font-size: 20px;
-  overflow-wrap: anywhere;
-}
-
-.have-owe .tone-sage .amount {
-  color: var(--color-cocoa);
-}
-
-.sub-heading {
-  font-family: var(--font-heading);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  margin: 0 0 var(--space-s2);
-}
 
 /* Shared with you on Home (#39): one row per person. */
-.rows > li:has(> .person-row) {
-  padding: 0;
-}
-
-.person-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-  width: calc(100% + 2 * var(--space-s2));
-  padding: var(--space-s3) var(--space-s2);
-  margin: 0 calc(-1 * var(--space-s2));
-  border-radius: var(--radius-input);
-  color: inherit;
-  text-decoration: none;
-}
-
-.person-row:hover {
-  background: var(--color-cream);
-}
-
-.person-row:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
-
-.person-money {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 var(--space-s3);
-  margin-top: var(--space-s1);
-}
-
-.person-row .chevron {
-  color: var(--color-text-secondary);
-  flex: none;
-}
-
-.role-tag {
-  margin-left: var(--space-s2);
-  vertical-align: 2px;
-}
 
 /* Compact desktop scale (#39): from 1024px, smaller type and tighter cards so
    more fits at a glance. Phones keep the comfortable sizes above. The scale
@@ -1169,7 +601,6 @@ a.btn {
     padding: var(--space-s2) var(--space-s4);
   }
 
-  .cols,
   .col {
     gap: var(--space-s4);
   }
@@ -1179,52 +610,13 @@ a.btn {
     gap: var(--space-s3);
   }
 
-  .total-big {
-    font-size: 36px;
-  }
-
-  .total-networth .amount,
-  .have-owe .amount {
-    font-size: 18px;
-  }
-
   .rows > li {
     padding: var(--space-s2) 0;
   }
 
-  .tx-icon,
   .avatar:not(.avatar-sm) {
     width: 32px;
     height: 32px;
-  }
-
-  .tx-icon svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .spend-icon {
-    width: 28px;
-    height: 28px;
-  }
-
-  .spend-icon svg {
-    width: 15px;
-    height: 15px;
-  }
-
-  .spend-row,
-  .person-row {
-    padding: var(--space-s2);
-  }
-
-  .have-owe {
-    margin-bottom: var(--space-s3);
-  }
-
-  .have-owe > a,
-  .have-owe > div {
-    padding: var(--space-s2) var(--space-s3);
   }
 
   .chip {
@@ -1233,48 +625,8 @@ a.btn {
 }
 
 /* Three columns from 1440px (Home). */
-@media (min-width: 1440px) {
-  .cols-3 {
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
-  }
-}
 
 /* Accounts page (#39 step 3). */
-.page-chips {
-  margin-bottom: var(--space-s4);
-}
-
-.net-worth {
-  margin-bottom: var(--space-s4);
-  gap: var(--space-s2);
-}
-
-.net-worth-head,
-.net-worth-key {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-s3);
-  flex-wrap: wrap;
-}
-
-.net-worth-total {
-  font-size: 22px;
-}
-
-.net-worth-bar {
-  display: flex;
-  gap: 2px;
-  height: 10px;
-  border-radius: var(--radius-button);
-  overflow: hidden;
-}
-
-.net-worth-bar > span {
-  flex-basis: 0;
-  min-width: 4px;
-  transition: flex-grow 300ms ease-out; /* #87 */
-}
 
 .dot {
   display: inline-block;
@@ -1284,60 +636,10 @@ a.btn {
   margin-right: var(--space-s1);
 }
 
-.dot-sage {
-  background: var(--color-sage);
-}
-
-.dot-clay {
-  background: var(--color-clay);
-}
-
-.accounts-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-s4);
-  align-items: start;
-  margin-bottom: var(--space-s4);
-}
-
-.account-col-have {
-  border-top: 4px solid var(--color-sage);
-}
-
-.account-col-owe {
-  border-top: 4px solid var(--color-clay);
-}
-
-.account-count {
-  margin-top: calc(-1 * var(--space-s2));
-}
-
-.account-group-head {
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--font-heading);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-  margin: 0 0 var(--space-s1);
-  padding-bottom: var(--space-s1);
-  border-bottom: 1px solid var(--color-sand);
-}
-
-.account-group + .account-group {
-  margin-top: var(--space-s2);
-}
-
 .bank-item {
   flex-direction: column;
   align-items: stretch !important;
   gap: var(--space-s2) !important;
-}
-
-.bank-line {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
 }
 
 .bank-badge {
@@ -1354,150 +656,12 @@ a.btn {
   flex: none;
 }
 
-.bank-status-ok {
-  color: var(--color-success);
-}
-
-.bank-status-warn,
-.bank-warning {
-  color: var(--color-clay-deep);
-}
-
-.chip.chip-danger {
-  align-self: flex-start;
-  color: var(--color-clay-deep);
-}
-
 .btn-small {
   font-size: 13px;
   padding: var(--space-s1) var(--space-s4);
 }
 
-.have-owe > a,
-.have-owe > div {
-  color: inherit;
-  text-decoration: none;
-}
-
-.have-owe > a:hover {
-  outline: 1px solid var(--color-border);
-}
-
-.have-owe > a:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
-
-@media (min-width: 1024px) {
-  .accounts-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .connected-banks {
-    grid-column: 1 / -1;
-  }
-}
-
-@media (min-width: 1440px) {
-  .accounts-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 0.8fr);
-  }
-
-  .connected-banks {
-    grid-column: auto;
-  }
-}
-
 /* Family page (#39 step 4). */
-.family-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-s4);
-  align-items: start;
-}
-
-.family-list .rows > li {
-  padding: 0;
-  border-top: none;
-}
-
-.family-person {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-  width: 100%;
-  padding: var(--space-s2);
-  border: none;
-  border-radius: var(--radius-input);
-  background: none;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.family-person:hover {
-  background: var(--color-cream);
-}
-
-.family-person[aria-current] {
-  background: var(--color-sand);
-}
-
-.family-person:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
-
-.avatar-invite {
-  background: var(--color-sage-light);
-  color: var(--color-cocoa);
-}
-
-.person-head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-  flex-wrap: wrap;
-}
-
-.person-head h2 {
-  margin: 0 0 var(--space-s1);
-}
-
-.person-section {
-  border-top: 1px solid var(--color-sand);
-  padding-top: var(--space-s3);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s2);
-}
-
-.person-section .have-owe {
-  margin-bottom: 0;
-}
-
-.person-links {
-  display: flex;
-  gap: var(--space-s4);
-  flex-wrap: wrap;
-  margin: 0;
-}
-
-.person-footer {
-  border-top: 1px solid var(--color-sand);
-  padding-top: var(--space-s3);
-}
-
-.link.danger-link {
-  color: var(--color-clay-deep);
-}
-
-.chip.chip-on {
-  background: #e3ece3;
-  border-color: var(--color-sage-light);
-  color: var(--color-sage-deep);
-}
 
 .switches {
   display: flex;
@@ -1518,45 +682,6 @@ a.btn {
   opacity: 0;
   width: 1px;
   height: 1px;
-}
-
-.switch-track {
-  width: 32px;
-  height: 18px;
-  border-radius: var(--radius-button);
-  background: var(--color-border);
-  position: relative;
-  flex: none;
-  transition: background 200ms ease-out;
-}
-
-.switch-track::after {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--color-white);
-  transition: left 200ms ease-out;
-}
-
-.switch input:checked + .switch-track {
-  background: var(--color-sage-deep);
-}
-
-.switch input:checked + .switch-track::after {
-  left: 16px;
-}
-
-.switch input:focus-visible + .switch-track {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
-
-.switch input:disabled + .switch-track {
-  opacity: 0.5;
 }
 
 /* Confirmation dialog (#38). */
@@ -1583,10 +708,6 @@ a.btn {
   margin: 0;
 }
 
-.dialog-body p {
-  margin: 0;
-}
-
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
@@ -1594,37 +715,7 @@ a.btn {
   flex-wrap: wrap;
 }
 
-.btn.btn-danger {
-  background: var(--color-error);
-}
-
-@media (min-width: 1024px) {
-  .family-grid {
-    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
-  }
-
-  .family-side {
-    grid-column: 2;
-  }
-}
-
 /* Three columns from 1440px: people, the person, their cards and debts. */
-@media (min-width: 1440px) {
-  .family-grid {
-    grid-template-columns: minmax(220px, 280px) minmax(0, 1.5fr) minmax(300px, 1fr);
-  }
-
-  .family-side {
-    grid-column: 3;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .switch-track,
-  .switch-track::after {
-    transition: none;
-  }
-}
 
 /* Role picker and your own summary on Family (#39). */
 .segmented {
@@ -1662,357 +753,24 @@ a.btn {
   outline-offset: 2px;
 }
 
-.your-role {
-  margin: 0;
-}
-
-.share-list > li {
-  flex-wrap: wrap;
-}
-
-.share-list .chips {
-  gap: var(--space-s1);
-}
-
 /* Have / owe tiles on phones: keep big amounts inside the tile. */
-.have-owe > a,
-.have-owe > div {
-  min-width: 0;
-}
-
-@media (max-width: 1023px) {
-  .have-owe .amount {
-    font-size: 17px;
-  }
-}
 
 /* Cards and debts stack, and How sharing works (#39). */
-.family-side {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s4);
-}
-
-.debt-count {
-  font-size: 11px;
-  vertical-align: super;
-  color: var(--color-text-secondary);
-  margin-left: 2px;
-}
-
-.debt-sub {
-  margin: calc(-1 * var(--space-s2)) 0 0;
-}
-
-.debt-cards {
-  position: relative;
-}
-
-.debt-card {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 150px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: var(--space-s3) var(--space-s4);
-  border: 2px solid var(--color-white);
-  border-radius: var(--radius-card);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: top 250ms ease-out;
-}
-
-.debt-card-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-s2);
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.debt-card-name {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-s2);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.debt-card-kind {
-  display: block;
-  font-size: 12px;
-}
-
-.debt-card-amount {
-  display: block;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 24px;
-  font-variant-numeric: tabular-nums;
-}
-
-.debt-clay {
-  background: var(--color-clay-deep);
-  color: var(--color-white);
-}
-
-.debt-cocoa {
-  background: var(--color-cocoa);
-  color: var(--color-cream);
-}
-
-.debt-sage {
-  background: var(--color-sage-deep);
-  color: var(--color-white);
-}
-
-.debt-sand {
-  background: var(--color-sand);
-  color: var(--color-cocoa);
-}
-
-.debt-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.debt-list-item {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-s3);
-  padding: var(--space-s1) var(--space-s2);
-  margin: 0 calc(-1 * var(--space-s2));
-  width: calc(100% + 2 * var(--space-s2));
-  border: none;
-  border-radius: var(--radius-input);
-  background: none;
-  font: inherit;
-  font-size: 13px;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.debt-list-item:hover,
-.debt-list-item[aria-pressed='true'] {
-  background: var(--color-cream);
-}
-
-.debt-list-item:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
-
-.how-sharing ul {
-  margin: 0;
-  padding-left: var(--space-s4);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s1);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .debt-card {
-    transition: none;
-  }
-}
 
 /* Transactions: list with summary or details beside it (#58). */
-.tx-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-s4);
-  align-items: start;
-  margin-top: var(--space-s4);
-}
-
-.tx-main {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s3);
-  min-width: 0;
-}
-
-.tx-list {
-  gap: var(--space-s4);
-}
-
-.tx-row-inner {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-  width: 100%;
-  min-width: 0;
-}
-
-.rows > li.tx-row-pick {
-  padding: 0;
-}
-
-button.tx-row-inner {
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  background: none;
-  border: none;
-  padding: var(--space-s2);
-  margin: 0 calc(-1 * var(--space-s2));
-  width: calc(100% + 2 * var(--space-s2));
-  border-radius: var(--radius-input);
-  cursor: pointer;
-}
-
-button.tx-row-inner:hover {
-  background: var(--color-cream);
-}
-
-button.tx-row-inner[aria-pressed='true'] {
-  background: var(--color-sand);
-}
-
-button.tx-row-inner:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
-
-.tx-hint {
-  text-align: center;
-  margin: 0;
-}
-
-.tx-summary {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s4);
-}
-
-.tx-summary .have-owe {
-  margin-bottom: 0;
-}
-
-.ring-wrap {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s4);
-  flex-wrap: wrap;
-}
-
-.ring-label {
-  font-family: var(--font-body);
-  fill: var(--color-text-secondary);
-}
-
-.ring-total {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  fill: var(--color-cocoa);
-}
-
-.ring-legend {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  flex: 1;
-  min-width: 160px;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-s3);
-}
-
-.ring-pct {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-s2);
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.ring-tick {
-  width: 3px;
-  height: 14px;
-  border-radius: 2px;
-}
 
 .tx-details {
   gap: var(--space-s3);
 }
 
-.tx-back {
-  align-self: flex-start;
-}
-
-.tx-details-head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-}
-
-.tx-details-head h2 {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
 /* Where a purchase happened: address and Open in Maps (#58; in-app map is #60). */
-.tx-place {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s2);
-}
-
-.tx-place p {
-  margin: 0;
-}
-
-.tx-address {
-  display: flex;
-  gap: var(--space-s3);
-  align-items: flex-start;
-  background: var(--color-cream);
-  border-radius: var(--radius-input);
-  padding: var(--space-s3);
-}
-
-.tx-address svg {
-  color: var(--color-clay-deep);
-  flex: none;
-  margin-top: 2px;
-}
-
-.tx-maps {
-  align-self: flex-start;
-  text-decoration: none;
-}
 
 .tx-details .link {
   align-self: flex-start;
 }
 
-@media (min-width: 1024px) {
-  .tx-layout {
-    grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
-  }
-
-  .tx-side {
-    position: sticky;
-    top: var(--space-s4);
-  }
-}
-
 /* Phones: summary above the list; details open over the page. */
 @media (max-width: 1023px) {
-  .tx-side {
-    order: -1;
-  }
-
   .tx-details {
     position: fixed;
     inset: 0;
@@ -2023,74 +781,10 @@ button.tx-row-inner:focus-visible {
 }
 
 /* Ring hover (#58): the hovered category stays, the others fade back. */
-.ring-seg {
-  cursor: pointer;
-  transition: opacity 200ms ease-out;
-}
-
-.ring-dim {
-  opacity: 0.3;
-}
-
-.ring-key {
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  background: none;
-  border: none;
-  padding: var(--space-s1);
-  margin: calc(-1 * var(--space-s1));
-  border-radius: var(--radius-input);
-  cursor: default;
-  transition: opacity 200ms ease-out;
-}
-
-.ring-key:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ring-seg,
-  .ring-key {
-    transition: none;
-  }
-}
 
 /* Settings (#39 step 5): same list-and-detail layout as Family. */
-.settings-grid .family-person {
-  padding: var(--space-s2) var(--space-s3);
-}
-
-.family-person.settings-danger {
-  color: var(--color-clay-deep);
-}
-
-.settings-section .rows > li.settings-row {
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.settings-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s3);
-}
-
-.settings-form label {
-  max-width: 420px;
-}
-
-.tag a {
-  color: inherit;
-}
 
 /* Settings stays two columns at every desktop width (no third column). */
-@media (min-width: 1440px) {
-  .settings-grid {
-    grid-template-columns: minmax(220px, 280px) minmax(0, 800px);
-  }
-}
 
 /* Frosted glass finish (#61, Dinesh 2026-10-11; Design System "Glass finish").
    Every card is translucent white over a soft sage, clay and sand glow, with
@@ -2136,20 +830,8 @@ body::before {
 }
 
 /* The total balance card: dark glass. */
-.panel.total-card {
-  background: var(--glass-surface-dark);
-  border: 1px solid rgb(255 255 255 / 0.18);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18);
-}
 
 /* Tinted tiles and chips sit on glass, so they let a little of it through. */
-.tone-sage {
-  background: color-mix(in srgb, #e3ece3 80%, transparent);
-}
-
-.tone-clay {
-  background: color-mix(in srgb, #f6e2dc 80%, transparent);
-}
 
 .chip {
   background: var(--glass-surface);
@@ -2186,10 +868,6 @@ body::before {
     backdrop-filter: none;
   }
 
-  .panel.total-card {
-    background: var(--color-cocoa);
-  }
-
   body::before {
     display: none;
   }
@@ -2209,18 +887,6 @@ body::before {
 
 @media (min-width: 1024px) {
   /* Sidebar 220px expanded, 60px collapsed (Dinesh), plus the 12px gap. */
-  .app-shell {
-    grid-template-columns: 232px minmax(0, 1fr);
-  }
-
-  .app-shell.is-collapsed {
-    grid-template-columns: 72px minmax(0, 1fr);
-  }
-
-  .app-shell.is-collapsed .nav a {
-    width: 42px;
-    height: 42px;
-  }
 
   .sidebar {
     margin: var(--space-s3) 0 var(--space-s3) var(--space-s3);
@@ -2313,47 +979,6 @@ body::before {
 }
 
 /* Yours / Everyone switch on the balance card (#68). Light on dark glass. */
-.total-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-s3);
-  flex-wrap: wrap;
-}
-
-.total-head .total-label {
-  margin: 0;
-}
-
-.scope-switch {
-  display: inline-flex;
-  gap: 2px;
-  padding: 2px;
-  border: 1px solid rgb(255 255 255 / 0.3);
-  border-radius: var(--radius-button);
-}
-
-.scope-switch button {
-  font: inherit;
-  font-size: 12px;
-  font-weight: 500;
-  border: none;
-  background: none;
-  color: var(--color-cream);
-  padding: 3px 12px;
-  border-radius: var(--radius-button);
-  cursor: pointer;
-}
-
-.scope-switch button[aria-pressed='true'] {
-  background: var(--color-cream);
-  color: var(--color-cocoa);
-}
-
-.scope-switch button:focus-visible {
-  outline: 2px solid var(--color-cream);
-  outline-offset: 2px;
-}
 
 /* Terms and Privacy (#36): one readable column, links on every screen. */
 .page.page-wide {
@@ -2525,15 +1150,6 @@ label.agree input {
 }
 
 /* App: the footer sits below the page content, at the bottom of the screen. */
-.app-main {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.app-main > .content {
-  flex: 1;
-}
 
 /* Phones: keep the page clear of the bottom tab bar (the signed-in app has
    no footer since #122). */
@@ -2544,355 +1160,24 @@ label.agree input {
 }
 
 /* Sidebar top and profile card (#72, option A). */
-.sidebar-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-s2);
-}
-
-.sidebar-top .sidebar-toggle {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  justify-content: center;
-  border: 1px solid var(--color-border);
-  border-radius: 50%;
-  flex: none;
-}
-
-.app-shell.is-collapsed .sidebar-top {
-  flex-direction: column;
-  gap: var(--space-s3);
-}
-
-.app-shell.is-collapsed .sidebar-top .sidebar-mark {
-  margin-bottom: 0;
-}
 
 .profile {
   position: relative;
 }
 
-.profile-card {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-  width: 100%;
-  padding: var(--space-s2) var(--space-s3);
-  font: inherit;
-  text-align: left;
-  color: var(--color-cocoa);
-  background: color-mix(in srgb, var(--color-white) 65%, transparent);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-  cursor: pointer;
-}
-
-.profile-card:hover {
-  background: var(--color-white);
-}
-
-.profile-card:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
-
-.profile-card .avatar {
-  width: 32px;
-  height: 32px;
-}
-
-.profile-text {
-  min-width: 0;
-}
-
-.profile-text strong,
-.profile-text span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.profile.is-collapsed .profile-card {
-  width: auto;
-  padding: 3px;
-  border-radius: 50%;
-}
-
 /* The menu: opens upward from the card, or beside the collapsed rail. */
-.profile-menu {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(100% + var(--space-s2));
-  z-index: 40;
-  display: flex;
-  flex-direction: column;
-  padding: var(--space-s1);
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-  box-shadow: var(--card-shade);
-}
-
-.profile.is-collapsed .profile-menu {
-  left: calc(100% + var(--space-s3));
-  right: auto;
-  bottom: 0;
-  width: 220px;
-}
-
-.profile-menu hr {
-  border: none;
-  border-top: 1px solid var(--color-sand);
-  margin: var(--space-s1) 0;
-}
-
-.profile-menu-label {
-  margin: var(--space-s1) var(--space-s3) 0;
-}
-
-.profile-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s2);
-  padding: var(--space-s2) var(--space-s3);
-  font: inherit;
-  font-size: 14px;
-  text-align: left;
-  color: var(--color-cocoa);
-  background: none;
-  border: none;
-  border-radius: var(--space-s2);
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.profile-item:hover,
-.profile-item:focus-visible {
-  background: var(--color-cream);
-  outline: none;
-}
 
 /* Transactions top (#75): filters card and the year-of-dots card, split
    like the list and summary below; stacked on phones. */
-.tx-top {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-s4);
-  margin-bottom: var(--space-s4);
-  /* Above the cards below, so a dot's day card isn't covered. */
-  position: relative;
-  z-index: 5;
-}
-
-@media (min-width: 1024px) {
-  .tx-top {
-    grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
-  }
-}
-
-.tx-filter-fields {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s3);
-  min-width: 0;
-}
-
-.tx-filter-fields input[type='search'] {
-  width: 100%;
-}
-
-.tx-day-filter {
-  margin: 0;
-}
-
-.tx-dots-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-}
 
 .dots {
   position: relative;
 }
 
 /* Twelve little months: six across on web, four across on phones. */
-.dots-months {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-s3) 10px;
-}
-
-@media (min-width: 1024px) {
-  .dots-months {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-}
-
-.dots-month {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 2px;
-  align-content: start;
-}
-
-.day-dot {
-  width: 100%;
-  max-width: 10px;
-  aspect-ratio: 1;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.day-dot:focus-visible,
-.day-dot-selected {
-  outline: 2px solid var(--color-cocoa);
-  outline-offset: 1px;
-}
-
-.day-dot-0 {
-  background: var(--color-sand);
-}
-
-.day-dot-1 {
-  background: color-mix(in srgb, var(--color-clay) 25%, var(--color-white));
-}
-
-.day-dot-2 {
-  background: color-mix(in srgb, var(--color-clay) 50%, var(--color-white));
-}
-
-.day-dot-3 {
-  background: color-mix(in srgb, var(--color-clay) 75%, var(--color-white));
-}
-
-.day-dot-4 {
-  background: var(--color-clay-deep);
-}
-
-.day-dot-ahead {
-  background: transparent;
-  box-shadow: inset 0 0 0 1px var(--color-border);
-  cursor: default;
-}
-
-.day-dot-blank {
-  visibility: hidden;
-}
-
-.dots-card {
-  position: absolute;
-  z-index: 20;
-  width: 240px;
-  padding: var(--space-s3);
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-  box-shadow: var(--card-shade);
-  pointer-events: none;
-}
-
-.dots-card p {
-  margin: 0;
-}
-
-.dots-card-date {
-  font-weight: 600;
-}
-
-.dots-card-row {
-  display: flex;
-  gap: var(--space-s2);
-  align-items: flex-start;
-  margin-top: var(--space-s2);
-}
-
-.dots-card-link {
-  margin-top: var(--space-s2) !important;
-  color: var(--color-clay-deep);
-}
 
 /* Credit cards on Home (#27, option F): one bar for the total limit, each
    card's balance a piece of it in a shade of clay; sand is what's available. */
-.cc-total {
-  color: var(--color-cocoa);
-  font-weight: 600;
-}
-
-.cc-bar {
-  display: flex;
-  height: 14px;
-  border-radius: var(--radius-button);
-  overflow: hidden;
-  background: var(--color-sand);
-  margin-bottom: var(--space-s2);
-}
-
-.cc-piece {
-  height: 100%;
-  transition: width 300ms ease-out; /* #87 */
-}
-
-.cc-piece + .cc-piece {
-  border-left: 2px solid var(--color-white);
-}
-
-.cc-shade-0 {
-  background: var(--color-clay-deep);
-}
-
-.cc-shade-1 {
-  background: var(--color-clay);
-}
-
-.cc-shade-2 {
-  background: color-mix(in srgb, var(--color-clay) 70%, var(--color-white));
-}
-
-.cc-shade-3 {
-  background: color-mix(in srgb, var(--color-clay) 50%, var(--color-white));
-}
-
-.cc-shade-4 {
-  background: color-mix(in srgb, var(--color-clay) 32%, var(--color-white));
-}
-
-.cc-ticks {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-s3);
-  margin-bottom: var(--space-s4);
-}
-
-.cc-rows > li {
-  align-items: flex-start;
-}
-
-.cc-swatch {
-  flex: none;
-  width: 10px;
-  height: 10px;
-  margin-top: 6px;
-  border-radius: 3px;
-}
-
-.cc-swatch-none {
-  box-shadow: inset 0 0 0 1px var(--color-border);
-}
-
-.cc-due-soon {
-  background: color-mix(in srgb, var(--color-warning) 18%, var(--color-white));
-}
-
-.cc-due-late {
-  background: var(--color-error);
-  color: var(--color-white);
-}
 
 /* Loading effect (#87, option A): while a busy zone loads for more than
    150ms, its cards' content dims and a thin clay bar slides along their top;
@@ -2971,49 +1256,10 @@ label.agree input {
 }
 
 /* Bank chips on Accounts (#84, option A): between net worth and the lists. */
-.bank-chips {
-  margin-bottom: var(--space-s4);
-}
-
-.chip-outline {
-  background: transparent;
-  border: 1px solid var(--color-border);
-}
-
-.chip-count {
-  margin-left: var(--space-s1);
-  font-size: 12px;
-  opacity: 0.75;
-}
 
 /* Amount, with the bank under it on Transactions (#83, option B). */
-.tx-amount {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  flex: none;
-  max-width: 45%;
-  text-align: right;
-}
-
-.tx-bank {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
 /* Reconnect (#51): the bank's buttons in one row. */
-.bank-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-s2);
-  align-items: center;
-}
-
-.bank-actions .chip-danger {
-  align-self: center;
-}
 
 /* Debts page (#27): rings on top with three facts, then one card per debt
    (two per row on web) with a notched gauge. */
@@ -3037,166 +1283,6 @@ label.agree input {
   }
 }
 
-.rings-chart {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-s5);
-  align-items: center;
-}
-
-@media (min-width: 900px) {
-  .rings-chart {
-    grid-template-columns: 330px minmax(0, 1fr);
-    gap: var(--space-s6);
-  }
-}
-
-.rings-svg {
-  position: relative;
-  width: min(330px, 100%);
-  margin: 0 auto;
-  container-type: inline-size;
-}
-
-.rings-svg svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.rings-track {
-  fill: none;
-  stroke: var(--color-sand);
-  transform-origin: center;
-  transform-box: view-box;
-  opacity: 0;
-  transform: scale(0.6);
-}
-
-.rings-chart.is-ready .rings-track {
-  opacity: 1;
-  transform: none;
-  transition:
-    transform 600ms cubic-bezier(0.2, 0.9, 0.25, 1.15) var(--delay),
-    opacity 400ms ease-out var(--delay);
-}
-
-.rings-arc {
-  fill: none;
-  cursor: pointer;
-  transition:
-    stroke-dasharray 1100ms cubic-bezier(0.2, 0.85, 0.25, 1.05) var(--arc-delay),
-    opacity 200ms ease-out;
-}
-
-.rings-arc.is-dim {
-  opacity: 0.28;
-}
-
-.rings-arc.is-hot {
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-clay-deep) 45%, transparent));
-}
-
-.rings-center {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  pointer-events: none;
-}
-
-.rings-center-value {
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.15;
-}
-
-.rings-center-label {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  line-height: 1.3;
-}
-
-.rings-legend {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s2);
-}
-
-.rings-legend li {
-  opacity: 0;
-  transform: translateX(24px);
-}
-
-.rings-chart.is-ready .rings-legend li {
-  opacity: 1;
-  transform: none;
-  transition:
-    transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--delay),
-    opacity 300ms ease-out var(--delay);
-}
-
-.rings-legend-row {
-  display: grid;
-  grid-template-columns: 12px minmax(0, 1fr) auto;
-  gap: var(--space-s1) var(--space-s3);
-  align-items: center;
-  width: 100%;
-  padding: var(--space-s2) var(--space-s3);
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  background: none;
-  border: none;
-  border-radius: var(--radius-input);
-  cursor: pointer;
-  transition:
-    background 200ms ease-out,
-    opacity 200ms ease-out;
-}
-
-.rings-legend-row:hover,
-.rings-legend-row.is-hot,
-.rings-legend-row:focus-visible {
-  background: color-mix(in srgb, var(--color-clay) 8%, var(--color-white));
-  outline: none;
-}
-
-.rings-legend-row.is-dim {
-  opacity: 0.45;
-}
-
-.rings-swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 4px;
-}
-
-.rings-legend-amount {
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.rings-legend-bar {
-  grid-column: 2 / 4;
-  height: 6px;
-  border-radius: var(--radius-button);
-  background: var(--color-sand);
-  overflow: hidden;
-}
-
-.rings-legend-bar i {
-  display: block;
-  height: 100%;
-  transition: width 900ms cubic-bezier(0.2, 0.8, 0.2, 1) var(--delay);
-}
-
 .panel.debts-facts {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -3215,14 +1301,6 @@ label.agree input {
 .debts-facts strong {
   font-size: 18px;
   font-variant-numeric: tabular-nums;
-}
-
-.debts-facts > .is-ok {
-  background: color-mix(in srgb, var(--color-sage) 14%, var(--color-white));
-}
-
-.debts-facts > .is-late {
-  background: color-mix(in srgb, var(--color-error) 12%, var(--color-white));
 }
 
 .debts-group {
@@ -3288,11 +1366,6 @@ label.agree input {
   margin: 0 0 var(--space-s2);
 }
 
-.notch-gauge {
-  display: flex;
-  gap: 4px;
-}
-
 .notch {
   flex: 1;
   height: 16px;
@@ -3302,121 +1375,18 @@ label.agree input {
 }
 
 /* Phones (#27): ☰ menu in the header. */
-.mobile-menu {
-  position: relative;
-}
-
-.menu-button {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-input);
-  border: 1px solid var(--color-border);
-  background: var(--color-white);
-  color: var(--color-cocoa);
-  cursor: pointer;
-}
-
-.menu-button:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
-
-.mobile-menu-list {
-  position: absolute;
-  right: 0;
-  top: calc(100% + var(--space-s2));
-  z-index: 50;
-  width: 240px;
-  display: flex;
-  flex-direction: column;
-  padding: var(--space-s1);
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-  box-shadow: var(--card-shade);
-}
-
-.mobile-menu-list hr {
-  border: none;
-  border-top: 1px solid var(--color-border);
-  margin: var(--space-s1) 0;
-}
-
-.mobile-menu-me {
-  display: flex;
-  gap: var(--space-s2);
-  align-items: center;
-  margin: 0;
-  padding: var(--space-s2) var(--space-s3);
-}
 
 @media (prefers-reduced-motion: reduce) {
-  .rings-track,
-  .rings-legend li {
-    opacity: 1;
-    transform: none;
-  }
-
-  .rings-chart.is-ready .rings-track,
-  .rings-chart.is-ready .rings-legend li,
-  .rings-arc,
-  .rings-legend-bar i,
   .notch {
     transition: none;
   }
 }
 
 /* Settings → Legal (#36, option A): the whole row opens the page. */
-.settings-link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-  width: 100%;
-  margin: calc(-1 * var(--space-s2)) calc(-1 * var(--space-s3));
-  padding: var(--space-s2) var(--space-s3);
-  border-radius: var(--radius-input);
-  color: var(--color-cocoa);
-  text-decoration: none;
-}
-
-.settings-link svg {
-  color: var(--color-text-secondary);
-  flex: none;
-}
-
-.settings-link:hover {
-  background: color-mix(in srgb, var(--color-clay) 6%, var(--color-white));
-}
-
-.settings-link:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
 
 /* Phone layout fixes (#97, Dinesh picked A for all four). */
 
 /* Home credit cards: name and amount on one line, details full width. */
-.cc-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-s3);
-  margin: 0;
-}
-
-.cc-top .amount {
-  white-space: nowrap;
-}
-
-.cc-rows .grow > p {
-  margin: 0;
-}
-
-.cc-rows .grow > p + p {
-  margin-top: 2px;
-}
 
 @media (max-width: 600px) {
   /* The total goes under the heading instead of squeezing it. */
@@ -3429,36 +1399,9 @@ label.agree input {
 
 /* Transactions: the bank under the amount on web, beside the category on
    phones (#83 B on web, #97 A on phones). */
-.tx-bank-inline {
-  display: none;
-}
-
-@media (max-width: 600px) {
-  .tx-amount .tx-bank {
-    display: none;
-  }
-
-  .tx-bank-inline {
-    display: inline;
-  }
-
-  .tx-row .tx-meta {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .tx-row .tx-meta .tx-owner {
-    display: inline-flex;
-    margin-right: 6px;
-    vertical-align: middle;
-  }
-}
 
 /* Tap targets on phones and tablets (#97, A): same look, bigger areas. */
 @media (max-width: 1023px) {
-  .scope-switch button,
   .segmented button {
     min-height: 40px;
   }
@@ -3477,46 +1420,9 @@ label.agree input {
   }
 
   /* Dots can't reach 44px: each one's area grows into the gaps around it. */
-  .day-dot {
-    position: relative;
-  }
-
-  .day-dot::after {
-    content: '';
-    position: absolute;
-    inset: -1px;
-  }
 }
 
 /* Day card arrows (#97): phones and tablets only. */
-.dots-card-step {
-  display: none;
-}
-
-@media (max-width: 1023px) {
-  .dots-card {
-    pointer-events: auto;
-  }
-
-  .dots-card-step {
-    display: flex;
-    justify-content: space-between;
-    margin: -4px -4px 4px;
-  }
-
-  .dots-card-step button {
-    width: 44px;
-    height: 36px;
-    font: inherit;
-    font-size: 22px;
-    line-height: 1;
-    color: var(--color-cocoa);
-    background: var(--color-cream);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-input);
-    cursor: pointer;
-  }
-}
 
 /* Sign out after inactivity (#91, Dinesh picked A and note 1). */
 .idle-dialog::backdrop {
@@ -3833,82 +1739,7 @@ label.agree input {
   text-transform: uppercase;
 }
 
-.codes-dialog {
-  padding: 0;
-  max-width: 440px;
-}
-
-.codes-dialog .card {
-  border: none;
-  max-width: none;
-}
-
 /* Settings: your authenticators under "Two-step sign-in". */
-.settings-row-wrap {
-  flex-wrap: wrap;
-}
-
-.auth-list {
-  flex-basis: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s2);
-  padding: var(--space-s2) var(--space-s3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-  background: color-mix(in srgb, var(--color-white) 60%, transparent);
-}
-
-.auth-items {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.auth-items li {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-  padding: var(--space-s2) 0;
-  border-top: 1px solid var(--color-border);
-  font-size: 14px;
-}
-
-.auth-items li:first-child {
-  border-top: none;
-}
-
-.auth-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  flex: none;
-  background: color-mix(in srgb, var(--color-sage) 16%, var(--color-white));
-  color: var(--color-sage-deep);
-}
-
-.auth-add {
-  align-self: flex-end;
-}
-
-.codes-meter {
-  display: flex;
-  gap: 3px;
-  margin-top: var(--space-s1);
-}
-
-.codes-meter i {
-  width: 14px;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--color-sand);
-}
-
-.codes-meter i.on {
-  background: var(--color-sage);
-}
 
 /* Print: only the codes (Print on the backup codes screen). */
 @media print {
@@ -3934,29 +1765,13 @@ label.agree input {
 /* Tidier sidebar (#122, Dinesh picked P, A and M2): a side-panel icon with
    no circle around it, a smaller menu and profile card, and Terms and
    Privacy as one quiet line in the menus. */
-.sidebar-top .sidebar-toggle {
-  border: none;
-  border-radius: var(--space-s2);
-}
-
-.sidebar-top .sidebar-toggle:hover {
-  background: none;
-  color: var(--color-cocoa);
-}
 
 @media (min-width: 1024px) {
   /* 208px sidebar plus the 12px gap. */
-  .app-shell {
-    grid-template-columns: 220px minmax(0, 1fr);
-  }
 
   .sidebar {
     padding: 20px 14px;
     gap: 20px;
-  }
-
-  .sidebar-logo {
-    width: 120px;
   }
 
   .nav {
@@ -3975,139 +1790,15 @@ label.agree input {
     height: 18px;
   }
 
-  .app-shell.is-collapsed .nav a {
-    width: 40px;
-    height: 40px;
-    padding: var(--space-s2);
-  }
-
-  .profile-card {
-    min-height: 48px;
-    padding: 4px 10px;
-    gap: 9px;
-    border-radius: 12px;
-    font-size: 13.5px;
-  }
-
-  .profile-card .avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 13px;
-  }
-
-  .profile-card .small {
-    font-size: 12px;
-  }
-
   /* A little wider than the card, so Terms and Privacy fit on one line. */
-  .profile:not(.is-collapsed) .profile-menu {
-    right: auto;
-    width: 220px;
-  }
 }
 
 /* Collapsed: just the avatar, no circle around it (#122). The keyboard
    focus ring stays. */
-.profile.is-collapsed .profile-card {
-  padding: 0;
-  border: none;
-  background: none;
-}
-
-.menu-legal {
-  margin: 0;
-  padding: var(--space-s1) var(--space-s2) var(--space-s2);
-  white-space: nowrap;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-
-.menu-legal a {
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-color: var(--color-border);
-  text-underline-offset: 3px;
-  border-radius: 4px;
-}
-
-.menu-legal a:hover {
-  color: var(--color-cocoa);
-}
-
-.menu-legal a:focus-visible {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
 
 /* Budgets (#13, Dinesh's mix): household budgets are glass tiles with a pace
    line, budgets for one person are rows of day notches with today outlined.
    Green under 80%, amber from 80%, red past 100%. */
-.budgets-split {
-  display: grid;
-  grid-template-columns: minmax(0, 1.9fr) minmax(300px, 1fr);
-  gap: var(--space-s4);
-  align-items: start;
-}
-
-.budgets-split > :only-child {
-  grid-column: 1 / -1;
-}
-
-@media (max-width: 1100px) {
-  .budgets-split {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-.budgets-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-s2);
-}
-
-.budgets-head h2 {
-  margin: 0;
-}
-
-.pace-key {
-  display: flex;
-  gap: var(--space-s3);
-}
-
-.pace-key span {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.pace-key b {
-  display: inline-block;
-  width: 14px;
-  border-top: 2px solid var(--color-cocoa);
-}
-
-.pace-key b.dash {
-  border-top: 2px dashed var(--color-text-secondary);
-}
-
-.budget-note {
-  margin: 0;
-  padding: var(--space-s3) var(--space-s4);
-  border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--color-sage) 14%, rgb(255 255 255 / 0.8));
-}
-
-.budget-switch {
-  align-self: flex-start;
-}
-
-.budget-tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: var(--space-s3);
-}
 
 .budget-tile {
   display: flex;
@@ -4121,121 +1812,12 @@ label.agree input {
   box-shadow: var(--glass-highlight), var(--card-shade);
 }
 
-.budget-top {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s2);
-}
-
-.budget-top h3,
-.budget-row-head h3 {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.budget-top .pace {
-  margin-left: auto;
-}
-
-.budget-nums {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: var(--space-s2);
-}
-
-.budget-left {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 18px;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-.budget-left.is-over {
-  color: var(--color-error);
-}
-
-.budget-edit {
-  align-self: flex-end;
-}
-
 .pace {
   font-size: 11.5px;
   font-weight: 600;
   border-radius: var(--radius-button);
   padding: 3px 9px;
   white-space: nowrap;
-}
-
-.pace-on {
-  background: color-mix(in srgb, var(--color-sage) 16%, var(--color-white));
-  color: var(--color-sage-deep);
-}
-
-.pace-ahead {
-  background: color-mix(in srgb, var(--color-warning) 20%, var(--color-white));
-  color: #7a5210;
-}
-
-.pace-over {
-  background: color-mix(in srgb, var(--color-error) 12%, var(--color-white));
-  color: var(--color-error);
-}
-
-.pace-full {
-  background: var(--color-sand);
-  color: var(--color-cocoa);
-}
-
-.pace-line {
-  display: block;
-  width: 100%;
-  height: 58px;
-  --line: var(--color-sage-deep);
-}
-
-.tone-line-warn {
-  --line: var(--color-warning);
-}
-
-.tone-line-over {
-  --line: var(--color-error);
-}
-
-.pace-limit {
-  stroke: var(--color-border);
-  stroke-width: 1;
-}
-
-.pace-even {
-  stroke: var(--color-text-secondary);
-  stroke-opacity: 0.6;
-  stroke-width: 1.5;
-  stroke-dasharray: 4 4;
-}
-
-.pace-area {
-  fill: var(--line);
-  opacity: 0.12;
-}
-
-.pace-spent {
-  fill: none;
-  stroke: var(--line);
-  stroke-width: 2.2;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-
-.pace-dot {
-  fill: var(--line);
-}
-
-.pace-line * {
-  vector-effect: non-scaling-stroke;
 }
 
 .budget-row {
@@ -4251,49 +1833,11 @@ label.agree input {
   padding-top: 0;
 }
 
-.budget-row-head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-}
-
-.budget-row-head .grow {
-  min-width: 0;
-}
-
-.budget-row-head h3 {
-  display: inline;
-}
-
-.budget-row-foot {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-s2);
-}
-
-.budget-row-end {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-s3);
-}
-
 .day-notches {
   display: flex;
   gap: 3px;
   --from: var(--color-sage-light);
   --to: var(--color-sage-deep);
-}
-
-.day-notches.notch-warn {
-  --from: color-mix(in srgb, var(--color-warning) 55%, var(--color-white));
-  --to: var(--color-warning);
-}
-
-.day-notches.notch-over {
-  --from: var(--color-clay);
-  --to: var(--color-error);
 }
 
 .day-notches i {
@@ -4312,22 +1856,6 @@ label.agree input {
   outline-offset: 1px;
 }
 
-.budget-period {
-  border: 0;
-  padding: 0;
-  margin: 0;
-}
-
-.budget-period legend {
-  padding: 0;
-  margin-bottom: var(--space-s2);
-  font-weight: 500;
-}
-
-.dialog-actions .budget-delete {
-  margin-right: auto;
-}
-
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .budget-tile {
     background: var(--color-white);
@@ -4340,12 +1868,6 @@ label.agree input {
     background: var(--color-white);
     border-color: var(--color-border);
   }
-}
-
-.budgets-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s4);
 }
 
 /* Dialogs are solid, so their chips need a visible edge. */
@@ -4415,124 +1937,9 @@ h1[tabindex='-1']:focus {
    logic (a labelled split bar), then the data (a plain bar and words per
    job). Each job has one colour, used for its dot, its part of the split
    and its bar; the words always carry the meaning too. */
-.job-essentials,
-.job-needs {
-  --c: var(--color-sage-deep);
-}
-
-.job-guilt_free,
-.job-wants {
-  --c: var(--color-warning);
-}
-
-.job-debt {
-  --c: var(--color-cocoa);
-}
-
-.job-short_term,
-.job-save {
-  --c: var(--color-sage);
-}
-
-.job-long_term {
-  --c: var(--color-clay);
-}
-
-.job-own {
-  --c: var(--color-sand);
-}
 
 .plan {
   gap: var(--space-s3);
-}
-
-.plan-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-s3);
-  flex-wrap: wrap;
-}
-
-.plan-answer {
-  margin: 0;
-  font-size: 22px;
-  overflow-wrap: break-word;
-  min-width: 0;
-}
-
-.plan-detail,
-.plan-income,
-.plan-cant,
-.plan-row-foot {
-  margin: 0;
-}
-
-.plan-detail {
-  margin-top: var(--space-s1);
-}
-
-.plan-template {
-  background: var(--color-sand);
-  border-radius: var(--radius-button);
-  padding: var(--space-s1) var(--space-s2);
-  white-space: nowrap;
-}
-
-.plan-step {
-  margin: var(--space-s2) 0 0;
-  font-size: 15px;
-}
-
-.plan-split,
-.plan-mini {
-  display: flex;
-  gap: 3px;
-}
-
-.plan-split {
-  height: 14px;
-}
-
-.plan-mini {
-  height: 8px;
-}
-
-.plan-seg,
-.plan-mini span {
-  min-width: 4px;
-  border-radius: 4px;
-  background: var(--c);
-}
-
-.plan-key {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: var(--space-s2);
-}
-
-.plan-key li,
-.plan-name {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-s2);
-}
-
-.plan-dot {
-  flex: none;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--c);
-}
-
-.plan-rows {
-  list-style: none;
-  margin: 0;
-  padding: 0;
 }
 
 .plan-row {
@@ -4547,17 +1954,6 @@ h1[tabindex='-1']:focus {
   border-top: 0;
 }
 
-.plan-row-top {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s2);
-  flex-wrap: wrap;
-}
-
-.plan-name {
-  font-weight: 700;
-}
-
 .plan-words {
   margin-left: auto;
   font-family: var(--font-heading);
@@ -4565,179 +1961,11 @@ h1[tabindex='-1']:focus {
   white-space: nowrap;
 }
 
-.plan-words.is-over {
-  color: var(--color-error);
-}
-
-.plan-words.is-done {
-  color: var(--color-sage-deep);
-}
-
-.plan-bar {
-  height: 10px;
-  border-radius: 5px;
-  overflow: hidden;
-  background: color-mix(in srgb, var(--c) 20%, var(--color-white));
-}
-
-.plan-bar i {
-  display: block;
-  height: 100%;
-  background: var(--c);
-  transform-origin: left;
-}
-
-.plan-bar.is-over i {
-  background: var(--color-error);
-}
-
-.plan-setup {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s2);
-}
-
-.plan-setup h2 {
-  margin: 0;
-}
-
-.plan-setup fieldset {
-  border: 0;
-  margin: 0;
-  padding: 0;
-}
-
-.plan-setup legend {
-  font-weight: 600;
-  margin-bottom: var(--space-s2);
-}
-
-.plan-templates {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: var(--space-s2);
-}
-
-.plan-template-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s2);
-  padding: var(--space-s3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  background: var(--color-white);
-  cursor: pointer;
-}
-
-.plan-template-card.is-on {
-  border: 2px solid var(--color-clay-deep);
-}
-
-.plan-template-card input {
-  position: absolute;
-  opacity: 0;
-}
-
-.plan-template-card:focus-within {
-  outline: 2px solid var(--color-clay-deep);
-  outline-offset: 2px;
-}
-
-.plan-own {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: var(--space-s2);
-}
-
-.plan-own legend,
-.plan-own p {
-  grid-column: 1 / -1;
-}
-
-.plan-own label {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s1);
-}
-
-.plan-actions {
-  display: flex;
-  gap: var(--space-s2);
-  flex-wrap: wrap;
-}
-
 /* Save and Cancel under an inline Settings form (#53). */
-.settings-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-}
-
-.settings-actions .link {
-  align-self: center;
-}
 
 /* Savings goals (#14, Dinesh picked the mix of draft 2): "This month" on top,
    goals as glass pots that fill, the opened goal as a forecast with its next
    milestone. The words always carry the meaning; the pictures are extra. */
-.goals-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s5);
-}
-
-.goals-answer {
-  margin: 0;
-  font-size: 22px;
-  overflow-wrap: break-word;
-  min-width: 0;
-}
-
-.goals-detail {
-  margin: 0;
-}
-
-.goals-checklist {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.goals-checklist li {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-s3);
-  padding: var(--space-s3) 0;
-  border-top: 1px solid var(--color-border);
-}
-
-.goals-checklist li:first-child {
-  border-top: 0;
-}
-
-.goals-check {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  margin-top: 2px;
-  border-radius: 50%;
-  border: 2px solid var(--color-border);
-}
-
-.goals-checklist .is-done .goals-check {
-  background: var(--color-sage-deep);
-  border-color: var(--color-sage-deep);
-  box-shadow: inset 0 0 0 4px var(--color-white);
-}
-
-.goals-check-name {
-  font-weight: 600;
-}
-
-.goals-checklist .is-done .goals-check-name {
-  color: var(--color-text-secondary);
-}
 
 .pots {
   list-style: none;
@@ -4777,168 +2005,8 @@ h1[tabindex='-1']:focus {
   outline-offset: 2px;
 }
 
-.pot-jar {
-  position: relative;
-  align-self: stretch;
-  height: 110px;
-  margin-bottom: var(--space-s1);
-  overflow: hidden;
-  border-radius: 18px 18px 26px 26px;
-  background: color-mix(in srgb, var(--c) 14%, var(--color-white));
-  border: 2px solid color-mix(in srgb, var(--c) 45%, var(--color-white));
-}
-
-.pot-fill {
-  position: absolute;
-  inset: 0;
-  background: var(--c);
-  transform-origin: bottom;
-}
-
-.pot-locked {
-  border-color: var(--color-border);
-  background: repeating-linear-gradient(135deg, var(--color-sand) 0 8px, var(--color-white) 8px 16px);
-}
-
-.pot-name {
-  font-weight: 700;
-  overflow-wrap: anywhere;
-}
-
-.pot-left {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 18px;
-  font-variant-numeric: tabular-nums;
-}
-
-.goal-detail h2,
-.goal-detail p,
-.goal-opened {
-  margin: 0;
-}
-
-.goal-forecast {
-  font-family: var(--font-heading);
-  font-size: 20px;
-  font-weight: 700;
-  overflow-wrap: break-word;
-}
-
-.goal-chart {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.goal-chart-line {
-  fill: none;
-  stroke: var(--c);
-  stroke-width: 3;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.goal-chart-proj {
-  stroke: var(--c);
-  stroke-width: 2;
-  stroke-dasharray: 5 6;
-  vector-effect: non-scaling-stroke;
-}
-
-.goal-chart-target {
-  stroke: var(--color-text-secondary);
-  stroke-dasharray: 2 4;
-  vector-effect: non-scaling-stroke;
-}
-
-.goal-chart-by {
-  stroke: var(--color-border);
-  vector-effect: non-scaling-stroke;
-}
-
-.goal-chart-dot {
-  fill: var(--color-sage-deep);
-}
-
-.goal-facts {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.goal-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s3);
-  flex-wrap: wrap;
-}
-
-.goal-actions .link {
-  align-self: center;
-}
-
-.goal-fills,
-.goal-who {
-  border: 0;
-  margin: 0;
-  padding: 0;
-}
-
-.goal-fills {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s2);
-}
-
-.goal-fills legend,
-.goal-who legend {
-  font-weight: 600;
-  margin-bottom: var(--space-s2);
-}
-
 /* How it fills (#14): two left-aligned choices with a hint; the picked one
    gets a dark outline. The radio drops the text box padding. */
-.goal-fill {
-  flex-direction: row;
-  align-items: flex-start;
-  gap: var(--space-s3);
-  padding: var(--space-s3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-input);
-  background: var(--color-white);
-  font-weight: 400;
-  cursor: pointer;
-}
-
-.goal-fill:has(input:checked) {
-  border-color: var(--color-cocoa);
-  box-shadow: inset 0 0 0 1px var(--color-cocoa);
-}
-
-.goal-fill:has(input:disabled) {
-  cursor: default;
-  color: var(--color-text-secondary);
-}
-
-.goal-fill input {
-  flex: none;
-  width: 18px;
-  height: 18px;
-  margin: 3px 0 0;
-  padding: 0;
-  accent-color: var(--color-cocoa);
-}
-
-.goal-fill strong {
-  display: block;
-  font-weight: 600;
-}
-
-.goal-fill small {
-  color: var(--color-text-secondary);
-  font-size: 13px;
-}
 
 /* Month picker (#14, the mix): a field in words, then quick picks over a
    month grid. Solid, like the dialog it sits in. */
@@ -5069,15 +2137,4 @@ h1[tabindex='-1']:focus {
 .month-cell:focus-visible {
   outline: 2px solid var(--color-clay-deep);
   outline-offset: 2px;
-}
-
-.goal-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: var(--space-s2);
-}
-
-.goals-card-title {
-  margin: 0;
-  font-weight: 700;
 }

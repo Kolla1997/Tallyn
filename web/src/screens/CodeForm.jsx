@@ -107,7 +107,7 @@ export default function CodeForm({ factorIds, button, onVerified, autoFocus = tr
             <input
               key={i}
               ref={(el) => (boxes.current[i] = el)}
-              className="code-box"
+              className={d ? 'code-box is-filled' : 'code-box'}
               inputMode="numeric"
               autoComplete={i === 0 ? 'one-time-code' : 'off'}
               aria-label={`Digit ${i + 1} of 6`}

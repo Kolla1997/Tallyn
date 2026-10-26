@@ -1,4 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Plus, Lock, Check } from 'lucide-react'
+import { curveLinear } from '@visx/curve'
+import { LineChart } from '@/components/charts/line-chart'
+import { Line } from '@/components/charts/line'
+import { XAxis } from '@/components/charts/x-axis'
 import LoadFailed from '../components/LoadFailed.jsx'
 import MonthPicker from '../components/MonthPicker.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
@@ -8,19 +13,25 @@ import { forecast, forecastWords, monthName, nextMilestone, perMonth, summary, t
 import { formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { useRetry } from '../lib/retry.js'
-import { PageHead } from './Shell.jsx'
+import { Head, Panel, Chips, Pill, NUM, MUTED, OWE } from '../components/calm/ui.jsx'
 
-// Savings goals (#14, Dinesh picked the mix of draft 2, part by part):
-// "This month" on top (what to put aside, ticked as money lands), every goal
-// as a glass pot that fills, and the goal you open as a forecast with its
-// next milestone. Tallyn never moves money; a goal follows one of its
-// person's accounts or is updated by hand. Progress is never shown to someone
-// who can't already see the balance behind it (the server leaves it out).
+// Savings goals (#14), in the calm redesign (#187, the #185 draft): "This month" on top (what
+// to put aside, ticked as money lands, the answer first), every goal as a pot that fills, and
+// the goal you open as a forecast drawn by Bklit, with its next milestone. Tallyn never moves
+// money; a goal follows one of its person's accounts or is updated by hand. Progress is never
+// shown to someone who can't already see the balance behind it (the server leaves it out).
 
 const KID = new Set(['teen', 'child'])
-const COLOURS = ['clay-deep', 'sage-deep', 'cocoa', 'sage', 'clay']
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'INR', 'MXN']
+const SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const today = () => new Date().toLocaleDateString('en-CA') // YYYY-MM-DD, local
+const NOTE = `m-0 text-[13px] ${MUTED}`
+const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 text-[14px]'
+const DIALOG =
+  'm-auto max-h-[90svh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border-0 bg-white dark:bg-zinc-900 p-5 text-zinc-900 dark:text-white shadow-2xl backdrop:bg-black/40'
+const FILL =
+  'flex cursor-pointer items-start gap-2 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 has-[:checked]:border-zinc-900 dark:has-[:checked]:border-white'
+const DIALOG_H = 'm-0 mb-1 font-[family-name:var(--font-heading)] text-[18px] font-semibold'
 
 export default function GoalsPage({ me, household, refreshKey }) {
   const [goals, setGoals] = useState(null)
@@ -69,14 +80,14 @@ export default function GoalsPage({ me, household, refreshKey }) {
   }
 
   return (
-    <>
-      <PageHead title="Goals" sub="Save toward what matters. Tallyn can't move money: move it in your bank's app.">
+    <div className="calm">
+      <Head title="Goals" sub="Save toward what matters. Tallyn can't move money: move it in your bank's app.">
         {canCreate && (
-          <button className="btn" onClick={() => setDialog({ kind: 'goal' })}>
+          <Pill icon={Plus} onClick={() => setDialog({ kind: 'goal' })}>
             New goal
-          </button>
+          </Pill>
         )}
-      </PageHead>
+      </Head>
 
       {!goals ? (
         failed ? (
@@ -85,78 +96,87 @@ export default function GoalsPage({ me, household, refreshKey }) {
           <TallynLoader />
         )
       ) : list.length === 0 ? (
-        <section className="panel empty-state">
-          <h2>No goals yet</h2>
-          <p className="muted">
+        <Panel id="goals-empty" title="No goals yet">
+          <p className={`m-0 text-[14px] ${MUTED}`}>
             Set one for a trip, a school fund or a rainy day. It can follow a savings account, so it fills on its own, or you can update it yourself.
           </p>
-        </section>
+        </Panel>
       ) : (
-        <div className="goals-page">
-          <section className="panel goals-month" aria-labelledby="goals-month-h">
-            <h2 id="goals-month-h" className="goals-answer">
-              {title}
-            </h2>
-            <p className="muted goals-detail">
-              {detail}{' '}
-              {sum.count > 0 && (
-                <>
-                  You&apos;ve saved {money(sum.saved)} of {money(sum.target)} across your {sum.count === 1 ? 'goal' : 'goals'} in {home}
-                  {sum.other > 0 && `, plus ${sum.other} in another currency`}.
-                </>
+        <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-12 [&>*]:min-w-0">
+          <div className={`grid gap-3 ${selected ? 'lg:col-span-7' : 'lg:col-span-12'}`}>
+            <section className="calm-glass min-w-0 rounded-2xl p-4" aria-labelledby="goals-month-h">
+              <h2 id="goals-month-h" className="m-0 font-[family-name:var(--font-heading)] text-[20px] font-semibold">
+                {title}
+              </h2>
+              <p className={`m-0 mt-0.5 text-[14px] ${MUTED}`}>
+                {detail}{' '}
+                {sum.count > 0 && (
+                  <>
+                    You&apos;ve saved {money(sum.saved)} of {money(sum.target)} across your {sum.count === 1 ? 'goal' : 'goals'} in {home}
+                    {sum.other > 0 && `, plus ${sum.other} in another currency`}.
+                  </>
+                )}
+              </p>
+              {month.length > 0 && (
+                <ul className="m-0 mt-3 grid list-none gap-2 p-0 sm:grid-cols-2">
+                  {month.map((s) => (
+                    <li key={s.goal.id} className="flex items-start gap-2.5 rounded-xl bg-white/70 dark:bg-zinc-800/60 p-3">
+                      <span
+                        className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full ${
+                          s.done ? 'bg-[var(--color-redesign-in)] text-white' : 'border-2 border-zinc-300 dark:border-zinc-700'
+                        }`}
+                        aria-hidden="true"
+                      >
+                        {s.done && <Check className="size-3.5" />}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-[14px] font-semibold">
+                          Put aside {money(s.due, s.goal.currency)} for {s.goal.name}
+                        </span>
+                        <span className={`block ${NOTE}`}>
+                          {s.done
+                            ? `Done: ${money(s.added, s.goal.currency)} added this month`
+                            : `Not yet this month. ${s.goal.account_id ? 'It ticks when the account grows.' : 'It ticks when you update the amount.'}`}
+                        </span>
+                      </span>
+                      <span className="sr-only">{s.done ? 'Done' : 'Not yet'}</span>
+                    </li>
+                  ))}
+                </ul>
               )}
-            </p>
-            {month.length > 0 && (
-              <ul className="goals-checklist">
-                {month.map((s) => (
-                  <li key={s.goal.id} className={s.done ? 'is-done' : ''}>
-                    <span className="goals-check" aria-hidden="true" />
-                    <span className="grow">
-                      <span className="block goals-check-name">
-                        Put aside {money(s.due, s.goal.currency)} for {s.goal.name}
-                      </span>
-                      <span className="small muted">
-                        {s.done
-                          ? `Done: ${money(s.added, s.goal.currency)} added this month`
-                          : `Not yet this month. ${s.goal.account_id ? 'It ticks when the account grows.' : 'It ticks when you update the amount.'}`}
-                      </span>
-                    </span>
-                    <span className="sr-only">{s.done ? 'Done' : 'Not yet'}</span>
+            </section>
+
+            <section aria-labelledby="goals-pots-h">
+              <h2 id="goals-pots-h" className="m-0 mb-2 font-[family-name:var(--font-heading)] text-[15px] font-semibold">
+                Your goals
+              </h2>
+              <ul className="m-0 grid list-none grid-cols-1 gap-3 p-0 min-[420px]:grid-cols-2 sm:grid-cols-3">
+                {list.map((g) => (
+                  <li key={g.id}>
+                    <Pot
+                      goal={g}
+                      owner={g.owner_user_id === me.user_id ? null : whoName(g.owner_user_id)}
+                      money={money}
+                      selected={selected?.id === g.id}
+                      onPick={() => pick(g.id)}
+                    />
                   </li>
                 ))}
               </ul>
-            )}
-          </section>
-
-          <section className="panel" aria-labelledby="goals-pots-h">
-            <h2 id="goals-pots-h">Your goals</h2>
-            <ul className="pots">
-              {list.map((g, i) => (
-                <li key={g.id}>
-                  <Pot
-                    goal={g}
-                    colour={COLOURS[i % COLOURS.length]}
-                    owner={g.owner_user_id === me.user_id ? null : whoName(g.owner_user_id)}
-                    money={money}
-                    selected={selected?.id === g.id}
-                    onPick={() => pick(g.id)}
-                  />
-                </li>
-              ))}
-            </ul>
-          </section>
+            </section>
+          </div>
 
           {selected && (
-            <GoalDetail
-              ref={detailRef}
-              goal={selected}
-              colour={COLOURS[list.indexOf(selected) % COLOURS.length]}
-              now={now}
-              money={money}
-              whoName={whoName}
-              onUpdate={() => setDialog({ kind: 'saved', goal: selected })}
-              onEdit={() => setDialog({ kind: 'goal', goal: selected })}
-            />
+            <div ref={detailRef} className="lg:col-span-5">
+              <GoalDetail
+                goal={selected}
+                now={now}
+                money={money}
+                whoName={whoName}
+                onUpdate={() => setDialog({ kind: 'saved', goal: selected })}
+                onEdit={() => setDialog({ kind: 'goal', goal: selected })}
+              />
+            </div>
           )}
         </div>
       )}
@@ -188,32 +208,47 @@ export default function GoalsPage({ me, household, refreshKey }) {
           }}
         />
       )}
-    </>
+    </div>
   )
 }
 
-// One goal as a glass pot that fills from the bottom (from E). A goal whose
-// progress is private shows a locked pot with its name and target only.
-function Pot({ goal, colour, owner, money, selected, onPick }) {
+// One goal as a pot that fills (a green bar). A goal whose progress is private shows a locked
+// pot with its name and target only.
+function Pot({ goal, owner, money, selected, onPick }) {
   const priv = goal.saved_minor == null
   const share = priv ? 0 : Math.min(1, goal.saved_minor / goal.target_minor)
   const left = priv ? 0 : Math.max(0, goal.target_minor - goal.saved_minor)
   return (
-    <button type="button" className={`pot job-${colour}`} style={{ '--c': `var(--color-${colour})` }} aria-pressed={selected} onClick={onPick} disabled={priv}>
-      <span className={`pot-jar${priv ? ' pot-locked' : ''}`} aria-hidden="true">
-        {!priv && <span className="pot-fill" style={{ transform: `scaleY(${share})` }} />}
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={onPick}
+      disabled={priv}
+      className={`flex h-full w-full flex-col gap-2 rounded-2xl border p-3 text-left transition-[border-color] duration-150 ${
+        priv
+          ? 'cursor-default border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent'
+          : 'calm-solid border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 aria-pressed:border-zinc-900 dark:aria-pressed:border-white'
+      }`}
+    >
+      <span className="relative block h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800" aria-hidden="true">
+        {!priv && <span className="absolute inset-y-0 left-0 block rounded-full bg-[var(--color-redesign-in)]" style={{ width: `${share * 100}%` }} />}
       </span>
-      <span className="pot-name">{goal.name}</span>
-      {owner && <span className="small muted">For {owner}</span>}
+      <span className="flex items-center gap-1.5 text-[14px] font-semibold">
+        {priv && <Lock className="size-3.5 text-zinc-500 dark:text-zinc-400" aria-hidden="true" />}
+        {goal.name}
+      </span>
+      {owner && <span className={NOTE}>For {owner}</span>}
       {priv ? (
         <>
-          <span className="small muted">Target {money(goal.target_minor, goal.currency)}</span>
-          <span className="pace pace-full">Progress is private</span>
+          <span className={NOTE}>Target {money(goal.target_minor, goal.currency)}</span>
+          <span className="w-fit rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[12px] font-semibold text-zinc-700 dark:text-zinc-200">
+            Progress is private
+          </span>
         </>
       ) : (
         <>
-          <span className="pot-left">{left > 0 ? `${money(left, goal.currency)} to go` : 'Reached'}</span>
-          <span className="small muted">
+          <span className={`text-[15px] ${NUM}`}>{left > 0 ? `${money(left, goal.currency)} to go` : 'Reached'}</span>
+          <span className={NOTE}>
             {money(goal.saved_minor, goal.currency)} of {money(goal.target_minor, goal.currency)}
             {goal.by_month && ` by ${monthName(goal.by_month)}`}
           </span>
@@ -223,8 +258,8 @@ function Pot({ goal, colour, owner, money, selected, onPick }) {
   )
 }
 
-// The goal you opened: the forecast (from G) with its next milestone (from F).
-function GoalDetail({ ref, goal, colour, now, money, whoName, onUpdate, onEdit }) {
+// The goal you opened: the forecast with its chart and its next milestone.
+function GoalDetail({ goal, now, money, whoName, onUpdate, onEdit }) {
   const f = forecast(goal, now)
   const next = nextMilestone(goal)
   const each = perMonth(goal, now)
@@ -235,64 +270,89 @@ function GoalDetail({ ref, goal, colour, now, money, whoName, onUpdate, onEdit }
         ? `${whoName(goal.owner_user_id)} and ${whoName(goal.shared_with)}`
         : `Only ${whoName(goal.owner_user_id).toLowerCase() === 'you' ? 'you' : whoName(goal.owner_user_id)}`
   return (
-    <section ref={ref} className="panel goal-detail" aria-labelledby="goal-detail-h" style={{ '--c': `var(--color-${colour})` }}>
-      <p className="small muted goal-opened">Opened</p>
-      <h2 id="goal-detail-h">{goal.name}</h2>
-      <p className="goal-forecast">{forecastWords(f, goal)}</p>
-      {f?.pace > 0 && <p className="small muted">You&apos;ve added about {money(f.pace, goal.currency)} a month since you started.</p>}
+    <Panel id="goal-detail-h" title={goal.name} meta={`${money(goal.saved_minor, goal.currency)} of ${money(goal.target_minor, goal.currency)}`}>
+      <p className="m-0 font-[family-name:var(--font-heading)] text-[18px] font-semibold">{forecastWords(f, goal)}</p>
+      {f?.pace > 0 && <p className={NOTE}>You&apos;ve added about {money(f.pace, goal.currency)} a month since you started.</p>}
       {f?.lands && <Forecast goal={goal} f={f} now={now} />}
-      {next && (
-        <p className="goal-next">
-          <strong>{money(next.left, goal.currency)}</strong> to {next.name}.
-        </p>
-      )}
-      {each > 0 && (
-        <p className="small">
-          Put aside <strong>{money(each, goal.currency)} a month</strong> to get there by {monthName(goal.by_month)}.
-        </p>
-      )}
-      <ul className="goal-facts small muted">
-        <li>{goal.account_id ? `Follows ${goal.account ?? 'a savings account'}: updates at each bank update.` : 'Updated by hand.'}</li>
-        <li>Who can see it: {who}.</li>
+      <ul className="m-0 mt-3 grid list-none gap-1.5 p-0 text-[14px]">
+        {next && (
+          <li>
+            <strong className={NUM}>{money(next.left, goal.currency)}</strong> to {next.name}.
+          </li>
+        )}
+        {each > 0 && (
+          <li>
+            Put aside <strong className={NUM}>{money(each, goal.currency)} a month</strong> to get there by {monthName(goal.by_month)}.
+          </li>
+        )}
+        <li className="text-zinc-600 dark:text-zinc-300">
+          {goal.account_id ? `Follows ${goal.account ?? 'a savings account'}: updates at each bank update.` : 'Updated by hand.'}
+        </li>
+        <li className="text-zinc-600 dark:text-zinc-300">Who can see it: {who}.</li>
       </ul>
       {goal.can_manage && (
-        <div className="goal-actions">
+        <div className="mt-4 flex flex-wrap gap-2">
           {!goal.account_id && (
-            <button className="btn btn-secondary" onClick={onUpdate}>
+            <Pill quiet onClick={onUpdate}>
               Update amount
-            </button>
+            </Pill>
           )}
-          <button className="link small" onClick={onEdit}>
+          <Pill quiet onClick={onEdit}>
             Change goal
-          </button>
+          </Pill>
         </div>
       )}
-    </section>
+    </Panel>
   )
 }
 
-// Saved so far, month by month (solid), and where this pace goes (dotted).
-// The sentence above says it in words; the picture is extra.
+// Saved so far, month by month (solid green), where this pace goes (dashed), and the target
+// (grey). The sentence above says it in words; the picture is extra.
 function Forecast({ goal, f, now }) {
-  const W = 600
-  const H = 160
-  const P = 12
-  const idx = (iso) => +iso.slice(0, 4) * 12 + +iso.slice(5, 7)
-  const points = [...(goal.history ?? []).filter((h) => idx(h.month) < idx(now)), { month: now, saved_minor: goal.saved_minor }]
-  const start = idx(points[0].month)
-  const end = Math.max(idx(f.lands), goal.by_month ? idx(goal.by_month) : 0, idx(now) + 1)
-  const top = Math.max(goal.target_minor, goal.saved_minor) * 1.08
-  const X = (iso) => P + ((W - 2 * P) * (idx(iso) - start)) / (end - start)
-  const Y = (v) => H - P - ((H - 2 * P) * v) / top
-  const line = points.map((p) => `${X(p.month)},${Y(p.saved_minor)}`).join(' ')
+  const data = useMemo(() => {
+    const idx = (iso) => +iso.slice(0, 4) * 12 + +iso.slice(5, 7) - 1
+    const at = (i) => new Date(Math.floor(i / 12), i % 12, 1)
+    const known = new Map((goal.history ?? []).filter((h) => idx(h.month) < idx(now)).map((h) => [idx(h.month), h.saved_minor]))
+    known.set(idx(now), goal.saved_minor)
+    const start = Math.min(...known.keys())
+    const nowI = idx(now)
+    const landI = idx(f.lands)
+    const end = Math.max(landI, goal.by_month ? idx(goal.by_month) : 0, nowI + 1)
+    const rows = []
+    let last = 0
+    for (let i = start; i <= end; i++) {
+      if (i <= nowI) last = known.get(i) ?? last
+      const saved = i <= nowI ? last : Math.min(goal.target_minor, goal.saved_minor + ((goal.target_minor - goal.saved_minor) * (i - nowI)) / (landI - nowI))
+      rows.push({ date: at(i), saved: Math.round(saved), target: goal.target_minor })
+    }
+    return { rows, nowAt: nowI - start }
+  }, [goal, f.lands, now])
   return (
-    <svg className="goal-chart" viewBox={`0 0 ${W} ${H}`} aria-hidden="true">
-      <line x1={P} x2={W - P} y1={Y(goal.target_minor)} y2={Y(goal.target_minor)} className="goal-chart-target" />
-      {goal.by_month && <line x1={X(goal.by_month)} x2={X(goal.by_month)} y1={P} y2={H - P} className="goal-chart-by" />}
-      <polyline points={line} className="goal-chart-line" />
-      <line x1={X(now)} y1={Y(goal.saved_minor)} x2={X(f.lands)} y2={Y(goal.target_minor)} className="goal-chart-proj" />
-      <circle cx={X(f.lands)} cy={Y(goal.target_minor)} r="5" className="goal-chart-dot" />
-    </svg>
+    <div className="mt-3" aria-hidden="true">
+      <LineChart data={data.rows} aspectRatio="3 / 1" margin={{ left: 8, right: 8, top: 8, bottom: 24 }}>
+        <Line
+          dataKey="target"
+          curve={curveLinear}
+          fadeEdges={false}
+          stroke="var(--color-redesign-grey-2)"
+          strokeWidth={1}
+          dashFromIndex={0}
+          showHighlight={false}
+          animate={false}
+        />
+        <Line
+          dataKey="saved"
+          curve={curveLinear}
+          fadeEdges={false}
+          stroke="var(--color-redesign-in)"
+          strokeWidth={2}
+          dashFromIndex={data.nowAt}
+          animate={false}
+        />
+        <XAxis labels={data.rows.map((r) => `${SHORT[r.date.getMonth()]} ${String(r.date.getFullYear()).slice(2)}`)} />
+      </LineChart>
+      <p className={`mt-1 ${NOTE}`}>Solid: saved so far. Dashed: where this pace goes. Grey: the target.</p>
+    </div>
   )
 }
 
@@ -378,13 +438,15 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
   }
 
   return (
-    <dialog ref={ref} className="dialog" aria-labelledby="goal-title" onCancel={(e) => (busy ? e.preventDefault() : onClose())}>
-      <form onSubmit={save}>
-        <h2 id="goal-title">{goal ? 'Change goal' : 'New goal'}</h2>
+    <dialog ref={ref} className={DIALOG} aria-labelledby="goal-title" onCancel={(e) => (busy ? e.preventDefault() : onClose())}>
+      <form onSubmit={save} className="grid gap-3 text-[14px]">
+        <h2 id="goal-title" className={DIALOG_H}>
+          {goal ? 'Change goal' : 'New goal'}
+        </h2>
         {!goal && kids.length > 0 && !KID.has(household.role) && (
-          <label>
-            For
-            <select value={owner} onChange={(e) => (setOwner(e.target.value), setAccount(''))}>
+          <label className="grid gap-1">
+            <span className="font-semibold">For</span>
+            <select className={FIELD} value={owner} onChange={(e) => (setOwner(e.target.value), setAccount(''))}>
               {[me.user_id, ...kids.map((k) => k.user_id)].map((id) => (
                 <option key={id} value={id}>
                   {whoName(id)}
@@ -393,21 +455,28 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
             </select>
           </label>
         )}
-        <label>
-          Name
-          <input value={name} maxLength={80} onChange={(e) => setName(e.target.value)} placeholder="Beach trip" required />
+        <label className="grid gap-1">
+          <span className="font-semibold">Name</span>
+          <input className={FIELD} value={name} maxLength={80} onChange={(e) => setName(e.target.value)} placeholder="Beach trip" required />
         </label>
-        <fieldset className="goal-fills">
-          <legend>How it fills</legend>
-          <label className="goal-fill">
-            <input type="radio" name="fills" checked={fills === 'account'} onChange={() => setFills('account')} disabled={accounts.length === 0} />
+        <fieldset className="m-0 grid gap-2 border-0 p-0">
+          <legend className="mb-1 p-0 font-semibold">How it fills</legend>
+          <label className={FILL}>
+            <input
+              type="radio"
+              name="fills"
+              className="mt-1 accent-zinc-900 dark:accent-white"
+              checked={fills === 'account'}
+              onChange={() => setFills('account')}
+              disabled={accounts.length === 0}
+            />
             <span>
-              <strong>Follow a savings account</strong>
-              <small>Fills on its own from the balance.</small>
+              <strong className="block">Follow a savings account</strong>
+              <small className={NOTE}>Fills on its own from the balance.</small>
             </span>
           </label>
           {fills === 'account' && accounts.length > 0 && (
-            <select aria-label="Account it follows" value={account} onChange={(e) => setAccount(e.target.value)}>
+            <select className={FIELD} aria-label="Account it follows" value={account} onChange={(e) => setAccount(e.target.value)}>
               <option value="">Choose an account</option>
               {accounts.map((a) => (
                 <option key={a.id} value={a.id}>
@@ -417,24 +486,32 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
               ))}
             </select>
           )}
-          {accounts.length === 0 && <p className="small muted">No savings account to follow yet. Link a bank, or update it yourself.</p>}
-          <label className="goal-fill">
-            <input type="radio" name="fills" checked={fills === 'hand'} onChange={() => setFills('hand')} />
+          {accounts.length === 0 && <p className={NOTE}>No savings account to follow yet. Link a bank, or update it yourself.</p>}
+          <label className={FILL}>
+            <input type="radio" name="fills" className="mt-1 accent-zinc-900 dark:accent-white" checked={fills === 'hand'} onChange={() => setFills('hand')} />
             <span>
-              <strong>I&apos;ll update it myself</strong>
-              <small>For cash, or money Tallyn can&apos;t see.</small>
+              <strong className="block">I&apos;ll update it myself</strong>
+              <small className={NOTE}>For cash, or money Tallyn can&apos;t see.</small>
             </span>
           </label>
         </fieldset>
-        <div className="goal-row">
-          <label>
-            Target ({cur})
-            <input inputMode="decimal" autoComplete="off" value={target} onChange={(e) => setTarget(e.target.value)} placeholder="5000" required />
+        <div className={`grid gap-2 ${fills === 'hand' ? 'grid-cols-[1fr_104px]' : ''}`}>
+          <label className="grid gap-1">
+            <span className="font-semibold">Target ({cur})</span>
+            <input
+              className={FIELD}
+              inputMode="decimal"
+              autoComplete="off"
+              value={target}
+              onChange={(e) => setTarget(e.target.value)}
+              placeholder="5000"
+              required
+            />
           </label>
           {fills === 'hand' && (
-            <label>
-              Currency
-              <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+            <label className="grid gap-1">
+              <span className="font-semibold">Currency</span>
+              <select className={FIELD} value={currency} onChange={(e) => setCurrency(e.target.value)}>
                 {[...new Set([household.home_currency, ...CURRENCIES])].map((c) => (
                   <option key={c}>{c}</option>
                 ))}
@@ -443,20 +520,21 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
           )}
         </div>
         <MonthPicker label="By (optional)" value={by} onChange={setBy} today={today()} />
-        <fieldset className="chips goal-who">
-          <legend>Who can see it</legend>
-          {[
-            ['me', owner === me.user_id ? 'Only me' : `Only ${whoName(owner)}`],
-            ['member', owner === me.user_id ? 'Me and…' : `${whoName(owner)} and…`],
-            ['everyone', 'Everyone in the household'],
-          ].map(([v, label]) => (
-            <button key={v} type="button" className="chip" aria-pressed={visibility === v} onClick={() => setVisibility(v)}>
-              {label}
-            </button>
-          ))}
+        <fieldset className="m-0 grid gap-1 border-0 p-0">
+          <legend className="mb-1 p-0 font-semibold">Who can see it</legend>
+          <Chips
+            label="Who can see it"
+            options={[
+              ['me', owner === me.user_id ? 'Only me' : `Only ${whoName(owner)}`],
+              ['member', owner === me.user_id ? 'Me and…' : `${whoName(owner)} and…`],
+              ['everyone', 'Everyone in the household'],
+            ]}
+            value={visibility}
+            onChange={setVisibility}
+          />
         </fieldset>
         {visibility === 'member' && (
-          <select aria-label="Who else can see it" value={sharedWith} onChange={(e) => setSharedWith(e.target.value)}>
+          <select className={FIELD} aria-label="Who else can see it" value={sharedWith} onChange={(e) => setSharedWith(e.target.value)}>
             <option value="">Choose someone</option>
             {others.map((m) => (
               <option key={m.user_id} value={m.user_id}>
@@ -465,29 +543,34 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
             ))}
           </select>
         )}
-        {fills === 'account' && <p className="small muted">People who can&apos;t see that account&apos;s balance see the goal&apos;s name and target only.</p>}
+        {fills === 'account' && <p className={NOTE}>People who can&apos;t see that account&apos;s balance see the goal&apos;s name and target only.</p>}
         {error && (
-          <p className="error" role="alert">
+          <p className="m-0 font-semibold" style={OWE} role="alert">
             {error}
           </p>
         )}
-        <div className="dialog-actions">
-          {goal &&
-            (confirmDelete ? (
-              <button type="button" className="btn btn-danger" disabled={busy} onClick={remove}>
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+          {goal ? (
+            confirmDelete ? (
+              <Pill disabled={busy} onClick={remove}>
                 Yes, delete it
-              </button>
+              </Pill>
             ) : (
-              <button type="button" className="link small danger-link" onClick={() => setConfirmDelete(true)}>
+              <button type="button" className="text-[13px] font-semibold underline underline-offset-4" style={OWE} onClick={() => setConfirmDelete(true)}>
                 Delete goal
               </button>
-            ))}
-          <button type="button" className="btn btn-secondary" onClick={onClose} disabled={busy}>
-            Cancel
-          </button>
-          <button type="submit" className="btn" disabled={busy}>
-            {busy ? 'Saving…' : goal ? 'Save' : 'Create goal'}
-          </button>
+            )
+          ) : (
+            <span />
+          )}
+          <span className="flex gap-2">
+            <Pill quiet onClick={onClose} disabled={busy}>
+              Cancel
+            </Pill>
+            <Pill type="submit" disabled={busy}>
+              {busy ? 'Saving…' : goal ? 'Save' : 'Create goal'}
+            </Pill>
+          </span>
         </div>
       </form>
     </dialog>
@@ -516,26 +599,28 @@ function SavedDialog({ goal, now, onClose, onSaved }) {
   }
 
   return (
-    <dialog ref={ref} className="dialog" aria-labelledby="saved-title" onCancel={(e) => (busy ? e.preventDefault() : onClose())}>
-      <form onSubmit={save}>
-        <h2 id="saved-title">Update {goal.name}</h2>
-        <label>
-          Saved so far ({goal.currency})
-          <input inputMode="decimal" autoComplete="off" value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus />
+    <dialog ref={ref} className={DIALOG} aria-labelledby="saved-title" onCancel={(e) => (busy ? e.preventDefault() : onClose())}>
+      <form onSubmit={save} className="grid gap-3 text-[14px]">
+        <h2 id="saved-title" className={DIALOG_H}>
+          Update {goal.name}
+        </h2>
+        <label className="grid gap-1">
+          <span className="font-semibold">Saved so far ({goal.currency})</span>
+          <input className={FIELD} inputMode="decimal" autoComplete="off" value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus />
         </label>
-        <p className="small muted">Move the money in your bank&apos;s app first; this only keeps count.</p>
+        <p className={NOTE}>Move the money in your bank&apos;s app first; this only keeps count.</p>
         {error && (
-          <p className="error" role="alert">
+          <p className="m-0 font-semibold" style={OWE} role="alert">
             {error}
           </p>
         )}
-        <div className="dialog-actions">
-          <button type="button" className="btn btn-secondary" onClick={onClose} disabled={busy}>
+        <div className="mt-2 flex justify-end gap-2">
+          <Pill quiet onClick={onClose} disabled={busy}>
             Cancel
-          </button>
-          <button type="submit" className="btn" disabled={busy}>
+          </Pill>
+          <Pill type="submit" disabled={busy}>
             {busy ? 'Saving…' : 'Save'}
-          </button>
+          </Pill>
         </div>
       </form>
     </dialog>

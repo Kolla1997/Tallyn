@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import TransactionRow from '../components/TransactionRow.jsx'
-import SpendingDots from '../components/SpendingDots.jsx'
+import { Search } from 'lucide-react'
+import { cleanName } from '../components/TransactionRow.jsx'
+import TxIcon from '../components/TxIcon.jsx'
+import { Head, Panel, See, Rows, Money, Pill, Chips, MUTED, IN } from '../components/calm/ui.jsx'
+import SpendingBars from '../components/SpendingBars.jsx'
 import { TxDetails, TxSummary } from '../components/TxSummary.jsx'
 import { api } from '../lib/api.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
-import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useBusy, useFadeOnChange } from '../lib/motion.js'
 
+const FIELD = 'h-9 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 text-[14px]'
 // All transactions (#42): switch between household members, search by
 // merchant, filter by category, grouped by day, 50 at a time. The API only
 // returns what this person may see (#28); the filters only narrow it.
@@ -43,6 +46,7 @@ function recentMonths() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
   })
 }
+const thisMonth = () => new Date().toISOString().slice(0, 7)
 const monthLabel = (m) => new Date(`${m}-01T12:00:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
 // Filters from the address (Home's spending card links here with
@@ -248,100 +252,103 @@ export default function TransactionsPage({ me, household, refreshKey }) {
   }, [picked])
 
   return (
-    <>
-      <PageHead title="Transactions" sub={iAmKid ? 'Your transactions' : 'Everything you can see in your household'} />
+    <div className="calm">
+      <Head title="Transactions" sub={iAmKid ? 'Your transactions' : 'Everything you can see in your household'} />
 
-      <div className="tx-top">
-        <section className="panel tx-filters" aria-label="Filter transactions">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-12 [&>*]:min-w-0">
+        <section aria-label="Filter transactions" className="calm-solid rounded-2xl p-4 lg:col-span-12">
           {others.length > 0 && (
-            <div className="chips" role="group" aria-label="Whose transactions">
-              {[[me.user_id, 'Yours'], ...others.map((m) => [m.user_id, nameOf(m)]), ['all', 'Everyone']].map(([id, label]) => (
-                <button key={id} className="chip" aria-pressed={who === id} onClick={() => setWho(id)}>
-                  {label}
-                </button>
-              ))}
-            </div>
+            <Chips
+              label="Whose transactions"
+              options={[[me.user_id, 'Yours'], ...others.map((m) => [m.user_id, nameOf(m)]), ['all', 'Everyone']]}
+              value={who}
+              onChange={setWho}
+            />
           )}
-          <div className="tx-filter-fields">
-            <label>
+          <div className={`grid gap-2 sm:grid-cols-2 xl:grid-cols-[2fr_1fr_1fr_1fr] ${others.length > 0 ? 'mt-3' : ''}`}>
+            <label className="relative sm:col-span-2 xl:col-span-1">
               <span className="sr-only">Search merchants</span>
-              <input type="search" placeholder="Search merchants" value={search} maxLength={100} onChange={(e) => setSearch(e.target.value)} />
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" aria-hidden="true" />
+              <input
+                type="search"
+                placeholder="Search merchants"
+                value={search}
+                maxLength={100}
+                onChange={(e) => setSearch(e.target.value)}
+                className={`${FIELD} pr-3 pl-9`}
+              />
             </label>
-            <div className="filter-row">
-              <label className="grow">
-                <span className="sr-only">Category</span>
-                <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                  <option value="">All categories</option>
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {categoryLabel(c)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grow">
-                <span className="sr-only">Month</span>
-                <select
-                  value={day ? '' : month}
-                  onChange={(e) => {
-                    setDay('')
-                    setMonth(e.target.value)
-                  }}
-                >
-                  <option value="">All months</option>
-                  {month && !months.includes(month) && <option value={month}>{monthLabel(month)}</option>}
-                  {months.map((m) => (
-                    <option key={m} value={m}>
-                      {monthLabel(m)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grow">
-                <span className="sr-only">Bank</span>
-                <select value={bank} onChange={(e) => setBank(e.target.value)}>
-                  <option value="">All banks</option>
-                  {bankChoices.map(([id, name]) => (
-                    <option key={id} value={id}>
-                      {name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            {day && (
-              <p className="small tx-day-filter">
-                Showing {dayLabelLong}{' '}
-                <button className="link small" onClick={() => setDay('')}>
-                  Clear
-                </button>
-              </p>
-            )}
+            <label>
+              <span className="sr-only">Category</span>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} className={FIELD}>
+                <option value="">All categories</option>
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {categoryLabel(c)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span className="sr-only">Month</span>
+              <select
+                value={day ? '' : month}
+                onChange={(e) => {
+                  setDay('')
+                  setMonth(e.target.value)
+                }}
+                className={FIELD}
+              >
+                <option value="">All months</option>
+                {month && !months.includes(month) && <option value={month}>{monthLabel(month)}</option>}
+                {months.map((m) => (
+                  <option key={m} value={m}>
+                    {monthLabel(m)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span className="sr-only">Bank</span>
+              <select value={bank} onChange={(e) => setBank(e.target.value)} className={FIELD}>
+                <option value="">All banks</option>
+                {bankChoices.map(([id, name]) => (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
+          {day && (
+            <p className="mt-2 text-[13px]">
+              Showing {dayLabelLong}{' '}
+              <button type="button" onClick={() => setDay('')} className="font-semibold underline underline-offset-4">
+                Clear
+              </button>
+            </p>
+          )}
         </section>
-        {/* The year of dots (#75): its own card, over the summary on web. */}
-        <section className={`panel tx-dots-card ${zone(dotsBusy, false)}`} aria-label="Spending by day" aria-busy={dotsBusy}>
-          <SpendingDots
-            year={year}
-            days={daily}
-            home={home}
-            selected={day}
-            onPick={(d) => {
-              setPicked('')
-              setDay(d)
-            }}
-          />
-        </section>
-      </div>
 
-      {error && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
+        {error && (
+          <p className="error lg:col-span-12" role="alert">
+            {error}
+          </p>
+        )}
 
-      <div className={`tx-layout ${zone(busy, fading)}`} aria-busy={busy}>
-        <div className="tx-main">
+        <div className={`lg:col-span-7 ${zone(busy, fading)}`} aria-busy={busy}>
+          <section aria-label="Spending by day" aria-busy={dotsBusy} className={`calm-glass mb-3 rounded-2xl p-4 ${zone(dotsBusy, false)}`}>
+            <SpendingBars
+              month={month || (day ? day.slice(0, 7) : thisMonth())}
+              days={daily}
+              home={home}
+              selected={day}
+              onPick={(d) => {
+                setPicked('')
+                setDay(d)
+              }}
+            />
+          </section>
           {failed && list && <StaleBanner what="your transactions" busy={loading} onRetry={() => setAttempt((n) => n + 1)} />}
           {!list ? (
             failed ? (
@@ -350,50 +357,49 @@ export default function TransactionsPage({ me, household, refreshKey }) {
               <TallynLoader />
             )
           ) : list.length === 0 ? (
-            <section className="panel empty-state">
-              <p className="muted">
+            <Panel label="No transactions">
+              <p className={`text-[13px] ${MUTED}`}>
                 {filtered
                   ? 'No transactions match. Try another person, search, category or month.'
                   : 'No transactions yet. A new bank can take a few minutes to show its history.'}
               </p>
-            </section>
+            </Panel>
           ) : (
             <>
-              <section className="panel tx-list" aria-label="Transactions">
-                {groups.map(([day, txs]) => (
-                  <div key={day} className="tx-day">
-                    <h2 className="day-heading">
-                      <span>{dayLabel(day)}</span>
-                      <span className="small muted">{dayTotal(txs)}</span>
+              <section aria-label="Transactions" className="calm-solid rounded-2xl px-4 pb-2">
+                {groups.map(([d, txs]) => (
+                  <div key={d}>
+                    <h2 className={`flex justify-between gap-3 pt-4 pb-1 text-[13px] font-semibold ${MUTED}`}>
+                      <span>{dayLabel(d)}</span>
+                      <span className="tabular-nums">{dayTotal(txs)}</span>
                     </h2>
-                    <ul className="rows">
+                    <Rows>
                       {txs.map((tx) => (
-                        <TransactionRow
+                        <TxRow
                           key={tx.id}
                           tx={tx}
-                          meId={me.user_id}
-                          people={people}
-                          showDate={false}
-                          showBank
-                          onSelect={(id) => setPicked(id === picked ? '' : id)}
+                          who={tx.owner_user_id === me.user_id ? 'You' : nameOf(people[tx.owner_user_id] ?? { user_id: tx.owner_user_id })}
                           selected={tx.id === picked}
+                          onSelect={() => setPicked(tx.id === picked ? '' : tx.id)}
                         />
                       ))}
-                    </ul>
+                    </Rows>
                   </div>
                 ))}
               </section>
               {more && (
-                <button className="btn btn-secondary show-more" onClick={showMore} disabled={loadingMore}>
-                  {loadingMore ? 'Loading…' : 'Show more'}
-                </button>
+                <div className="mt-3 flex justify-center">
+                  <Pill quiet onClick={showMore}>
+                    {loadingMore ? 'Loading…' : 'Show more'}
+                  </Pill>
+                </div>
               )}
-              {!pickedTx && <p className="small muted tx-hint">Pick a transaction to see its details</p>}
+              {!pickedTx && <p className={`mt-2 text-center text-[13px] ${MUTED}`}>Pick a transaction to see its details</p>}
             </>
           )}
         </div>
 
-        <aside className="tx-side" aria-label={pickedTx ? 'Transaction details' : 'Summary'}>
+        <aside aria-label={pickedTx ? 'Transaction details' : 'Summary'} className={`lg:sticky lg:top-3 lg:col-span-5 lg:self-start ${zone(busy, fading)}`}>
           {pickedTx ? (
             <TxDetails
               tx={pickedTx}
@@ -408,9 +414,48 @@ export default function TransactionsPage({ me, household, refreshKey }) {
           ) : (
             <TxSummary totals={totals} scope={scope} month={day ? '' : month} day={day} />
           )}
+          <p className="mt-2 px-1">
+            <See to="/budgets">Budgets</See>
+          </p>
         </aside>
       </div>
-    </>
+    </div>
+  )
+}
+
+// One transaction as a row you can pick for its details.
+function TxRow({ tx, who, selected, onSelect }) {
+  const out = tx.amount_minor > 0
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={onSelect}
+        aria-pressed={selected}
+        className="-mx-2 flex w-[calc(100%+16px)] items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors duration-150 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 aria-pressed:bg-zinc-100 dark:aria-pressed:bg-zinc-800"
+      >
+        <TxIcon tx={tx} />
+        <span className="min-w-0 grow">
+          <span className="block truncate text-[14px] font-semibold">
+            {cleanName(tx.merchant || tx.name || 'Transaction')}
+            {tx.pending && (
+              <span className="ml-2 rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
+                Pending
+              </span>
+            )}
+          </span>
+          <span className={`block truncate text-[13px] ${MUTED}`}>
+            {[categoryLabel(tx.category_primary), tx.bank_name && `${tx.bank_name}${tx.account_mask ? ` ··${tx.account_mask}` : ''}`, who]
+              .filter(Boolean)
+              .join(' · ')}
+          </span>
+        </span>
+        <Money className="text-[14px]" tone={out ? undefined : IN}>
+          {out ? '−' : '+'}
+          {formatMoney(Math.abs(tx.amount_minor), tx.currency)}
+        </Money>
+      </button>
+    </li>
   )
 }
 

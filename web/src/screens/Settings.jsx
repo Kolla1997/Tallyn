@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
-import { PhoneIcon } from '../components/Icons.jsx'
+import { User, ShieldCheck, Home, Database, Bell, FileText, LogOut, Smartphone, ChevronRight, Check, Plus } from 'lucide-react'
 import { api, apiFile } from '../lib/api.js'
 import { LEGAL } from '../lib/legal.js'
 import { verifiedAuthenticators } from '../lib/mfa.js'
@@ -9,21 +9,26 @@ import { rememberSignOutNote, signOutHere } from '../lib/session.js'
 import { supabase } from '../lib/supabase.js'
 import { SaveBackupCodes } from './BackupCodes.jsx'
 import CodeForm from './CodeForm.jsx'
-import { PageHead } from './Shell.jsx'
+import { Head, Panel, Pill, MUTED, OWE, IN } from '../components/calm/ui.jsx'
 
-// Settings (#39 step 5): sections on the left, the chosen one on the right,
-// like Family. Everything here works today; what doesn't yet says so and
+// Settings (#39 step 5), in the calm redesign (#187, the #185 draft): sections on the left, the
+// chosen one on the right, like Family. Everything here works today; what doesn't yet says so and
 // names its ticket, so nothing pretends to work.
 
 const SECTIONS = [
-  ['profile', 'Profile'],
-  ['security', 'Sign-in and security'],
-  ['household', 'Household'],
-  ['data', 'Your data'],
-  ['notifications', 'Notifications'],
-  ['legal', 'Legal'],
-  ['leave', 'Leave or close'],
+  ['profile', 'Profile', User],
+  ['security', 'Sign-in and security', ShieldCheck],
+  ['household', 'Household', Home],
+  ['data', 'Your data', Database],
+  ['notifications', 'Notifications', Bell],
+  ['legal', 'Legal', FileText],
+  ['leave', 'Leave or close', LogOut],
 ]
+const NOTE = `m-0 text-[13px] ${MUTED}`
+const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 text-[14px]'
+const TEXT_LINK = 'text-[13px] font-semibold underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-4 hover:decoration-current'
+const DIALOG =
+  'calm m-auto max-h-[90svh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border-0 bg-white dark:bg-zinc-900 p-5 text-zinc-900 dark:text-white shadow-2xl backdrop:bg-black/40'
 const ROLE_LABEL = { owner: 'Owner', adult: 'Adult', teen: 'Teen', child: 'Child', viewer: 'Viewer' }
 
 const fromAddress = () => {
@@ -41,25 +46,28 @@ export default function Settings({ me, household, email, onSaved, onSignOut }) {
   }, [section])
 
   return (
-    <>
-      <PageHead title="Settings" sub="Your profile, sign-in and household" />
-      <div className="family-grid settings-grid">
-        <nav className="panel family-list" aria-label="Settings sections">
-          <ul className="rows">
-            {SECTIONS.map(([key, label]) => (
-              <li key={key}>
+    <div className="calm">
+      <Head title="Settings" sub="Your profile, sign-in and household" />
+      <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-12 [&>*]:min-w-0">
+        <nav className="calm-glass rounded-2xl p-2 lg:col-span-4 xl:col-span-3" aria-label="Settings sections">
+          <ul className="m-0 grid list-none gap-0.5 p-0">
+            {SECTIONS.map(([key, label, I]) => (
+              <li key={key} className={key === 'leave' ? 'mt-1 border-t border-zinc-200 dark:border-zinc-800 pt-1' : undefined}>
                 <button
-                  className={key === 'leave' ? 'family-person settings-danger' : 'family-person'}
+                  type="button"
                   aria-current={section === key ? 'true' : undefined}
                   onClick={() => setSection(key)}
+                  className="flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left text-[14px] font-semibold transition-colors duration-150 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 aria-[current=true]:bg-zinc-100 dark:aria-[current=true]:bg-zinc-800"
+                  style={key === 'leave' ? OWE : undefined}
                 >
-                  {label}
+                  <I className="size-4 shrink-0" aria-hidden="true" />
+                  <span className="grow">{label}</span>
                 </button>
               </li>
             ))}
           </ul>
         </nav>
-        <div className="family-detail">
+        <div className="lg:col-span-8 xl:col-span-9">
           {section === 'profile' && <Profile me={me} email={email} onSaved={onSaved} />}
           {section === 'security' && <Security email={email} onSignOut={onSignOut} />}
           {section === 'household' && <Household household={household} onSaved={onSaved} />}
@@ -69,28 +77,27 @@ export default function Settings({ me, household, email, onSaved, onSignOut }) {
           {section === 'leave' && <LeaveOrClose me={me} household={household} email={email} />}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
 function Section({ id, title, children }) {
   return (
-    <section className="panel settings-section" aria-labelledby={id}>
-      <div className="panel-head">
-        <h2 id={id}>{title}</h2>
-      </div>
+    <Panel id={id} title={title}>
       {children}
-    </section>
+    </Panel>
   )
 }
 
-// One line in a section: a label with a note, and something on the right.
+const Rows = ({ children }) => <ul className="m-0 list-none divide-y divide-zinc-100 dark:divide-zinc-800 p-0">{children}</ul>
+
+// One setting: what it is and its state on the left, its action on the right.
 function Row({ label, note, children }) {
   return (
-    <li className="settings-row">
-      <span className="grow">
-        <span className="name block">{label}</span>
-        {note && <span className="small muted block">{note}</span>}
+    <li className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3 first:pt-1 last:pb-1">
+      <span className="min-w-0 grow basis-60">
+        <span className="name block text-[14px] font-semibold">{label}</span>
+        {note && <span className={`block ${NOTE}`}>{note}</span>}
       </span>
       {children}
     </li>
@@ -101,7 +108,7 @@ function Row({ label, note, children }) {
 // code, never shown to people (Settings showed GitHub links until #36's fix).
 // eslint-disable-next-line no-unused-vars
 function Soon({ ticket }) {
-  return <span className="tag">Coming soon</span>
+  return <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[12px] font-semibold text-zinc-700 dark:text-zinc-200">Coming soon</span>
 }
 
 function Profile({ me, email, onSaved }) {
@@ -124,10 +131,11 @@ function Profile({ me, email, onSaved }) {
 
   return (
     <Section id="profile-h" title="Profile">
-      <form onSubmit={save} className="settings-form">
-        <label>
-          Your name, as your family sees it
+      <form onSubmit={save}>
+        <label className="grid max-w-sm gap-1 text-[14px]">
+          <span className="font-semibold">Your name, as your family sees it</span>
           <input
+            className={FIELD}
             value={name}
             maxLength={80}
             placeholder="Alex"
@@ -137,20 +145,19 @@ function Profile({ me, email, onSaved }) {
             }}
           />
         </label>
-        <ul className="rows">
+        <Rows>
           <Row label="Email" note={email}>
-            <button className="btn btn-secondary" type="submit">
-              Save
-            </button>
+            <Pill type="submit">Save</Pill>
           </Row>
-        </ul>
+        </Rows>
         {saved && (
-          <p className="saved small" role="status">
+          <p className="m-0 mt-1 flex items-center gap-1.5 text-[13px] font-semibold" style={IN} role="status">
+            <Check className="size-4" aria-hidden="true" />
             Saved. Your family now sees you as {name.trim() || 'your role'}.
           </p>
         )}
         {error && (
-          <p className="error" role="alert">
+          <p className="m-0 mt-1 font-semibold" style={OWE} role="alert">
             {error}
           </p>
         )}
@@ -172,7 +179,7 @@ function Security({ email, onSignOut }) {
 
   return (
     <Section id="security-h" title="Sign-in and security">
-      <ul className="rows">
+      <Rows>
         <Row label="Email" note={email} />
         <Authenticators />
         <BackupCodesRow email={email} />
@@ -180,16 +187,16 @@ function Security({ email, onSignOut }) {
           <Soon ticket={22} />
         </Row>
         <Row label="Sign out of other devices" note={done ? 'Done. Only this device is signed in now.' : 'Phones, tablets and browsers other than this one'}>
-          <button className="btn btn-secondary btn-small" onClick={() => setConfirming(true)}>
+          <Pill quiet onClick={() => setConfirming(true)}>
             Sign out others
-          </button>
+          </Pill>
         </Row>
         <Row label="Sign out" note="Everywhere you’re signed in">
-          <button className="btn btn-secondary btn-small" onClick={onSignOut}>
+          <Pill quiet onClick={onSignOut}>
             Sign out
-          </button>
+          </Pill>
         </Row>
-      </ul>
+      </Rows>
       {confirming && (
         <ConfirmDialog title="Sign out of other devices?" action="Sign out others" onConfirm={signOutOthers} onClose={() => setConfirming(false)}>
           <p>Every other phone, tablet and browser signed in to your account will need to sign in again. You&apos;ll stay signed in here.</p>
@@ -226,41 +233,44 @@ function Authenticators() {
 
   const count = list?.length ?? 0
   return (
-    <li className="settings-row settings-row-wrap">
-      <span className="grow">
-        <span className="name block">Two-step sign-in</span>
-        <span className="small muted block">{list ? (count === 1 ? '1 authenticator app' : `${count} authenticator apps`) : 'Authenticator app'}</span>
-      </span>
-      <span className="status-on small">On</span>
-      <div className="auth-list">
-        {error && (
-          <p className="error small" role="alert">
-            {error}
-          </p>
-        )}
-        <ul className="auth-items">
-          {list?.map((f) => (
-            <li key={f.id}>
-              <span className="auth-icon">
-                <PhoneIcon />
-              </span>
-              <span className="grow">
-                <strong className="block">{f.friendly_name || 'Authenticator app'}</strong>
-                <span className="small muted block">Added {shortDate(f.created_at)}</span>
-              </span>
-              {count > 1 ? (
-                <button type="button" className="link-quiet" onClick={() => setRemoving(f)}>
-                  Remove
-                </button>
-              ) : (
-                <span className="small muted">Your only one</span>
-              )}
-            </li>
-          ))}
-        </ul>
-        <button type="button" className="btn btn-secondary btn-small auth-add" onClick={() => setAdding(true)}>
-          + Add another
-        </button>
+    <li className="py-3 first:pt-1">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <span className="min-w-0 grow">
+          <span className="name block text-[14px] font-semibold">Two-step sign-in</span>
+          <span className={`block ${NOTE}`}>{list ? (count === 1 ? '1 authenticator app' : `${count} authenticator apps`) : 'Authenticator app'}</span>
+        </span>
+        <span className="flex items-center gap-1 text-[13px] font-semibold" style={IN}>
+          <Check className="size-4" aria-hidden="true" />
+          On
+        </span>
+      </div>
+      {error && (
+        <p className="m-0 mt-2 text-[13px] font-semibold" style={OWE} role="alert">
+          {error}
+        </p>
+      )}
+      <ul className="m-0 mt-2 grid list-none gap-1.5 p-0">
+        {list?.map((f) => (
+          <li key={f.id} className="flex items-center gap-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 px-3 py-2">
+            <Smartphone className="size-4 shrink-0 text-zinc-500 dark:text-zinc-400" aria-hidden="true" />
+            <span className="min-w-0 grow">
+              <strong className="block text-[14px]">{f.friendly_name || 'Authenticator app'}</strong>
+              <span className={`block ${NOTE}`}>Added {shortDate(f.created_at)}</span>
+            </span>
+            {count > 1 ? (
+              <button type="button" className={TEXT_LINK} onClick={() => setRemoving(f)}>
+                Remove
+              </button>
+            ) : (
+              <span className={NOTE}>Your only one</span>
+            )}
+          </li>
+        ))}
+      </ul>
+      <div className="mt-2">
+        <Pill quiet icon={Plus} onClick={() => setAdding(true)}>
+          Add another
+        </Pill>
       </div>
       {adding && <AddAuthenticator names={list?.map((f) => f.friendly_name) ?? []} onAdded={load} onClose={() => setAdding(false)} />}
       {removing && (
@@ -296,22 +306,22 @@ function BackupCodesRow({ email }) {
       : `${status.left} of ${status.total} left · for when you can’t use your authenticator`
 
   return (
-    <li className="settings-row">
-      <span className="grow">
-        <span className="name block">Backup codes</span>
-        <span className="small muted block">{note}</span>
+    <li className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
+      <span className="min-w-0 grow basis-60">
+        <span className="name block text-[14px] font-semibold">Backup codes</span>
+        <span className={`block ${NOTE}`}>{note}</span>
         {status?.total > 0 && (
-          <span className="codes-meter" aria-hidden="true">
+          <span className="mt-1.5 flex gap-1" aria-hidden="true">
             {Array.from({ length: status.total }, (_, i) => (
-              <i key={i} className={i < status.left ? 'on' : ''} />
+              <i key={i} className={`h-2 w-4 rounded-sm ${i < status.left ? 'bg-[var(--color-redesign-in)]' : 'bg-zinc-200 dark:bg-zinc-700'}`} />
             ))}
           </span>
         )}
       </span>
       {status && (
-        <button className="btn btn-secondary btn-small" onClick={() => setConfirming(true)}>
+        <Pill quiet onClick={() => setConfirming(true)}>
           {status.total === 0 ? 'Get codes' : 'Regenerate'}
-        </button>
+        </Pill>
       )}
       {confirming && (
         <ConfirmDialog
@@ -347,7 +357,7 @@ function CodesDialog({ email, onClose }) {
     return () => d.open && d.close()
   }, [])
   return (
-    <dialog ref={ref} className="dialog codes-dialog" aria-label="Your backup codes" onCancel={(e) => e.preventDefault()}>
+    <dialog ref={ref} className={`${DIALOG} calm-auth max-w-lg`} aria-label="Your backup codes" onCancel={(e) => e.preventDefault()}>
       <SaveBackupCodes email={email} done="Done" onDone={onClose} />
     </dialog>
   )
@@ -394,36 +404,50 @@ function AddAuthenticator({ names, onAdded, onClose }) {
   }
 
   return (
-    <dialog ref={ref} className="dialog" aria-labelledby="add-auth-title" onCancel={(e) => (e.preventDefault(), cancel())}>
-      <h2 id="add-auth-title">Add another authenticator</h2>
+    <dialog ref={ref} className={DIALOG} aria-labelledby="add-auth-title" onCancel={(e) => (e.preventDefault(), cancel())}>
+      <h2 id="add-auth-title" className="m-0 mb-3 font-[family-name:var(--font-heading)] text-[18px] font-semibold">
+        Add another authenticator
+      </h2>
       {!factor ? (
-        <form onSubmit={start}>
-          <label>
-            Give it a name
-            <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} required placeholder="1Password, Work phone…" autoFocus />
+        <form onSubmit={start} className="grid gap-3 text-[14px]">
+          <label className="grid gap-1">
+            <span className="font-semibold">Give it a name</span>
+            <input
+              className={FIELD}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={40}
+              required
+              placeholder="1Password, Work phone…"
+              autoFocus
+            />
           </label>
           {error && (
-            <p className="error" role="alert">
+            <p className="m-0 font-semibold" style={OWE} role="alert">
               {error}
             </p>
           )}
-          <div className="dialog-actions">
-            <button type="button" className="btn btn-secondary" onClick={cancel}>
+          <div className="mt-2 flex justify-end gap-2">
+            <Pill quiet onClick={cancel}>
               Cancel
-            </button>
-            <button type="submit" className="btn" disabled={busy || !name.trim()}>
+            </Pill>
+            <Pill type="submit" disabled={busy || !name.trim()}>
               Show the QR code
-            </button>
+            </Pill>
           </div>
         </form>
       ) : (
-        <>
-          <p className="muted">In {name.trim()}, add an account and scan this code.</p>
-          <img className="qr" src={factor.qr} alt="QR code to add Tallyn to your other authenticator app" />
-          <p className="muted small">Can&apos;t scan it? Enter this key instead:</p>
-          <p className="secret">{factor.secret}</p>
-          <p className="muted">
-            Then enter the <span className="nowrap">6-digit</span> code it shows.
+        <div className="grid gap-3 text-[14px]">
+          <p className={`m-0 ${MUTED}`}>In {name.trim()}, add an account and scan this code.</p>
+          <div className="flex flex-wrap items-center gap-4">
+            <img className="size-36 rounded-lg bg-white dark:bg-zinc-900 p-1" src={factor.qr} alt="QR code to add Tallyn to your other authenticator app" />
+            <div className="min-w-0">
+              <p className={NOTE}>Can&apos;t scan it? Enter this key instead:</p>
+              <p className="m-0 mt-1 font-mono text-[13px] font-semibold break-all">{factor.secret}</p>
+            </div>
+          </div>
+          <p className={`m-0 ${MUTED}`}>
+            Then enter the <span className="whitespace-nowrap">6-digit</span> code it shows.
           </p>
           <CodeForm
             factorIds={[factor.id]}
@@ -434,12 +458,12 @@ function AddAuthenticator({ names, onAdded, onClose }) {
               onClose()
             }}
           />
-          <div className="dialog-actions">
-            <button type="button" className="btn btn-secondary" onClick={cancel}>
+          <div className="flex justify-end">
+            <Pill quiet onClick={cancel}>
               Cancel
-            </button>
+            </Pill>
           </div>
-        </>
+        </div>
       )}
     </dialog>
   )
@@ -459,21 +483,21 @@ function Household({ household, onSaved }) {
   if (!household) {
     return (
       <Section id="household-h" title="Household">
-        <p className="small muted">You&apos;re not in a household yet.</p>
+        <p className={NOTE}>You&apos;re not in a household yet.</p>
       </Section>
     )
   }
   return (
     <Section id="household-h" title="Household">
-      <ul className="rows">
+      <Rows>
         {renaming ? (
-          <li className="settings-row">
+          <li className="py-3 first:pt-1">
             <RenameHousehold household={household} onDone={() => setRenaming(false)} onSaved={onSaved} />
           </li>
         ) : (
           <Row label="Name" note={household.name}>
             {household.role === 'owner' && (
-              <button className="link small" onClick={() => setRenaming(true)}>
+              <button type="button" className={TEXT_LINK} onClick={() => setRenaming(true)}>
                 Rename
               </button>
             )}
@@ -482,11 +506,11 @@ function Household({ household, onSaved }) {
         <Row label="Home currency" note={`${household.home_currency}. Totals in one currency come with conversion.`} />
         <Row label="Your role" note={ROLE_LABEL[household.role] ?? household.role} />
         <Row label="People" note={count == null ? '' : `${count} ${count === 1 ? 'member' : 'members'}`}>
-          <Link to="/family" className="link small">
+          <Link to="/family" className={TEXT_LINK}>
             Family
           </Link>
         </Row>
-      </ul>
+      </Rows>
     </Section>
   )
 }
@@ -514,24 +538,22 @@ function RenameHousehold({ household, onDone, onSaved }) {
   }
 
   return (
-    <form onSubmit={save} className="settings-form grow">
-      <label>
-        Household name
-        <input value={name} maxLength={80} onChange={(e) => setName(e.target.value)} autoFocus />
+    <form onSubmit={save} className="flex flex-wrap items-end gap-2">
+      <label className="grid grow basis-60 gap-1 text-[14px]">
+        <span className="font-semibold">Household name</span>
+        <input className={FIELD} value={name} maxLength={80} onChange={(e) => setName(e.target.value)} autoFocus />
       </label>
+      <Pill quiet type="submit" disabled={busy}>
+        {busy ? 'Saving…' : 'Save'}
+      </Pill>
+      <button className={`${TEXT_LINK} h-9`} type="button" onClick={onDone}>
+        Cancel
+      </button>
       {error && (
-        <p className="error" role="alert">
+        <p className="m-0 w-full font-semibold" style={OWE} role="alert">
           {error}
         </p>
       )}
-      <div className="settings-actions">
-        <button className="btn btn-secondary" type="submit" disabled={busy}>
-          {busy ? 'Saving…' : 'Save'}
-        </button>
-        <button className="link small" type="button" onClick={onDone}>
-          Cancel
-        </button>
-      </div>
     </form>
   )
 }
@@ -562,24 +584,24 @@ function YourData() {
   const [confirming, setConfirming] = useState(false)
   return (
     <Section id="data-h" title="Your data">
-      <p className="small muted">Tallyn reads balances and transactions from your banks. It can&apos;t move money.</p>
-      <ul className="rows">
+      <p className={NOTE}>Tallyn reads balances and transactions from your banks. It can&apos;t move money.</p>
+      <Rows>
         <Row label="Connected banks" note="Link, check or unlink your banks">
-          <Link to="/accounts" className="link small">
+          <Link to="/accounts" className={TEXT_LINK}>
             Accounts
           </Link>
         </Row>
         <Row label="Who sees your money" note="Choose what each person sees">
-          <Link to="/family" className="link small">
+          <Link to="/family" className={TEXT_LINK}>
             Family
           </Link>
         </Row>
         <Row label="Download your data" note="Everything Tallyn holds about you">
-          <button className="btn btn-secondary btn-small" onClick={() => setConfirming(true)}>
+          <Pill quiet onClick={() => setConfirming(true)}>
             Download
-          </button>
+          </Pill>
         </Row>
-      </ul>
+      </Rows>
       {confirming && (
         <ConfirmDialog title="Download your data?" action="Download" needsCode onConfirm={downloadData} onClose={() => setConfirming(false)}>
           <p>
@@ -595,11 +617,11 @@ function YourData() {
 function Notifications() {
   return (
     <Section id="notifications-h" title="Notifications">
-      <ul className="rows">
+      <Rows>
         <Row label="Alerts" note="For example a big purchase, a low balance, or a bank that needs you to sign in again">
           <Soon ticket={55} />
         </Row>
-      </ul>
+      </Rows>
     </Section>
   )
 }
@@ -609,32 +631,19 @@ function Notifications() {
 function Legal() {
   return (
     <Section id="legal-h" title="Legal">
-      <ul className="rows">
+      <Rows>
         {[LEGAL.terms, LEGAL.privacy].map((doc) => (
-          <li key={doc.path} className="settings-row">
-            <Link to={doc.path} className="settings-link">
+          <li key={doc.path}>
+            <Link to={doc.path} className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/60">
               <span className="grow">
-                <span className="name block">{doc.title}</span>
-                <span className="small muted block">Version {doc.version}</span>
+                <span className="name block text-[14px] font-semibold">{doc.title}</span>
+                <span className={`block ${NOTE}`}>Version {doc.version}</span>
               </span>
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path d="m9 6 6 6-6 6" />
-              </svg>
+              <ChevronRight className="size-4 text-zinc-400" aria-hidden="true" />
             </Link>
           </li>
         ))}
-      </ul>
+      </Rows>
     </Section>
   )
 }
@@ -662,20 +671,20 @@ function LeaveOrClose({ me, household, email }) {
   const [closing, setClosing] = useState(false)
   return (
     <Section id="leave-h" title="Leave or close">
-      <ul className="rows">
+      <Rows>
         {household && (
           <Row label={`Leave ${household.name}`} note="You'll confirm with your name and a code from your authenticator app">
-            <Link to={`/family?member=${me.user_id}`} className="link small danger-link">
+            <Link to={`/family?member=${me.user_id}`} className={TEXT_LINK} style={OWE}>
               Leave
             </Link>
           </Row>
         )}
         <Row label="Close your Tallyn account" note="Removes your banks, transactions and sign-in">
-          <button className="link small danger-link" onClick={() => setClosing(true)}>
+          <button type="button" className={TEXT_LINK} style={OWE} onClick={() => setClosing(true)}>
             Close account
           </button>
         </Row>
-      </ul>
+      </Rows>
       {closing && (
         <ConfirmDialog
           title="Close your Tallyn account?"
@@ -690,7 +699,7 @@ function LeaveOrClose({ me, household, email }) {
             its budgets stay for the others.
           </p>
           <p>
-            <Link to="/settings?section=data" className="link small" onClick={() => setClosing(false)}>
+            <Link to="/settings?section=data" className={TEXT_LINK} onClick={() => setClosing(false)}>
               Download your data first
             </Link>
           </p>
