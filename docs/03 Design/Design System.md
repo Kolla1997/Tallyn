@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-25
+updated: 2026-10-26
 issue: 10
 tags: [design]
 ---
@@ -137,3 +137,4 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-25 | Redesign sidebar: the rail is collapsed by default (icon names on hover and keyboard focus, » opens it); menu text 13px; rows 34px (32px items, 2px apart). Replaces the 40px items and 14px text of 2026-10-16 when built (#185) | Dinesh picked the rail over a labelled rail and a top bar, then asked for smaller text and less space |
 | 2026-10-25 | Redesign layouts (#185): lists are rows in one card, never one stretched card per item. Debts: a summary strip (waffle for cards vs loans, four figures) over a table with bullet bars (Dinesh picked F, the mix). Accounts: the same strip with Bklit rings for what you have, then one card per bank holding its accounts as tiles, each card as wide as its accounts (picked F, the bank bento, a mix of "by bank" and "tiles") | Single items stretched edge to edge read huge; banks listed once where their accounts are |
 | 2026-10-25 | Redesign charts (#185): spending by day as one red bar per day with a daily average line and three facts (picked the mix of four forms); spending reads in a red scale, empty days grey; numbers always written beside the marks | Dinesh asked for red instead of black, then for less wasted space; ui-ux-pro-max: never colour alone |
+| 2026-10-26 | Light and dark (#187): the drafts' dark theme in the app, switched with the sun and moon (in the rail, the phone header and the sign-in footer); follows the device until you choose. Dark values live beside the light ones in `design-tokens.json` (`dark`). Avatars use colours that keep white letters readable in both | Dinesh picked the sun and moon switch in the drafts; the first build left dark out by mistake |

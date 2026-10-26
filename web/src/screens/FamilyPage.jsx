@@ -59,14 +59,20 @@ const say = (err, fallback) => MESSAGES[err.message] ?? fallback
 const NOTE = `m-0 text-[13px] ${MUTED}`
 const SUB = 'm-0 mb-1.5 font-[family-name:var(--font-heading)] text-[15px] font-semibold'
 const CARD = 'calm-solid min-w-0 rounded-2xl p-4'
-const LINK = 'text-[13px] font-semibold text-zinc-900 underline decoration-zinc-300 underline-offset-4 hover:decoration-zinc-900'
-const CHANGE = 'shrink-0 text-[13px] font-semibold text-zinc-600 underline decoration-zinc-300 underline-offset-4 hover:text-zinc-900'
+const LINK =
+  'text-[13px] font-semibold text-zinc-900 dark:text-white underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-4 hover:decoration-zinc-900 dark:hover:decoration-white'
+const CHANGE =
+  'shrink-0 text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-4 hover:text-zinc-900 dark:hover:text-white'
 
-const Tag = ({ children }) => <span className="inline-block rounded-full bg-zinc-100 px-2 py-0.5 text-[12px] font-semibold text-zinc-700">{children}</span>
+const Tag = ({ children }) => (
+  <span className="inline-block rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[12px] font-semibold text-zinc-700 dark:text-zinc-200">
+    {children}
+  </span>
+)
 
 // A shared category, ticked.
 const Given = ({ children }) => (
-  <li className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-3 py-1 text-[13px] font-semibold">
+  <li className="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-800 px-3 py-1 text-[13px] font-semibold">
     <Check className="size-3.5" style={IN} aria-hidden="true" />
     {children}
   </li>
@@ -79,7 +85,7 @@ function Switch({ label, checked, disabled, onChange }) {
       <input type="checkbox" role="switch" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} className="peer sr-only" />
       <span
         aria-hidden="true"
-        className="relative h-5 w-9 shrink-0 rounded-full bg-zinc-300 transition-colors duration-150 peer-checked:bg-[var(--color-redesign-in)] peer-disabled:opacity-50 peer-focus-visible:ring-2 peer-focus-visible:ring-zinc-900 peer-focus-visible:ring-offset-2 after:absolute after:top-0.5 after:left-0.5 after:size-4 after:rounded-full after:bg-white after:transition-transform after:duration-150 peer-checked:after:translate-x-4 motion-reduce:after:transition-none"
+        className="relative h-5 w-9 shrink-0 rounded-full bg-zinc-300 dark:bg-zinc-600 transition-colors duration-150 peer-checked:bg-[var(--color-redesign-in)] dark:peer-checked:bg-[var(--color-redesign-in)] peer-disabled:opacity-50 peer-focus-visible:ring-2 peer-focus-visible:ring-zinc-900 dark:peer-focus-visible:ring-white peer-focus-visible:ring-offset-2 after:absolute after:top-0.5 after:left-0.5 after:size-4 after:rounded-full after:bg-white after:transition-transform after:duration-150 peer-checked:after:translate-x-4 motion-reduce:after:transition-none"
       />
     </label>
   )
@@ -89,11 +95,11 @@ function Switch({ label, checked, disabled, onChange }) {
 function HaveOwe({ have, owe, cur, haveTo, oweTo, you }) {
   return (
     <div className="grid grid-cols-2 gap-3">
-      <Link to={haveTo} className="block rounded-xl bg-zinc-50 p-3 no-underline hover:bg-zinc-100">
+      <Link to={haveTo} className="block rounded-xl bg-zinc-50 dark:bg-zinc-800/60 p-3 no-underline hover:bg-zinc-100 dark:hover:bg-zinc-800">
         <span className={`block ${NOTE}`}>{you ? 'You have' : 'Has'}</span>
         <Money className="text-[20px]">{formatMoney(have, cur)}</Money>
       </Link>
-      <Link to={oweTo} className="block rounded-xl bg-zinc-50 p-3 no-underline hover:bg-zinc-100">
+      <Link to={oweTo} className="block rounded-xl bg-zinc-50 dark:bg-zinc-800/60 p-3 no-underline hover:bg-zinc-100 dark:hover:bg-zinc-800">
         <span className={`block ${NOTE}`}>{you ? 'You owe' : 'Owes'}</span>
         <Money className="text-[20px]" tone={owe > 0 ? OWE : undefined}>
           {formatMoney(owe, cur)}
@@ -129,7 +135,7 @@ function CardsAndDebts({ title, accounts, home }) {
 function HowSharingWorks() {
   return (
     <Panel id="how-h" title="How sharing works" glass>
-      <ul className={`m-0 grid list-disc gap-1 pl-4 text-[13px] text-zinc-600`}>
+      <ul className={`m-0 grid list-disc gap-1 pl-4 text-[13px] text-zinc-600 dark:text-zinc-300`}>
         <li>Nobody sees your money until you share it.</li>
         <li>Owners and adults see their teens&apos; and children&apos;s money.</li>
         <li>Time and location are only shared together with transactions.</li>
@@ -141,7 +147,7 @@ function HowSharingWorks() {
 }
 
 const PERSON_BTN =
-  'flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors duration-150 hover:bg-zinc-50 aria-[current=true]:bg-zinc-100'
+  'flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors duration-150 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 aria-[current=true]:bg-zinc-100 dark:aria-[current=true]:bg-zinc-800'
 
 export default function FamilyPage({ me, household, refreshKey, onChanged, onLeft }) {
   const [members, setMembers] = useState(null)
@@ -249,7 +255,7 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
                     onClick={() => setSelected(`invite-${inv.id}`)}
                   >
                     <span
-                      className="flex size-9 shrink-0 items-center justify-center rounded-full border border-dashed border-zinc-400 text-zinc-500"
+                      className="flex size-9 shrink-0 items-center justify-center rounded-full border border-dashed border-zinc-400 dark:border-zinc-600 text-zinc-500 dark:text-zinc-400"
                       aria-hidden="true"
                     >
                       <Mail className="size-4" />
@@ -392,14 +398,14 @@ function Person({ person, members, onSelect, me, household, sharing, setSharing,
         </div>
         {isOwner && !you && person.role !== 'child' && (
           <div className="mt-3">
-            <div role="group" aria-label={`Role for ${name}`} className="inline-flex flex-wrap rounded-full bg-zinc-100 p-0.5">
+            <div role="group" aria-label={`Role for ${name}`} className="inline-flex flex-wrap rounded-full bg-zinc-100 dark:bg-zinc-800 p-0.5">
               {ROLES.map(([r, l]) => (
                 <button
                   key={r}
                   type="button"
                   aria-pressed={person.role === r}
                   onClick={() => chooseRole(r)}
-                  className="rounded-full px-3 py-1 text-[13px] font-semibold text-zinc-600 transition-colors duration-150 aria-pressed:bg-white aria-pressed:text-zinc-900 aria-pressed:shadow-sm"
+                  className="rounded-full px-3 py-1 text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 transition-colors duration-150 aria-pressed:bg-white dark:aria-pressed:bg-zinc-900 aria-pressed:text-zinc-900 dark:aria-pressed:text-white aria-pressed:shadow-sm"
                 >
                   {l}
                 </button>
@@ -452,7 +458,7 @@ function Person({ person, members, onSelect, me, household, sharing, setSharing,
           <h3 className={SUB}>You share with {name}</h3>
           {canShare ? (
             <>
-              <div className="divide-y divide-zinc-100">
+              <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
                 {CATEGORIES.map(([c, label]) => (
                   <Switch
                     key={c}
@@ -634,7 +640,10 @@ function PendingInvite({ invite, onCancelled }) {
   return (
     <section className={CARD} aria-labelledby="pending-h">
       <div className="flex items-center gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-dashed border-zinc-400 text-zinc-500" aria-hidden="true">
+        <span
+          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-dashed border-zinc-400 dark:border-zinc-600 text-zinc-500 dark:text-zinc-400"
+          aria-hidden="true"
+        >
           <Mail className="size-4" />
         </span>
         <div className="min-w-0 grow">

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { verifiedAuthenticators, verifyCode } from '../lib/mfa.js'
 import { Pill, OWE } from './calm/ui.jsx'
 
-const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 bg-white px-3 text-[14px]'
+const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 text-[14px]'
 
 // A deliberate confirmation for actions that are hard to undo (#38): the
 // person types a name to confirm and, for the most serious ones, enters a
@@ -52,7 +52,7 @@ export default function ConfirmDialog({ title, children, action, typeToConfirm, 
   return (
     <dialog
       ref={ref}
-      className="calm m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border-0 bg-white p-5 text-zinc-900 shadow-2xl backdrop:bg-black/40"
+      className="calm m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border-0 bg-white dark:bg-zinc-900 p-5 text-zinc-900 dark:text-white shadow-2xl backdrop:bg-black/40"
       aria-labelledby="dialog-title"
       onCancel={(e) => (busy ? e.preventDefault() : onClose())}
     >
@@ -60,7 +60,7 @@ export default function ConfirmDialog({ title, children, action, typeToConfirm, 
         <h2 id="dialog-title" className="m-0 font-[family-name:var(--font-heading)] text-[18px] font-semibold">
           {title}
         </h2>
-        <div className="grid gap-2 text-zinc-600 [&_p]:m-0">{children}</div>
+        <div className="grid gap-2 text-zinc-600 dark:text-zinc-300 [&_p]:m-0">{children}</div>
         {typeToConfirm && (
           <label className="grid gap-1">
             <span>

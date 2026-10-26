@@ -60,7 +60,11 @@ export default function IncomePlan({ me, household, today }) {
           <span className={`flex items-baseline gap-2 text-[13px] ${MUTED}`}>
             <span>{TEMPLATES[plan.template].label}</span>
             {canManage && (
-              <button type="button" onClick={() => setEditing(true)} className="font-semibold text-zinc-900 underline decoration-zinc-300 underline-offset-4">
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="font-semibold text-zinc-900 dark:text-white underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-4"
+              >
                 Change
               </button>
             )}
@@ -103,8 +107,14 @@ export default function IncomePlan({ me, household, today }) {
 }
 
 // The split bar's colours, one per job in order: ink, red, grey, green, light grey.
-const JOB_TONE = ['bg-zinc-900', 'bg-[var(--color-redesign-accent)]', 'bg-zinc-500', 'bg-[var(--color-redesign-in)]', 'bg-zinc-300']
-const FIELD = 'h-9 w-full rounded-xl border border-zinc-200 bg-white px-3 text-[14px]'
+const JOB_TONE = [
+  'bg-zinc-900 dark:bg-white',
+  'bg-[var(--color-redesign-accent)]',
+  'bg-zinc-500',
+  'bg-[var(--color-redesign-in)]',
+  'bg-zinc-300 dark:bg-zinc-600',
+]
+const FIELD = 'h-9 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 text-[14px]'
 const STEP = `m-0 mt-4 mb-1.5 text-[13px] font-semibold ${MUTED}`
 
 function PlanView({ plan, today, money }) {
@@ -117,7 +127,7 @@ function PlanView({ plan, today, money }) {
       </h3>
       <p className={`m-0 mt-0.5 text-[14px] ${MUTED}`}>{detail}</p>
       <p className={`m-0 mt-1 text-[13px] ${MUTED}`}>
-        Your income: <strong className={`text-zinc-900 ${NUM}`}>{money(plan.monthly_income_minor)}</strong> a month
+        Your income: <strong className={`text-zinc-900 dark:text-white ${NUM}`}>{money(plan.monthly_income_minor)}</strong> a month
       </p>
 
       <h4 className={STEP}>How your income is split</h4>
@@ -126,11 +136,11 @@ function PlanView({ plan, today, money }) {
           <span key={j.key} className={JOB_TONE[i % JOB_TONE.length]} style={{ flexGrow: j.share }} />
         ))}
       </div>
-      <ul className="m-0 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-zinc-600">
+      <ul className="m-0 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-zinc-600 dark:text-zinc-300">
         {list.map((j, i) => (
           <li key={j.key} className="flex items-center gap-1.5">
             <i className={`inline-block size-2 rounded-full ${JOB_TONE[i % JOB_TONE.length]}`} aria-hidden="true" />
-            {j.name} {j.share}%<span className={`${NUM} text-zinc-900`}>{money(j.planned)}</span>
+            {j.name} {j.share}%<span className={`${NUM} text-zinc-900 dark:text-white`}>{money(j.planned)}</span>
           </li>
         ))}
       </ul>
@@ -140,12 +150,12 @@ function PlanView({ plan, today, money }) {
         {list.map((j) => {
           const over = j.state === 'over'
           return (
-            <li key={j.key} className="plan-row rounded-xl bg-white/70 p-3">
+            <li key={j.key} className="plan-row rounded-xl bg-white/70 dark:bg-zinc-800/60 p-3">
               <div className="flex items-baseline justify-between gap-2 text-[14px]">
                 <span className="font-semibold">{j.name}</span>
                 <Words j={j} money={money} />
               </div>
-              <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-zinc-200" aria-hidden="true">
+              <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700" aria-hidden="true">
                 <span
                   className={`block h-full rounded-full ${over ? 'bg-[var(--color-redesign-accent)]' : j.kind === 'move' ? 'bg-[var(--color-redesign-in)]' : 'bg-zinc-500'}`}
                   style={{ width: `${Math.min(100, j.planned ? (j.used / j.planned) * 100 : 0)}%` }}
@@ -246,7 +256,9 @@ function PlanSetup({ household, member, today, plan, onSaved, onCancel }) {
         </label>
         <input id={incomeId} className={FIELD} inputMode="decimal" autoComplete="off" value={income} onChange={(e) => setIncome(e.target.value)} required />
       </div>
-      {suggested > 0 && <p className={`m-0 text-[13px] ${MUTED}`}>Suggested from your pay in {suggestionMonths(today)}. Tax refunds and one-offs are left out.</p>}
+      {suggested > 0 && (
+        <p className={`m-0 text-[13px] ${MUTED}`}>Suggested from your pay in {suggestionMonths(today)}. Tax refunds and one-offs are left out.</p>
+      )}
       {suggested === 0 && <p className={`m-0 text-[13px] ${MUTED}`}>We didn&apos;t find regular pay in the last 3 months. Type your monthly income.</p>}
 
       <fieldset className="m-0 border-0 p-0">
@@ -255,17 +267,24 @@ function PlanSetup({ household, member, today, plan, onSaved, onCancel }) {
           {Object.entries(TEMPLATES).map(([key, t]) => (
             <label
               key={key}
-              className={`flex cursor-pointer flex-col gap-2 rounded-xl border bg-white p-3 text-[14px] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-zinc-900 ${
-                template === key ? 'border-zinc-900' : 'border-zinc-200'
+              className={`flex cursor-pointer flex-col gap-2 rounded-xl border bg-white dark:bg-zinc-900 p-3 text-[14px] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-zinc-900 dark:has-[:focus-visible]:ring-white ${
+                template === key ? 'border-zinc-900 dark:border-white' : 'border-zinc-200 dark:border-zinc-800'
               }`}
             >
               <span className="flex items-center gap-2">
-                <input type="radio" name="template" value={key} checked={template === key} onChange={() => setTemplate(key)} className="accent-zinc-900" />
+                <input
+                  type="radio"
+                  name="template"
+                  value={key}
+                  checked={template === key}
+                  onChange={() => setTemplate(key)}
+                  className="accent-zinc-900 dark:accent-white"
+                />
                 <span className="name font-semibold">{t.label}</span>
               </span>
               <span className="flex h-2 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
                 {Object.entries(t.shares ?? { own: 100 }).map(([k, v], i) => (
-                  <span key={k} className={t.shares ? JOB_TONE[i % JOB_TONE.length] : 'bg-zinc-200'} style={{ flexGrow: v }} />
+                  <span key={k} className={t.shares ? JOB_TONE[i % JOB_TONE.length] : 'bg-zinc-200 dark:bg-zinc-700'} style={{ flexGrow: v }} />
                 ))}
               </span>
             </label>

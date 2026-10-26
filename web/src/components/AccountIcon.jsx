@@ -30,7 +30,10 @@ export function accountKind(a) {
 
 export default function AccountIcon({ account }) {
   return (
-    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700" aria-hidden="true">
+    <span
+      className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200"
+      aria-hidden="true"
+    >
       <svg
         width="16"
         height="16"

@@ -12,7 +12,7 @@ import TallynLoader from '../components/TallynLoader.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useBusy, useFadeOnChange } from '../lib/motion.js'
 
-const FIELD = 'h-9 w-full rounded-xl border border-zinc-200 bg-white px-3 text-[14px]'
+const FIELD = 'h-9 w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 text-[14px]'
 // All transactions (#42): switch between household members, search by
 // merchant, filter by category, grouped by day, 50 at a time. The API only
 // returns what this person may see (#28); the filters only narrow it.
@@ -432,7 +432,7 @@ function TxRow({ tx, who, selected, onSelect }) {
         type="button"
         onClick={onSelect}
         aria-pressed={selected}
-        className="-mx-2 flex w-[calc(100%+16px)] items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors duration-150 hover:bg-zinc-50 aria-pressed:bg-zinc-100"
+        className="-mx-2 flex w-[calc(100%+16px)] items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors duration-150 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 aria-pressed:bg-zinc-100 dark:aria-pressed:bg-zinc-800"
       >
         <IconTile>
           <svg
@@ -452,7 +452,11 @@ function TxRow({ tx, who, selected, onSelect }) {
         <span className="min-w-0 grow">
           <span className="block truncate text-[14px] font-semibold">
             {cleanName(tx.merchant || tx.name || 'Transaction')}
-            {tx.pending && <span className="ml-2 rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-semibold text-zinc-600">Pending</span>}
+            {tx.pending && (
+              <span className="ml-2 rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">
+                Pending
+              </span>
+            )}
           </span>
           <span className={`block truncate text-[13px] ${MUTED}`}>
             {[categoryLabel(tx.category_primary), tx.bank_name && `${tx.bank_name}${tx.account_mask ? ` ··${tx.account_mask}` : ''}`, who]

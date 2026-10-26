@@ -23,7 +23,7 @@ const GROUPS = [
   ['other', 'Other loans', 'borrowed or limit', 'var(--color-redesign-grey-3)'],
 ]
 const NUM = 'font-[family-name:var(--font-heading)] font-semibold tabular-nums'
-const MUTED = 'text-zinc-500'
+const MUTED = 'text-zinc-500 dark:text-zinc-400'
 const KID = new Set(['teen', 'child'])
 
 export function groupOf(a) {
@@ -153,10 +153,10 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
       ) : (
         <>
           <section aria-label="What you owe by kind" className="calm-glass mb-3 grid gap-5 rounded-2xl p-4 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center">
-            <div className="lg:border-r lg:border-zinc-200 lg:pr-6">
+            <div className="lg:border-r lg:border-zinc-200 dark:lg:border-zinc-800 lg:pr-6">
               <Waffle groups={groups} total={total} money={money} />
             </div>
-            <dl className="grid grid-cols-2 gap-y-3 sm:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] sm:divide-x sm:divide-zinc-200">
+            <dl className="grid grid-cols-2 gap-y-3 sm:grid-cols-[minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] sm:divide-x sm:divide-zinc-200 dark:sm:divide-zinc-800">
               <Figure
                 label={who === 'everyone' ? 'Everyone owes' : who === 'yours' ? 'You owe' : `${nameOf(people[who] ?? { user_id: who })} owes`}
                 value={money(total)}
@@ -184,7 +184,7 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
 
           <section aria-label="Your debts" className="calm-solid overflow-hidden rounded-2xl">
             <div
-              className={`hidden grid-cols-[minmax(0,1fr)_240px_140px] gap-x-6 border-b border-zinc-200 px-4 py-2.5 text-[13px] font-semibold sm:grid ${MUTED}`}
+              className={`hidden grid-cols-[minmax(0,1fr)_240px_140px] gap-x-6 border-b border-zinc-200 dark:border-zinc-800 px-4 py-2.5 text-[13px] font-semibold sm:grid ${MUTED}`}
             >
               <span>Debt</span>
               <span>Progress</span>
@@ -194,7 +194,7 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
               <div key={g.key} role="group" aria-labelledby={`debts-${g.key}`}>
                 <h2
                   id={`debts-${g.key}`}
-                  className={`m-0 flex justify-between border-b border-zinc-100 bg-zinc-50 px-4 py-1.5 font-[family-name:var(--font-body)] text-[13px] font-semibold ${MUTED}`}
+                  className={`m-0 flex justify-between border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/60 px-4 py-1.5 font-[family-name:var(--font-body)] text-[13px] font-semibold ${MUTED}`}
                 >
                   {g.label} <span className="tabular-nums">{money(g.value)}</span>
                 </h2>
@@ -205,7 +205,7 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
                 </ul>
               </div>
             ))}
-            <p className="m-0 flex justify-between border-t border-zinc-200 px-4 py-3 text-sm font-semibold">
+            <p className="m-0 flex justify-between border-t border-zinc-200 dark:border-zinc-800 px-4 py-3 text-sm font-semibold">
               {who === 'everyone' ? 'Everyone owes' : 'You owe'}
               <span className={NUM} style={{ color: 'var(--color-redesign-owe-text)' }}>
                 {money(total)}
@@ -279,7 +279,7 @@ function DebtRow({ account: a, money, onChanged, onError }) {
   return (
     <li
       aria-label={`${a.name}${a.mask ? ` ending ${a.mask}` : ''}`}
-      className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-2 border-b border-zinc-100 px-4 py-3 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_240px_140px]"
+      className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-2 border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_240px_140px]"
     >
       <div className="flex min-w-0 items-center gap-3">
         <AccountIcon account={a} />
@@ -323,14 +323,14 @@ function Details({ account: a, money, onChanged, onError }) {
     const state = dueState(date, overdue)
     if (state === 'late')
       return (
-        <span className="rounded-full bg-red-50 px-1.5 py-0.5 font-semibold" style={{ color: 'var(--color-redesign-owe-text)' }}>
+        <span className="rounded-full bg-red-50 dark:bg-red-950/40 px-1.5 py-0.5 font-semibold" style={{ color: 'var(--color-redesign-owe-text)' }}>
           Overdue
         </span>
       )
     if (!date) return amount != null ? `${money(amount)} a month` : null
     const text = `${amount != null ? `${money(amount)} ` : ''}${state === 'past' ? 'last due' : 'due'} ${shortDate(date)}`
     return state === 'soon' ? (
-      <span className="rounded-full bg-red-50 px-1.5 py-0.5 font-semibold" style={{ color: 'var(--color-redesign-owe-text)' }}>
+      <span className="rounded-full bg-red-50 dark:bg-red-950/40 px-1.5 py-0.5 font-semibold" style={{ color: 'var(--color-redesign-owe-text)' }}>
         {text}
       </span>
     ) : (
@@ -390,7 +390,7 @@ function Details({ account: a, money, onChanged, onError }) {
           <ReconnectBank
             bankId={bank.id}
             label={needsSignIn ? `Reconnect ${bank.institution_name || 'bank'}` : kind === 'card' ? 'Add APR and due dates' : 'Add rates and due dates'}
-            className="font-semibold text-zinc-900 underline decoration-zinc-300 underline-offset-4"
+            className="font-semibold text-zinc-900 dark:text-white underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-4"
             onDone={onChanged}
             onError={onError}
           />

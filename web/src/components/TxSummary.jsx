@@ -114,7 +114,11 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
 
   return (
     <section ref={panel} className="tx-details calm-solid rounded-2xl p-4" aria-labelledby="tx-details-h">
-      <button type="button" onClick={onBack} className="mb-3 inline-flex items-center gap-1 text-[13px] font-semibold text-zinc-600 hover:text-zinc-900">
+      <button
+        type="button"
+        onClick={onBack}
+        className="mb-3 inline-flex items-center gap-1 text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white"
+      >
         <ArrowLeft className="size-3.5" aria-hidden="true" />
         Back to summary
       </button>
@@ -162,7 +166,7 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
       </dl>
       {hasPlace ? (
         <div className="mt-4 grid gap-2">
-          <p className="flex items-start gap-2 rounded-xl bg-zinc-100 px-3 py-2.5 text-[13px] text-zinc-700">
+          <p className="flex items-start gap-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 px-3 py-2.5 text-[13px] text-zinc-700 dark:text-zinc-200">
             <MapPin className="size-4 shrink-0" aria-hidden="true" />
             <span>
               {w.address && <span className="block">{w.address}</span>}
@@ -171,7 +175,7 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
             </span>
           </p>
           <a
-            className="inline-flex h-8 w-fit items-center rounded-full border border-zinc-300 px-3 text-[13px] font-semibold"
+            className="inline-flex h-8 w-fit items-center rounded-full border border-zinc-300 dark:border-zinc-700 px-3 text-[13px] font-semibold"
             href={mapsLink(w, name)}
             target="_blank"
             rel="noreferrer noopener"
@@ -181,7 +185,7 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
           <p className={`text-[13px] ${MUTED}`}>Opens your maps app. Tallyn doesn&apos;t send the location anywhere until you tap.</p>
         </div>
       ) : (
-        <p className="mt-4 flex items-center gap-2 rounded-xl bg-zinc-100 px-3 py-2.5 text-[13px] text-zinc-600">
+        <p className="mt-4 flex items-center gap-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 px-3 py-2.5 text-[13px] text-zinc-600 dark:text-zinc-300">
           <MapPin className="size-4 shrink-0" aria-hidden="true" />
           No location for this one.
         </p>
@@ -189,7 +193,7 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
       <button
         type="button"
         onClick={() => onMerchant(tx.merchant)}
-        className="mt-3 text-[13px] font-semibold text-zinc-900 underline decoration-zinc-300 underline-offset-4"
+        className="mt-3 text-[13px] font-semibold text-zinc-900 dark:text-white underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-4"
       >
         All {name} transactions
       </button>

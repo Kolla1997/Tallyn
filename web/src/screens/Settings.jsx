@@ -25,10 +25,10 @@ const SECTIONS = [
   ['leave', 'Leave or close', LogOut],
 ]
 const NOTE = `m-0 text-[13px] ${MUTED}`
-const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 bg-white px-3 text-[14px]'
-const TEXT_LINK = 'text-[13px] font-semibold underline decoration-zinc-300 underline-offset-4 hover:decoration-current'
+const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 text-[14px]'
+const TEXT_LINK = 'text-[13px] font-semibold underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-4 hover:decoration-current'
 const DIALOG =
-  'calm m-auto max-h-[90svh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border-0 bg-white p-5 text-zinc-900 shadow-2xl backdrop:bg-black/40'
+  'calm m-auto max-h-[90svh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border-0 bg-white dark:bg-zinc-900 p-5 text-zinc-900 dark:text-white shadow-2xl backdrop:bg-black/40'
 const ROLE_LABEL = { owner: 'Owner', adult: 'Adult', teen: 'Teen', child: 'Child', viewer: 'Viewer' }
 
 const fromAddress = () => {
@@ -52,12 +52,12 @@ export default function Settings({ me, household, email, onSaved, onSignOut }) {
         <nav className="calm-glass rounded-2xl p-2 lg:col-span-4 xl:col-span-3" aria-label="Settings sections">
           <ul className="m-0 grid list-none gap-0.5 p-0">
             {SECTIONS.map(([key, label, I]) => (
-              <li key={key} className={key === 'leave' ? 'mt-1 border-t border-zinc-200 pt-1' : undefined}>
+              <li key={key} className={key === 'leave' ? 'mt-1 border-t border-zinc-200 dark:border-zinc-800 pt-1' : undefined}>
                 <button
                   type="button"
                   aria-current={section === key ? 'true' : undefined}
                   onClick={() => setSection(key)}
-                  className="flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left text-[14px] font-semibold transition-colors duration-150 hover:bg-zinc-50 aria-[current=true]:bg-zinc-100"
+                  className="flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left text-[14px] font-semibold transition-colors duration-150 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 aria-[current=true]:bg-zinc-100 dark:aria-[current=true]:bg-zinc-800"
                   style={key === 'leave' ? OWE : undefined}
                 >
                   <I className="size-4 shrink-0" aria-hidden="true" />
@@ -89,7 +89,7 @@ function Section({ id, title, children }) {
   )
 }
 
-const Rows = ({ children }) => <ul className="m-0 list-none divide-y divide-zinc-100 p-0">{children}</ul>
+const Rows = ({ children }) => <ul className="m-0 list-none divide-y divide-zinc-100 dark:divide-zinc-800 p-0">{children}</ul>
 
 // One setting: what it is and its state on the left, its action on the right.
 function Row({ label, note, children }) {
@@ -108,7 +108,7 @@ function Row({ label, note, children }) {
 // code, never shown to people (Settings showed GitHub links until #36's fix).
 // eslint-disable-next-line no-unused-vars
 function Soon({ ticket }) {
-  return <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[12px] font-semibold text-zinc-700">Coming soon</span>
+  return <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[12px] font-semibold text-zinc-700 dark:text-zinc-200">Coming soon</span>
 }
 
 function Profile({ me, email, onSaved }) {
@@ -251,8 +251,8 @@ function Authenticators() {
       )}
       <ul className="m-0 mt-2 grid list-none gap-1.5 p-0">
         {list?.map((f) => (
-          <li key={f.id} className="flex items-center gap-3 rounded-xl bg-zinc-50 px-3 py-2">
-            <Smartphone className="size-4 shrink-0 text-zinc-500" aria-hidden="true" />
+          <li key={f.id} className="flex items-center gap-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 px-3 py-2">
+            <Smartphone className="size-4 shrink-0 text-zinc-500 dark:text-zinc-400" aria-hidden="true" />
             <span className="min-w-0 grow">
               <strong className="block text-[14px]">{f.friendly_name || 'Authenticator app'}</strong>
               <span className={`block ${NOTE}`}>Added {shortDate(f.created_at)}</span>
@@ -313,7 +313,7 @@ function BackupCodesRow({ email }) {
         {status?.total > 0 && (
           <span className="mt-1.5 flex gap-1" aria-hidden="true">
             {Array.from({ length: status.total }, (_, i) => (
-              <i key={i} className={`h-2 w-4 rounded-sm ${i < status.left ? 'bg-[var(--color-redesign-in)]' : 'bg-zinc-200'}`} />
+              <i key={i} className={`h-2 w-4 rounded-sm ${i < status.left ? 'bg-[var(--color-redesign-in)]' : 'bg-zinc-200 dark:bg-zinc-700'}`} />
             ))}
           </span>
         )}
@@ -440,7 +440,7 @@ function AddAuthenticator({ names, onAdded, onClose }) {
         <div className="grid gap-3 text-[14px]">
           <p className={`m-0 ${MUTED}`}>In {name.trim()}, add an account and scan this code.</p>
           <div className="flex flex-wrap items-center gap-4">
-            <img className="size-36 rounded-lg bg-white p-1" src={factor.qr} alt="QR code to add Tallyn to your other authenticator app" />
+            <img className="size-36 rounded-lg bg-white dark:bg-zinc-900 p-1" src={factor.qr} alt="QR code to add Tallyn to your other authenticator app" />
             <div className="min-w-0">
               <p className={NOTE}>Can&apos;t scan it? Enter this key instead:</p>
               <p className="m-0 mt-1 font-mono text-[13px] font-semibold break-all">{factor.secret}</p>
@@ -634,7 +634,7 @@ function Legal() {
       <Rows>
         {[LEGAL.terms, LEGAL.privacy].map((doc) => (
           <li key={doc.path}>
-            <Link to={doc.path} className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 hover:bg-zinc-50">
+            <Link to={doc.path} className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/60">
               <span className="grow">
                 <span className="name block text-[14px] font-semibold">{doc.title}</span>
                 <span className={`block ${NOTE}`}>Version {doc.version}</span>

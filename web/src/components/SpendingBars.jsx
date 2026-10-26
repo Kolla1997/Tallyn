@@ -46,10 +46,10 @@ export default function SpendingBars({ month, days, home, selected, onPick }) {
     <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_170px]">
       <div className="min-w-0">
         <h2 className="m-0 font-[family-name:var(--font-heading)] text-[15px] font-semibold">Spending by day</h2>
-        <p aria-live="polite" className="m-0 text-[13px] text-zinc-500 tabular-nums">
+        <p aria-live="polite" className="m-0 text-[13px] text-zinc-500 dark:text-zinc-400 tabular-nums">
           {readDay ? (
             <>
-              <b className="font-semibold text-zinc-900">{label(readDay.key)}</b> · {money(readDay.amount)} spent
+              <b className="font-semibold text-zinc-900 dark:text-white">{label(readDay.key)}</b> · {money(readDay.amount)} spent
             </>
           ) : (
             `${money(total)} spent in ${monthName} so far · taller, redder days spent more`
@@ -57,7 +57,7 @@ export default function SpendingBars({ month, days, home, selected, onPick }) {
         </p>
         <div className="relative mt-6 flex h-28 items-end gap-[3px]" onMouseLeave={() => setPointed('')}>
           <span
-            className="pointer-events-none absolute inset-x-0 border-t border-dashed border-zinc-400"
+            className="pointer-events-none absolute inset-x-0 border-t border-dashed border-zinc-400 dark:border-zinc-600"
             style={{ bottom: `${Math.min(100, (avg / cap) * 100)}%` }}
             aria-hidden="true"
           />
@@ -96,35 +96,35 @@ export default function SpendingBars({ month, days, home, selected, onPick }) {
             )
           })}
         </div>
-        <div className="mt-1 flex text-[12px] text-zinc-500" aria-hidden="true">
+        <div className="mt-1 flex text-[12px] text-zinc-500 dark:text-zinc-400" aria-hidden="true">
           {list.map((d, i) => (
             <span key={d.key} className="flex-1 whitespace-nowrap">
               {[0, 7, 14, 21, 28].includes(i) ? label(d.key).split(', ')[1] : ''}
             </span>
           ))}
         </div>
-        <p className="m-0 mt-2 text-[13px] text-zinc-500">
+        <p className="m-0 mt-2 text-[13px] text-zinc-500 dark:text-zinc-400">
           {selected ? 'Showing that day below. Pick it again to see every day.' : 'Pick a day to see its spending below.'}
         </p>
       </div>
-      <dl className="m-0 grid content-start gap-2.5 text-[13px] sm:border-l sm:border-zinc-200 sm:pl-4">
+      <dl className="m-0 grid content-start gap-2.5 text-[13px] sm:border-l sm:border-zinc-200 dark:sm:border-zinc-800 sm:pl-4">
         <div>
-          <dt className="text-zinc-500">A day, on average</dt>
+          <dt className="text-zinc-500 dark:text-zinc-400">A day, on average</dt>
           <dd className="m-0 font-[family-name:var(--font-heading)] text-[16px] font-semibold tabular-nums">{money(avg)}</dd>
         </div>
         {biggest && (
           <div>
-            <dt className="text-zinc-500">Biggest day</dt>
+            <dt className="text-zinc-500 dark:text-zinc-400">Biggest day</dt>
             <dd className="m-0 font-semibold tabular-nums" style={{ color: 'var(--color-redesign-owe-text)' }}>
-              {money(biggest.amount)} <span className="font-normal text-zinc-500">· {label(biggest.key)}</span>
+              {money(biggest.amount)} <span className="font-normal text-zinc-500 dark:text-zinc-400">· {label(biggest.key)}</span>
             </dd>
           </div>
         )}
         {quietest && (
           <div>
-            <dt className="text-zinc-500">Quietest day</dt>
+            <dt className="text-zinc-500 dark:text-zinc-400">Quietest day</dt>
             <dd className="m-0 font-semibold tabular-nums">
-              {money(quietest.amount)} <span className="font-normal text-zinc-500">· {label(quietest.key)}</span>
+              {money(quietest.amount)} <span className="font-normal text-zinc-500 dark:text-zinc-400">· {label(quietest.key)}</span>
             </dd>
           </div>
         )}

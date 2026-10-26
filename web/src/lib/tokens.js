@@ -9,9 +9,11 @@ const fallback = {
   button: 'system-ui, sans-serif',
 }
 
-export function applyTokens(root = document.documentElement) {
-  for (const [name, { value }] of Object.entries(tokens.color)) {
-    root.style.setProperty(`--color-${name}`, value)
+// `theme`: 'light' or 'dark' (#187). Tokens with a `dark` value take it in the dark theme.
+export function applyTokens(root = document.documentElement, theme = 'light') {
+  const pick = (t) => (theme === 'dark' && t.dark ? t.dark : t.value)
+  for (const [name, t] of Object.entries(tokens.color)) {
+    root.style.setProperty(`--color-${name}`, pick(t))
   }
   for (const [name, { value }] of Object.entries(tokens.font)) {
     root.style.setProperty(`--font-${name}`, `'${value}', ${fallback[name] ?? 'sans-serif'}`)
@@ -23,7 +25,7 @@ export function applyTokens(root = document.documentElement) {
     root.style.setProperty(`--space-${name}`, `${value}px`)
   }
   // Glass finish (#61): --glass-surface, --glass-blur, --glow-opacity, ...
-  for (const [name, { value }] of Object.entries(tokens.effect ?? {})) {
-    root.style.setProperty(`--${name}`, value)
+  for (const [name, t] of Object.entries(tokens.effect ?? {})) {
+    root.style.setProperty(`--${name}`, pick(t))
   }
 }

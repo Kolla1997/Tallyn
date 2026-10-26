@@ -2,7 +2,7 @@
 type: adr
 status: draft
 owner: Dinesh
-updated: 2026-10-25
+updated: 2026-10-26
 issue: 187
 tags: [adr, frontend, design]
 ---
@@ -34,4 +34,4 @@ Option A, one screen at a time (#187).
 - The app's CSS grows by Tailwind's utilities for the classes in use; old rules shrink as screens move.
 - Until every screen has moved, old and new screens sit side by side under the new shell.
 - The Clay/Cream palette and the glass rules in the Design System are replaced as screens move; the brand guide keeps the logo and fonts.
-- The app stays light only; the drafts' dark mode would be a separate feature.
+- Light and dark, as in the drafts (Dinesh picked the sun and moon switch): `src/lib/theme.js` puts a `dark` class on `<html>` and applies each redesign token's `dark` value from `design-tokens.json`; screens carry the drafts' `dark:` classes. Your choice is kept on the device; until you choose, Tallyn follows the device's setting.

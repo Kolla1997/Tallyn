@@ -10,8 +10,8 @@
 @source './components';
 @source './preview.jsx';
 
-/* The app is light only (#187): dark: variants in the libraries apply only under a .dark class,
-   which the app never sets. */
+/* Light and dark (#187): lib/theme.js puts a .dark class on <html>; dark: variants (the screens'
+   and the libraries') apply under it. */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -54,6 +54,21 @@ body {
   --font-button: var(--font-body);
 }
 
+/* The dark theme for what the old stylesheet still draws (loaders, banners, the month picker). */
+.dark body {
+  --color-sand: #27272a;
+  --color-sage-light: #14532d;
+  --color-text-secondary: #a1a1aa;
+  --color-border: #27272a;
+  --color-warning: #f59e0b;
+}
+/* --color-white is also Tailwind's white (text-white on red buttons), so these few old parts get
+   their dark ground by name. */
+.dark :is(.skip-link, .stale-banner, .load-failed, .month-field, .month-panel, .month-cell) {
+  background-color: #18181b;
+  color: #fafafa;
+}
+
 /* Under the redesign's shell, the page itself takes its ground (the old cream stays on unmoved
    sign-in pages until they move). */
 body:has(.calm-page) {
@@ -84,12 +99,19 @@ body:has(.calm-page) {
   border: 1px solid #e4e4e7;
   box-shadow: var(--redesign-card-shade);
 }
+.dark .calm-solid {
+  background-color: #18181b;
+  border-color: #27272a;
+}
 @supports not (backdrop-filter: blur(1px)) {
   .calm-page {
     background-image: none;
   }
   .calm-glass {
     background-color: #fff;
+  }
+  .dark .calm-glass {
+    background-color: #18181b;
   }
 }
 @media (prefers-reduced-transparency: reduce) {
@@ -99,6 +121,9 @@ body:has(.calm-page) {
   .calm-glass {
     background-color: #fff;
     backdrop-filter: none;
+  }
+  .dark .calm-glass {
+    background-color: #18181b;
   }
 }
 
@@ -130,6 +155,9 @@ body:has(.calm-page) {
   .calm-page .panel:has(.rows, ul, ol, table) {
     background: #fff;
     backdrop-filter: none;
+  }
+  .dark .calm-page .panel:has(.rows, ul, ol, table) {
+    background: #18181b;
   }
 }
 
@@ -352,6 +380,67 @@ body:has(.calm-page) {
   }
   .calm-auth .site-footer a:hover {
     color: var(--color-zinc-900);
+  }
+  /* Dark (#187): the drafts' dark card. */
+  .dark .calm-auth .card {
+    border-color: #27272a;
+    background: #18181b;
+    color: #fafafa;
+  }
+  .dark .calm-auth .card :is(input:not([type='checkbox']):not([type='radio']), select) {
+    border-color: #3f3f46;
+    background: #09090b;
+    color: #fafafa;
+  }
+  .dark .calm-auth .card :is(.muted, .small.muted, .password-rule, .or-divider) {
+    color: #a1a1aa;
+  }
+  .dark .calm-auth .card .btn-secondary {
+    border-color: #3f3f46;
+    background: transparent;
+    color: #fafafa;
+  }
+  .dark .calm-auth .card :is(.link, .link-quiet, a) {
+    color: #d4d4d8;
+    text-decoration-color: #52525b;
+  }
+  .dark .calm-auth .card :is(.switch-link, .agree a) {
+    color: #fafafa;
+  }
+  .dark .calm-auth .card :is(.info-note, .warn-note, .codes-grid) {
+    background: rgba(39, 39, 42, 0.6);
+    color: #e4e4e7;
+  }
+  .dark .calm-auth .card .info-note svg {
+    color: #e4e4e7;
+  }
+  .dark .calm-auth .card .agree {
+    color: #d4d4d8;
+  }
+  .dark .calm-auth .card .code-box.is-filled {
+    border-color: #fafafa;
+  }
+  .dark .calm-auth .card .or-divider::before,
+  .dark .calm-auth .card .or-divider::after {
+    background: #27272a;
+  }
+  .dark .calm-auth .card .reset-icon {
+    background: #27272a;
+    color: #fafafa;
+  }
+  .dark .calm-auth .card .qr {
+    border-color: #3f3f46;
+    background: #fff;
+  }
+  .dark .calm-auth .site-footer {
+    border-top-color: #27272a;
+    color: #a1a1aa;
+  }
+  .dark .calm-auth .site-footer a {
+    color: #a1a1aa;
+  }
+  .dark .calm-auth .site-footer a:hover {
+    color: #fafafa;
   }
 }
 

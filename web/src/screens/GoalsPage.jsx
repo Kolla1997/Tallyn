@@ -26,10 +26,11 @@ const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'INR', 'MXN']
 const SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 const today = () => new Date().toLocaleDateString('en-CA') // YYYY-MM-DD, local
 const NOTE = `m-0 text-[13px] ${MUTED}`
-const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 bg-white px-3 text-[14px]'
+const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 text-[14px]'
 const DIALOG =
-  'm-auto max-h-[90svh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border-0 bg-white p-5 text-zinc-900 shadow-2xl backdrop:bg-black/40'
-const FILL = 'flex cursor-pointer items-start gap-2 rounded-xl border border-zinc-200 p-3 has-[:checked]:border-zinc-900'
+  'm-auto max-h-[90svh] w-[calc(100%-2rem)] max-w-md overflow-y-auto rounded-2xl border-0 bg-white dark:bg-zinc-900 p-5 text-zinc-900 dark:text-white shadow-2xl backdrop:bg-black/40'
+const FILL =
+  'flex cursor-pointer items-start gap-2 rounded-xl border border-zinc-200 dark:border-zinc-800 p-3 has-[:checked]:border-zinc-900 dark:has-[:checked]:border-white'
 const DIALOG_H = 'm-0 mb-1 font-[family-name:var(--font-heading)] text-[18px] font-semibold'
 
 export default function GoalsPage({ me, household, refreshKey }) {
@@ -119,10 +120,10 @@ export default function GoalsPage({ me, household, refreshKey }) {
               {month.length > 0 && (
                 <ul className="m-0 mt-3 grid list-none gap-2 p-0 sm:grid-cols-2">
                   {month.map((s) => (
-                    <li key={s.goal.id} className="flex items-start gap-2.5 rounded-xl bg-white/70 p-3">
+                    <li key={s.goal.id} className="flex items-start gap-2.5 rounded-xl bg-white/70 dark:bg-zinc-800/60 p-3">
                       <span
                         className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full ${
-                          s.done ? 'bg-[var(--color-redesign-in)] text-white' : 'border-2 border-zinc-300'
+                          s.done ? 'bg-[var(--color-redesign-in)] text-white' : 'border-2 border-zinc-300 dark:border-zinc-700'
                         }`}
                         aria-hidden="true"
                       >
@@ -224,21 +225,25 @@ function Pot({ goal, owner, money, selected, onPick }) {
       onClick={onPick}
       disabled={priv}
       className={`flex h-full w-full flex-col gap-2 rounded-2xl border p-3 text-left transition-[border-color] duration-150 ${
-        priv ? 'cursor-default border-dashed border-zinc-300 bg-transparent' : 'calm-solid border-zinc-200 hover:border-zinc-400 aria-pressed:border-zinc-900'
+        priv
+          ? 'cursor-default border-dashed border-zinc-300 dark:border-zinc-700 bg-transparent'
+          : 'calm-solid border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 aria-pressed:border-zinc-900 dark:aria-pressed:border-white'
       }`}
     >
-      <span className="relative block h-2 overflow-hidden rounded-full bg-zinc-100" aria-hidden="true">
+      <span className="relative block h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800" aria-hidden="true">
         {!priv && <span className="absolute inset-y-0 left-0 block rounded-full bg-[var(--color-redesign-in)]" style={{ width: `${share * 100}%` }} />}
       </span>
       <span className="flex items-center gap-1.5 text-[14px] font-semibold">
-        {priv && <Lock className="size-3.5 text-zinc-500" aria-hidden="true" />}
+        {priv && <Lock className="size-3.5 text-zinc-500 dark:text-zinc-400" aria-hidden="true" />}
         {goal.name}
       </span>
       {owner && <span className={NOTE}>For {owner}</span>}
       {priv ? (
         <>
           <span className={NOTE}>Target {money(goal.target_minor, goal.currency)}</span>
-          <span className="w-fit rounded-full bg-zinc-100 px-2 py-0.5 text-[12px] font-semibold text-zinc-700">Progress is private</span>
+          <span className="w-fit rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[12px] font-semibold text-zinc-700 dark:text-zinc-200">
+            Progress is private
+          </span>
         </>
       ) : (
         <>
@@ -280,10 +285,10 @@ function GoalDetail({ goal, now, money, whoName, onUpdate, onEdit }) {
             Put aside <strong className={NUM}>{money(each, goal.currency)} a month</strong> to get there by {monthName(goal.by_month)}.
           </li>
         )}
-        <li className="text-zinc-600">
+        <li className="text-zinc-600 dark:text-zinc-300">
           {goal.account_id ? `Follows ${goal.account ?? 'a savings account'}: updates at each bank update.` : 'Updated by hand.'}
         </li>
-        <li className="text-zinc-600">Who can see it: {who}.</li>
+        <li className="text-zinc-600 dark:text-zinc-300">Who can see it: {who}.</li>
       </ul>
       {goal.can_manage && (
         <div className="mt-4 flex flex-wrap gap-2">
@@ -329,7 +334,7 @@ function Forecast({ goal, f, now }) {
           dataKey="target"
           curve={curveLinear}
           fadeEdges={false}
-          stroke="var(--color-zinc-400)"
+          stroke="var(--color-redesign-grey-2)"
           strokeWidth={1}
           dashFromIndex={0}
           showHighlight={false}
@@ -460,7 +465,7 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
             <input
               type="radio"
               name="fills"
-              className="mt-1 accent-zinc-900"
+              className="mt-1 accent-zinc-900 dark:accent-white"
               checked={fills === 'account'}
               onChange={() => setFills('account')}
               disabled={accounts.length === 0}
@@ -483,7 +488,7 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
           )}
           {accounts.length === 0 && <p className={NOTE}>No savings account to follow yet. Link a bank, or update it yourself.</p>}
           <label className={FILL}>
-            <input type="radio" name="fills" className="mt-1 accent-zinc-900" checked={fills === 'hand'} onChange={() => setFills('hand')} />
+            <input type="radio" name="fills" className="mt-1 accent-zinc-900 dark:accent-white" checked={fills === 'hand'} onChange={() => setFills('hand')} />
             <span>
               <strong className="block">I&apos;ll update it myself</strong>
               <small className={NOTE}>For cash, or money Tallyn can&apos;t see.</small>

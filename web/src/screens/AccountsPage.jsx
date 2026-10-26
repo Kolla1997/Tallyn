@@ -32,7 +32,7 @@ const HAVE_GROUPS = [
 ]
 const KIND_LABEL = { everyday: 'Everyday', savings: 'Savings', investment: 'Investments', card: 'Credit card', loan: 'Loan' }
 const NUM = 'font-[family-name:var(--font-heading)] font-semibold tabular-nums'
-const MUTED = 'text-zinc-500'
+const MUTED = 'text-zinc-500 dark:text-zinc-400'
 const KID = new Set(['teen', 'child'])
 
 // Mortgages, student, auto and other loans all count as Loans here.
@@ -160,7 +160,7 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
                 <button
                   key={id || 'all'}
                   type="button"
-                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 text-[13px] font-semibold text-zinc-600 transition-[border-color,color] duration-150 aria-pressed:border-zinc-900 aria-pressed:text-zinc-900"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 transition-[border-color,color] duration-150 aria-pressed:border-zinc-900 dark:aria-pressed:border-white aria-pressed:text-zinc-900 dark:aria-pressed:text-white"
                   aria-pressed={(picked?.id ?? '') === id}
                   onClick={() => setBank(id)}
                 >
@@ -207,7 +207,7 @@ function NetWorth({ have, owe, home, accounts }) {
       aria-label="Net worth"
     >
       {parts.length > 0 && (
-        <div className="flex flex-wrap items-center gap-4 lg:border-r lg:border-zinc-200 lg:pr-6">
+        <div className="flex flex-wrap items-center gap-4 lg:border-r lg:border-zinc-200 dark:lg:border-zinc-800 lg:pr-6">
           <div aria-hidden="true">
             <RingChart
               data={parts.map((p) => ({ label: p.label, value: p.value, maxValue: have }))}
@@ -233,7 +233,7 @@ function NetWorth({ have, owe, home, accounts }) {
           </ul>
         </div>
       )}
-      <dl className="m-0 grid grid-cols-2 gap-y-3 sm:grid-cols-3 sm:divide-x sm:divide-zinc-200">
+      <dl className="m-0 grid grid-cols-2 gap-y-3 sm:grid-cols-3 sm:divide-x sm:divide-zinc-200 dark:sm:divide-zinc-800">
         <div className="sm:pr-4">
           <dt className={`text-[13px] ${MUTED}`}>Net worth</dt>
           <dd className={`m-0 text-[22px] whitespace-nowrap ${NUM}`}>
@@ -338,7 +338,7 @@ function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnecte
               className={`bank-item calm-solid flex min-w-[280px] flex-col overflow-hidden rounded-2xl ${ok ? '' : 'ring-1 ring-[var(--color-redesign-accent)]'}`}
               style={{ flex: `${n} 1 ${n * 320}px` }}
             >
-              <div className="flex items-center gap-2.5 border-b border-zinc-100 px-3 py-2">
+              <div className="flex items-center gap-2.5 border-b border-zinc-100 dark:border-zinc-800 px-3 py-2">
                 <span className="bank-badge" aria-hidden="true">
                   {initials(name)}
                 </span>
@@ -347,12 +347,15 @@ function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnecte
                   {b.accounts.length} {b.accounts.length === 1 ? 'account' : 'accounts'} · {whose}
                 </span>
               </div>
-              <ul className="m-0 grid grow list-none divide-x divide-zinc-100 p-0" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
+              <ul
+                className="m-0 grid grow list-none divide-x divide-zinc-100 dark:divide-zinc-800 p-0"
+                style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}
+              >
                 {b.accounts.map((a) => (
                   <AccountTile key={a.id} a={a} meId={me.user_id} owner={showOwner ? (people[b.owner_user_id] ?? { user_id: b.owner_user_id }) : null} />
                 ))}
               </ul>
-              <div className="mt-auto grid gap-1.5 border-t border-zinc-100 px-3 py-2">
+              <div className="mt-auto grid gap-1.5 border-t border-zinc-100 dark:border-zinc-800 px-3 py-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <BankStatus bank={b} />
                   {b.can_unlink && (
@@ -403,7 +406,8 @@ function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnecte
   )
 }
 
-const SMALL = 'inline-flex h-8 items-center rounded-full border border-zinc-300 bg-white px-3 text-[13px] font-semibold text-zinc-900'
+const SMALL =
+  'inline-flex h-8 items-center rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 text-[13px] font-semibold text-zinc-900 dark:text-white'
 const SMALL_RED = 'inline-flex h-8 items-center rounded-full border-0 px-3 text-[13px] font-semibold text-white bg-[var(--color-redesign-button)]'
 
 function BankStatus({ bank }) {

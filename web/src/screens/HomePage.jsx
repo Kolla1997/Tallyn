@@ -166,8 +166,7 @@ function Total({ banks, me, roles, home, scope, onScope, spent }) {
   return (
     <section
       aria-label={yours ? 'Your balance' : 'Total balance'}
-      className="flex h-full flex-col justify-center gap-3 rounded-2xl p-5 text-white"
-      style={{ background: 'var(--color-redesign-ink)' }}
+      className="flex h-full flex-col justify-center gap-3 rounded-2xl bg-zinc-950 p-5 text-white dark:bg-black dark:ring-1 dark:ring-zinc-800"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="m-0 text-[13px] text-zinc-400">{yours ? `Your balance · in ${cur ?? home}` : `Everything you can see · in ${cur ?? home}`}</p>
@@ -301,7 +300,7 @@ function Spending({ days, summary, home, everyone }) {
       <p className={`m-0 mt-1.5 px-1 text-[13px] ${MUTED}`}>
         {spent > 0 ? (
           <>
-            {monthName(now)} so far: <b className="font-semibold text-zinc-900">{formatMoney(spent, home)}</b> spent.{' '}
+            {monthName(now)} so far: <b className="font-semibold text-zinc-900 dark:text-white">{formatMoney(spent, home)}</b> spent.{' '}
           </>
         ) : (
           <>No spending yet this month. </>
@@ -366,8 +365,8 @@ function Recent({ txs, me, people, everyone }) {
       <div className="overflow-hidden">
         <SmoothTab
           label="Kind of transaction"
-          activeColor="bg-zinc-900"
-          activeTextColor="text-white"
+          activeColor="bg-zinc-900 dark:bg-white"
+          activeTextColor="text-white dark:text-zinc-900"
           items={[
             { id: 'spending', title: 'Spending', content: list('spending', 'No spending yet.') },
             { id: 'transfers', title: 'Transfers', content: list('transfers', 'No transfers yet.') },

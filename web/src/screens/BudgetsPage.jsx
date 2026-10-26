@@ -27,9 +27,10 @@ const PACE = {
   over: 'Over budget',
 }
 const PERIOD = { month: 'every month', week: 'every week' }
-const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 bg-white px-3 text-[14px]'
+const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 text-[14px]'
 const NOTE = `m-0 text-[13px] ${MUTED}`
-const CHANGE = 'shrink-0 text-[13px] font-semibold text-zinc-600 underline decoration-zinc-300 underline-offset-4 hover:text-zinc-900'
+const CHANGE =
+  'shrink-0 text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-4 hover:text-zinc-900 dark:hover:text-white'
 
 const what = (b) => (b.category ? categoryLabel(b.category) : 'Everything')
 const toGo = (n) => (n === 0 ? 'last day' : `${n} ${n === 1 ? 'day' : 'days'} to go`)
@@ -51,7 +52,10 @@ function PacePill({ b, today }) {
   const p = pace(b.spent_minor, b.amount_minor, periodInfo(b, today).elapsed)
   const warn = p === 'over' || p === 'ahead'
   return (
-    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[12px] font-semibold ${warn ? 'bg-red-50' : 'bg-zinc-100 text-zinc-700'}`} style={warn ? OWE : undefined}>
+    <span
+      className={`shrink-0 rounded-full px-2 py-0.5 text-[12px] font-semibold ${warn ? 'bg-red-50 dark:bg-red-950/40' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200'}`}
+      style={warn ? OWE : undefined}
+    >
       {PACE[p]}
     </span>
   )
@@ -73,12 +77,21 @@ export function PaceLine({ b, today }) {
   return (
     <div className="mt-2" aria-hidden="true">
       <LineChart data={data} aspectRatio="3 / 1" margin={{ left: 0, right: 0, top: 4, bottom: 4 }}>
-        <Line dataKey="even" curve={curveLinear} fadeEdges={false} stroke="var(--color-zinc-400)" strokeWidth={1.5} dashFromIndex={0} showHighlight={false} animate={false} />
+        <Line
+          dataKey="even"
+          curve={curveLinear}
+          fadeEdges={false}
+          stroke="var(--color-redesign-grey-2)"
+          strokeWidth={1.5}
+          dashFromIndex={0}
+          showHighlight={false}
+          animate={false}
+        />
         <Line
           dataKey="spent"
           curve={curveLinear}
           fadeEdges={false}
-          stroke={warn ? 'var(--color-redesign-accent)' : 'var(--color-zinc-600)'}
+          stroke={warn ? 'var(--color-redesign-accent)' : 'var(--color-redesign-grey-3)'}
           strokeWidth={2}
           animate={false}
         />
@@ -97,7 +110,7 @@ export function DayNotches({ b, today }) {
       {Array.from({ length: days }, (_, i) => (
         <i
           key={i}
-          className={`h-6 grow rounded-[3px] ${i < filled ? `on ${fill}` : 'bg-zinc-200'} ${i === day - 1 ? 'today ring-2 ring-zinc-900 ring-offset-1' : ''}`}
+          className={`h-6 grow rounded-[3px] ${i < filled ? `on ${fill}` : 'bg-zinc-200 dark:bg-zinc-700'} ${i === day - 1 ? 'today ring-2 ring-zinc-900 dark:ring-white ring-offset-1 dark:ring-offset-zinc-900' : ''}`}
         />
       ))}
     </div>
@@ -257,16 +270,10 @@ export default function BudgetsPage({ me, household, refreshKey }) {
                   <p className={NOTE}>Your spending counts in household budgets automatically, as totals only.</p>
                 ) : (
                   <label className="flex cursor-pointer flex-row items-center gap-2 text-[14px] font-semibold">
-                    <input
-                      type="checkbox"
-                      role="switch"
-                      checked={!!mine?.counted}
-                      onChange={(e) => setCount(e.target.checked)}
-                      className="peer sr-only"
-                    />
+                    <input type="checkbox" role="switch" checked={!!mine?.counted} onChange={(e) => setCount(e.target.checked)} className="peer sr-only" />
                     <span
                       aria-hidden="true"
-                      className="relative h-5 w-9 shrink-0 rounded-full bg-zinc-300 transition-colors duration-150 peer-checked:bg-[var(--color-redesign-in)] peer-focus-visible:ring-2 peer-focus-visible:ring-zinc-900 peer-focus-visible:ring-offset-2 after:absolute after:top-0.5 after:left-0.5 after:size-4 after:rounded-full after:bg-white after:transition-transform after:duration-150 peer-checked:after:translate-x-4 motion-reduce:after:transition-none"
+                      className="relative h-5 w-9 shrink-0 rounded-full bg-zinc-300 dark:bg-zinc-600 transition-colors duration-150 peer-checked:bg-[var(--color-redesign-in)] dark:peer-checked:bg-[var(--color-redesign-in)] peer-focus-visible:ring-2 peer-focus-visible:ring-zinc-900 dark:peer-focus-visible:ring-white peer-focus-visible:ring-offset-2 after:absolute after:top-0.5 after:left-0.5 after:size-4 after:rounded-full after:bg-white after:transition-transform after:duration-150 peer-checked:after:translate-x-4 motion-reduce:after:transition-none"
                     />
                     Count my spending in household budgets (totals only)
                   </label>
@@ -285,7 +292,11 @@ export default function BudgetsPage({ me, household, refreshKey }) {
               <>
                 {shared.length > 0 && (
                   <section aria-labelledby="budgets-household">
-                    <SectionHead id="budgets-household" title="Household budgets" note="From the start of each budget to today. Solid line: spent. Dashed: an even pace." />
+                    <SectionHead
+                      id="budgets-household"
+                      title="Household budgets"
+                      note="From the start of each budget to today. Solid line: spent. Dashed: an even pace."
+                    />
                     <ul className="m-0 grid list-none gap-3 p-0 sm:grid-cols-2 xl:grid-cols-3">
                       {shared.map((b) => (
                         <HouseholdBudget key={b.id} b={b} today={data.today} money={money} onChange={() => setEditing(b)} />
@@ -348,7 +359,7 @@ function Counting({ counting, people, me }) {
   const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
   return (
     <p className={NOTE}>
-      Counting in household budgets: {list}. <b className="font-semibold text-zinc-900">Totals only, never transactions.</b>
+      Counting in household budgets: {list}. <b className="font-semibold text-zinc-900 dark:text-white">Totals only, never transactions.</b>
     </p>
   )
 }
@@ -401,7 +412,7 @@ function BudgetDialog({ budget, choices, people, me, household, onClose, onSaved
   return (
     <dialog
       ref={ref}
-      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border-0 bg-white p-5 text-zinc-900 shadow-2xl backdrop:bg-black/40"
+      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border-0 bg-white dark:bg-zinc-900 p-5 text-zinc-900 dark:text-white shadow-2xl backdrop:bg-black/40"
       aria-labelledby="budget-title"
       onCancel={(e) => (busy ? e.preventDefault() : onClose())}
     >
@@ -445,7 +456,15 @@ function BudgetDialog({ budget, choices, people, me, household, onClose, onSaved
         </fieldset>
         <label className="grid gap-1">
           <span className="font-semibold">Amount ({cur})</span>
-          <input className={FIELD} inputMode="decimal" autoComplete="off" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" required />
+          <input
+            className={FIELD}
+            inputMode="decimal"
+            autoComplete="off"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="0.00"
+            required
+          />
           {amount && !minor && (
             <span className="text-[13px] font-semibold" style={OWE}>
               Enter an amount above zero, like 250 or 250.50.
