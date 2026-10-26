@@ -3,23 +3,15 @@ import TallynLoader from '../components/TallynLoader.jsx'
 import { api } from '../lib/api.js'
 import { fromMinor, toMinor } from '../lib/budgets.js'
 import { formatMoney } from '../lib/money.js'
+import { Chips, Pill, NUM, MUTED, OWE, IN } from '../components/calm/ui.jsx'
 import { answer, BUCKETS, JOBS, jobs, ownSharesOk, suggestionMonths, TEMPLATES } from '../lib/plans.js'
 
-// Plan from your income (#133, Dinesh picked 3A): at the top of the Budgets
+// Plan from your income (#133, Dinesh picked 3A; calm redesign #187 from the #185 draft): at the top of the Budgets
 // page. Answer first (a sentence), then the logic (income and a labelled
 // split bar), then the data (a plain bar and words per job). One plan for the
 // household and one per person, with the budget rules (ADR 0014).
 
 const KID = new Set(['teen', 'child'])
-const STATE = {
-  on: ['pace-on', 'On pace'],
-  ahead: ['pace-ahead', 'Ahead of pace'],
-  full: ['pace-full', 'All used, as planned'],
-  over: ['pace-over', 'Over'],
-  done: ['pace-on', 'Done'],
-  tomove: ['pace-full', 'Still to move'],
-}
-
 export default function IncomePlan({ me, household, today }) {
   const [plans, setPlans] = useState(null)
   const [scope, setScope] = useState('household') // household | mine
@@ -51,7 +43,7 @@ export default function IncomePlan({ me, household, today }) {
 
   if (error) {
     return (
-      <p className="error" role="alert">
+      <p className="m-0 text-[14px] font-semibold" style={OWE} role="alert">
         {error}
       </p>
     )
@@ -59,16 +51,32 @@ export default function IncomePlan({ me, household, today }) {
   if (!plans) return <TallynLoader small />
 
   return (
-    <section className="panel plan" aria-labelledby="plan-h">
+    <section className="calm-glass min-w-0 rounded-2xl p-4" aria-labelledby={plan && !editing ? 'plan-title' : 'plan-h'}>
+      {plan && !editing && (
+        <header className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <h2 id="plan-title" className="m-0 font-[family-name:var(--font-heading)] text-[15px] font-semibold">
+            Plan from your income
+          </h2>
+          <span className={`flex items-baseline gap-2 text-[13px] ${MUTED}`}>
+            <span>{TEMPLATES[plan.template].label}</span>
+            {canManage && (
+              <button type="button" onClick={() => setEditing(true)} className="font-semibold text-zinc-900 underline decoration-zinc-300 underline-offset-4">
+                Change
+              </button>
+            )}
+          </span>
+        </header>
+      )}
       {canMine && (
-        <div className="chips plan-scope" role="group" aria-label="Whose plan">
-          <button type="button" className="chip" aria-pressed={scope === 'household'} onClick={() => (setScope('household'), setEditing(false))}>
-            Household
-          </button>
-          <button type="button" className="chip" aria-pressed={scope === 'mine'} onClick={() => (setScope('mine'), setEditing(false))}>
-            Just me
-          </button>
-        </div>
+        <Chips
+          label="Whose plan"
+          options={[
+            ['household', 'Household'],
+            ['mine', 'Just me'],
+          ]}
+          value={scope}
+          onChange={(v) => (setScope(v), setEditing(false))}
+        />
       )}
       {editing || (!plan && canManage) ? (
         <PlanSetup
@@ -81,80 +89,76 @@ export default function IncomePlan({ me, household, today }) {
           onCancel={plan ? () => setEditing(false) : null}
         />
       ) : plan ? (
-        <PlanView plan={plan} today={today} money={money} canManage={canManage} onChange={() => setEditing(true)} />
+        <PlanView plan={plan} today={today} money={money} />
       ) : (
         <>
-          <h2 id="plan-h">No household plan yet</h2>
-          <p className="muted">An owner or adult can plan the household&apos;s month from its income here.</p>
+          <h2 id="plan-h" className="m-0 mt-3 font-[family-name:var(--font-heading)] text-[18px] font-semibold">
+            No household plan yet
+          </h2>
+          <p className={`m-0 mt-1 text-[14px] ${MUTED}`}>An owner or adult can plan the household&apos;s month from its income here.</p>
         </>
       )}
     </section>
   )
 }
 
-function PlanView({ plan, today, money, canManage, onChange }) {
+// The split bar's colours, one per job in order: ink, red, grey, green, light grey.
+const JOB_TONE = ['bg-zinc-900', 'bg-[var(--color-redesign-accent)]', 'bg-zinc-500', 'bg-[var(--color-redesign-in)]', 'bg-zinc-300']
+const FIELD = 'h-9 w-full rounded-xl border border-zinc-200 bg-white px-3 text-[14px]'
+const STEP = `m-0 mt-4 mb-1.5 text-[13px] font-semibold ${MUTED}`
+
+function PlanView({ plan, today, money }) {
   const list = jobs(plan, today)
   const { title, detail } = answer(list, plan, today, money)
   return (
     <>
-      <div className="plan-head">
-        <div>
-          <h2 id="plan-h" className="plan-answer">
-            {title}
-          </h2>
-          <p className="muted plan-detail">{detail}</p>
-        </div>
-        <span className="small plan-template">{TEMPLATES[plan.template].label}</span>
-      </div>
-      <p className="plan-income">
-        Your income: <strong>{money(plan.monthly_income_minor)}</strong> a month{' '}
-        {canManage && (
-          <button type="button" className="link small" onClick={onChange}>
-            Change
-          </button>
-        )}
+      <h3 id="plan-h" className="m-0 mt-3 font-[family-name:var(--font-heading)] text-[20px] font-semibold">
+        {title}
+      </h3>
+      <p className={`m-0 mt-0.5 text-[14px] ${MUTED}`}>{detail}</p>
+      <p className={`m-0 mt-1 text-[13px] ${MUTED}`}>
+        Your income: <strong className={`text-zinc-900 ${NUM}`}>{money(plan.monthly_income_minor)}</strong> a month
       </p>
 
-      <h3 className="plan-step">How your income is split</h3>
-      <div className="plan-split" aria-hidden="true">
-        {list.map((j) => (
-          <span key={j.key} className={`plan-seg job-${j.key}`} style={{ flexGrow: j.share }} />
+      <h4 className={STEP}>How your income is split</h4>
+      <div className="flex h-3 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
+        {list.map((j, i) => (
+          <span key={j.key} className={JOB_TONE[i % JOB_TONE.length]} style={{ flexGrow: j.share }} />
         ))}
       </div>
-      <ul className="plan-key small">
-        {list.map((j) => (
-          <li key={j.key}>
-            <i className={`plan-dot job-${j.key}`} aria-hidden="true" />
-            <span>
-              <span className="block">{j.name}</span>
-              <strong>{money(j.planned)}</strong> <span className="muted">{j.share}%</span>
-            </span>
+      <ul className="m-0 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-zinc-600">
+        {list.map((j, i) => (
+          <li key={j.key} className="flex items-center gap-1.5">
+            <i className={`inline-block size-2 rounded-full ${JOB_TONE[i % JOB_TONE.length]}`} aria-hidden="true" />
+            {j.name} {j.share}%<span className={`${NUM} text-zinc-900`}>{money(j.planned)}</span>
           </li>
         ))}
       </ul>
 
-      <h3 className="plan-step">How each job is going</h3>
-      <ul className="plan-rows">
-        {list.map((j) => (
-          <li key={j.key} className="plan-row">
-            <div className="plan-row-top">
-              <span className="plan-name">
-                <i className={`plan-dot job-${j.key}`} aria-hidden="true" />
-                {j.name}
+      <h4 className={STEP}>How each job is going</h4>
+      <ul className="m-0 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-[repeat(var(--jobs),minmax(0,1fr))]" style={{ '--jobs': list.length }}>
+        {list.map((j) => {
+          const over = j.state === 'over'
+          return (
+            <li key={j.key} className="plan-row rounded-xl bg-white/70 p-3">
+              <div className="flex items-baseline justify-between gap-2 text-[14px]">
+                <span className="font-semibold">{j.name}</span>
+                <Words j={j} money={money} />
+              </div>
+              <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-zinc-200" aria-hidden="true">
+                <span
+                  className={`block h-full rounded-full ${over ? 'bg-[var(--color-redesign-accent)]' : j.kind === 'move' ? 'bg-[var(--color-redesign-in)]' : 'bg-zinc-500'}`}
+                  style={{ width: `${Math.min(100, j.planned ? (j.used / j.planned) * 100 : 0)}%` }}
+                />
               </span>
-              <span className={`pace ${STATE[j.state][0]}`}>{STATE[j.state][1]}</span>
-              <Words j={j} money={money} />
-            </div>
-            <div className={`plan-bar job-${j.key}${j.state === 'over' ? ' is-over' : ''}`} aria-hidden="true">
-              <i style={{ transform: `scaleX(${Math.min(1, j.planned ? j.used / j.planned : 0)})` }} />
-            </div>
-            <p className="small muted plan-row-foot">
-              {j.kind === 'spend' ? 'Spent' : 'Moved'} {money(j.used)} of {money(j.planned)}, for {j.for}
-            </p>
-          </li>
-        ))}
+              <p className={`m-0 mt-1 text-[13px] ${MUTED}`}>
+                {j.kind === 'spend' ? 'Spent' : 'Moved'} {money(j.used)} of {money(j.planned)}, for {j.for}
+              </p>
+            </li>
+          )
+        })}
       </ul>
-      <p className="small muted plan-cant">
+      <p className={`m-0 mt-3 text-[13px] ${MUTED}`}>
         Tallyn can only see what reaches your bank. Retirement taken from your pay first, like a 401(k), isn&apos;t counted here.
       </p>
     </>
@@ -162,10 +166,21 @@ function PlanView({ plan, today, money, canManage, onChange }) {
 }
 
 function Words({ j, money }) {
-  if (j.state === 'over') return <strong className="plan-words is-over">{money(j.used - j.planned)} over</strong>
-  if (j.state === 'done') return <strong className="plan-words is-done">Done</strong>
+  const cls = `plan-words shrink-0 whitespace-nowrap ${NUM}`
+  if (j.state === 'over')
+    return (
+      <strong className={cls} style={OWE}>
+        {money(j.used - j.planned)} over
+      </strong>
+    )
+  if (j.state === 'done')
+    return (
+      <strong className={cls} style={IN}>
+        Done
+      </strong>
+    )
   return (
-    <strong className="plan-words">
+    <strong className={cls}>
       {money(Math.max(0, j.planned - j.used))} {j.kind === 'spend' ? 'left' : 'to move'}
     </strong>
   )
@@ -214,58 +229,81 @@ function PlanSetup({ household, member, today, plan, onSaved, onCancel }) {
   }
 
   return (
-    <form className="plan-setup" onSubmit={save}>
-      <h2 id="plan-h">{plan ? 'Change your plan' : 'Plan your month'}</h2>
-      {!plan && <p className="muted">Give every dollar a job. Start from your income, then pick a common way to split it. You can change every amount.</p>}
-      <label htmlFor={incomeId}>Monthly income</label>
-      <input id={incomeId} inputMode="decimal" autoComplete="off" value={income} onChange={(e) => setIncome(e.target.value)} required />
-      {suggested > 0 && <p className="small muted">Suggested from your pay in {suggestionMonths(today)}. Tax refunds and one-offs are left out.</p>}
-      {suggested === 0 && <p className="small muted">We didn&apos;t find regular pay in the last 3 months. Type your monthly income.</p>}
+    <form className="mt-3 grid gap-3" onSubmit={save}>
+      <div>
+        <h2 id="plan-h" className="m-0 font-[family-name:var(--font-heading)] text-[18px] font-semibold">
+          {plan ? 'Change your plan' : 'Plan your month'}
+        </h2>
+        {!plan && (
+          <p className={`m-0 mt-1 text-[14px] ${MUTED}`}>
+            Give every dollar a job. Start from your income, then pick a common way to split it. You can change every amount.
+          </p>
+        )}
+      </div>
+      <div className="grid max-w-xs gap-1">
+        <label htmlFor={incomeId} className="text-[13px] font-semibold">
+          Monthly income
+        </label>
+        <input id={incomeId} className={FIELD} inputMode="decimal" autoComplete="off" value={income} onChange={(e) => setIncome(e.target.value)} required />
+      </div>
+      {suggested > 0 && <p className={`m-0 text-[13px] ${MUTED}`}>Suggested from your pay in {suggestionMonths(today)}. Tax refunds and one-offs are left out.</p>}
+      {suggested === 0 && <p className={`m-0 text-[13px] ${MUTED}`}>We didn&apos;t find regular pay in the last 3 months. Type your monthly income.</p>}
 
-      <fieldset className="plan-templates">
-        <legend>How to split it</legend>
-        {Object.entries(TEMPLATES).map(([key, t]) => (
-          <label key={key} className={`plan-template-card${template === key ? ' is-on' : ''}`}>
-            <input type="radio" name="template" value={key} checked={template === key} onChange={() => setTemplate(key)} />
-            <span className="name block">{t.label}</span>
-            <span className="plan-mini" aria-hidden="true">
-              {Object.entries(t.shares ?? { own: 100 }).map(([k, v]) => (
-                <span key={k} className={`job-${k}`} style={{ flexGrow: v }} />
-              ))}
-            </span>
-          </label>
-        ))}
+      <fieldset className="m-0 border-0 p-0">
+        <legend className="mb-1.5 p-0 text-[13px] font-semibold">How to split it</legend>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {Object.entries(TEMPLATES).map(([key, t]) => (
+            <label
+              key={key}
+              className={`flex cursor-pointer flex-col gap-2 rounded-xl border bg-white p-3 text-[14px] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-zinc-900 ${
+                template === key ? 'border-zinc-900' : 'border-zinc-200'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <input type="radio" name="template" value={key} checked={template === key} onChange={() => setTemplate(key)} className="accent-zinc-900" />
+                <span className="name font-semibold">{t.label}</span>
+              </span>
+              <span className="flex h-2 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
+                {Object.entries(t.shares ?? { own: 100 }).map(([k, v], i) => (
+                  <span key={k} className={t.shares ? JOB_TONE[i % JOB_TONE.length] : 'bg-zinc-200'} style={{ flexGrow: v }} />
+                ))}
+              </span>
+            </label>
+          ))}
+        </div>
       </fieldset>
 
       {template === 'own' && (
-        <fieldset className="plan-own">
-          <legend>Your split, in percent</legend>
-          {BUCKETS.map((k) => (
-            <label key={k}>
-              {JOBS[k].name}
-              <input inputMode="numeric" value={own[k]} onChange={(e) => setOwn({ ...own, [k]: e.target.value.replace(/\D/g, '') })} />
-            </label>
-          ))}
-          <p className={`small ${total === 100 ? 'muted' : 'error'}`} aria-live="polite">
+        <fieldset className="m-0 border-0 p-0">
+          <legend className="mb-1.5 p-0 text-[13px] font-semibold">Your split, in percent</legend>
+          <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-5">
+            {BUCKETS.map((k) => (
+              <label key={k} className="grid gap-1 text-[13px]">
+                {JOBS[k].name}
+                <input className={FIELD} inputMode="numeric" value={own[k]} onChange={(e) => setOwn({ ...own, [k]: e.target.value.replace(/\D/g, '') })} />
+              </label>
+            ))}
+          </div>
+          <p className={`m-0 mt-1.5 text-[13px] ${total === 100 ? MUTED : 'font-semibold'}`} style={total === 100 ? undefined : OWE} aria-live="polite">
             Adds up to {total}%{total === 100 ? '' : ', needs to be 100%'}
           </p>
         </fieldset>
       )}
 
-      <p className="small muted">A common way to split income, not financial advice.</p>
+      <p className={`m-0 text-[13px] ${MUTED}`}>A common way to split income, not financial advice.</p>
       {error && (
-        <p className="error" role="alert">
+        <p className="m-0 text-[14px] font-semibold" style={OWE} role="alert">
           {error}
         </p>
       )}
-      <div className="plan-actions">
-        <button className="btn" type="submit" disabled={busy}>
+      <div className="flex flex-wrap gap-2">
+        <Pill type="submit" disabled={busy}>
           {busy ? 'Saving…' : plan ? 'Save changes' : 'Start my plan'}
-        </button>
+        </Pill>
         {onCancel && (
-          <button className="btn btn-secondary" type="button" onClick={onCancel}>
+          <Pill quiet onClick={onCancel}>
             Cancel
-          </button>
+          </Pill>
         )}
       </div>
     </form>

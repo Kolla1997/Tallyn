@@ -98,8 +98,8 @@ export function Chips({ label, options, value, onChange }) {
 // The classes of a pill, for components that render their own button (Link a bank).
 export const PILL = 'inline-flex h-9 items-center gap-1.5 rounded-full border-0 px-3 text-[13px] font-semibold text-white bg-[var(--color-redesign-button)]'
 
-export function Pill({ children, icon: I, quiet, onClick, type = 'button', to }) {
-  const cls = `inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold no-underline ${
+export function Pill({ children, icon: I, quiet, onClick, type = 'button', to, disabled, label }) {
+  const cls = `inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold no-underline disabled:opacity-60 ${
     quiet ? 'border border-zinc-300 bg-white text-zinc-900' : 'border-0 text-white'
   }`
   const style = quiet ? undefined : { background: 'var(--color-redesign-button)' }
@@ -114,7 +114,7 @@ export function Pill({ children, icon: I, quiet, onClick, type = 'button', to })
       {inner}
     </Link>
   ) : (
-    <button type={type} className={cls} style={style} onClick={(e) => (press(e), onClick?.(e))}>
+    <button type={type} className={cls} style={style} disabled={disabled} aria-label={label} onClick={(e) => (press(e), onClick?.(e))}>
       {inner}
     </button>
   )
