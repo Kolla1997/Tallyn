@@ -8,7 +8,7 @@ import { canAddCardDetails, dueState, shortDate, todayISO } from '../lib/cards.j
 import { formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { ReconnectBank } from './Banks.jsx'
-import { PageHead } from './Shell.jsx'
+import { Head, Panel, Chips } from '../components/calm/ui.jsx'
 
 // Debts (#27), in the calm redesign (#187, Dinesh picked layout F): a summary strip with a waffle
 // for the split by kind and four figures (you owe, due this month, interest this year, overdue),
@@ -119,21 +119,22 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
   const overdue = debts.filter((a) => a.card?.is_overdue || a.loan?.is_overdue).length
 
   return (
-    <>
-      <PageHead title="Debts" sub="Everything you owe, in one place" />
+    <div className="calm">
+      <Head title="Debts" sub="Everything you owe, in one place" />
 
       {showSwitch && (
-        <div className="chips page-chips" role="group" aria-label="Whose debts">
-          {[['yours', 'Yours'], ...owners.map((id) => [id, nameOf(people[id] ?? { user_id: id })]), ['everyone', 'Everyone']].map(([key, label]) => (
-            <button key={key} className="chip" aria-pressed={who === key} onClick={() => setWho(key)}>
-              {label}
-            </button>
-          ))}
+        <div className="mb-3">
+          <Chips
+            label="Whose debts"
+            options={[['yours', 'Yours'], ...owners.map((id) => [id, nameOf(people[id] ?? { user_id: id })]), ['everyone', 'Everyone']]}
+            value={who}
+            onChange={setWho}
+          />
         </div>
       )}
 
       {error && (
-        <p className="error" role="alert">
+        <p className="m-0 mb-3 text-[14px] font-semibold" style={{ color: 'var(--color-redesign-owe-text)' }} role="alert">
           {error}
         </p>
       )}
@@ -146,9 +147,9 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
           <TallynLoader />
         )
       ) : debts.length === 0 ? (
-        <section className="panel empty-state">
-          <p className="muted">{who === 'yours' ? 'No credit cards or loans to show. Nice.' : 'No credit cards or loans to show here.'}</p>
-        </section>
+        <Panel label="No debts">
+          <p className={`m-0 text-[14px] ${MUTED}`}>{who === 'yours' ? 'No credit cards or loans to show. Nice.' : 'No credit cards or loans to show here.'}</p>
+        </Panel>
       ) : (
         <>
           <section aria-label="What you owe by kind" className="calm-glass mb-3 grid gap-5 rounded-2xl p-4 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center">
@@ -213,13 +214,13 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
           </section>
 
           {others > 0 && (
-            <p className="small muted">
+            <p className={`m-0 mt-3 text-[13px] ${MUTED}`}>
               {others} {others === 1 ? 'debt is' : 'debts are'} in another currency or {others === 1 ? 'has' : 'have'} no balance yet. See Accounts.
             </p>
           )}
         </>
       )}
-    </>
+    </div>
   )
 }
 
@@ -320,10 +321,21 @@ function Details({ account: a, money, onChanged, onError }) {
   const bank = a.bank
   const due = (amount, date, overdue) => {
     const state = dueState(date, overdue)
-    if (state === 'late') return <span className="tag cc-due-late">Overdue</span>
+    if (state === 'late')
+      return (
+        <span className="rounded-full bg-red-50 px-1.5 py-0.5 font-semibold" style={{ color: 'var(--color-redesign-owe-text)' }}>
+          Overdue
+        </span>
+      )
     if (!date) return amount != null ? `${money(amount)} a month` : null
     const text = `${amount != null ? `${money(amount)} ` : ''}${state === 'past' ? 'last due' : 'due'} ${shortDate(date)}`
-    return state === 'soon' ? <span className="tag cc-due-soon">{text}</span> : text
+    return state === 'soon' ? (
+      <span className="rounded-full bg-red-50 px-1.5 py-0.5 font-semibold" style={{ color: 'var(--color-redesign-owe-text)' }}>
+        {text}
+      </span>
+    ) : (
+      text
+    )
   }
   const join = (parts) => parts.filter(Boolean).reduce((out, p, i) => (i ? [...out, ' · ', <span key={i}>{p}</span>] : [<span key={i}>{p}</span>]), [])
 
@@ -331,7 +343,7 @@ function Details({ account: a, money, onChanged, onError }) {
     const aprs = a.card.aprs ?? []
     const apr = (aprs.find((x) => x.type === 'purchase_apr') ?? aprs[0])?.percent
     return (
-      <p className="small muted">
+      <p className={`m-0 text-[13px] ${MUTED}`}>
         {join([
           apr && `APR ${apr}%`,
           a.card.minimum_payment_minor != null && `Min ${money(a.card.minimum_payment_minor)}`,
@@ -346,7 +358,7 @@ function Details({ account: a, money, onChanged, onError }) {
     const end =
       l.payoff_date && (l.kind === 'mortgage' ? `${l.term ? `${l.term}, ` : ''}ends ${monthYear(l.payoff_date)}` : `Paid off by ${monthYear(l.payoff_date)}`)
     return (
-      <p className="small muted">
+      <p className={`m-0 text-[13px] ${MUTED}`}>
         {join([
           rate,
           due(l.next_payment_minor, l.next_payment_due_date, l.is_overdue),
@@ -360,17 +372,17 @@ function Details({ account: a, money, onChanged, onError }) {
 
   // No details: say why, and offer a fix when one can help (#51).
   const kind = a.type === 'credit' ? 'card' : ['student', 'mortgage'].includes((a.subtype ?? '').toLowerCase()) ? 'loan' : 'other'
-  if (kind === 'other') return <p className="small muted">Your bank doesn&apos;t share loan details for this account.</p>
+  if (kind === 'other') return <p className={`m-0 text-[13px] ${MUTED}`}>Your bank doesn&apos;t share loan details for this account.</p>
   const needsSignIn = bank.status === 'needs_reauth'
   if (!needsSignIn && !canAddCardDetails(bank)) {
     return (
-      <p className="small muted">
+      <p className={`m-0 text-[13px] ${MUTED}`}>
         {kind === 'card' ? 'Your bank doesn’t share APR or due dates for this card.' : 'Your bank doesn’t share loan details for this account.'}
       </p>
     )
   }
   return (
-    <p className="small muted">
+    <p className={`m-0 text-[13px] ${MUTED}`}>
       {kind === 'card' ? 'No APR or due date yet' : 'No rate or due date yet'}
       {bank.can_unlink && (
         <>
@@ -378,7 +390,7 @@ function Details({ account: a, money, onChanged, onError }) {
           <ReconnectBank
             bankId={bank.id}
             label={needsSignIn ? `Reconnect ${bank.institution_name || 'bank'}` : kind === 'card' ? 'Add APR and due dates' : 'Add rates and due dates'}
-            className="link small"
+            className="font-semibold text-zinc-900 underline decoration-zinc-300 underline-offset-4"
             onDone={onChanged}
             onError={onError}
           />

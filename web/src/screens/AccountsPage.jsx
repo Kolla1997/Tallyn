@@ -7,7 +7,7 @@ import { Avatar, nameOf } from '../lib/people.jsx'
 import { isOwed } from '../lib/summary.js'
 import { LinkBank, ReconnectBank } from './Banks.jsx'
 import { canAddCardDetails, cardsWithoutDetails } from '../lib/cards.js'
-import { PageHead } from './Shell.jsx'
+import { Head, Panel, Chips, PILL } from '../components/calm/ui.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
@@ -102,10 +102,11 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
   }, [bank])
 
   return (
-    <>
-      <PageHead title="Accounts" sub="Your banks and the ones shared with you">
+    <div className="calm">
+      <Head title="Accounts" sub="Your banks and the ones shared with you">
         {canLink && (
           <LinkBank
+            className={PILL}
             householdId={household.id}
             onLinked={() => {
               load()
@@ -114,20 +115,21 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
             onError={setError}
           />
         )}
-      </PageHead>
+      </Head>
 
       {showSwitch && (
-        <div className="chips page-chips" role="group" aria-label="Whose accounts">
-          {[['yours', 'Yours'], ...owners.map((id) => [id, nameOf(people[id] ?? { user_id: id })]), ['everyone', 'Everyone']].map(([key, label]) => (
-            <button key={key} className="chip" aria-pressed={who === key} onClick={() => setWho(key)}>
-              {label}
-            </button>
-          ))}
+        <div className="mb-3">
+          <Chips
+            label="Whose accounts"
+            options={[['yours', 'Yours'], ...owners.map((id) => [id, nameOf(people[id] ?? { user_id: id })]), ['everyone', 'Everyone']]}
+            value={who}
+            onChange={setWho}
+          />
         </div>
       )}
 
       {error && (
-        <p className="error" role="alert">
+        <p className="m-0 mb-3 text-[14px] font-semibold" style={{ color: 'var(--color-redesign-owe-text)' }} role="alert">
           {error}
         </p>
       )}
@@ -140,23 +142,29 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
           <TallynLoader />
         )
       ) : accounts.length === 0 ? (
-        <section className="panel empty-state">
-          <p className="muted">
+        <Panel label="No accounts">
+          <p className={`m-0 text-[14px] ${MUTED}`}>
             {who !== 'yours'
               ? 'No accounts to show here.'
               : canLink
                 ? 'You haven’t linked a bank yet. Use Link a bank above.'
                 : 'You don’t have any banks linked.'}
           </p>
-        </section>
+        </Panel>
       ) : (
         <>
           <NetWorth have={have} owe={owe} home={home} accounts={counted} />
           {shown.length > 1 && (
-            <div className="chips bank-chips" role="group" aria-label="Which bank">
+            <div className="mb-3 flex flex-wrap gap-1.5" role="group" aria-label="Which bank">
               {[['', 'All', accounts.length], ...shown.map((b) => [b.id, b.institution_name || 'Bank', b.accounts.length])].map(([id, label, n]) => (
-                <button key={id || 'all'} className="chip chip-outline" aria-pressed={(picked?.id ?? '') === id} onClick={() => setBank(id)}>
-                  {label} <span className="chip-count">{n}</span>
+                <button
+                  key={id || 'all'}
+                  type="button"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 text-[13px] font-semibold text-zinc-600 transition-[border-color,color] duration-150 aria-pressed:border-zinc-900 aria-pressed:text-zinc-900"
+                  aria-pressed={(picked?.id ?? '') === id}
+                  onClick={() => setBank(id)}
+                >
+                  {label} <span className="tabular-nums text-zinc-400">{n}</span>
                 </button>
               ))}
             </div>
@@ -171,14 +179,14 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
             onError={setError}
           />
           {uncounted > 0 && (
-            <p className="small muted">
+            <p className={`m-0 mt-3 text-[13px] ${MUTED}`}>
               {uncounted} {uncounted === 1 ? 'account isn’t' : 'accounts aren’t'} in the totals: another currency or no balance yet. Totals in one currency come
               later.
             </p>
           )}
         </>
       )}
-    </>
+    </div>
   )
 }
 
@@ -348,27 +356,29 @@ function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnecte
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <BankStatus bank={b} />
                   {b.can_unlink && (
-                    <div className="bank-actions">
+                    <div className="flex shrink-0 flex-wrap gap-1.5">
                       {/* Reconnect (#51): sign in again, or share card details (#27). */}
-                      {b.status === 'needs_reauth' && <ReconnectBank bankId={b.id} label="Reconnect" onDone={onReconnected} onError={onError} />}
-                      {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
-                        <ReconnectBank bankId={b.id} label="Add APR and due dates" className="chip" onDone={onReconnected} onError={onError} />
+                      {b.status === 'needs_reauth' && (
+                        <ReconnectBank bankId={b.id} label="Reconnect" className={SMALL_RED} onDone={onReconnected} onError={onError} />
                       )}
-                      <button className="chip chip-danger" onClick={() => setUnlinking(b)}>
+                      {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
+                        <ReconnectBank bankId={b.id} label="Add APR and due dates" className={SMALL} onDone={onReconnected} onError={onError} />
+                      )}
+                      <button type="button" className={SMALL} style={{ color: 'var(--color-redesign-owe-text)' }} onClick={() => setUnlinking(b)}>
                         Unlink
                       </button>
                     </div>
                   )}
                 </div>
                 {!ok && (
-                  <p className="small bank-warning m-0">
+                  <p className="m-0 text-[13px] font-semibold" style={{ color: 'var(--color-redesign-owe-text)' }}>
                     {b.status === 'needs_reauth'
                       ? 'This bank asked you to sign in again, so its balances aren’t updating.'
                       : 'This bank was disconnected and isn’t updating.'}
                   </p>
                 )}
                 {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
-                  <p className="small muted m-0">
+                  <p className={`m-0 text-[13px] ${MUTED}`}>
                     {cardsWithoutDetails(b)} {cardsWithoutDetails(b) === 1 ? 'credit card doesn’t' : 'credit cards don’t'} have APR or due dates yet.
                   </p>
                 )}
@@ -377,7 +387,7 @@ function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnecte
           )
         })}
       </ul>
-      <p className="small muted mt-3">Tallyn reads balances and transactions. It can&apos;t move money.</p>
+      <p className={`m-0 mt-3 text-[13px] ${MUTED}`}>Tallyn reads balances and transactions. It can&apos;t move money.</p>
       {unlinking && (
         <ConfirmDialog
           title={`Unlink ${unlinking.institution_name || 'this bank'}?`}
@@ -393,11 +403,26 @@ function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnecte
   )
 }
 
+const SMALL = 'inline-flex h-8 items-center rounded-full border border-zinc-300 bg-white px-3 text-[13px] font-semibold text-zinc-900'
+const SMALL_RED = 'inline-flex h-8 items-center rounded-full border-0 px-3 text-[13px] font-semibold text-white bg-[var(--color-redesign-button)]'
+
 function BankStatus({ bank }) {
-  if (bank.status === 'needs_reauth') return <p className="small bank-status bank-status-warn">Needs you to sign in again</p>
-  if (bank.status === 'disconnected') return <p className="small bank-status bank-status-warn">Disconnected</p>
-  if (!bank.last_synced_at) return <p className="small muted">Getting your accounts…</p>
-  return <p className="small bank-status bank-status-ok">Up to date · {ago(bank.last_synced_at)}</p>
+  const warn = 'm-0 text-[13px] font-semibold'
+  const owe = { color: 'var(--color-redesign-owe-text)' }
+  if (bank.status === 'needs_reauth')
+    return (
+      <p className={warn} style={owe}>
+        Needs you to sign in again
+      </p>
+    )
+  if (bank.status === 'disconnected')
+    return (
+      <p className={warn} style={owe}>
+        Disconnected
+      </p>
+    )
+  if (!bank.last_synced_at) return <p className={`m-0 text-[13px] ${MUTED}`}>Getting your accounts…</p>
+  return <p className={`m-0 text-[13px] ${MUTED}`}>Up to date, {ago(bank.last_synced_at)}</p>
 }
 
 function ago(when) {

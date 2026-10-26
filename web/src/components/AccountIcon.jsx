@@ -1,6 +1,4 @@
-import { isOwed } from '../lib/summary.js'
-
-// Account type icons (#39): sage for money you have, clay for money you owe.
+// Account type icons (#39), on a plain grey tile (calm redesign #187: colour is for money, not icons).
 // Picked from Plaid's account type and subtype. Decorative: the account name
 // is always next to it.
 
@@ -32,10 +30,10 @@ export function accountKind(a) {
 
 export default function AccountIcon({ account }) {
   return (
-    <span className={`tx-icon ${isOwed(account) ? 'tone-clay' : 'tone-sage'}`} aria-hidden="true">
+    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-zinc-700" aria-hidden="true">
       <svg
-        width="20"
-        height="20"
+        width="16"
+        height="16"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
