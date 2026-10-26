@@ -238,3 +238,54 @@ body {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
+
+/* Glass draft (#185): Tallyn's glass finish (#61) in the redesign's colours. Soft: faint glows, every
+   card frosted. Tallyn: #61 at full strength, the sidebar too. Mix: glows, the sidebar and summary
+   cards frosted; cards that hold a list or a table stay solid, as #61 keeps what people must read
+   carefully solid. Solid again without blur support or with reduced transparency. */
+[data-glass='soft'],
+[data-glass='tallyn'],
+[data-glass='mix'] {
+  background-image:
+    radial-gradient(42rem 30rem at 8% 0%, var(--glow-green), transparent 70%), radial-gradient(40rem 28rem at 96% 4%, var(--glow-red), transparent 70%),
+    radial-gradient(60rem 26rem at 50% 105%, var(--glow-grey), transparent 70%);
+  background-attachment: fixed;
+}
+[data-glass='soft'] {
+  background-image:
+    radial-gradient(42rem 30rem at 8% 0%, color-mix(in srgb, var(--glow-green) 50%, transparent), transparent 70%),
+    radial-gradient(40rem 28rem at 96% 4%, color-mix(in srgb, var(--glow-red) 50%, transparent), transparent 70%),
+    radial-gradient(60rem 26rem at 50% 105%, color-mix(in srgb, var(--glow-grey) 50%, transparent), transparent 70%);
+}
+:is([data-glass='soft'], [data-glass='tallyn']) main :is(.rounded-2xl, .rounded-3xl).bg-white,
+[data-glass='tallyn'] aside.bg-white,
+[data-glass='mix'] aside.bg-white,
+[data-glass='mix'] main :is(.rounded-2xl, .rounded-3xl).bg-white:not(:has(table, ul, ol)) {
+  background-color: var(--glass-surface);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-highlight), var(--card-shade);
+  backdrop-filter: blur(18px) saturate(1.2);
+}
+[data-glass='mix'] main :is(.rounded-2xl, .rounded-3xl).bg-white:has(table, ul, ol) {
+  box-shadow: var(--card-shade);
+}
+@supports not (backdrop-filter: blur(1px)) {
+  [data-glass] {
+    background-image: none;
+  }
+  [data-glass] :is(main, aside) :is(.rounded-2xl, .rounded-3xl).bg-white,
+  [data-glass] aside.bg-white {
+    background-color: revert-layer;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  [data-glass] {
+    background-image: none;
+  }
+  [data-glass] main :is(.rounded-2xl, .rounded-3xl).bg-white,
+  [data-glass] aside.bg-white {
+    background-color: revert-layer;
+    backdrop-filter: none;
+  }
+}

@@ -51,6 +51,14 @@ export const THEME = {
     '--spend-2': '#f87171',
     '--spend-3': '#dc2626',
     '--spend-4': '#7f1d1d',
+    // Glass (#61's recipe, in the redesign's colours): surface, edge, highlight, shade, three glows.
+    '--glass-surface': 'rgba(255, 255, 255, 0.7)',
+    '--glass-border': 'rgba(255, 255, 255, 0.8)',
+    '--glass-highlight': 'inset 0 1px 0 rgba(255, 255, 255, 0.9)',
+    '--card-shade': '0 6px 20px rgba(24, 24, 27, 0.08), 0 1px 3px rgba(24, 24, 27, 0.06)',
+    '--glow-green': 'rgba(22, 163, 74, 0.22)',
+    '--glow-red': 'rgba(220, 38, 38, 0.16)',
+    '--glow-grey': 'rgba(161, 161, 170, 0.3)',
   },
   dark: {
     '--accent': '#dc2626',
@@ -72,6 +80,13 @@ export const THEME = {
     '--spend-2': '#6b1d1d',
     '--spend-3': '#b91c1c',
     '--spend-4': '#f87171',
+    '--glass-surface': 'rgba(24, 24, 27, 0.62)',
+    '--glass-border': 'rgba(255, 255, 255, 0.08)',
+    '--glass-highlight': 'inset 0 1px 0 rgba(255, 255, 255, 0.06)',
+    '--card-shade': '0 6px 20px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3)',
+    '--glow-green': 'rgba(22, 163, 74, 0.16)',
+    '--glow-red': 'rgba(220, 38, 38, 0.14)',
+    '--glow-grey': 'rgba(161, 161, 170, 0.1)',
   },
 }
 const EASE = 'cubicBezier(0.23, 1, 0.32, 1)'
@@ -256,8 +271,24 @@ function Sidebar({ dark, collapsed, onToggle, page, go }) {
 }
 
 // The signed-in shell: draft bar (page switcher, Light/Dark), sidebar, phone header and tab bar.
+const GLASS = [
+  ['off', 'Off'],
+  ['soft', 'Soft'],
+  ['tallyn', 'Tallyn'],
+  ['mix', 'Mix'],
+]
+
 export function Shell({ page, pages, go, dark, setDark, children, bare = false }) {
   const q = new URLSearchParams(location.search)
+  // Glass draft (#185): off, soft, tallyn (#61 at full strength) or mix (frame and summaries in glass,
+  // lists solid). ?g= picks one.
+  const [glass, setGlassState] = useState(GLASS.some(([k]) => k === q.get('g')) ? q.get('g') : 'mix')
+  const setGlass = (g) => {
+    setGlassState(g)
+    const u = new URL(location.href)
+    u.searchParams.set('g', g)
+    history.replaceState(null, '', u)
+  }
   // Rail, collapsed by default (#185, Dinesh picked it). ?nav=expanded opens it.
   const [collapsed, setCollapsed] = useState(q.get('nav') !== 'expanded')
   useLayoutEffect(() => {
@@ -265,7 +296,12 @@ export function Shell({ page, pages, go, dark, setDark, children, bare = false }
     document.body.style.background = dark ? THEME.dark['--page'] : THEME.light['--page']
   }, [dark])
   return (
-    <div style={THEME[dark ? 'dark' : 'light']} data-compact className="min-h-svh bg-zinc-50 font-body text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+    <div
+      style={THEME[dark ? 'dark' : 'light']}
+      data-compact
+      data-glass={glass}
+      className="min-h-svh bg-zinc-50 font-body text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100"
+    >
       <div className="sticky top-0 z-50 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-zinc-200 bg-white/90 px-4 py-2 text-[13px] text-zinc-600 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90 dark:text-zinc-400">
         <b className="text-zinc-900 dark:text-white">Draft for #185 · calm screens</b>
         <label className="flex items-center gap-2">
@@ -283,7 +319,21 @@ export function Shell({ page, pages, go, dark, setDark, children, bare = false }
           </select>
         </label>
         <span>made-up names and amounts</span>
-        <span role="group" aria-label="Theme" className="ml-auto flex gap-0.5 rounded-full border border-zinc-300 p-0.5 dark:border-zinc-700">
+        <span role="group" aria-label="Draft: glass" className="ml-auto flex items-center gap-1">
+          <span className="mr-1">Glass</span>
+          {GLASS.map(([k, label]) => (
+            <button
+              key={k}
+              type="button"
+              aria-pressed={k === glass}
+              onClick={() => setGlass(k)}
+              className="rounded-full border border-zinc-300 px-2.5 py-0.5 font-semibold aria-pressed:border-zinc-900 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:border-zinc-700 dark:aria-pressed:border-white dark:aria-pressed:bg-white dark:aria-pressed:text-zinc-900"
+            >
+              {label}
+            </button>
+          ))}
+        </span>
+        <span role="group" aria-label="Theme" className="flex gap-0.5 rounded-full border border-zinc-300 p-0.5 dark:border-zinc-700">
           {[false, true].map((v) => (
             <button
               key={String(v)}
