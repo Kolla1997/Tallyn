@@ -12,24 +12,27 @@ import TallynLoader from '../components/TallynLoader.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
 import CountUp from '../components/CountUp.jsx'
+import { RingChart } from '@/components/charts/ring-chart'
+import { Ring } from '@/components/charts/ring'
 import { useFadeOnChange } from '../lib/motion.js'
 
-// Accounts (#39 step 3): net worth with a have-vs-owe bar, then every account
-// in two columns, You have and You owe, grouped by type, and the connected
-// banks with their status and Unlink. Switch between your accounts, each
-// person who shares with you, and everyone. The API only returns what this
-// person may see (#28); the switcher only narrows it. Bank chips (#84,
-// option A) narrow the two columns to one bank; net worth stays whole.
+// Accounts (#39), in the calm redesign (#187, Dinesh picked F, the bank bento, with rings): a
+// summary strip with Bklit rings for what you have by kind, net worth, have and owe; then one
+// card per bank holding its accounts as tiles, each card as wide as its accounts, with the bank's
+// status and actions (Reconnect, Add APR and due dates, Unlink) at its foot. Switch between your
+// accounts, each person who shares with you, and everyone. The API only returns what this person
+// may see (#28); the switcher only narrows it. Bank chips (#84) narrow the cards to one bank; the
+// summary stays whole.
 
+// What you have, by kind, as rings (and their colours).
 const HAVE_GROUPS = [
-  ['everyday', 'Everyday'],
-  ['savings', 'Savings'],
-  ['investment', 'Investments'],
+  ['everyday', 'Everyday', 'var(--color-redesign-ink)'],
+  ['savings', 'Savings', 'var(--color-redesign-in)'],
+  ['investment', 'Investments', 'var(--color-redesign-grey-2)'],
 ]
-const OWE_GROUPS = [
-  ['card', 'Credit cards'],
-  ['loan', 'Loans'],
-]
+const KIND_LABEL = { everyday: 'Everyday', savings: 'Savings', investment: 'Investments', card: 'Credit card', loan: 'Loan' }
+const NUM = 'font-[family-name:var(--font-heading)] font-semibold tabular-nums'
+const MUTED = 'text-zinc-500'
 const KID = new Set(['teen', 'child'])
 
 // Mortgages, student, auto and other loans all count as Loans here.
@@ -86,10 +89,6 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
 
   // The picked bank, if it belongs to the person shown; otherwise all.
   const picked = shown.find((b) => b.id === bank)
-  const inBank = picked ? accounts.filter((a) => a.bank.id === picked.id) : accounts
-  const inBankCounted = inBank.filter((a) => a.currency === home && a.current_balance_minor != null)
-  const bankHave = sum(inBankCounted.filter((a) => !isOwed(a)))
-  const bankOwe = sum(inBankCounted.filter((a) => isOwed(a)))
 
   useEffect(() => {
     if (banks && bank && !picked) setBank('') // switched to someone without this bank
@@ -152,7 +151,7 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
         </section>
       ) : (
         <>
-          <NetWorth have={have} owe={owe} home={home} />
+          <NetWorth have={have} owe={owe} home={home} accounts={counted} />
           {shown.length > 1 && (
             <div className="chips bank-chips" role="group" aria-label="Which bank">
               {[['', 'All', accounts.length], ...shown.map((b) => [b.id, b.institution_name || 'Bank', b.accounts.length])].map(([id, label, n]) => (
@@ -162,41 +161,15 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
               ))}
             </div>
           )}
-          <div className="accounts-grid">
-            <AccountColumn
-              id="have"
-              title="You have"
-              total={bankHave}
-              bankName={picked?.institution_name}
-              groups={HAVE_GROUPS}
-              accounts={inBank.filter((a) => !isOwed(a))}
-              home={home}
-              people={people}
-              showOwner={who === 'everyone'}
-              meId={me.user_id}
-            />
-            <AccountColumn
-              id="owe"
-              title="You owe"
-              total={bankOwe}
-              bankName={picked?.institution_name}
-              groups={OWE_GROUPS}
-              accounts={inBank.filter((a) => isOwed(a))}
-              home={home}
-              people={people}
-              showOwner={who === 'everyone'}
-              meId={me.user_id}
-              owed
-            />
-            <ConnectedBanks
-              banks={shown}
-              me={me}
-              people={people}
-              onUnlinked={() => (load(), onChanged?.())}
-              onReconnected={() => (load(), onChanged?.())}
-              onError={setError}
-            />
-          </div>
+          <ConnectedBanks
+            banks={picked ? [picked] : shown}
+            me={me}
+            people={people}
+            showOwner={who === 'everyone'}
+            onUnlinked={() => (load(), onChanged?.())}
+            onReconnected={() => (load(), onChanged?.())}
+            onError={setError}
+          />
           {uncounted > 0 && (
             <p className="small muted">
               {uncounted} {uncounted === 1 ? 'account isn’t' : 'accounts aren’t'} in the totals: another currency or no balance yet. Totals in one currency come
@@ -209,108 +182,126 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
   )
 }
 
-// Net worth with a bar showing how what you have compares with what you owe.
-// Switching person counts the numbers to their new values (#87).
-function NetWorth({ have, owe, home }) {
+// The summary strip: what you have by kind as rings, then net worth, have and owe. Switching
+// person counts the numbers to their new values (#87).
+function NetWorth({ have, owe, home, accounts }) {
   const net = have - owe
-  const both = have + owe
   const money = (v) => formatMoney(v, home)
-  return (
-    <section className={useFadeOnChange(`${have}|${owe}`) ? 'panel net-worth is-fading' : 'panel net-worth'} aria-label="Net worth">
-      <div className="net-worth-head">
-        <span className="small muted">Net worth</span>
-        <span className="amount net-worth-total">
-          <CountUp value={net} format={(v) => `${v < 0 ? '−' : ''}${money(Math.abs(v))}`} />
-        </span>
-      </div>
-      {both > 0 && (
-        <div className="net-worth-bar" aria-hidden="true">
-          {have > 0 && <span className="spend-sage" style={{ flexGrow: have }} />}
-          {owe > 0 && <span className="spend-clay" style={{ flexGrow: owe }} />}
-        </div>
-      )}
-      <div className="net-worth-key small muted">
-        <span>
-          <span className="dot dot-sage" aria-hidden="true" /> Have <CountUp value={have} format={money} />
-        </span>
-        <span>
-          <span className="dot dot-clay" aria-hidden="true" /> Owe <CountUp value={owe} format={money} />
-        </span>
-      </div>
-    </section>
-  )
-}
-
-function AccountColumn({ id, title, total, bankName, groups, accounts, home, people, showOwner, meId, owed = false }) {
+  const parts = HAVE_GROUPS.map(([key, label, color]) => ({
+    label,
+    color,
+    value: accounts.filter((a) => !isOwed(a) && groupOf(a) === key).reduce((t, a) => t + a.current_balance_minor, 0),
+  })).filter((p) => p.value > 0)
+  const pct = (v) => (have > 0 ? Math.round((v / have) * 100) : 0)
   return (
     <section
-      id={id}
-      className={`panel account-col ${owed ? 'account-col-owe' : 'account-col-have'}${useFadeOnChange(accounts.map((a) => a.id).join()) ? ' is-fading' : ''}`}
-      aria-labelledby={`${id}-h`}
+      className={`calm-glass mb-3 grid gap-5 rounded-2xl p-4 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center${useFadeOnChange(`${have}|${owe}`) ? ' is-fading' : ''}`}
+      aria-label="Net worth"
     >
-      <div className="panel-head">
-        <h2 id={`${id}-h`}>{title}</h2>
-        <span className={owed ? 'amount money-out' : 'amount'}>
-          <CountUp value={total} format={(v) => formatMoney(v, home)} />
-        </span>
-      </div>
-      <p className="small muted account-count">
-        {accounts.length} {accounts.length === 1 ? 'account' : 'accounts'}
-        {bankName && ` · ${bankName}`}
-      </p>
-      {accounts.length === 0 && <p className="small muted">{owed ? 'Nothing owed here.' : 'Nothing here yet.'}</p>}
-      {groups.map(([key, label]) => {
-        const list = accounts.filter((a) => groupOf(a) === key).sort((x, y) => (y.current_balance_minor ?? 0) - (x.current_balance_minor ?? 0))
-        if (list.length === 0) return null
-        const subtotal = list.filter((a) => a.currency === home && a.current_balance_minor != null).reduce((t, a) => t + a.current_balance_minor, 0)
-        return (
-          <div key={key} className="account-group">
-            <h3 className="account-group-head">
-              <span>{label}</span>
-              <span className={owed ? 'money-out' : undefined}>{formatMoney(subtotal, home)}</span>
-            </h3>
-            <ul className="rows">
-              {list.map((a) => (
-                <AccountItem key={a.id} a={a} meId={meId} owner={showOwner ? (people[a.bank.owner_user_id] ?? { user_id: a.bank.owner_user_id }) : null} />
+      {parts.length > 0 && (
+        <div className="flex flex-wrap items-center gap-4 lg:border-r lg:border-zinc-200 lg:pr-6">
+          <div aria-hidden="true">
+            <RingChart
+              data={parts.map((p) => ({ label: p.label, value: p.value, maxValue: have }))}
+              size={120}
+              strokeWidth={9}
+              ringGap={3}
+              baseInnerRadius={30}
+            >
+              {parts.map((p, i) => (
+                <Ring key={p.label} index={i} color={p.color} showGlow={false} />
               ))}
-            </ul>
+            </RingChart>
           </div>
-        )
-      })}
+          <ul className="m-0 grid list-none gap-1 p-0 text-[13px]">
+            {parts.map((p) => (
+              <li key={p.label} className="flex items-center gap-2">
+                <i className="block size-2 shrink-0 rounded-[2px]" style={{ background: p.color }} />
+                <span>{p.label}</span>
+                <b className={`ml-auto pl-4 ${NUM}`}>{money(p.value)}</b>
+                <span className={`w-10 text-right tabular-nums ${MUTED}`}>{pct(p.value)}%</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <dl className="m-0 grid grid-cols-2 gap-y-3 sm:grid-cols-3 sm:divide-x sm:divide-zinc-200">
+        <div className="sm:pr-4">
+          <dt className={`text-[13px] ${MUTED}`}>Net worth</dt>
+          <dd className={`m-0 text-[22px] whitespace-nowrap ${NUM}`}>
+            <CountUp value={net} format={(v) => `${v < 0 ? '−' : ''}${money(Math.abs(v))}`} />
+          </dd>
+          <dd className={`m-0 text-[13px] ${MUTED}`}>In {home}</dd>
+        </div>
+        <div className="sm:px-4">
+          <dt className={`text-[13px] ${MUTED}`}>You have</dt>
+          <dd className={`m-0 text-[22px] whitespace-nowrap ${NUM}`} style={{ color: 'var(--color-redesign-in-text)' }}>
+            <CountUp value={have} format={money} />
+          </dd>
+        </div>
+        <div className="sm:px-4">
+          <dt className={`text-[13px] ${MUTED}`}>You owe</dt>
+          <dd className={`m-0 text-[22px] whitespace-nowrap ${NUM}`} style={{ color: 'var(--color-redesign-owe-text)' }}>
+            <CountUp value={owe} format={money} />
+          </dd>
+        </div>
+      </dl>
     </section>
   )
 }
 
-function AccountItem({ a, owner, meId }) {
+// One account as a tile inside its bank's card: name, kind and mask (and whose, when showing
+// everyone), the balance, and what's worth knowing (available money, a card's limit used).
+function AccountTile({ a, owner, meId }) {
   const owed = isOwed(a)
-  // Spendable money, when the bank says it differs from the balance.
   const available =
     !owed && a.type === 'depository' && a.available_balance_minor != null && a.available_balance_minor !== a.current_balance_minor
       ? `${formatMoney(a.available_balance_minor, a.currency)} available`
       : null
+  const used =
+    a.type === 'credit' && a.credit_limit_minor > 0 && a.current_balance_minor != null
+      ? Math.round((a.current_balance_minor / a.credit_limit_minor) * 100)
+      : null
   return (
-    <li>
-      <AccountIcon account={a} />
-      <div className="grow">
-        <p className="name">{a.name}</p>
-        <p className="small muted tx-meta">
-          {owner && (
-            <span className="tx-owner">
-              <Avatar member={owner} small />
-              {owner.user_id === meId ? 'You' : nameOf(owner)}
-            </span>
-          )}
-          <span>{[a.bank.institution_name, a.mask && `••${a.mask}`, available].filter(Boolean).join(' · ')}</span>
-        </p>
-      </div>
-      <span className={owed ? 'amount money-out' : 'amount'}>{a.current_balance_minor == null ? '—' : formatMoney(a.current_balance_minor, a.currency)}</span>
+    <li className="grid content-start gap-2 p-3">
+      <span className="flex min-w-0 items-center gap-2.5">
+        <AccountIcon account={a} />
+        <span className="min-w-0">
+          <span className="name block truncate text-[14px] font-semibold">{a.name}</span>
+          <span className={`flex flex-wrap items-center gap-1.5 text-[13px] ${MUTED}`}>
+            {KIND_LABEL[groupOf(a)] ?? 'Account'}
+            {a.mask && ` ··${a.mask}`}
+            {owner && (
+              <span className="tx-owner">
+                <Avatar member={owner} small />
+                {owner.user_id === meId ? 'You' : nameOf(owner)}
+              </span>
+            )}
+          </span>
+        </span>
+      </span>
+      <span className={`text-[18px] ${NUM}`} style={owed ? { color: 'var(--color-redesign-owe-text)' } : undefined}>
+        {a.current_balance_minor == null ? '—' : formatMoney(a.current_balance_minor, a.currency)}
+      </span>
+      {used != null && (
+        <span className="block">
+          <span className="block h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--color-redesign-track)' }} aria-hidden="true">
+            <span className="block h-full rounded-full" style={{ width: `${Math.min(100, used)}%`, background: 'var(--color-redesign-accent)' }} />
+          </span>
+          <span className={`mt-1 block text-[13px] ${MUTED}`}>
+            {used}% of {formatMoney(a.credit_limit_minor, a.currency)} limit used
+          </span>
+        </span>
+      )}
+      {available && <span className={`text-[13px] ${MUTED}`}>{available}</span>}
     </li>
   )
 }
 
-// Each bank's status and, where this person may, Unlink. Unlinking asks you
-// to type the bank's name (#38); it's your own data, so no 2FA code.
-function ConnectedBanks({ banks, me, people, onUnlinked, onReconnected, onError }) {
+// Each bank as a card holding its accounts as tiles, as wide as its accounts; its status and,
+// where this person may, Reconnect and Unlink at its foot. Unlinking asks you to type the bank's
+// name (#38); it's your own data, so no 2FA code.
+function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnected, onError }) {
   const [unlinking, setUnlinking] = useState(null) // the bank being unlinked
 
   async function unlink(bank) {
@@ -323,57 +314,70 @@ function ConnectedBanks({ banks, me, people, onUnlinked, onReconnected, onError 
   }
 
   return (
-    <section className={useFadeOnChange(banks.map((b) => b.id).join()) ? 'panel connected-banks is-fading' : 'panel connected-banks'} aria-labelledby="banks-h">
-      <div className="panel-head">
-        <h2 id="banks-h">Connected banks</h2>
-      </div>
-      <ul className="rows">
+    <section className={useFadeOnChange(banks.map((b) => b.id).join()) ? 'is-fading' : undefined} aria-labelledby="banks-h">
+      <h2 id="banks-h" className="sr-only">
+        Connected banks
+      </h2>
+      <ul className="m-0 flex list-none flex-wrap gap-3 p-0">
         {banks.map((b) => {
           const name = b.institution_name || 'Bank'
           const whose = b.owner_user_id === me.user_id ? 'yours' : nameOf(people[b.owner_user_id] ?? { user_id: b.owner_user_id })
+          const n = Math.max(1, b.accounts.length)
+          const ok = b.status === 'active'
           return (
-            <li key={b.id} className="bank-item">
-              <div className="bank-line">
+            <li
+              key={b.id}
+              className={`bank-item calm-solid flex min-w-[280px] flex-col overflow-hidden rounded-2xl ${ok ? '' : 'ring-1 ring-[var(--color-redesign-accent)]'}`}
+              style={{ flex: `${n} 1 ${n * 320}px` }}
+            >
+              <div className="flex items-center gap-2.5 border-b border-zinc-100 px-3 py-2">
                 <span className="bank-badge" aria-hidden="true">
                   {initials(name)}
                 </span>
-                <div className="grow">
-                  <p className="name">{name}</p>
-                  <BankStatus bank={b} />
-                </div>
+                <p className="name m-0 min-w-0 grow truncate text-[14px] font-semibold">{name}</p>
+                <span className={`text-[13px] ${MUTED}`}>
+                  {b.accounts.length} {b.accounts.length === 1 ? 'account' : 'accounts'} · {whose}
+                </span>
               </div>
-              <p className="small muted">
-                {b.accounts.length} {b.accounts.length === 1 ? 'account' : 'accounts'} · {whose}
-              </p>
-              {b.status !== 'active' && (
-                <p className="small bank-warning">
-                  {b.status === 'needs_reauth'
-                    ? 'This bank asked you to sign in again, so its balances aren’t updating.'
-                    : 'This bank was disconnected and isn’t updating.'}
-                </p>
-              )}
-              {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
-                <p className="small muted">
-                  {cardsWithoutDetails(b)} {cardsWithoutDetails(b) === 1 ? 'credit card doesn’t' : 'credit cards don’t'} have APR or due dates yet.
-                </p>
-              )}
-              {b.can_unlink && (
-                <div className="bank-actions">
-                  {/* Reconnect (#51): sign in again, or share card details (#27). */}
-                  {b.status === 'needs_reauth' && <ReconnectBank bankId={b.id} label="Reconnect" onDone={onReconnected} onError={onError} />}
-                  {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
-                    <ReconnectBank bankId={b.id} label="Add APR and due dates" className="chip" onDone={onReconnected} onError={onError} />
+              <ul className="m-0 grid grow list-none divide-x divide-zinc-100 p-0" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
+                {b.accounts.map((a) => (
+                  <AccountTile key={a.id} a={a} meId={me.user_id} owner={showOwner ? (people[b.owner_user_id] ?? { user_id: b.owner_user_id }) : null} />
+                ))}
+              </ul>
+              <div className="mt-auto grid gap-1.5 border-t border-zinc-100 px-3 py-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <BankStatus bank={b} />
+                  {b.can_unlink && (
+                    <div className="bank-actions">
+                      {/* Reconnect (#51): sign in again, or share card details (#27). */}
+                      {b.status === 'needs_reauth' && <ReconnectBank bankId={b.id} label="Reconnect" onDone={onReconnected} onError={onError} />}
+                      {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
+                        <ReconnectBank bankId={b.id} label="Add APR and due dates" className="chip" onDone={onReconnected} onError={onError} />
+                      )}
+                      <button className="chip chip-danger" onClick={() => setUnlinking(b)}>
+                        Unlink
+                      </button>
+                    </div>
                   )}
-                  <button className="chip chip-danger" onClick={() => setUnlinking(b)}>
-                    Unlink
-                  </button>
                 </div>
-              )}
+                {!ok && (
+                  <p className="small bank-warning m-0">
+                    {b.status === 'needs_reauth'
+                      ? 'This bank asked you to sign in again, so its balances aren’t updating.'
+                      : 'This bank was disconnected and isn’t updating.'}
+                  </p>
+                )}
+                {canAddCardDetails(b) && cardsWithoutDetails(b) > 0 && (
+                  <p className="small muted m-0">
+                    {cardsWithoutDetails(b)} {cardsWithoutDetails(b) === 1 ? 'credit card doesn’t' : 'credit cards don’t'} have APR or due dates yet.
+                  </p>
+                )}
+              </div>
             </li>
           )
         })}
       </ul>
-      <p className="small muted">Tallyn reads balances and transactions. It can&apos;t move money.</p>
+      <p className="small muted mt-3">Tallyn reads balances and transactions. It can&apos;t move money.</p>
       {unlinking && (
         <ConfirmDialog
           title={`Unlink ${unlinking.institution_name || 'this bank'}?`}

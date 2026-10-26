@@ -20,6 +20,36 @@ body {
   overflow-x: clip;
 }
 
+/* Phase A of the move (#187): the old stylesheet is built on Tallyn's token variables, so every
+   screen takes the redesign's colours, card glass and radii from here at once. Declared on body,
+   which overrides the values applyTokens puts on the root. Screens then move one by one where the
+   drafts change their layout. */
+body {
+  --color-clay: var(--color-redesign-accent);
+  --color-clay-deep: var(--color-redesign-button);
+  --color-sage: var(--color-redesign-in);
+  --color-sage-deep: var(--color-redesign-in-text);
+  --color-sage-light: #bbf7d0;
+  --color-cocoa: var(--color-redesign-ink);
+  --color-cream: var(--color-redesign-page);
+  --color-sand: #f4f4f5;
+  --color-white: #ffffff;
+  --color-text-secondary: #52525b;
+  --color-border: #e4e4e7;
+  --color-success: var(--color-redesign-in-text);
+  --color-warning: #b45309;
+  --color-error: var(--color-redesign-owe-text);
+  --glass-surface: var(--redesign-glass-surface);
+  --glass-border: var(--redesign-glass-border);
+  --glass-highlight: var(--redesign-glass-highlight);
+  --card-shade: var(--redesign-card-shade);
+  --glass-surface-dark: rgba(9, 9, 11, 0.92);
+  --glow-opacity: 1;
+  --radius-card: 16px;
+  --radius-input: 12px;
+  --font-button: var(--font-body);
+}
+
 /* Under the redesign's shell, the page itself takes its ground (the old cream stays on unmoved
    sign-in pages until they move). */
 body:has(.calm-page) {
@@ -72,4 +102,29 @@ body:has(.calm-page) {
 .calm-page :is(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--color-redesign-focus);
   outline-offset: 2px;
+}
+
+/* Glass Mix on the old cards (#187): summaries frosted, cards holding lists or tables solid. */
+@layer components {
+  /* The redesign's sizes over the old compact desktop scale (#187): small text 13px, card titles
+     15px, buttons 13px. */
+  @media (min-width: 1024px) {
+    .calm-page :is(.small, .chip) {
+      font-size: 13px;
+    }
+    .calm-page :is(h2, .panel-head h2) {
+      font-size: 15px;
+    }
+    .calm-page .btn {
+      font-size: 13px;
+      padding: 7px 14px;
+    }
+  }
+  .calm-page :is(.amount, .money, [class*='amount']) {
+    font-variant-numeric: tabular-nums;
+  }
+  .calm-page .panel:has(.rows, ul, ol, table) {
+    background: #fff;
+    backdrop-filter: none;
+  }
 }

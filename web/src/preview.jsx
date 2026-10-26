@@ -1,35 +1,31 @@
-// Redesign preview (#187): renders real app components with made-up props and no server, through
-// the app's own stylesheet, so each moved screen can be checked before it ships. Dev only.
+// Redesign preview (#187): the real signed-in app (Home and every page, the real shell and
+// router) with made-up data and no server, through the app's own stylesheet. Dev only.
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { applyTokens } from './lib/tokens.js'
+import { fakeApi } from './preview/fakeApi.js'
 import './fonts.css'
 import './app.css'
-import Shell, { PageHead } from './screens/Shell.jsx'
+import Home from './screens/Home.jsx'
+import AuthPage from './components/AuthPage.jsx'
+import SignIn from './screens/SignIn.jsx'
 
+globalThis.__tallynPreviewApi = fakeApi
+// Open /preview.html?p=accounts to start on a page; the app's router then takes over.
+const start = new URLSearchParams(location.search).get('p')
+history.replaceState(null, '', start === 'signin' ? '/' : `/${start && start !== 'home' ? start : ''}`)
 applyTokens()
 
-const me = { display_name: 'Maya' }
-const household = { id: 'h1', name: 'The Rivera family', role: 'owner' }
-
-function Preview() {
-  return (
-    <Shell me={me} household={household} households={[household]} onChooseHousehold={() => {}} onSignOut={() => {}}>
-      <PageHead title="Home" sub="The shell only: screens move one by one (#187)" />
-      <section className="calm-glass rounded-2xl p-4">
-        <p className="text-[13px] text-zinc-600">A frosted summary card (glass Mix).</p>
-      </section>
-      <section className="calm-solid mt-3 rounded-2xl p-4">
-        <ul className="text-[13px] text-zinc-600">
-          <li>A solid card that holds a list.</li>
-        </ul>
-      </section>
-    </Shell>
-  )
-}
-
+// ?p=signin shows the sign-in screen in its page frame instead.
+const signIn = start === 'signin'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Preview />
+    {signIn ? (
+      <AuthPage>
+        <SignIn />
+      </AuthPage>
+    ) : (
+      <Home email="maya.rivera@fastmail.com" onSignOut={() => {}} />
+    )}
   </StrictMode>,
 )

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import TransactionRow from '../components/TransactionRow.jsx'
-import SpendingDots from '../components/SpendingDots.jsx'
+import SpendingBars from '../components/SpendingBars.jsx'
 import { TxDetails, TxSummary } from '../components/TxSummary.jsx'
 import { api } from '../lib/api.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
@@ -43,6 +43,7 @@ function recentMonths() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
   })
 }
+const thisMonth = () => new Date().toISOString().slice(0, 7)
 const monthLabel = (m) => new Date(`${m}-01T12:00:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
 // Filters from the address (Home's spending card links here with
@@ -319,10 +320,10 @@ export default function TransactionsPage({ me, household, refreshKey }) {
             )}
           </div>
         </section>
-        {/* The year of dots (#75): its own card, over the summary on web. */}
+        {/* Spending by day (#187, the #185 mix): this month, or the month being looked at. */}
         <section className={`panel tx-dots-card ${zone(dotsBusy, false)}`} aria-label="Spending by day" aria-busy={dotsBusy}>
-          <SpendingDots
-            year={year}
+          <SpendingBars
+            month={month || (day ? day.slice(0, 7) : thisMonth())}
             days={daily}
             home={home}
             selected={day}
