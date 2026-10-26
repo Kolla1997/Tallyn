@@ -8,8 +8,6 @@ import { useState } from 'react'
 import { Link2, Wallet, PiggyBank, Globe, Users, CreditCard, Car } from 'lucide-react'
 import { RingChart } from '@/components/charts/ring-chart'
 import { Ring } from '@/components/charts/ring'
-import { Gauge } from '@/components/charts/gauge'
-import SpendingRing from '@/components/kokonutui/spending-ring'
 import * as D from '../home/data.js'
 import { Note, Chips, Button, PageHead, Badge, usd } from './ui.jsx'
 
@@ -52,20 +50,8 @@ const MUTED = 'text-zinc-500 dark:text-zinc-400'
 const LINE = 'border-zinc-100 dark:border-zinc-800'
 
 // ── Shared pieces ────────────────────────────────────────────────────────────────────────────
-// What you have, by kind: four ways to draw it in place of the waffle (draft: ?s=).
-// Bklit rings and gauges, and Kokonut's ring with its own card frame taken off. Each keeps the
-// amount and share written beside its marks.
-const SPLITS = [
-  ['rings', 'Rings'],
-  ['notches', 'Notches'],
-  ['donut', 'Donut'],
-  ['mix', 'Mix'],
-]
-const DONUT_CLASS = {
-  Everyday: { stroke: 'stroke-[var(--ink)]', dot: 'bg-[var(--ink)]' },
-  Savings: { stroke: 'stroke-[var(--in)]', dot: 'bg-[var(--in)]' },
-  'Other currencies': { stroke: 'stroke-[var(--grey-2)]', dot: 'bg-[var(--grey-2)]' },
-}
+// What you have, by kind (Dinesh picked Rings): Bklit rings, one per kind filled to its share,
+// with the amount and share written beside them.
 const pct = (p, total) => Math.round((p.value / total) * 100)
 const Legend = ({ parts, total }) => (
   <ul className="grid gap-1 text-[13px]">
@@ -94,57 +80,14 @@ function Rings({ parts, total, size = 120 }) {
     </RingChart>
   )
 }
-const NotchRows = ({ parts, total, notches = 20 }) => (
-  <ul className="grid w-full min-w-0 gap-2 text-[13px] sm:w-auto sm:min-w-[260px]">
-    {parts.map((p) => (
-      <li key={p.label}>
-        <span className="mb-1 flex items-baseline gap-2">
-          <span className="font-semibold">{p.label}</span>
-          <b className={`${NUM} ml-auto`}>{usd(p.value)}</b>
-          <span className={`w-9 text-right tabular-nums ${MUTED}`}>{pct(p, total)}%</span>
-        </span>
-        <Gauge
-          orientation="linear"
-          inactiveFill="var(--track)"
-          value={pct(p, total)}
-          totalNotches={notches}
-          activeFill={p.color}
-          defaultLabel={p.label}
-          suffix="%"
-          minWidth={160}
-          linearHeight={8}
-        />
-      </li>
-    ))}
-  </ul>
+const Split = ({ parts, total }) => (
+  <div className="flex flex-wrap items-center gap-4">
+    <Rings parts={parts} total={total} />
+    <Legend parts={parts} total={total} />
+  </div>
 )
-function Split({ kind, parts, total }) {
-  if (kind === 'notches') return <NotchRows parts={parts} total={total} />
-  if (kind === 'donut')
-    return (
-      <SpendingRing
-        title="What you have"
-        currency="USD"
-        className="max-w-[300px] rounded-none border-0 bg-transparent p-0 dark:bg-transparent"
-        categories={parts.map((p) => ({ name: p.label, amount: p.value, change: undefined, ...DONUT_CLASS[p.label] }))}
-      />
-    )
-  if (kind === 'mix')
-    return (
-      <div className="flex flex-wrap items-center gap-4">
-        <Rings parts={parts} total={total} size={84} />
-        <NotchRows parts={parts} total={total} notches={16} />
-      </div>
-    )
-  return (
-    <div className="flex flex-wrap items-center gap-4">
-      <Rings parts={parts} total={total} />
-      <Legend parts={parts} total={total} />
-    </div>
-  )
-}
 
-function Summary({ have, owe, parts, counts, split }) {
+function Summary({ have, owe, parts, counts }) {
   const figures = [
     ['Net worth', usd(have - owe), 'In US dollars'],
     ['You have', usd(have), `${counts[0]} ${counts[0] === 1 ? 'account' : 'accounts'}`, 'var(--in-text)'],
@@ -154,7 +97,7 @@ function Summary({ have, owe, parts, counts, split }) {
     <section aria-label="What you have and owe" className={`${CARD} grid gap-5 p-4 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-center`}>
       {have > 0 && (
         <div className={`lg:border-r lg:pr-6 ${LINE}`}>
-          <Split kind={split} parts={parts} total={have} />
+          <Split parts={parts} total={have} />
         </div>
       )}
       <dl className="grid grid-cols-2 gap-y-3 sm:grid-cols-3 sm:divide-x sm:divide-zinc-100 dark:sm:divide-zinc-800">
@@ -284,16 +227,6 @@ function Bento({ visibleBanks, showOwner }) {
 
 export default function Accounts() {
   const [who, setWho] = useState('yours')
-  const [split, setSplit] = useState(() => {
-    const v = new URLSearchParams(location.search).get('s')
-    return SPLITS.some(([k]) => k === v) ? v : 'mix'
-  })
-  const pickSplit = (v) => {
-    setSplit(v)
-    const u = new URL(location.href)
-    u.searchParams.set('s', v)
-    history.replaceState(null, '', u)
-  }
   const accounts = D.accounts.filter((a) => (who === 'everyone' ? true : who === 'yours' ? a.who === 'maya' : a.who === who))
   const haveList = accounts.filter((a) => a.usd > 0).sort((a, b) => b.usd - a.usd)
   const oweList = accounts.filter((a) => a.usd < 0).sort((a, b) => a.usd - b.usd)
@@ -309,28 +242,11 @@ export default function Accounts() {
       <PageHead title="Accounts" sub="Your banks and the ones shared with you">
         <Button icon={Link2}>Link a bank</Button>
       </PageHead>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-3">
         <Chips label="Whose accounts" options={WHO} value={who} onChange={setWho} />
-        <span
-          role="group"
-          aria-label="Draft: what you have"
-          className="flex gap-1 rounded-full border border-dashed border-zinc-300 p-0.5 text-[12px] dark:border-zinc-700"
-        >
-          {SPLITS.map(([k, name]) => (
-            <button
-              key={k}
-              type="button"
-              aria-pressed={k === split}
-              onClick={() => pickSplit(k)}
-              className="rounded-full px-2.5 py-0.5 font-semibold text-zinc-600 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:text-zinc-300 dark:aria-pressed:bg-white dark:aria-pressed:text-zinc-900"
-            >
-              {name}
-            </button>
-          ))}
-        </span>
       </div>
       <div className="grid gap-3">
-        <Summary key={who} have={have} owe={owe} parts={parts} counts={[haveList.length, oweList.length]} split={split} />
+        <Summary key={who} have={have} owe={owe} parts={parts} counts={[haveList.length, oweList.length]} />
         <Bento key={who} showOwner={who === 'everyone'} visibleBanks={visibleBanks} />
       </div>
     </>
