@@ -4,10 +4,10 @@ import { useTakeover } from '../lib/takeover.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { cleanName } from './TransactionRow.jsx'
-import { categoryPath } from './TxIcon.jsx'
+import TxIcon from './TxIcon.jsx'
 import TallynLoader from './TallynLoader.jsx'
 import CountUp from './CountUp.jsx'
-import { Panel, Rows, IconTile, NUM, MUTED, IN } from './calm/ui.jsx'
+import { Panel, Rows, NUM, MUTED, IN } from './calm/ui.jsx'
 
 // The Transactions page's right column (#58), in the calm redesign (#187, the #185 draft): a
 // summary of whatever is filtered (money in and spent, top merchants, spending by category as
@@ -123,21 +123,7 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
         Back to summary
       </button>
       <div className="flex items-center gap-3">
-        <IconTile>
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            focusable="false"
-          >
-            <path d={categoryPath(tx.category_primary)} />
-          </svg>
-        </IconTile>
+        <TxIcon tx={tx} />
         <h2 ref={heading} id="tx-details-h" className="grow font-[family-name:var(--font-heading)] text-[18px] font-semibold" tabIndex={-1}>
           {name}
         </h2>

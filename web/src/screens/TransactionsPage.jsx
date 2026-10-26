@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Search } from 'lucide-react'
 import { cleanName } from '../components/TransactionRow.jsx'
-import { categoryPath } from '../components/TxIcon.jsx'
-import { Head, Panel, See, Rows, IconTile, Money, Pill, Chips, MUTED, IN } from '../components/calm/ui.jsx'
+import TxIcon from '../components/TxIcon.jsx'
+import { Head, Panel, See, Rows, Money, Pill, Chips, MUTED, IN } from '../components/calm/ui.jsx'
 import SpendingBars from '../components/SpendingBars.jsx'
 import { TxDetails, TxSummary } from '../components/TxSummary.jsx'
 import { api } from '../lib/api.js'
@@ -434,21 +434,7 @@ function TxRow({ tx, who, selected, onSelect }) {
         aria-pressed={selected}
         className="-mx-2 flex w-[calc(100%+16px)] items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors duration-150 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 aria-pressed:bg-zinc-100 dark:aria-pressed:bg-zinc-800"
       >
-        <IconTile>
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            focusable="false"
-          >
-            <path d={categoryPath(tx.category_primary)} />
-          </svg>
-        </IconTile>
+        <TxIcon tx={tx} />
         <span className="min-w-0 grow">
           <span className="block truncate text-[14px] font-semibold">
             {cleanName(tx.merchant || tx.name || 'Transaction')}

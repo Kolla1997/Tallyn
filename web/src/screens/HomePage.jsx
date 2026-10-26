@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link2, Users, CreditCard, Car } from 'lucide-react'
 import AccountIcon from '../components/AccountIcon.jsx'
-import { categoryPath } from '../components/TxIcon.jsx'
+import TxIcon from '../components/TxIcon.jsx'
 import { cleanName } from '../components/TransactionRow.jsx'
 import { api } from '../lib/api.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
@@ -12,7 +12,7 @@ import TallynLoader from '../components/TallynLoader.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
 import { shortDate } from '../lib/cards.js'
-import { Head, Panel, See, Rows, Row, IconTile, Money, Pill, PILL, NUM, MUTED, OWE, IN } from '../components/calm/ui.jsx'
+import { Head, Panel, See, Rows, Row, Money, Pill, PILL, NUM, MUTED, OWE, IN } from '../components/calm/ui.jsx'
 import SplitFlapText from '@/components/kokonutui/split-flap-text'
 import NotificationStack from '@/components/kokonutui/notification-stack'
 import MetricCard from '@/components/kokonutui/metric-card'
@@ -325,23 +325,7 @@ function Recent({ txs, me, people, everyone }) {
           return (
             <Row
               key={t.id}
-              lead={
-                <IconTile>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    focusable="false"
-                  >
-                    <path d={categoryPath(t.category_primary)} />
-                  </svg>
-                </IconTile>
-              }
+              lead={<TxIcon tx={t} />}
               name={cleanName(t.merchant || t.name || 'Transaction')}
               sub={`${categoryLabel(t.category_primary)} · ${shortDate(t.date)}${t.pending ? ' · pending' : ''}${everyone ? ` · ${who}` : ''}`}
             >

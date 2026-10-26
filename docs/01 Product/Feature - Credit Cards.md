@@ -2,7 +2,7 @@
 type: spec
 status: active
 owner: Dinesh
-updated: 2026-10-12
+updated: 2026-10-26
 issue: 27
 tags: [spec, plaid, home]
 ---
@@ -41,7 +41,7 @@ Option F (Dinesh picked from six drafts): header "$10,860 used of $24,000 total 
 - `internal/plaid`: `Account.LimitMinor`; `Liabilities()` keeps exact APR strings and drops unknown types and impossible rates; `NoLiabilities()` for codes that just mean "nothing to give".
 - `internal/sync`: `syncCards` runs at most every 20 hours per bank.
 - `GET /api/banks`: each account has `credit_limit_minor` and `card` (null until details arrive).
-- Web: `components/CreditCards.jsx`.
+- Web: `screens/DebtsPage.jsx` and `screens/AccountsPage.jsx` (the calm redesign, #187, replaced `CreditCards.jsx`).
 
 ## Rollout
 1. Run `0011_credit_cards.sql` on dev (done 2026-10-12).
