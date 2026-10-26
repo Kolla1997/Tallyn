@@ -1,31 +1,47 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Link2, Users, CreditCard, Car } from 'lucide-react'
 import AccountIcon from '../components/AccountIcon.jsx'
 import { categoryPath } from '../components/TxIcon.jsx'
-import TransactionRow from '../components/TransactionRow.jsx'
+import { cleanName } from '../components/TransactionRow.jsx'
 import { api } from '../lib/api.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { Avatar, nameOf } from '../lib/people.jsx'
-import { Link } from '../lib/router.jsx'
-import { currencies, isOwed, ownerGroup, summarize } from '../lib/summary.js'
-import CreditCards from '../components/CreditCards.jsx'
-import CountUp from '../components/CountUp.jsx'
-import { useFadeOnChange } from '../lib/motion.js'
+import { currencies, isOwed, summarize } from '../lib/summary.js'
 import { LinkBank } from './Banks.jsx'
-import { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
-import { summary, thisMonth } from '../lib/goals.js'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
+import { shortDate } from '../lib/cards.js'
+import { Head, Panel, See, Rows, Row, IconTile, Money, Pill, PILL, NUM, MUTED, OWE, IN } from '../components/calm/ui.jsx'
+import SplitFlapText from '@/components/kokonutui/split-flap-text'
+import NotificationStack from '@/components/kokonutui/notification-stack'
+import MetricCard from '@/components/kokonutui/metric-card'
+import SmoothTab from '@/components/kokonutui/smooth-tab'
+import { Gauge } from '@/components/charts/gauge'
 
-// Home (#39 step 2), matching docs/03 Design/Comps/web-app-draft.html:
-// total balance and net worth, your accounts apart from money shared with you
-// (#37), recent transactions by person, spending this month, family, goals.
-// Everything shown is what the API returns for this person, so the sharing
-// rules (#28) already apply.
+// Home in the calm redesign (#187), built from the #185/#182 draft (web/src/lab/home/CalmHome.jsx):
+// a 12-column grid with
+//   1 Total (8)                       | Coming up (4)
+//   2 Spending, last 90 days (8)      | Recent transactions (4)
+//   3 Your accounts (4) | Credit cards + Shared with you (4) | Family + Goals (4)
+// Kokonut's split-flap total, notification stack, metric card and smooth tabs, Bklit gauges.
+// Everything shown is what the API returns for this person, so the sharing rules (#28) apply.
+// Yours / Everyone switches the whole page (#68).
 
 const now = new Date()
 const MONTH = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
 const monthName = (d) => d.toLocaleDateString('en-US', { month: 'long' })
+const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+const DAY = 86400000
+
+// Spending, transfers and income are kept apart, so loan payments and moves between accounts
+// don't look like spending (#77).
+const TRANSFER = new Set(['TRANSFER_IN', 'TRANSFER_OUT', 'LOAN_PAYMENTS'])
+export function txKind(t) {
+  if (TRANSFER.has(t.category_primary)) return 'transfers'
+  if (t.category_primary === 'INCOME') return 'income'
+  return 'spending'
+}
 
 export default function HomePage({ me, household, refreshKey, onChanged }) {
   const [banks, setBanks] = useState(null)
@@ -33,18 +49,30 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
   const [txs, setTxs] = useState(null)
   const [mine, setMine] = useState(null)
   const [spending, setSpending] = useState(null) // { yours, everyone } month summaries, one per currency
+  const [daily, setDaily] = useState({ yours: [], everyone: [] })
   const [scope, setScope] = useState('yours') // Home opens on your own money (#68)
   const [error, setError] = useState('')
   const [failed, setFailed] = useState(false) // the last load failed (#151)
+  const home = household.home_currency
 
   const load = useCallback(() => {
     const hh = encodeURIComponent(household.id)
+    const owner = encodeURIComponent(me.user_id)
+    const year = now.getFullYear()
+    // The spending trend loads on its own, so Home never waits for it.
+    Promise.all([
+      api(`/api/transactions/daily?household_id=${hh}&year=${year}&owner=${owner}`),
+      api(`/api/transactions/daily?household_id=${hh}&year=${year}&owner=all`),
+    ]).then(
+      ([y, e]) => setDaily({ yours: y?.days ?? [], everyone: e?.days ?? [] }),
+      () => {},
+    )
     return Promise.all([
       api(`/api/banks?household_id=${hh}`),
       api(`/api/households/${hh}/members`),
       api(`/api/transactions?household_id=${hh}&limit=200`),
-      api(`/api/transactions?household_id=${hh}&owner=${encodeURIComponent(me.user_id)}&limit=100`),
-      api(`/api/transactions/summary?household_id=${hh}&month=${MONTH}&owner=${encodeURIComponent(me.user_id)}`),
+      api(`/api/transactions?household_id=${hh}&owner=${owner}&limit=100`),
+      api(`/api/transactions/summary?household_id=${hh}&month=${MONTH}&owner=${owner}`),
       api(`/api/transactions/summary?household_id=${hh}&month=${MONTH}`),
     ]).then(
       ([b, m, t, y, sy, se]) => {
@@ -68,19 +96,20 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
   const people = useMemo(() => Object.fromEntries(members.map((m) => [m.user_id, m])), [members])
   const roles = useMemo(() => Object.fromEntries(members.map((m) => [m.user_id, m.role])), [members])
   const canLink = household.role === 'owner' || household.role === 'adult'
-  const wide = useMinWidth(1440)
+  const everyone = scope === 'everyone'
   const greeting = me.display_name ? `Hello, ${me.display_name}` : 'Hello'
+  const shown = banks ? (everyone ? banks : banks.filter((b) => b.owner_user_id === me.user_id)) : []
+  const summary = spending?.[scope]?.find((x) => x.currency === home)
 
   return (
-    <>
-      <PageHead title={household.name} tab="Home" sub={greeting}>
-        {canLink && <LinkBank householdId={household.id} onLinked={onChanged} onError={setError} />}
-        {/* One button for the Family page, where inviting and sharing both
-            live (#97, A: Share with family and Invite went to the same page). */}
-        <Link to="/family" className="btn btn-secondary">
+    <div className="calm">
+      <Head title={household.name} tab="Home" sub={greeting}>
+        {canLink && <LinkBank householdId={household.id} onLinked={onChanged} onError={setError} className={PILL} />}
+        {/* One button for the Family page, where inviting and sharing both live (#97). */}
+        <Pill to="/family" quiet icon={Users}>
           Family and sharing
-        </Link>
-      </PageHead>
+        </Pill>
+      </Head>
       {error && (
         <p className="error" role="alert">
           {error}
@@ -94,521 +123,396 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
           <TallynLoader />
         )
       ) : (
-        <HomeColumns
-          wide={wide}
-          total={<TotalCard banks={banks} summary={spending?.[scope]} me={me} roles={roles} home={household.home_currency} scope={scope} onScope={setScope} />}
-          accounts={<YourAccounts banks={banks} me={me} canLink={canLink} home={household.home_currency} everyone={scope === 'everyone'} />}
-          cards={<CreditCards banks={banks} me={me} home={household.home_currency} everyone={scope === 'everyone'} onChanged={onChanged} onError={setError} />}
-          recent={<RecentTransactions txs={(scope === 'yours' ? mine : txs) ?? []} me={me} people={people} everyone={scope === 'everyone'} />}
-          spending={
-            <SpendingCard
-              spending={spending?.[scope]?.flatMap((x) => x.categories) ?? []}
-              month={MONTH}
-              home={household.home_currency}
-              everyone={scope === 'everyone'}
-            />
-          }
-          shared={<SharedWithYou banks={banks} me={me} people={people} roles={roles} home={household.home_currency} />}
-          family={<FamilyCard members={members} isOwner={household.role === 'owner'} />}
-          goals={<GoalsCard household={household} />}
-        />
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-12 [&>*]:min-w-0">
+          <div className="md:col-span-2 lg:col-span-8">
+            <Total banks={banks} me={me} roles={roles} home={home} scope={scope} onScope={setScope} spent={summary?.spent_minor ?? 0} />
+          </div>
+          <div className="md:col-span-2 lg:col-span-4">
+            <ComingUp banks={shown} home={home} />
+          </div>
+          <div className="md:col-span-2 lg:col-span-8">
+            <Spending days={daily[scope]} summary={summary} home={home} everyone={everyone} />
+          </div>
+          <div className="md:col-span-2 lg:col-span-4">
+            <Recent txs={(everyone ? txs : mine) ?? []} me={me} people={people} everyone={everyone} />
+          </div>
+          <div className="lg:col-span-4">
+            <YourAccounts banks={shown} home={home} everyone={everyone} canLink={canLink} />
+          </div>
+          <div className="grid content-start gap-3 lg:col-span-4">
+            <Cards banks={shown} />
+            <SharedWithYou banks={banks} me={me} people={people} roles={roles} />
+          </div>
+          <div className="grid content-start gap-3 md:col-span-2 lg:col-span-4">
+            <Family members={members} isOwner={household.role === 'owner'} />
+            <Goals household={household} />
+          </div>
+        </div>
       )}
-    </>
-  )
-}
-
-// Three columns on wide screens (1440px and up), two from 1280px, one below
-// (the one- and two-column cases share markup; CSS stacks them under 1280px).
-function HomeColumns({ wide, total, accounts, cards, recent, spending, shared, family, goals }) {
-  if (wide) {
-    return (
-      <div className="cols cols-3">
-        <div className="col">
-          {total}
-          {accounts}
-          {cards}
-        </div>
-        <div className="col">
-          {spending}
-          {recent}
-        </div>
-        <div className="col">
-          {shared}
-          {family}
-          {goals}
-        </div>
-      </div>
-    )
-  }
-  return (
-    <div className="cols">
-      <div className="col">
-        {total}
-        {accounts}
-        {cards}
-        {recent}
-      </div>
-      <div className="col">
-        {spending}
-        {shared}
-        {family}
-        {goals}
-      </div>
     </div>
   )
 }
 
-function useMinWidth(px) {
-  const query = `(min-width: ${px}px)`
-  const [match, setMatch] = useState(() => window.matchMedia(query).matches)
-  useEffect(() => {
-    const mq = window.matchMedia(query)
-    const update = () => setMatch(mq.matches)
-    mq.addEventListener('change', update)
-    return () => mq.removeEventListener('change', update)
-  }, [query])
-  return match
-}
-
-// The balance card (#68): your own money first, or everyone's you can see.
-// The switch here changes the whole Home page.
-function TotalCard({ banks, summary, me, roles, home, scope, onScope }) {
-  const fading = useFadeOnChange(scope) // #87: Yours / Everyone fades and counts
-  const totals = summarize(banks, me.user_id, roles)
-  const yoursOnly = summarize(
-    banks.filter((b) => b.owner_user_id === me.user_id),
-    me.user_id,
-    roles,
-  )
-  const list = currencies(totals, home)
-  if (list.length === 0) {
-    return (
-      <section className="panel total-card" aria-label="Total balance">
-        <p className="total-label">Total balance</p>
-        <p className="amount total-big">—</p>
-        <p className="small total-note">Link a bank to see your total.</p>
-      </section>
-    )
-  }
-  const cur = list[0]
-  const t = totals[cur]
-  const y = yoursOnly[cur] ?? { have: 0, owe: 0, net: 0 }
+// Row 1: the total on dark, as split-flap figures, with Yours / Everyone (#68).
+function Total({ banks, me, roles, home, scope, onScope, spent }) {
   const yours = scope === 'yours'
-
-  // Spent this month in this currency, from the month summary, which counts
-  // every transaction (#147). Same rules as the spending card.
-  const spent = summary?.find((x) => x.currency === cur)?.spent_minor ?? 0
-
-  const parts = (
-    yours
-      ? [
-          ['Everyone you can see', t.have],
-          ['Shared with you', t.shared],
-          ['Your kids', t.kids],
-        ]
-      : [
-          ['Yours', t.yours],
-          ['Shared with you', t.shared],
-          ['Your kids', t.kids],
-        ]
-  ).filter(([, v], i) => i === 0 || v !== 0)
-  const big = yours ? y : t
-
+  const totals = summarize(yours ? banks.filter((b) => b.owner_user_id === me.user_id) : banks, me.user_id, roles)
+  const list = currencies(totals, home)
+  const cur = list[0]
+  const t = cur ? totals[cur] : null
   return (
-    <section className={fading ? 'panel total-card is-fading' : 'panel total-card'} aria-label={yours ? 'Your balance' : 'Total balance'}>
-      <div className="total-head">
-        <p className="total-label">{yours ? `Your balance · ${cur}` : `Total balance · ${cur} · everything you can see`}</p>
-        <div className="scope-switch" role="group" aria-label="Show on Home">
+    <section
+      aria-label={yours ? 'Your balance' : 'Total balance'}
+      className="flex h-full flex-col justify-center gap-3 rounded-2xl p-5 text-white"
+      style={{ background: 'var(--color-redesign-ink)' }}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="m-0 text-[13px] text-zinc-400">{yours ? `Your balance · in ${cur ?? home}` : `Everything you can see · in ${cur ?? home}`}</p>
+        <div role="group" aria-label="Show on Home" className="flex rounded-full bg-white/10 p-0.5 text-[13px] font-semibold">
           {[
             ['yours', 'Yours'],
             ['everyone', 'Everyone'],
-          ].map(([key, label]) => (
-            <button key={key} aria-pressed={scope === key} onClick={() => onScope(key)}>
+          ].map(([k, label]) => (
+            <button
+              key={k}
+              type="button"
+              aria-pressed={scope === k}
+              onClick={() => onScope(k)}
+              className="rounded-full border-0 bg-transparent px-3 py-1 text-zinc-300 transition-[background-color,color] duration-150 aria-pressed:bg-white aria-pressed:text-zinc-950"
+            >
               {label}
             </button>
           ))}
         </div>
       </div>
-      <div className="total-row">
-        <p className="amount total-big">
-          <CountUp value={big.have} format={(v) => formatMoney(v, cur)} />
-        </p>
-        {spent > 0 && <p className="small total-note">−{formatMoney(spent, cur)} spent this month</p>}
-      </div>
-      <div className="total-split">
-        {parts.map(([label, v]) => (
-          <div key={label}>
-            <span>{label}</span>
-            <span className="amount">{formatMoney(v, cur)}</span>
-          </div>
-        ))}
-      </div>
-      <div className="total-networth">
-        <div>
-          <span>{yours ? 'Your net worth' : 'Net worth'}</span>
-          <span className="amount">
-            <CountUp value={big.net} format={(v) => formatMoney(v, cur)} />
-          </span>
-        </div>
-        <p className="small">
-          What {yours ? 'you have' : 'everyone has'}, {formatMoney(big.have, cur)}, minus what {yours ? 'you owe' : 'they owe'}, {formatMoney(big.owe, cur)} on
-          cards and loans
-        </p>
-      </div>
-      {list.length > 1 && (
-        <p className="small total-note">
-          Also{' '}
-          {list
-            .slice(1)
-            .map((c) => `${formatMoney(totals[c].have, c)} in ${c}`)
-            .join(', ')}
-          . Totals in one currency come later.
-        </p>
-      )}
-    </section>
-  )
-}
-
-// Your accounts (#39, option B): what you have and what you owe, then your
-// biggest balances (two of each). The full list is on the Accounts page.
-function YourAccounts({ banks, me, canLink, home, everyone = false }) {
-  const shown = everyone ? banks : banks.filter((b) => b.owner_user_id === me.user_id)
-  const mine = shown.flatMap((b) => b.accounts.map((a) => ({ ...a, bankName: b.institution_name })))
-  const cur = currencies(summarize(shown, me.user_id, {}), home)[0]
-  const inCur = mine.filter((a) => a.currency === cur && a.current_balance_minor != null)
-  const have = inCur.filter((a) => !isOwed(a))
-  const owe = inCur.filter((a) => isOwed(a))
-  const sum = (list) => list.reduce((t, a) => t + a.current_balance_minor, 0)
-  const biggest = (list) => [...list].sort((x, y) => y.current_balance_minor - x.current_balance_minor).slice(0, 2)
-  const top = [...biggest(have), ...biggest(owe)]
-  const others = mine.length - inCur.length
-  const fading = useFadeOnChange(everyone)
-
-  return (
-    <section className={fading ? 'panel is-fading' : 'panel'} aria-labelledby="yours-h">
-      <div className="panel-head">
-        <h2 id="yours-h">{everyone ? 'Everyone’s accounts' : 'Your accounts'}</h2>
-        {mine.length > 0 && (
-          <Link to={everyone ? '/accounts?person=everyone' : '/accounts'} className="link small">
-            All {mine.length} {mine.length === 1 ? 'account' : 'accounts'}
-          </Link>
-        )}
-      </div>
-      {mine.length === 0 ? (
-        <p className="small muted">{canLink ? 'You haven’t linked a bank yet. Use Link a bank above.' : 'You don’t have any banks linked.'}</p>
+      {!t ? (
+        <>
+          <p className={`m-0 text-4xl ${NUM}`}>—</p>
+          <p className="m-0 text-[13px] text-zinc-400">Link a bank to see your total.</p>
+        </>
       ) : (
         <>
-          <div className="have-owe">
-            <Link to="/accounts#have" className="tone-sage">
-              <span className="small">{everyone ? 'Everyone has' : 'You have'}</span>
-              <span className="amount">
-                <CountUp value={sum(have)} format={(v) => formatMoney(v, cur)} />
-              </span>
-              <span className="small muted">
-                {have.length} {have.length === 1 ? 'account' : 'accounts'}
-              </span>
-            </Link>
-            <Link to="/accounts#owe" className="tone-clay">
-              <span className="small">{everyone ? 'Everyone owes' : 'You owe'}</span>
-              <span className="amount">
-                <CountUp value={sum(owe)} format={(v) => formatMoney(v, cur)} />
-              </span>
-              <span className="small muted">
-                {owe.length} {owe.length === 1 ? 'account' : 'accounts'}
-              </span>
-            </Link>
+          <div className="overflow-x-auto">
+            <SplitFlapText text={formatMoney(t.have, cur)} className="text-2xl md:text-4xl" />
+            <span className="sr-only">{formatMoney(t.have, cur)}</span>
           </div>
-          {top.length > 0 && (
-            <>
-              <h3 className="sub-heading">Biggest balances</h3>
-              <ul className="rows">
-                {top.map((a) => (
-                  <li key={a.id}>
-                    <AccountIcon account={a} />
-                    <div className="grow">
-                      <p className="name">{a.name}</p>
-                      <p className="small muted">{[a.bankName, a.mask && `••${a.mask}`].filter(Boolean).join(' · ')}</p>
-                    </div>
-                    <span className={isOwed(a) ? 'amount money-out' : 'amount'}>{formatMoney(a.current_balance_minor, a.currency)}</span>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-          {others > 0 && (
-            <p className="small muted">
-              {others} {others === 1 ? 'account is' : 'accounts are'} in another currency or {others === 1 ? 'has' : 'have'} no balance yet. See All accounts.
-            </p>
-          )}
+          <p className="m-0 text-[13px] text-zinc-400">
+            {yours ? 'Your net worth' : 'Net worth'} <span className="text-white">{formatMoney(t.net, cur)}</span> after {formatMoney(t.owe, cur)} owed on cards
+            and loans.
+            {spent > 0 && <> −{formatMoney(spent, cur)} spent this month.</>}
+            {list.length > 1 && (
+              <>
+                {' '}
+                Also{' '}
+                {list
+                  .slice(1)
+                  .map((c) => `${formatMoney(totals[c].have, c)} in ${c}`)
+                  .join(', ')}
+                .
+              </>
+            )}
+          </p>
         </>
       )}
     </section>
   )
 }
 
-// Shared with you (#37, #39 option A): one row per person whose money you can
-// see, and why: they share balances with you, or you're their parent. Their
-// accounts open on the Family page. Kept apart from your own money.
-function SharedWithYou({ banks, me, people, roles, home }) {
-  const byOwner = new Map()
-  for (const b of banks) {
-    if (b.owner_user_id === me.user_id) continue
-    const p = byOwner.get(b.owner_user_id) ?? { id: b.owner_user_id, have: 0, owe: 0, owes: false, count: 0 }
-    for (const a of b.accounts) {
-      p.count++
-      if (a.currency !== home || a.current_balance_minor == null) continue
-      if (isOwed(a)) {
-        p.owe += a.current_balance_minor
-        p.owes = true
-      } else {
-        p.have += a.current_balance_minor
-      }
-    }
-    byOwner.set(b.owner_user_id, p)
-  }
-  if (byOwner.size === 0) return null
-
+// Coming up: card and loan payments due in the next 8 days, as Kokonut's notification stack.
+function ComingUp({ banks, home }) {
+  const [today] = useState(() => iso(new Date()))
+  const [until] = useState(() => iso(new Date(Date.now() + 8 * DAY)))
+  const items = banks
+    .flatMap((b) =>
+      b.accounts.map((a) => {
+        const [amount, date] = a.card
+          ? [a.card.minimum_payment_minor ?? a.current_balance_minor, a.card.next_payment_due_date]
+          : a.loan
+            ? [a.loan.next_payment_minor, a.loan.next_payment_due_date]
+            : []
+        return date && date >= today && date <= until ? { a, amount, date, bank: b.institution_name } : null
+      }),
+    )
+    .filter(Boolean)
+    .sort((x, y) => x.date.localeCompare(y.date))
+  const total = items.reduce((t, i) => t + (i.amount ?? 0), 0)
+  const days = (d) => Math.round((Date.parse(d) - Date.parse(today)) / DAY)
   return (
-    <section className="panel panel-shared" aria-labelledby="shared-h">
-      <div className="panel-head">
-        <h2 id="shared-h">Shared with you</h2>
-        <Link to="/family" className="link small">
-          Sharing
-        </Link>
-      </div>
-      <ul className="rows">
-        {[...byOwner.values()].map((p) => {
-          const member = people[p.id] ?? { user_id: p.id }
-          const kid = ownerGroup(p.id, me.user_id, roles) === 'kids'
+    <Panel id="due-h" title="Coming up" meta={items.length ? `Next 8 days · ${formatMoney(total, home)}` : 'Next 8 days'}>
+      {items.length === 0 ? (
+        <p className={`m-0 text-[13px] ${MUTED}`}>Nothing due from your cards or loans in the next 8 days.</p>
+      ) : (
+        <NotificationStack
+          notifications={items.map((i) => {
+            const I = i.a.card ? CreditCard : Car
+            const soon = days(i.date) <= 5
+            return {
+              id: i.a.id,
+              app: `Due ${shortDate(i.date)}`,
+              title: `${i.a.name} · ${formatMoney(i.amount, i.a.currency)}`,
+              body: `${i.bank}, in ${days(i.date)} ${days(i.date) === 1 ? 'day' : 'days'}.`,
+              time: shortDate(i.date),
+              icon: (
+                <span
+                  className="flex size-8 items-center justify-center rounded-lg text-white"
+                  style={{ background: soon ? 'var(--color-redesign-accent)' : 'var(--color-redesign-grey-5)' }}
+                >
+                  <I className="size-4" aria-hidden="true" />
+                </span>
+              ),
+            }
+          })}
+        />
+      )}
+    </Panel>
+  )
+}
+
+// Row 2: spending over the last 90 days as Kokonut's metric card (7, 30 or 90 days).
+function Spending({ days, summary, home, everyone }) {
+  const [end] = useState(() => Date.now())
+  const data = useMemo(() => {
+    const byDay = Object.fromEntries((days ?? []).filter((d) => d.currency === home).map((d) => [d.date, d.amount_minor]))
+    const out = []
+    for (let i = 89; i >= 0; i--) {
+      const key = iso(new Date(end - i * DAY))
+      out.push({ date: key, parts: [(byDay[key] ?? 0) / 100] })
+    }
+    return out
+  }, [days, home, end])
+  const spent = summary?.spent_minor ?? 0
+  return (
+    <section aria-label={`${everyone ? 'Spending' : 'Your spending'} in ${monthName(now)}`} className="min-w-0">
+      <MetricCard
+        label={everyone ? 'Spending' : 'Your spending'}
+        segments={['Spending']}
+        data={data}
+        events={[]}
+        periods={[7, 30, 90]}
+        defaultPeriod={30}
+        format="currency"
+        currency={home}
+        upIsGood={false}
+        className="w-full max-w-none"
+      />
+      <p className={`m-0 mt-1.5 px-1 text-[13px] ${MUTED}`}>
+        {spent > 0 ? (
+          <>
+            {monthName(now)} so far: <b className="font-semibold text-zinc-900">{formatMoney(spent, home)}</b> spent.{' '}
+          </>
+        ) : (
+          <>No spending yet this month. </>
+        )}
+        Transfers and loan payments aren&apos;t counted as spending. <See to="/budgets">Budgets</See>
+      </p>
+    </section>
+  )
+}
+
+// Recent transactions by kind, in Kokonut's smooth tabs.
+function Recent({ txs, me, people, everyone }) {
+  const list = (kind, empty) => {
+    const shown = txs.filter((t) => txKind(t) === kind).slice(0, 6)
+    if (txs.length === 0) return <p className={`m-0 text-[13px] ${MUTED}`}>No transactions yet. A new bank can take a few minutes to show its history.</p>
+    if (shown.length === 0) return <p className={`m-0 text-[13px] ${MUTED}`}>{empty}</p>
+    return (
+      <Rows>
+        {shown.map((t) => {
+          const out = t.amount_minor > 0
+          const who = t.owner_user_id === me.user_id ? 'You' : nameOf(people[t.owner_user_id] ?? { user_id: t.owner_user_id })
           return (
-            <li key={p.id}>
-              <Link to={`/family?member=${p.id}`} className="person-row">
-                <Avatar member={member} />
-                <span className="grow">
-                  <span className="name block">
-                    {nameOf(member)}
-                    {kid && <span className="tag role-tag">{roles[p.id] === 'child' ? 'Child' : 'Teen'}</span>}
+            <Row
+              key={t.id}
+              lead={
+                <IconTile>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    focusable="false"
+                  >
+                    <path d={categoryPath(t.category_primary)} />
+                  </svg>
+                </IconTile>
+              }
+              name={cleanName(t.merchant || t.name || 'Transaction')}
+              sub={`${categoryLabel(t.category_primary)} · ${shortDate(t.date)}${t.pending ? ' · pending' : ''}${everyone ? ` · ${who}` : ''}`}
+            >
+              <Money className="text-[14px]" tone={out ? undefined : IN}>
+                {out ? '−' : '+'}
+                {formatMoney(Math.abs(t.amount_minor), t.currency)}
+              </Money>
+            </Row>
+          )
+        })}
+      </Rows>
+    )
+  }
+  return (
+    <Panel
+      id="tx-h"
+      title={everyone ? 'Recent transactions' : 'Your recent transactions'}
+      meta={<See to={everyone ? '/transactions?owner=all' : '/transactions'}>See all</See>}
+      className="h-full"
+    >
+      <div className="overflow-hidden">
+        <SmoothTab
+          label="Kind of transaction"
+          activeColor="bg-zinc-900"
+          activeTextColor="text-white"
+          items={[
+            { id: 'spending', title: 'Spending', content: list('spending', 'No spending yet.') },
+            { id: 'transfers', title: 'Transfers', content: list('transfers', 'No transfers yet.') },
+            { id: 'income', title: 'Income', content: list('income', 'No income yet.') },
+          ]}
+        />
+      </div>
+    </Panel>
+  )
+}
+
+// Row 3: what you have, biggest first; the full list is on Accounts.
+function YourAccounts({ banks, home, everyone, canLink }) {
+  const all = banks.flatMap((b) => b.accounts.map((a) => ({ ...a, bankName: b.institution_name })))
+  const have = all.filter((a) => !isOwed(a)).sort((x, y) => (y.current_balance_minor ?? 0) - (x.current_balance_minor ?? 0))
+  return (
+    <Panel
+      id="yours-h"
+      title={everyone ? 'Everyone’s accounts' : 'Your accounts'}
+      meta={
+        all.length > 0 && (
+          <See to={everyone ? '/accounts?person=everyone' : '/accounts'}>{`All ${all.length} ${all.length === 1 ? 'account' : 'accounts'}`}</See>
+        )
+      }
+      className="h-full"
+    >
+      {all.length === 0 ? (
+        <p className={`m-0 text-[13px] ${MUTED}`}>{canLink ? 'You haven’t linked a bank yet. Use Link a bank above.' : 'You don’t have any banks linked.'}</p>
+      ) : (
+        <Rows>
+          {have.slice(0, 6).map((a) => (
+            <Row
+              key={a.id}
+              lead={<AccountIcon account={a} />}
+              name={a.name}
+              sub={[a.bankName, a.mask && `··${a.mask}`, a.currency !== home && a.currency].filter(Boolean).join(' ')}
+            >
+              <Money className="text-[14px]">{formatMoney(a.current_balance_minor, a.currency)}</Money>
+            </Row>
+          ))}
+        </Rows>
+      )}
+    </Panel>
+  )
+}
+
+// Each credit card: what's owed, what's available of the limit, when it's due, a notched gauge.
+function Cards({ banks }) {
+  const cards = banks.flatMap((b) => b.accounts.filter((a) => a.type === 'credit').map((a) => ({ ...a, bankName: b.institution_name })))
+  if (cards.length === 0) return null
+  return (
+    <Panel id="card-h" title={cards.length === 1 ? 'Credit card' : 'Credit cards'} meta={<See to="/debts">Debts</See>}>
+      <ul className="m-0 grid list-none gap-3 p-0">
+        {cards.map((a) => {
+          const limit = a.credit_limit_minor
+          const used = limit > 0 ? Math.round(((a.current_balance_minor ?? 0) / limit) * 100) : null
+          return (
+            <li key={a.id}>
+              <div className="flex items-start justify-between gap-3">
+                <span>
+                  <span className="block text-[14px] font-semibold">
+                    {a.name} {a.mask && <span className={`font-normal ${MUTED}`}>··{a.mask}</span>}
                   </span>
-                  <span className="small muted block">
-                    {kid ? 'You see this as a parent' : 'Shares balances'} · {p.count} {p.count === 1 ? 'account' : 'accounts'}
-                  </span>
-                  <span className="person-money small">
-                    <span>
-                      Has <span className="amount">{formatMoney(p.have, home)}</span>
-                    </span>
-                    {p.owes ? (
-                      <span>
-                        owes <span className="amount money-out">{formatMoney(p.owe, home)}</span>
-                      </span>
-                    ) : (
-                      <span className="muted">owes nothing</span>
-                    )}
+                  <span className={`block text-[13px] ${MUTED}`}>
+                    {limit > 0
+                      ? `${formatMoney(Math.max(0, limit - (a.current_balance_minor ?? 0)), a.currency)} available of ${formatMoney(limit, a.currency)}`
+                      : a.bankName}
                   </span>
                 </span>
-                <svg
-                  className="chevron"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path d="m9 6 6 6-6 6" />
-                </svg>
-              </Link>
+                <span className="text-right">
+                  <Money className="block text-[14px]" tone={OWE}>
+                    {formatMoney(a.current_balance_minor, a.currency)}
+                  </Money>
+                  {a.card?.next_payment_due_date && <span className={`block text-[13px] ${MUTED}`}>Due {shortDate(a.card.next_payment_due_date)}</span>}
+                </span>
+              </div>
+              {used != null && (
+                <div className="mt-2">
+                  <Gauge
+                    orientation="linear"
+                    inactiveFill="var(--color-redesign-track)"
+                    value={Math.min(100, used)}
+                    totalNotches={28}
+                    activeFill="var(--color-redesign-accent)"
+                    defaultLabel="Limit used"
+                    suffix="%"
+                    minWidth={160}
+                    linearHeight={14}
+                  />
+                </div>
+              )}
             </li>
           )
         })}
       </ul>
-    </section>
+    </Panel>
   )
 }
 
-// Your recent transactions (#39, option C): only yours, since everyone's are
-// on the Transactions page. Spending, transfers and income are kept apart, so
-// loan payments and moves between accounts don't look like spending (#77). Same
-// rules as the spending card.
-const TRANSFER = new Set(['TRANSFER_IN', 'TRANSFER_OUT', 'LOAN_PAYMENTS'])
-const RECENT_TABS = [
-  ['spending', 'Spending', 'No spending yet.'],
-  ['transfers', 'Transfers', 'No transfers yet.'],
-  ['income', 'Income', 'No income yet.'],
-]
-
-export function txKind(t) {
-  if (TRANSFER.has(t.category_primary)) return 'transfers'
-  if (t.category_primary === 'INCOME') return 'income'
-  return 'spending'
-}
-
-function RecentTransactions({ txs, me, people, everyone = false }) {
-  const [tab, setTab] = useState('spending')
-  const shown = txs.filter((t) => txKind(t) === tab).slice(0, 5)
-  const empty = RECENT_TABS.find(([key]) => key === tab)[2]
-  const fading = useFadeOnChange(`${tab}|${everyone}`)
-
+// Shared with you (#37): each account someone else shares, kept apart from your own money.
+function SharedWithYou({ banks, me, people, roles }) {
+  const theirs = banks
+    .filter((b) => b.owner_user_id !== me.user_id)
+    .flatMap((b) => b.accounts.map((a) => ({ ...a, owner: b.owner_user_id, bankName: b.institution_name })))
+  if (theirs.length === 0) return null
   return (
-    <section className={fading ? 'panel is-fading' : 'panel'} aria-labelledby="tx-h">
-      <div className="panel-head">
-        <h2 id="tx-h">{everyone ? 'Recent transactions' : 'Your recent transactions'}</h2>
-        <Link to={everyone ? '/transactions?owner=all' : '/transactions'} className="link small">
-          See all
-        </Link>
-      </div>
-      <div className="chips" role="group" aria-label="Kind of transaction">
-        {RECENT_TABS.map(([key, label]) => (
-          <button key={key} className="chip" aria-pressed={tab === key} onClick={() => setTab(key)}>
-            {label}
-          </button>
-        ))}
-      </div>
-      {txs.length === 0 ? (
-        <p className="small muted">No transactions yet. A new bank can take a few minutes to show its history.</p>
-      ) : shown.length === 0 ? (
-        <p className="small muted">{empty}</p>
-      ) : (
-        <ul className="rows">
-          {shown.map((t) => (
-            <TransactionRow key={t.id} tx={t} meId={me.user_id} people={people} />
-          ))}
-        </ul>
-      )}
-      {tab === 'transfers' && (
-        <p className="small muted">Loan and card payments and moves between your own accounts sit here, so they don&apos;t look like spending.</p>
-      )}
-    </section>
+    <Panel id="shared-h" title="Shared with you" meta={<See to="/family">Sharing</See>}>
+      <Rows>
+        {theirs.map((a) => {
+          const m = people[a.owner] ?? { user_id: a.owner }
+          const kid = ['teen', 'child'].includes(roles[a.owner])
+          return (
+            <Row
+              key={a.id}
+              lead={<Avatar member={m} />}
+              name={a.name}
+              sub={`${kid ? 'You see this as a parent' : `From ${nameOf(m)}`} · ${a.bankName}${a.mask ? ` ··${a.mask}` : ''}`}
+            >
+              <Money className="text-[14px]" tone={isOwed(a) ? OWE : undefined}>
+                {a.current_balance_minor == null ? '—' : formatMoney(a.current_balance_minor, a.currency)}
+              </Money>
+            </Row>
+          )
+        })}
+      </Rows>
+    </Panel>
   )
 }
 
-// Spending this month (#39): one bar split by category, then a row per
-// category with its icon, share, number of purchases and amount. The top four
-// get their own colour; the rest are grouped as Other. Each row opens the
-// Transactions page filtered to that category and month.
-const SPEND_COLORS = ['clay', 'sage', 'cocoa', 'sage-light']
-
-function SpendingCard({ spending, month, home, everyone = false }) {
-  const rows = spending.filter((s) => s.currency === home).sort((a, b) => b.amount_minor - a.amount_minor)
-  const total = rows.reduce((sum, r) => sum + r.amount_minor, 0)
-  const top = rows.slice(0, SPEND_COLORS.length).map((r, i) => ({ ...r, color: SPEND_COLORS[i] }))
-  const rest = rows.slice(SPEND_COLORS.length)
-  if (rest.length > 0) {
-    top.push({
-      category: 'OTHER',
-      color: 'sand',
-      amount_minor: rest.reduce((sum, r) => sum + r.amount_minor, 0),
-      count: rest.reduce((sum, r) => sum + r.count, 0),
-      label: `Other (${rest.length} categories)`,
-    })
-  }
-  const share = (v) => {
-    const p = (v / total) * 100
-    return p < 1 ? '<1%' : `${Math.round(p)}%`
-  }
-  const fading = useFadeOnChange(everyone)
-
+function Family({ members, isOwner }) {
   return (
-    <section className={fading ? 'panel is-fading' : 'panel'} aria-labelledby="sp-h">
-      <div className="panel-head">
-        <h2 id="sp-h">
-          {everyone ? 'Spending' : 'Your spending'} in {monthName(new Date())}
-        </h2>
-        {rows.length > 0 && (
-          <span className="amount">
-            <CountUp value={total} format={(v) => formatMoney(v, home)} />
-          </span>
-        )}
-      </div>
-      {rows.length === 0 ? (
-        <p className="small muted">No spending yet this month.</p>
-      ) : (
-        <>
-          <div className="spend-bar" aria-hidden="true">
-            {top.map((r) => (
-              <span key={r.category} className={`spend-${r.color}`} style={{ flexGrow: r.amount_minor }} />
-            ))}
-          </div>
-          <ul className="rows spend-rows">
-            {top.map((r) => {
-              const label = r.label ?? categoryLabel(r.category)
-              // Same month as these totals, so the counts match what opens.
-              // The same person as these totals: Transactions opens on yours
-              // by default, so Everyone needs owner=all.
-              const p = new URLSearchParams(everyone ? { owner: 'all' } : {})
-              if (r.category !== 'OTHER') p.set('category', r.category)
-              if (month) p.set('month', month)
-              const to = `/transactions?${p}`
-              return (
-                <li key={r.category}>
-                  <Link to={to} className="spend-row">
-                    <span className={`spend-icon spend-${r.color}`} aria-hidden="true">
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        focusable="false"
-                      >
-                        <path d={categoryPath(r.category)} />
-                      </svg>
-                    </span>
-                    <span className="grow">
-                      <span className="name block">{label}</span>
-                      <span className="small muted block">
-                        {share(r.amount_minor)} · {r.count} {r.count === 1 ? 'purchase' : 'purchases'}
-                      </span>
-                    </span>
-                    <span className="amount">{formatMoney(r.amount_minor, home)}</span>
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
-        </>
-      )}
-      <p className="small muted">Transfers and loan payments aren&apos;t counted as spending.</p>
-    </section>
-  )
-}
-
-function FamilyCard({ members, isOwner }) {
-  return (
-    <section className="panel panel-dashed" aria-labelledby="fam-h">
-      <div className="panel-head">
-        <h2 id="fam-h">Family</h2>
-        <Link to="/family" className="link small">
-          {isOwner ? 'Manage' : 'Sharing'}
-        </Link>
-      </div>
-      <ul className="rows">
+    <Panel id="fam-h" title="Family" meta={<See to="/family">{isOwner ? 'Manage' : 'Sharing'}</See>}>
+      <Rows>
         {members.map((m) => (
-          <li key={m.user_id}>
-            <Avatar member={m} />
-            <div className="grow">
-              <p className="name">
-                {nameOf(m)}
-                {m.is_you && ' (you)'}
-              </p>
-              <p className="small muted">{m.role}</p>
-            </div>
-          </li>
+          <Row
+            key={m.user_id}
+            lead={<Avatar member={m} />}
+            name={`${nameOf(m)}${m.is_you ? ' (you)' : ''}`}
+            sub={m.role ? m.role[0].toUpperCase() + m.role.slice(1) : ''}
+          />
         ))}
-      </ul>
-    </section>
+      </Rows>
+    </Panel>
   )
 }
 
-// Goals on Home (#14): the Goals page's answer, in short. Loads on its own so
-// Home never waits for it; says nothing it can't back up if it fails.
-function GoalsCard({ household }) {
+// Goals on Home (#14): each goal and how full it is. Loads on its own so Home never waits for it.
+function Goals({ household }) {
   const [goals, setGoals] = useState(null)
   const today = new Date().toLocaleDateString('en-CA')
   useEffect(() => {
@@ -618,31 +522,51 @@ function GoalsCard({ household }) {
     )
   }, [household.id, today])
   const list = goals ?? []
-  const month = thisMonth(list, today)
-  const { title, detail } = summary(month, today, formatMoney)
   return (
-    <section className="panel panel-dashed" aria-labelledby="goals-h">
-      <div className="panel-head">
-        <h2 id="goals-h">Goals</h2>
-        {list.length > 0 && (
-          <Link to="/goals" className="link small">
-            See goals
-          </Link>
-        )}
-      </div>
+    <Panel id="goals-h" title="Goals" meta={list.length > 0 && <See to="/goals">See goals</See>}>
       {list.length === 0 ? (
-        <p className="small muted">
-          Save for a trip or a school fund, and let a savings account keep track for you.{' '}
-          <Link to="/goals" className="link small">
-            Set a goal
-          </Link>
+        <p className={`m-0 text-[13px] ${MUTED}`}>
+          Save for a trip or a school fund, and let a savings account keep track for you. <See to="/goals">Set a goal</See>
         </p>
       ) : (
-        <>
-          <p className="goals-card-title">{month.length ? title : `${list.length} ${list.length === 1 ? 'goal' : 'goals'}`}</p>
-          {detail && <p className="small muted">{detail}</p>}
-        </>
+        <ul className="m-0 grid list-none gap-3 p-0">
+          {list.map((g) => {
+            const known = g.saved_minor != null
+            const pct = known ? Math.min(100, Math.round((g.saved_minor / g.target_minor) * 100)) : 0
+            return (
+              <li key={g.id}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="text-[14px] font-semibold">{g.name}</span>
+                  <span className={`text-[14px] ${NUM}`}>
+                    {known ? formatMoney(g.saved_minor, g.currency) : 'Private'}{' '}
+                    <span className={`font-[family-name:var(--font-body)] text-[13px] font-normal ${MUTED}`}>of {formatMoney(g.target_minor, g.currency)}</span>
+                  </span>
+                </div>
+                <p className={`m-0 text-[13px] ${MUTED}`}>
+                  {known
+                    ? `${g.by_month ? `By ${new Date(`${g.by_month}T12:00:00`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} · ` : ''}${pct}%`
+                    : 'Progress is private'}
+                </p>
+                {known && (
+                  <div className="mt-1.5">
+                    <Gauge
+                      orientation="linear"
+                      inactiveFill="var(--color-redesign-track)"
+                      value={pct}
+                      totalNotches={28}
+                      activeFill="var(--color-redesign-in)"
+                      defaultLabel={g.name}
+                      suffix="%"
+                      minWidth={160}
+                      linearHeight={12}
+                    />
+                  </div>
+                )}
+              </li>
+            )
+          })}
+        </ul>
       )}
-    </section>
+    </Panel>
   )
 }

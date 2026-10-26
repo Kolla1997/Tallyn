@@ -10,6 +10,10 @@
 @source './components';
 @source './preview.jsx';
 
+/* The app is light only (#187): dark: variants in the libraries apply only under a .dark class,
+   which the app never sets. */
+@custom-variant dark (&:is(.dark *));
+
 @theme inline {
   --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
   --font-body: Montserrat, ui-sans-serif, system-ui, sans-serif;
@@ -126,5 +130,48 @@ body:has(.calm-page) {
   .calm-page .panel:has(.rows, ul, ol, table) {
     background: #fff;
     backdrop-filter: none;
+  }
+}
+
+/* Tailwind's reset, scoped to rebuilt screens (#187): the libraries' components and the rebuilt
+   pages expect it; screens that haven't moved keep the old base rules. Zero specificity, so
+   utilities still win. */
+@layer base {
+  .calm :where(*, ::before, ::after) {
+    box-sizing: border-box;
+    border: 0 solid;
+    margin: 0;
+    padding: 0;
+  }
+  .calm :where(h1, h2, h3, h4, h5, h6) {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  .calm :where(ol, ul, menu) {
+    list-style: none;
+  }
+  .calm :where(a) {
+    color: inherit;
+    text-decoration: inherit;
+  }
+  .calm :where(button, input, select, optgroup, textarea) {
+    font: inherit;
+    font-feature-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+  .calm :where(button, [role='button']) {
+    cursor: pointer;
+  }
+  .calm :where(img, svg, video, canvas) {
+    display: block;
+    vertical-align: middle;
+  }
+  .calm :where(img, video) {
+    max-width: 100%;
+    height: auto;
   }
 }
