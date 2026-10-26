@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-24
+updated: 2026-10-25
 issue: 10
 tags: [design]
 ---
@@ -132,3 +132,8 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-24 | Goals: "This month" checklist on top, goals as glass pots that fill, and one goal up close as a forecast with its next milestone (#14) | Dinesh picked the mix of draft 2, part by part: each part answers a different question (what to do this month; how are my goals; will this one make it) |
 | 2026-10-24 | Month fields: a field in words ("June 2027 · 8 months away") opening quick picks (No date, 6 months, 1 year, 2 years) over a year-by-year month grid; past months off (`web/src/components/MonthPicker.jsx`, #14) | Dinesh picked the mix of the month draft (`docs/03 Design/Comps/web-goals-month-draft.html`): the browser's month box looks different everywhere and offers days a goal doesn't need |
 | 2026-10-24 | Screens are designed by [[#Designing a screen]]: Tallyn's look first, then taste-skill's app-screen method for content, its layouts as references only, and its checks with the glass, glow and palette rules allowed (#180) | Dinesh: use taste-skill as a reference while the Tallyn design doc stays in charge; layered, not merged, so the pinned copy stays unchanged |
+| 2026-10-25 | Calm redesign, drafted for every screen in the draft lab (`web/src/lab/calm/`, #185): red, green, white and black, red for the one action and what's owed, green for money in and progress; cards are plain white or near-black, no glass. **Applies to the app only when the redesign is built**; until then the rules above stand | Dinesh: the bold drafts were overwhelming, he likes the calm approach |
+| 2026-10-25 | Redesign sizes: one 1280px content width on every page, centred; body 14px, small 13px, names 15px, figures 22px, page titles 24px; buttons 13px text with 14px icons; rows and cards a little roomier (#185). Replaces the compact column of [[#App type and density]] when built | Dinesh asked for "one size smaller" (size C), then one step up everywhere, then less empty space at the sides; one width keeps pages lined up (Hallmark Floor 14) |
+| 2026-10-25 | Redesign sidebar: the rail is collapsed by default (icon names on hover and keyboard focus, » opens it); menu text 13px; rows 34px (32px items, 2px apart). Replaces the 40px items and 14px text of 2026-10-16 when built (#185) | Dinesh picked the rail over a labelled rail and a top bar, then asked for smaller text and less space |
+| 2026-10-25 | Redesign layouts (#185): lists are rows in one card, never one stretched card per item. Debts: a summary strip (waffle for cards vs loans, four figures) over a table with bullet bars (Dinesh picked F, the mix). Accounts: the same strip with Bklit rings for what you have, then one card per bank holding its accounts as tiles, each card as wide as its accounts (picked F, the bank bento, a mix of "by bank" and "tiles") | Single items stretched edge to edge read huge; banks listed once where their accounts are |
+| 2026-10-25 | Redesign charts (#185): spending by day as one red bar per day with a daily average line and three facts (picked the mix of four forms); spending reads in a red scale, empty days grey; numbers always written beside the marks | Dinesh asked for red instead of black, then for less wasted space; ui-ux-pro-max: never colour alone |

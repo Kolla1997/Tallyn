@@ -2,7 +2,7 @@
 type: log
 status: active
 owner: Dinesh
-updated: 2026-10-24
+updated: 2026-10-25
 tags: [log]
 ---
 
@@ -11,6 +11,11 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-25
+- #185 Calm drafts of every screen in the draft lab (`web/src/lab/calm/`, open `lab.html`): Home, Accounts, Transactions, Budgets, Debts, Family, Goals, Settings, and the sign-in and setup screens (Sign in, Create account, 2FA code, backup code, Set up 2FA, Backup codes, Reset password, Check your email, New password, Create household, Join). Each keeps every job of its real screen; made-up data adds up across pages ($3,486 spent, $17,871.73 net worth, $15,486.40 owed).
+- #185 Dinesh's picks, in order: sizes C then one step up everywhere; spending by day in red, then the mix of four forms; Debts layout F (summary strip + table) with the waffle; collapsed rail with 13px text and 34px rows; one 1280px width on every page; sun and moon icons for the theme switch; smaller buttons; Accounts F (bank bento, a mix of by-bank and tiles) with Bklit rings. Recorded in the Design System decisions; they apply to the app only when the redesign is built.
+- #185 Hallmark Floor fixes in the drafts: colours and fonts through tokens, focus rings on every control, `overflow-x: clip`, reduced motion on the switch, no middle-dot captions; sloplint 0 FAIL on the pages (the chart library's dark token block and the stamp waived). Checked with the taste-skill inspector on every page, light and dark.
+- #185 Daily spending data now matches the Transactions list for Oct 20–24; five earlier days give up the difference, so October still adds up to $3,486.
+- Open: applying the redesign to the real app needs its own ticket and plan (it drops the glass finish and Clay palette, and brings Tailwind and the libraries out of the lab, which ADR 0016 keeps in the lab).
 - #183 Draft lab in `web/`: Tailwind v4 + shadcn (scoped to `lab.html`, never shipped), Bklit charts, free Kokonut UI and anime.js, installed with the shadcn CLI. Dinesh chose `web/` over a separate lab, free Kokonut only, Tallyn's fonts. [[0016-ui-libraries-in-a-draft-lab]]. npm 10 needed npm 11 for one install (`edgesOut` bug).
 
 ## 2026-10-24
