@@ -412,7 +412,6 @@ fieldset.share label {
 
 /* Phones and small tablets: header and bottom tab bar instead of the sidebar. */
 @media (max-width: 1023px) {
-
   .sidebar {
     display: none;
   }
@@ -772,7 +771,6 @@ a.btn {
 
 /* Phones: summary above the list; details open over the page. */
 @media (max-width: 1023px) {
-
   .tx-details {
     position: fixed;
     inset: 0;
@@ -1379,7 +1377,6 @@ label.agree input {
 /* Phones (#27): ☰ menu in the header. */
 
 @media (prefers-reduced-motion: reduce) {
-
   .notch {
     transition: none;
   }
