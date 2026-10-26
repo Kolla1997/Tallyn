@@ -156,8 +156,8 @@ export default function Shell({ me, household, households, onChooseHousehold, on
           ))}
         </nav>
         <div className={`mt-auto flex flex-col gap-2 ${collapsed ? 'items-center' : ''}`}>
-          <div className={collapsed ? '' : 'px-1'}>
-            <ThemeSwitch stacked={collapsed} />
+          <div className={collapsed ? '' : 'px-1.5'}>
+            <ThemeSwitch />
           </div>
           <ProfileMenu
             name={name}
@@ -174,7 +174,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
       <header className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 lg:hidden">
         <Logo light={logo} dark={logoDark} className="h-7" />
         <div className="flex items-center gap-2">
-          <ThemeSwitch />
+          <ThemeSwitch size="size-10" />
           <MobileMenu name={name} initial={initial} household={household} onSignOut={onSignOut} />
         </div>
       </header>

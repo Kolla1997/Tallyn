@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { MIN_PASSWORD, rememberPasswordChanged, rememberResetAsked } from '../lib/recovery.js'
 import { supabase } from '../lib/supabase.js'
 import { authMessage } from '../lib/authErrors.js'
@@ -111,13 +112,14 @@ export function ResetRequest({ initialEmail = '', expired = false, onBack }) {
 // Saving signs you out on your other devices, then opens Home with a note.
 export function ChoosePassword({ email, onDone }) {
   const [password, setPassword] = useState('')
-  const [show, setShow] = useState(false)
+  const [show, toggleShow, hide] = useShowPassword()
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const long = password.length >= MIN_PASSWORD
 
   async function save(e) {
     e.preventDefault()
+    hide()
     if (!long) return
     setError('')
     setBusy(true)
@@ -145,6 +147,7 @@ export function ChoosePassword({ email, onDone }) {
           <span className="password-field">
             <input
               id="new-password"
+              className="pr-11"
               type={show ? 'text' : 'password'}
               autoComplete="new-password"
               required
@@ -153,9 +156,7 @@ export function ChoosePassword({ email, onDone }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button type="button" className="password-show" aria-pressed={show} onClick={() => setShow(!show)}>
-              {show ? 'Hide' : 'Show'}
-            </button>
+            <ShowPassword show={show} onToggle={toggleShow} />
           </span>
         </div>
         <PasswordRule ok={long} />
@@ -170,6 +171,36 @@ export function ChoosePassword({ email, onDone }) {
         <p className="muted small">You&apos;ll be signed out on your other devices.</p>
       </form>
     </section>
+  )
+}
+
+// Showing a password is short-lived: it hides itself again after 10 seconds (and the form hides it
+// on submit), so a typed password isn't left on screen.
+const SHOW_FOR = 10_000
+export function useShowPassword() {
+  const [show, setShow] = useState(false)
+  useEffect(() => {
+    if (!show) return
+    const t = setTimeout(() => setShow(false), SHOW_FOR)
+    return () => clearTimeout(t)
+  }, [show])
+  return [show, () => setShow((v) => !v), () => setShow(false)]
+}
+
+// The eye at the end of a password field (the #185 draft): shows what you typed, or hides it again.
+export function ShowPassword({ show, onToggle }) {
+  const I = show ? EyeOff : Eye
+  return (
+    <button
+      type="button"
+      aria-pressed={show}
+      aria-label={show ? 'Hide password' : 'Show password'}
+      title={show ? 'Hide password' : 'Show password'}
+      onClick={onToggle}
+      className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl border-0 bg-transparent p-0 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+    >
+      <I className="size-4" aria-hidden="true" />
+    </button>
   )
 }
 

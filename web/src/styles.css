@@ -1624,25 +1624,6 @@ label.agree input {
   padding-right: 64px;
 }
 
-.password-show {
-  position: absolute;
-  right: var(--space-s2);
-  top: 50%;
-  transform: translateY(-50%);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  background: none;
-  border: none;
-  padding: var(--space-s1) var(--space-s2);
-  border-radius: var(--radius-input);
-  text-decoration: underline;
-  text-decoration-color: var(--color-border);
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
-
 .password-rule {
   margin: calc(-1 * var(--space-s2)) 0 0;
   font-size: 13px;

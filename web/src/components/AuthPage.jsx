@@ -11,6 +11,7 @@ import { Link } from '../lib/router.jsx'
 export default function AuthPage({ children, wide = false, centred = false }) {
   return (
     <main className={`page calm-page calm-auth${wide ? ' page-wide' : ''}${centred ? ' page-centred' : ''}`}>
+      <ThemeSwitch className="fixed top-4 right-4 z-10" />
       <img className="logo dark:hidden" src={logo} alt="Tallyn" />
       <img className="logo hidden dark:block" src={logoDark} alt="Tallyn" />
       {children}
@@ -30,13 +31,10 @@ export function SiteFooter() {
         <img className="hidden dark:block" src={wordmarkDark} alt="Tallyn" height="20" />
         <span>· It all adds up.</span>
       </span>
-      <span className="flex items-center gap-4">
-        <ThemeSwitch />
-        <nav aria-label="Legal" className="flex gap-3">
-          <Link to="/terms">Terms of Service</Link>
-          <Link to="/privacy">Privacy Policy</Link>
-        </nav>
-      </span>
+      <nav aria-label="Legal" className="flex gap-3">
+        <Link to="/terms">Terms of Service</Link>
+        <Link to="/privacy">Privacy Policy</Link>
+      </nav>
     </footer>
   )
 }

@@ -73,7 +73,7 @@ describe('ChoosePassword', () => {
     expect(save).toBeEnabled()
     expect(screen.getByText(/At least 8 characters/)).toHaveClass('password-rule-ok')
     expect(screen.getByLabelText('New password')).toHaveAttribute('type', 'password')
-    fireEvent.click(screen.getByRole('button', { name: 'Show' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Show password' }))
     expect(screen.getByLabelText('New password')).toHaveAttribute('type', 'text')
   })
 
