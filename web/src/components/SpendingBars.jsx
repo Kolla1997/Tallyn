@@ -61,7 +61,7 @@ export default function SpendingBars({ month, days, home, selected, onPick }) {
             style={{ bottom: `${Math.min(100, (avg / cap) * 100)}%` }}
             aria-hidden="true"
           />
-          {list.map((d) => {
+          {list.map((d, i) => {
             const capped = d.amount > cap
             const on = selected === d.key
             return (
@@ -78,7 +78,9 @@ export default function SpendingBars({ month, days, home, selected, onPick }) {
                 className="relative flex h-full flex-1 items-end border-0 bg-transparent p-0"
               >
                 {capped && (
-                  <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 -translate-y-full font-[family-name:var(--font-heading)] text-[11px] font-semibold whitespace-nowrap tabular-nums">
+                  <span
+                    className={`absolute -top-0.5 -translate-y-full ${i < 3 ? 'left-0' : i > list.length - 4 ? 'right-0' : 'left-1/2 -translate-x-1/2'} font-[family-name:var(--font-heading)] text-[11px] font-semibold whitespace-nowrap tabular-nums`}
+                  >
                     {money(d.amount)}
                   </span>
                 )}

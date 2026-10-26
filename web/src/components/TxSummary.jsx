@@ -1,199 +1,97 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
+import { ArrowLeft, MapPin } from 'lucide-react'
 import { useTakeover } from '../lib/takeover.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { cleanName } from './TransactionRow.jsx'
-import TxIcon from './TxIcon.jsx'
+import { categoryPath } from './TxIcon.jsx'
 import TallynLoader from './TallynLoader.jsx'
 import CountUp from './CountUp.jsx'
+import { Panel, Rows, IconTile, NUM, MUTED, IN } from './calm/ui.jsx'
 
-// The Transactions page's right column (#58): a summary of whatever is
-// filtered, or the details of the transaction you picked.
+// The Transactions page's right column (#58), in the calm redesign (#187, the #185 draft): a
+// summary of whatever is filtered (money in and spent, top merchants, spending by category as
+// bars with their shares), or the details of the transaction you picked.
 
-// Ring colours, top four categories then Other. Flat brand colours only.
-const RING = ['var(--color-clay-deep)', 'var(--color-sage-deep)', 'var(--color-cocoa)', 'var(--color-sage-light)']
-const OTHER = 'var(--color-sand)'
-
-// The space inside the ring is about 76 of the drawing's 140 units. Shrink
-// long text (big totals, long names) so it always fits; ~0.6em per character.
-const INSIDE = 76
-const fit = (text, max) => Math.min(max, INSIDE / (String(text).length * 0.6))
-
-export function TxSummary({ totals, scope, month, day }) {
+export function TxSummary({ totals, scope }) {
   if (!totals) {
-    return <section className="panel">{totals === null ? <TallynLoader small /> : <p className="small muted">Nothing to add up for these filters.</p>}</section>
+    return (
+      <Panel label="Summary">{totals === null ? <TallynLoader small /> : <p className={`text-[13px] ${MUTED}`}>Nothing to add up for these filters.</p>}</Panel>
+    )
   }
   const cur = totals.currency
+  const cats = totals.categories ?? []
+  const top = cats[0]?.amount_minor || 1
+  const pct = (v) => {
+    const p = (v / (totals.spent_minor || 1)) * 100
+    return p < 1 ? '<1%' : `${Math.round(p)}%`
+  }
   return (
-    <div className="tx-summary">
-      <section className="panel" aria-labelledby="sum-h">
-        <div className="panel-head">
-          <h2 id="sum-h">{scope}</h2>
-        </div>
-        <div className="have-owe">
-          <div className="tone-sage">
-            <span className="small">Money in</span>
-            <span className="amount money-in">
+    <div className="grid gap-3">
+      <Panel id="sum-h" title={scope} glass>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <p className={`text-[13px] ${MUTED}`}>Money in</p>
+            <p className={`text-[22px] ${NUM}`} style={IN}>
               <CountUp value={totals.money_in_minor} format={(v) => `+${formatMoney(v, cur)}`} />
-            </span>
+            </p>
           </div>
-          <div className="tone-clay">
-            <span className="small">Spent</span>
-            <span className="amount">
-              <CountUp value={totals.spent_minor} format={(v) => formatMoney(v, cur)} />
-            </span>
+          <div>
+            <p className={`text-[13px] ${MUTED}`}>Spent</p>
+            <p className={`text-[22px] ${NUM}`}>
+              <CountUp value={totals.spent_minor} format={(v) => `−${formatMoney(v, cur)}`} />
+            </p>
           </div>
         </div>
         {totals.transfers_minor > 0 && (
-          <p className="small muted">Transfers and loan payments ({formatMoney(totals.transfers_minor, cur)}) aren&apos;t counted as spending.</p>
+          <p className={`mt-2 text-[13px] ${MUTED}`}>
+            Transfers and loan payments ({formatMoney(totals.transfers_minor, cur)}) aren&apos;t counted as spending.
+          </p>
         )}
-      </section>
+      </Panel>
 
-      <CategoryRing categories={totals.categories} spent={totals.spent_minor} cur={cur} month={month} day={day} />
-
-      {totals.merchants.length > 0 && (
-        <section className="panel" aria-labelledby="merch-h">
-          <div className="panel-head">
-            <h2 id="merch-h">Top merchants</h2>
-          </div>
-          <ul className="rows">
+      {totals.merchants?.length > 0 && (
+        <Panel id="merch-h" title="Top merchants">
+          <Rows>
             {totals.merchants.map((m) => (
-              <li key={m.merchant}>
-                <span className="grow">
-                  <span className="name block">{cleanName(m.merchant)}</span>
-                  <span className="small muted block">
+              <li key={m.merchant} className="flex items-center justify-between gap-3 py-2">
+                <span className="min-w-0">
+                  <span className="block truncate text-[14px] font-semibold">{cleanName(m.merchant)}</span>
+                  <span className={`block text-[13px] ${MUTED}`}>
                     {m.count} {m.count === 1 ? 'purchase' : 'purchases'}
                   </span>
                 </span>
-                <span className="amount">{formatMoney(m.amount_minor, cur)}</span>
+                <span className={`text-[14px] ${NUM}`}>{formatMoney(m.amount_minor, cur)}</span>
+              </li>
+            ))}
+          </Rows>
+        </Panel>
+      )}
+
+      {cats.length > 0 && (
+        <Panel id="cat-h" title="By category">
+          <ul aria-label="Categories" className="grid gap-2.5">
+            {cats.map((c) => (
+              <li key={c.category}>
+                <div className="flex items-baseline justify-between gap-3 text-[14px]">
+                  <span className="font-semibold">{categoryLabel(c.category)}</span>
+                  <span className="flex items-baseline gap-2">
+                    <span className={`text-[13px] ${MUTED}`}>{pct(c.amount_minor)}</span>
+                    <span className={NUM}>{formatMoney(c.amount_minor, cur)}</span>
+                  </span>
+                </div>
+                <span className="mt-1 block h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--color-redesign-track)' }} aria-hidden="true">
+                  <span className="block h-full rounded-full bg-zinc-500" style={{ width: `${(c.amount_minor / top) * 100}%` }} />
+                </span>
               </li>
             ))}
           </ul>
-        </section>
+        </Panel>
       )}
     </div>
   )
 }
 
-// Spending by category as a ring: total in the middle, a legend with each
-// category's share. Top four get their own colour; the rest are Other.
-// Hover a colour or its legend entry (or tap, or focus it) to see that
-// category in the middle; the others fade back.
-function CategoryRing({ categories, spent, cur, month, day }) {
-  const [active, setActive] = useState(null) // label of the highlighted category
-  const top = categories.slice(0, RING.length).map((c, i) => ({ label: categoryLabel(c.category), amount: c.amount_minor, count: c.count, color: RING[i] }))
-  const rest = categories.slice(RING.length)
-  if (rest.length > 0) {
-    top.push({
-      label: 'Other',
-      amount: rest.reduce((t, c) => t + c.amount_minor, 0),
-      count: rest.reduce((t, c) => t + c.count, 0),
-      color: OTHER,
-    })
-  }
-  const shown = top.find((c) => c.label === active)
-  const tag = day
-    ? new Date(`${day}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    : month
-      ? new Date(`${month}-01T12:00:00`).toLocaleDateString('en-US', { month: 'short' })
-      : 'All time'
-  const R = 52
-  const C = 2 * Math.PI * R
-  const GAP = top.length > 1 ? 6 : 0
-  // Where each segment starts: the shares before it, worked out up front.
-  const starts = top.map((_, i) => top.slice(0, i).reduce((t, c) => t + (c.amount / spent) * C, 0))
-  const pct = (v) => {
-    const p = (v / spent) * 100
-    return p < 1 ? '<1%' : `${Math.round(p)}%`
-  }
-
-  return (
-    <section className="panel" aria-labelledby="cat-h">
-      <div className="panel-head">
-        <h2 id="cat-h">By category</h2>
-        <span className="tag">{tag}</span>
-      </div>
-      {spent <= 0 ? (
-        <p className="small muted">No spending here.</p>
-      ) : (
-        <div className="ring-wrap">
-          <svg width="180" height="180" viewBox="0 0 140 140" role="img" aria-label={`Spending by category, ${formatMoney(spent, cur)} in total`}>
-            {top.map((c, i) => {
-              const share = (c.amount / spent) * C
-              const len = Math.max(share - GAP, 1)
-              const seg = (
-                <circle
-                  key={c.label}
-                  className={active && active !== c.label ? 'ring-seg ring-dim' : 'ring-seg'}
-                  onMouseEnter={() => setActive(c.label)}
-                  onMouseLeave={() => setActive(null)}
-                  onClick={() => setActive(active === c.label ? null : c.label)}
-                  cx="70"
-                  cy="70"
-                  r={R}
-                  fill="none"
-                  style={{ stroke: c.color }}
-                  strokeWidth="16"
-                  strokeLinecap={top.length > 1 ? 'round' : 'butt'}
-                  strokeDasharray={`${len} ${C - len}`}
-                  strokeDashoffset={-starts[i]}
-                  transform="rotate(-90 70 70)"
-                />
-              )
-              return seg
-            })}
-            {shown ? (
-              <>
-                <text x="70" y="56" textAnchor="middle" className="ring-label" fontSize={fit(shown.label, 11)}>
-                  {shown.label}
-                </text>
-                <text x="70" y="76" textAnchor="middle" className="ring-total" fontSize={fit(formatMoney(shown.amount, cur), 17)}>
-                  {formatMoney(shown.amount, cur)}
-                </text>
-                <text x="70" y="93" textAnchor="middle" className="ring-label" fontSize={fit(`${pct(shown.amount)} · ${shown.count} purchases`, 10)}>
-                  {pct(shown.amount)} · {shown.count} {shown.count === 1 ? 'purchase' : 'purchases'}
-                </text>
-              </>
-            ) : (
-              <>
-                <text x="70" y="64" textAnchor="middle" className="ring-label" fontSize="11">
-                  Total spent
-                </text>
-                <text x="70" y="84" textAnchor="middle" className="ring-total" fontSize={fit(formatMoney(spent, cur), 17)}>
-                  {formatMoney(spent, cur)}
-                </text>
-              </>
-            )}
-          </svg>
-          <ul className="ring-legend" aria-label="Categories">
-            {top.map((c) => (
-              <li key={c.label}>
-                <button
-                  type="button"
-                  className={active && active !== c.label ? 'ring-key ring-dim' : 'ring-key'}
-                  aria-label={`${c.label}: ${formatMoney(c.amount, cur)}, ${pct(c.amount)}, ${c.count} ${c.count === 1 ? 'purchase' : 'purchases'}`}
-                  onMouseEnter={() => setActive(c.label)}
-                  onMouseLeave={() => setActive(null)}
-                  onFocus={() => setActive(c.label)}
-                  onBlur={() => setActive(null)}
-                >
-                  <span className="small muted block">{c.label}</span>
-                  <span className="ring-pct">
-                    <span className="ring-tick" style={{ background: c.color }} aria-hidden="true" />
-                    {pct(c.amount)}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </section>
-  )
-}
-
-// One transaction in full. Time and place only show when the API returned
-// them, i.e. when you may see them (#28).
 export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
   const shown = -tx.amount_minor
   const w = tx.whereabouts
@@ -209,86 +107,98 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
   const hasPlace = Boolean(w?.address || place || (w?.lat != null && w?.lon != null))
   const owner = tx.owner_user_id === meId ? 'You' : nameOf(people[tx.owner_user_id] ?? { user_id: tx.owner_user_id })
   const name = cleanName(tx.merchant)
-  // On phones the details cover the page (#153): focus moves in, and back to
-  // the row when they close.
+  // On phones the details cover the page (#153): focus moves in, and back to the row when they close.
   const panel = useRef(null)
   const heading = useRef(null)
   useTakeover(panel, heading, { key: tx.id })
 
   return (
-    <section ref={panel} className="panel tx-details" aria-labelledby="tx-details-h">
-      <button className="link small tx-back" onClick={onBack}>
-        ← Back to summary
+    <section ref={panel} className="tx-details calm-solid rounded-2xl p-4" aria-labelledby="tx-details-h">
+      <button type="button" onClick={onBack} className="mb-3 inline-flex items-center gap-1 text-[13px] font-semibold text-zinc-600 hover:text-zinc-900">
+        <ArrowLeft className="size-3.5" aria-hidden="true" />
+        Back to summary
       </button>
-      <div className="tx-details-head">
-        <TxIcon tx={tx} />
-        <h2 ref={heading} id="tx-details-h" className="grow" tabIndex={-1}>
+      <div className="flex items-center gap-3">
+        <IconTile>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            focusable="false"
+          >
+            <path d={categoryPath(tx.category_primary)} />
+          </svg>
+        </IconTile>
+        <h2 ref={heading} id="tx-details-h" className="grow font-[family-name:var(--font-heading)] text-[18px] font-semibold" tabIndex={-1}>
           {name}
         </h2>
-        <span className={shown > 0 ? 'amount money-in' : 'amount'}>
+        <span className={`text-[18px] ${NUM}`} style={shown > 0 ? IN : undefined}>
           {shown > 0 ? '+' : shown < 0 ? '−' : ''}
           {formatMoney(Math.abs(shown), tx.currency)}
         </span>
       </div>
-      <dl className="kv">
-        <dt>When</dt>
+      <dl className="mt-4 grid grid-cols-[96px_1fr] gap-y-2 text-[14px]">
+        <dt className={MUTED}>When</dt>
         <dd>
           {day}
           {time && ` · ${time}`}
           {tx.pending && ' · pending'}
         </dd>
-        <dt>Who</dt>
+        <dt className={MUTED}>Who</dt>
         <dd>{owner}</dd>
         {tx.account_name && (
           <>
-            <dt>Account</dt>
+            <dt className={MUTED}>Account</dt>
             <dd>{tx.account_name}</dd>
           </>
         )}
-        <dt>Category</dt>
+        <dt className={MUTED}>Category</dt>
         <dd>{tx.category_primary ? categoryLabel(tx.category_primary) : 'Other'}</dd>
       </dl>
       {hasPlace ? (
-        <div className="tx-place">
-          <div className="tx-address">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z" />
-              <circle cx="12" cy="9.5" r="2.5" />
-            </svg>
+        <div className="mt-4 grid gap-2">
+          <p className="flex items-start gap-2 rounded-xl bg-zinc-100 px-3 py-2.5 text-[13px] text-zinc-700">
+            <MapPin className="size-4 shrink-0" aria-hidden="true" />
             <span>
               {w.address && <span className="block">{w.address}</span>}
               {place && <span className="block">{place}</span>}
-              {w.store_number && <span className="block small muted">Store #{w.store_number}</span>}
+              {w.store_number && <span className={`block ${MUTED}`}>Store #{w.store_number}</span>}
             </span>
-          </div>
-          <a className="btn btn-secondary btn-small tx-maps" href={mapsLink(w, name)} target="_blank" rel="noreferrer noopener">
+          </p>
+          <a
+            className="inline-flex h-8 w-fit items-center rounded-full border border-zinc-300 px-3 text-[13px] font-semibold"
+            href={mapsLink(w, name)}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
             Open in Maps
           </a>
-          <p className="small muted">Opens your maps app. Tallyn doesn&apos;t send the location anywhere until you tap.</p>
+          <p className={`text-[13px] ${MUTED}`}>Opens your maps app. Tallyn doesn&apos;t send the location anywhere until you tap.</p>
         </div>
       ) : (
-        <p className="small muted">No location for this one.</p>
+        <p className="mt-4 flex items-center gap-2 rounded-xl bg-zinc-100 px-3 py-2.5 text-[13px] text-zinc-600">
+          <MapPin className="size-4 shrink-0" aria-hidden="true" />
+          No location for this one.
+        </p>
       )}
-      <button className="link small" onClick={() => onMerchant(tx.merchant)}>
+      <button
+        type="button"
+        onClick={() => onMerchant(tx.merchant)}
+        className="mt-3 text-[13px] font-semibold text-zinc-900 underline decoration-zinc-300 underline-offset-4"
+      >
         All {name} transactions
       </button>
     </section>
   )
 }
 
-// A link to the place in the person's maps app: Apple Maps on Apple devices,
-// Google Maps elsewhere. Coordinates when the bank gave them, else the address.
+// A link to the place in the person's maps app: Apple Maps on Apple devices, Google Maps
+// elsewhere. Coordinates when the bank gave them, else the address.
 function mapsLink(w, name) {
   const coords = w.lat != null && w.lon != null ? `${w.lat},${w.lon}` : null
   const text = [w.address, w.city, w.region, w.postal_code].filter(Boolean).join(', ') || name
