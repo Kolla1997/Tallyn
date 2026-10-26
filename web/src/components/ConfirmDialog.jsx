@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { verifiedAuthenticators, verifyCode } from '../lib/mfa.js'
+import { Pill, OWE } from './calm/ui.jsx'
+
+const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 bg-white px-3 text-[14px]'
 
 // A deliberate confirmation for actions that are hard to undo (#38): the
 // person types a name to confirm and, for the most serious ones, enters a
@@ -47,21 +50,30 @@ export default function ConfirmDialog({ title, children, action, typeToConfirm, 
   }
 
   return (
-    <dialog ref={ref} className="dialog" aria-labelledby="dialog-title" onCancel={(e) => (busy ? e.preventDefault() : onClose())}>
-      <form onSubmit={submit}>
-        <h2 id="dialog-title">{title}</h2>
-        <div className="dialog-body">{children}</div>
+    <dialog
+      ref={ref}
+      className="calm m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border-0 bg-white p-5 text-zinc-900 shadow-2xl backdrop:bg-black/40"
+      aria-labelledby="dialog-title"
+      onCancel={(e) => (busy ? e.preventDefault() : onClose())}
+    >
+      <form onSubmit={submit} className="grid gap-3 text-[14px]">
+        <h2 id="dialog-title" className="m-0 font-[family-name:var(--font-heading)] text-[18px] font-semibold">
+          {title}
+        </h2>
+        <div className="grid gap-2 text-zinc-600 [&_p]:m-0">{children}</div>
         {typeToConfirm && (
-          <label>
-            Type <strong>{typeToConfirm}</strong> to confirm
-            <input value={typed} onChange={(e) => setTyped(e.target.value)} autoComplete="off" spellCheck={false} autoFocus />
+          <label className="grid gap-1">
+            <span>
+              Type <strong>{typeToConfirm}</strong> to confirm
+            </span>
+            <input className={FIELD} value={typed} onChange={(e) => setTyped(e.target.value)} autoComplete="off" spellCheck={false} autoFocus />
           </label>
         )}
         {needsCode && (
-          <label>
-            6-digit code from your authenticator app
+          <label className="grid gap-1">
+            <span>6-digit code from your authenticator app</span>
             <input
-              className="code-input"
+              className={`${FIELD} max-w-40 tracking-[0.3em] tabular-nums`}
               inputMode="numeric"
               autoComplete="one-time-code"
               pattern="[0-9]{6}"
@@ -72,17 +84,17 @@ export default function ConfirmDialog({ title, children, action, typeToConfirm, 
           </label>
         )}
         {error && (
-          <p className="error" role="alert">
+          <p className="m-0 font-semibold" style={OWE} role="alert">
             {error}
           </p>
         )}
-        <div className="dialog-actions">
-          <button type="button" className="btn btn-secondary" onClick={onClose} disabled={busy}>
+        <div className="mt-2 flex justify-end gap-2">
+          <Pill quiet onClick={onClose} disabled={busy}>
             Cancel
-          </button>
-          <button type="submit" className="btn btn-danger" disabled={!ready}>
+          </Pill>
+          <Pill type="submit" disabled={!ready}>
             {busy ? 'Working…' : action}
-          </button>
+          </Pill>
         </div>
       </form>
     </dialog>

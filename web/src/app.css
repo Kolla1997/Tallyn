@@ -150,6 +150,14 @@ body:has(.calm-page) {
   .calm :where(ol, ul, menu) {
     list-style: none;
   }
+  /* The old stylesheet stacks every form and label as a column; calm screens lay them out themselves. */
+  .calm :where(form, label) {
+    display: block;
+    flex-direction: row;
+    gap: 0;
+    font-size: inherit;
+    font-weight: inherit;
+  }
   .calm :where(a) {
     color: inherit;
     text-decoration: inherit;

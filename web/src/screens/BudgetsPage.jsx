@@ -256,7 +256,7 @@ export default function BudgetsPage({ me, household, refreshKey }) {
                 {kid ? (
                   <p className={NOTE}>Your spending counts in household budgets automatically, as totals only.</p>
                 ) : (
-                  <label className="flex cursor-pointer items-center gap-2 text-[14px] font-semibold">
+                  <label className="flex cursor-pointer flex-row items-center gap-2 text-[14px] font-semibold">
                     <input
                       type="checkbox"
                       role="switch"
