@@ -15,14 +15,32 @@
     "test:e2e": "playwright test -c playwright.e2e.config.js"
   },
   "dependencies": {
+    "@number-flow/react": "^0.6.2",
     "@supabase/supabase-js": "^2.117.3",
+    "@visx/curve": "^4.0.0",
+    "@visx/event": "^4.0.0",
+    "@visx/gradient": "^4.0.0",
+    "@visx/grid": "^4.0.0",
+    "@visx/group": "^4.0.0",
+    "@visx/responsive": "^4.0.0",
+    "@visx/scale": "^4.0.0",
+    "@visx/shape": "^4.0.0",
+    "animejs": "^4.5.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "d3-array": "^3.2.4",
+    "d3-shape": "^3.2.0",
+    "lucide-react": "^1.61.0",
+    "motion": "^14.6.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "react-plaid-link": "^5.0.0"
+    "react-plaid-link": "^5.0.0",
+    "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.49.1",
+    "@tailwindcss/vite": "^4.3.3",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
     "@vitejs/plugin-react": "^6.1.2",
@@ -32,6 +50,7 @@
     "globals": "^17.13.0",
     "jsdom": "^29.1.1",
     "prettier": "^3.9.10",
+    "tailwindcss": "^4.3.3",
     "vite": "^8.3.4",
     "vitest": "^4.1.11"
   }
