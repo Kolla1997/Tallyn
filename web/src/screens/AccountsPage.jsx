@@ -12,6 +12,7 @@ import TallynLoader from '../components/TallynLoader.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
 import CountUp from '../components/CountUp.jsx'
+import { GalleryHorizontalEnd, LayoutGrid } from 'lucide-react'
 import { RingChart } from '@/components/charts/ring-chart'
 import { Ring } from '@/components/charts/ring'
 import { useFadeOnChange } from '../lib/motion.js'
@@ -28,7 +29,7 @@ import { useFadeOnChange } from '../lib/motion.js'
 const HAVE_GROUPS = [
   ['everyday', 'Everyday', 'var(--color-redesign-ink)'],
   ['savings', 'Savings', 'var(--color-redesign-in)'],
-  ['investment', 'Investments', 'var(--color-redesign-grey-2)'],
+  ['investment', 'Investments', 'var(--color-redesign-grey-3)'],
 ]
 const KIND_LABEL = { everyday: 'Everyday', savings: 'Savings', investment: 'Investments', card: 'Credit card', loan: 'Loan' }
 const NUM = 'font-[family-name:var(--font-heading)] font-semibold tabular-nums'
@@ -43,6 +44,7 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
   const [members, setMembers] = useState([])
   // 'yours', 'everyone' or a user ID; Family links here with ?person=<id>.
   const [who, setWho] = useState(() => new URLSearchParams(window.location.search).get('person') || 'yours')
+  const [view, setView] = useAccountsView() // 'row' (scrolls sideways) or 'grid'
   // A linked bank's ID, or '' for all (#84). Kept in the address.
   const [bank, setBank] = useState(() => {
     const v = new URLSearchParams(window.location.search).get('bank') ?? ''
@@ -154,22 +156,28 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
       ) : (
         <>
           <NetWorth have={have} owe={owe} home={home} accounts={counted} />
-          {shown.length > 1 && (
-            <div className="mb-3 flex flex-wrap gap-1.5" role="group" aria-label="Which bank">
-              {[['', 'All', accounts.length], ...shown.map((b) => [b.id, b.institution_name || 'Bank', b.accounts.length])].map(([id, label, n]) => (
-                <button
-                  key={id || 'all'}
-                  type="button"
-                  className="inline-flex h-8 items-center gap-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 transition-[border-color,color] duration-150 aria-pressed:border-zinc-900 dark:aria-pressed:border-white aria-pressed:text-zinc-900 dark:aria-pressed:text-white"
-                  aria-pressed={(picked?.id ?? '') === id}
-                  onClick={() => setBank(id)}
-                >
-                  {label} <span className="tabular-nums text-zinc-400">{n}</span>
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            {shown.length > 1 ? (
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Which bank">
+                {[['', 'All', accounts.length], ...shown.map((b) => [b.id, b.institution_name || 'Bank', b.accounts.length])].map(([id, label, n]) => (
+                  <button
+                    key={id || 'all'}
+                    type="button"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 transition-[border-color,color] duration-150 aria-pressed:border-zinc-900 dark:aria-pressed:border-white aria-pressed:text-zinc-900 dark:aria-pressed:text-white"
+                    aria-pressed={(picked?.id ?? '') === id}
+                    onClick={() => setBank(id)}
+                  >
+                    {label} <span className="tabular-nums text-zinc-400">{n}</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <span />
+            )}
+            <ViewSwitch view={view} onChange={setView} />
+          </div>
           <ConnectedBanks
+            view={view}
             banks={picked ? [picked] : shown}
             me={me}
             people={people}
@@ -311,7 +319,7 @@ function AccountTile({ a, owner, meId }) {
 // Each bank as a card holding its accounts as tiles, as wide as its accounts; its status and,
 // where this person may, Reconnect and Unlink at its foot. Unlinking asks you to type the bank's
 // name (#38); it's your own data, so no 2FA code.
-function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnected, onError }) {
+function ConnectedBanks({ view, banks, me, people, showOwner, onUnlinked, onReconnected, onError }) {
   const [unlinking, setUnlinking] = useState(null) // the bank being unlinked
 
   async function unlink(bank) {
@@ -339,7 +347,7 @@ function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnecte
             <li
               key={b.id}
               className={`bank-item calm-solid flex min-w-[280px] flex-col overflow-hidden rounded-2xl ${ok ? '' : 'ring-1 ring-[var(--color-redesign-accent)]'}`}
-              style={{ flex: `${n} 1 ${n * 320}px` }}
+              style={{ flex: view === 'row' ? '1 1 100%' : `${n} 1 ${n * 320}px` }}
             >
               <div className="flex items-center gap-2.5 border-b border-zinc-100 dark:border-zinc-800 px-3 py-2">
                 <span className="bank-badge" aria-hidden="true">
@@ -350,14 +358,27 @@ function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnecte
                   {b.accounts.length} {b.accounts.length === 1 ? 'account' : 'accounts'} · {whose}
                 </span>
               </div>
-              <ul
-                className="-mt-px -ml-px m-0 grid grow list-none p-0 [&>li]:border-t [&>li]:border-l [&>li]:border-zinc-100 dark:[&>li]:border-zinc-800"
-                style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}
-              >
-                {b.accounts.map((a) => (
-                  <AccountTile key={a.id} a={a} meId={me.user_id} owner={showOwner ? (people[b.owner_user_id] ?? { user_id: b.owner_user_id }) : null} />
-                ))}
-              </ul>
+              {view === 'row' ? (
+                // One row that scrolls sideways (Dinesh's default); keyboard users can focus and scroll it.
+                <ul
+                  tabIndex={0}
+                  aria-label={`${name} accounts`}
+                  className="-ml-px m-0 flex grow list-none snap-x overflow-x-auto overscroll-x-contain p-0 [scrollbar-width:thin] [&>li]:w-[220px] [&>li]:shrink-0 [&>li]:snap-start [&>li]:border-l [&>li]:border-zinc-100 dark:[&>li]:border-zinc-800"
+                >
+                  {b.accounts.map((a) => (
+                    <AccountTile key={a.id} a={a} meId={me.user_id} owner={showOwner ? (people[b.owner_user_id] ?? { user_id: b.owner_user_id }) : null} />
+                  ))}
+                </ul>
+              ) : (
+                <ul
+                  className="-mt-px -ml-px m-0 grid grow list-none p-0 [&>li]:border-t [&>li]:border-l [&>li]:border-zinc-100 dark:[&>li]:border-zinc-800"
+                  style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}
+                >
+                  {b.accounts.map((a) => (
+                    <AccountTile key={a.id} a={a} meId={me.user_id} owner={showOwner ? (people[b.owner_user_id] ?? { user_id: b.owner_user_id }) : null} />
+                  ))}
+                </ul>
+              )}
               <div className="mt-auto grid gap-1.5 border-t border-zinc-100 dark:border-zinc-800 px-3 py-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <BankStatus bank={b} />
@@ -412,6 +433,55 @@ function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnecte
 const SMALL =
   'inline-flex h-8 items-center rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 text-[13px] font-semibold text-zinc-900 dark:text-white'
 const SMALL_RED = 'inline-flex h-8 items-center rounded-full border-0 px-3 text-[13px] font-semibold text-white bg-[var(--color-redesign-button)]'
+
+// How each bank's accounts are laid out (#187): one row that scrolls sideways, or a grid. Kept on
+// this device.
+const VIEW_KEY = 'tallyn.accountsView'
+function useAccountsView() {
+  const [view, setView] = useState(() => {
+    try {
+      return localStorage.getItem(VIEW_KEY) === 'grid' ? 'grid' : 'row'
+    } catch {
+      return 'row'
+    }
+  })
+  const choose = (v) => {
+    setView(v)
+    try {
+      localStorage.setItem(VIEW_KEY, v)
+    } catch {
+      // storage blocked: the choice lasts for this visit
+    }
+  }
+  return [view, choose]
+}
+
+function ViewSwitch({ view, onChange }) {
+  return (
+    <div
+      role="group"
+      aria-label="Account layout"
+      className="flex gap-0.5 rounded-full border border-zinc-200 bg-white p-0.5 dark:border-zinc-800 dark:bg-zinc-900"
+    >
+      {[
+        ['row', 'One row', GalleryHorizontalEnd],
+        ['grid', 'Grid', LayoutGrid],
+      ].map(([v, label, I]) => (
+        <button
+          key={v}
+          type="button"
+          aria-pressed={view === v}
+          aria-label={label}
+          title={label}
+          onClick={() => onChange(v)}
+          className="flex size-7 items-center justify-center rounded-full border-0 bg-transparent p-0 text-zinc-500 transition-colors duration-150 hover:text-zinc-900 aria-pressed:bg-zinc-900 aria-pressed:text-white dark:text-zinc-400 dark:hover:text-white dark:aria-pressed:bg-white dark:aria-pressed:text-zinc-900"
+        >
+          <I className="size-4" aria-hidden="true" />
+        </button>
+      ))}
+    </div>
+  )
+}
 
 function BankStatus({ bank }) {
   const warn = 'm-0 text-[13px] font-semibold'

@@ -137,6 +137,18 @@ describe('AccountsPage', () => {
     expect(callsTo(api, `/api/banks/${B1}`, 'DELETE')).toHaveLength(1)
   })
 
+  it('each bank’s accounts sit in one row by default; Grid lays them out in rows, and is remembered', async () => {
+    localStorage.clear()
+    answers()
+    await open()
+    expect(screen.getByRole('button', { name: 'One row' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('list', { name: 'Fake Credit Union accounts' })).toHaveAttribute('tabindex', '0')
+    fireEvent.click(screen.getByRole('button', { name: 'Grid' }))
+    expect(screen.queryByRole('list', { name: 'Fake Credit Union accounts' })).toBeNull()
+    expect(localStorage.getItem('tallyn.accountsView')).toBe('grid')
+    localStorage.clear()
+  })
+
   it('empty: says how to start, or that nothing is linked', async () => {
     answers([])
     await open()
