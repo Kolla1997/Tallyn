@@ -1,7 +1,8 @@
 // Package supabaseadmin calls Supabase Auth's admin API with the project's
-// server-only key (ADR 0013). Its one job: removing a person's authenticators
-// when they recover with a backup code (#23). The key is never used for the
-// database (ADR 0002) and never reaches the browser.
+// server-only key (ADR 0013, 0015). Two jobs: removing a person's
+// authenticators when they recover with a backup code (#23), and deleting a
+// person's sign-in when they close their account (#56). The key is never used
+// for the database (ADR 0002) and never reaches the browser.
 package supabaseadmin
 
 import (
@@ -63,6 +64,31 @@ func (c *Client) RemoveFactors(ctx context.Context, userID string) error {
 	return nil
 }
 
+// DeleteUser deletes userID's Supabase sign-in for good (#56). The database
+// deletes everything else of theirs by cascade. A sign-in that's already gone
+// counts as done, so a retried closing finishes.
+func (c *Client) DeleteUser(ctx context.Context, userID string) error {
+	if !uuidRE.MatchString(userID) {
+		return errors.New("supabaseadmin: user ID must be a UUID")
+	}
+	err := c.do(ctx, http.MethodDelete, "/users/"+userID, nil)
+	var s statusError
+	if errors.As(err, &s) && s.status == http.StatusNotFound {
+		return nil
+	}
+	return err
+}
+
+// statusError is a non-2xx answer. Its text never holds the body.
+type statusError struct {
+	method, what string
+	status       int
+}
+
+func (e statusError) Error() string {
+	return fmt.Sprintf("supabaseadmin: %s %s: status %d", e.method, e.what, e.status)
+}
+
 func (c *Client) do(ctx context.Context, method, path string, out any) error {
 	req, err := http.NewRequestWithContext(ctx, method, c.base+path, nil)
 	if err != nil {
@@ -78,7 +104,7 @@ func (c *Client) do(ctx context.Context, method, path string, out any) error {
 	body, _ := io.ReadAll(io.LimitReader(res.Body, 1<<20))
 	if res.StatusCode/100 != 2 {
 		// Never log the body in full: it can echo request details.
-		return fmt.Errorf("supabaseadmin: %s %s: status %d", method, strings.SplitN(path, "/", 3)[1], res.StatusCode)
+		return statusError{method: method, what: strings.SplitN(path, "/", 3)[1], status: res.StatusCode}
 	}
 	if out != nil && len(body) > 0 {
 		if err := json.Unmarshal(body, out); err != nil {

@@ -1,13 +1,13 @@
 import './lib/recovery-capture.js' // first: a password reset link (#22)
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { applyTokens } from './lib/tokens.js'
+import { startTheme } from './lib/theme.js'
 import { captureInviteFromURL } from './lib/invite.js'
 import './fonts.css'
-import './styles.css'
+import './app.css' // styles.css inside, in a lower layer (#187)
 import App from './App.jsx'
 
-applyTokens()
+startTheme()
 captureInviteFromURL() // before anything else reads the URL
 
 // After an update, an open tab may ask for a page file that no longer exists

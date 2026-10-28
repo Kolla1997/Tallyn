@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { clearActive } from '../lib/idle.js'
 import { NOTES, takeSignOutNote } from '../lib/session.js'
 import { MIN_PASSWORD, resetAskedEmail } from '../lib/recovery.js'
-import { PasswordRule, ResetRequest } from './ResetPassword.jsx'
+import { PasswordRule, ResetRequest, ShowPassword, useShowPassword } from './ResetPassword.jsx'
 import { LEGAL, rememberAgreement } from '../lib/legal.js'
 import { Link } from '../lib/router.jsx'
 import { supabase } from '../lib/supabase.js'
+import { authMessage, isExistingAccount } from '../lib/authErrors.js'
+import Heading from '../components/Heading.jsx'
 
 // Sign in or create an account with email and password. 2FA comes next.
 // `expired`: a password reset link had expired or was used (#22).
@@ -17,6 +19,7 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
   const [busy, setBusy] = useState(false)
   const [sentTo, setSentTo] = useState('')
   const [agreed, setAgreed] = useState(false) // sign-up only (#36)
+  const [show, toggleShow, hide] = useShowPassword()
   // Signed out automatically, after 30 minutes idle (#91, Dinesh picked note 1)
   // or 12 hours (#92): say why, once. Being here also ends the old activity
   // clock, so the next sign-in starts fresh.
@@ -28,6 +31,7 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
 
   async function submit(e) {
     e.preventDefault()
+    hide()
     setError('')
     if (mode === 'signup' && !agreed) return
     setBusy(true)
@@ -41,7 +45,9 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
           })
     setBusy(false)
     if (error) {
-      setError(error.message)
+      // Same screen as a new sign-up, so nobody can find out who has an account (#152).
+      if (mode === 'signup' && isExistingAccount(error)) setSentTo(email)
+      else setError(authMessage(error))
       return
     }
     // With email confirmation on, sign-up returns no session until the link is opened.
@@ -69,7 +75,7 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
   if (sentTo) {
     return (
       <section className="card">
-        <h1>Check your email</h1>
+        <Heading>Check your email</Heading>
         <p>
           We sent a link to <strong>{sentTo}</strong>. Open it to confirm your account, then sign in.
         </p>
@@ -89,7 +95,7 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
   const signup = mode === 'signup'
   return (
     <section className="card">
-      <h1>{signup ? 'Create your account' : 'Welcome back'}</h1>
+      <Heading>{signup ? 'Create your account' : 'Welcome back'}</Heading>
       {note && !signup && (
         <p className="info-note" role="status">
           <svg
@@ -126,16 +132,20 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
               </button>
             )}
           </span>
-          <input
-            id="sign-in-password"
-            type="password"
-            autoComplete={signup ? 'new-password' : 'current-password'}
-            required
-            minLength={signup ? MIN_PASSWORD : undefined}
-            aria-describedby={signup ? 'password-rule' : undefined}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          <span className="password-field">
+            <input
+              id="sign-in-password"
+              className="pr-11"
+              type={show ? 'text' : 'password'}
+              autoComplete={signup ? 'new-password' : 'current-password'}
+              required
+              minLength={signup ? MIN_PASSWORD : undefined}
+              aria-describedby={signup ? 'password-rule' : undefined}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <ShowPassword show={show} onToggle={toggleShow} />
+          </span>
         </div>
         {signup && <PasswordRule ok={password.length >= MIN_PASSWORD} />}
         {error && (

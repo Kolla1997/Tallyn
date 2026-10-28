@@ -4,6 +4,7 @@ import { currentVersions, LEGAL, takeAgreement } from '../lib/legal.js'
 import { Link } from '../lib/router.jsx'
 import AuthPage from './AuthPage.jsx'
 import TallynLoader from './TallynLoader.jsx'
+import Heading from './Heading.jsx'
 
 // Before the app, everyone must have agreed to the current Terms of Service
 // and Privacy Policy (#36). If they ticked "I agree" at sign-up on this device,
@@ -64,7 +65,7 @@ export default function ConsentGate({ onSignOut, children }) {
       {state === 'checking' && <TallynLoader />}
       {state === 'error' && (
         <section className="card">
-          <h1>Something went wrong</h1>
+          <Heading>Something went wrong</Heading>
           <p className="muted">We couldn&apos;t check your agreement to our terms. Try again in a moment.</p>
           <button className="btn" onClick={() => window.location.reload()}>
             Try again
@@ -76,7 +77,7 @@ export default function ConsentGate({ onSignOut, children }) {
       )}
       {state === 'needed' && (
         <section className="card">
-          <h1>Before you start</h1>
+          <Heading>Before you start</Heading>
           <p>Please read and agree to how Tallyn works and how we look after your data.</p>
           <p>
             <Link to={LEGAL.terms.path} target="_blank" rel="noopener">

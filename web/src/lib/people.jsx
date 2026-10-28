@@ -1,6 +1,7 @@
 // Names and avatar colours for household members (#39). Colours come from
 // design-tokens.json (via CSS variables) and stay the same for a person.
-const COLORS = ['var(--color-clay-deep)', 'var(--color-sage-deep)', 'var(--color-cocoa)', 'var(--color-sage)']
+// Colours that keep white letters readable in light and dark (#187).
+const COLORS = ['var(--color-redesign-button)', 'var(--color-redesign-in)', 'var(--color-redesign-grey-5)', 'var(--color-redesign-accent)']
 
 export function colorFor(userId) {
   let h = 0

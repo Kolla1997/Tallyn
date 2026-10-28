@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { MIN_PASSWORD, rememberPasswordChanged, rememberResetAsked } from '../lib/recovery.js'
 import { supabase } from '../lib/supabase.js'
+import { authMessage } from '../lib/authErrors.js'
+import Heading from '../components/Heading.jsx'
 
 // Password reset (#22, Dinesh picked A): ask for a link, then (after the link
 // and the 2FA code) choose a new password.
@@ -45,7 +48,7 @@ export function ResetRequest({ initialEmail = '', expired = false, onBack }) {
         <span className="reset-icon">
           <MailIcon />
         </span>
-        <h1>Check your email</h1>
+        <Heading>Check your email</Heading>
         <p className="muted">
           If there&apos;s a Tallyn account for <strong className="text-strong">{sentTo}</strong>, we&apos;ve sent it a link to reset your password. The link
           works for 1 hour.
@@ -76,7 +79,7 @@ export function ResetRequest({ initialEmail = '', expired = false, onBack }) {
 
   return (
     <section className="card">
-      <h1>{expired ? 'This link has expired' : 'Reset your password'}</h1>
+      <Heading>{expired ? 'This link has expired' : 'Reset your password'}</Heading>
       <p className="muted">
         {expired
           ? 'Reset links work once, for 1 hour. Ask for a new one and use the newest email.'
@@ -109,13 +112,14 @@ export function ResetRequest({ initialEmail = '', expired = false, onBack }) {
 // Saving signs you out on your other devices, then opens Home with a note.
 export function ChoosePassword({ email, onDone }) {
   const [password, setPassword] = useState('')
-  const [show, setShow] = useState(false)
+  const [show, toggleShow, hide] = useShowPassword()
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const long = password.length >= MIN_PASSWORD
 
   async function save(e) {
     e.preventDefault()
+    hide()
     if (!long) return
     setError('')
     setBusy(true)
@@ -124,7 +128,7 @@ export function ChoosePassword({ email, onDone }) {
       setBusy(false)
       if (error.code === 'same_password') setError("That's your current password. Choose a new one.")
       else if (error.code === 'weak_password') setError('Choose a longer or less common password.')
-      else setError(error.message)
+      else setError(authMessage(error))
       return
     }
     // Whoever might have the old password is signed out everywhere else.
@@ -135,7 +139,7 @@ export function ChoosePassword({ email, onDone }) {
 
   return (
     <section className="card">
-      <h1>Choose a new password</h1>
+      <Heading>Choose a new password</Heading>
       {email && <p className="muted">For {email}.</p>}
       <form onSubmit={save}>
         <div className="field">
@@ -143,6 +147,7 @@ export function ChoosePassword({ email, onDone }) {
           <span className="password-field">
             <input
               id="new-password"
+              className="pr-11"
               type={show ? 'text' : 'password'}
               autoComplete="new-password"
               required
@@ -151,9 +156,7 @@ export function ChoosePassword({ email, onDone }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button type="button" className="password-show" aria-pressed={show} onClick={() => setShow(!show)}>
-              {show ? 'Hide' : 'Show'}
-            </button>
+            <ShowPassword show={show} onToggle={toggleShow} />
           </span>
         </div>
         <PasswordRule ok={long} />
@@ -168,6 +171,36 @@ export function ChoosePassword({ email, onDone }) {
         <p className="muted small">You&apos;ll be signed out on your other devices.</p>
       </form>
     </section>
+  )
+}
+
+// Showing a password is short-lived: it hides itself again after 10 seconds (and the form hides it
+// on submit), so a typed password isn't left on screen.
+const SHOW_FOR = 10_000
+export function useShowPassword() {
+  const [show, setShow] = useState(false)
+  useEffect(() => {
+    if (!show) return
+    const t = setTimeout(() => setShow(false), SHOW_FOR)
+    return () => clearTimeout(t)
+  }, [show])
+  return [show, () => setShow((v) => !v), () => setShow(false)]
+}
+
+// The eye at the end of a password field (the #185 draft): shows what you typed, or hides it again.
+export function ShowPassword({ show, onToggle }) {
+  const I = show ? EyeOff : Eye
+  return (
+    <button
+      type="button"
+      aria-pressed={show}
+      aria-label={show ? 'Hide password' : 'Show password'}
+      title={show ? 'Hide password' : 'Show password'}
+      onClick={onToggle}
+      className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl border-0 bg-transparent p-0 text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+    >
+      <I className="size-4" aria-hidden="true" />
+    </button>
   )
 }
 

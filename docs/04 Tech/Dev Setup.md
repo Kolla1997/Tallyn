@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-23
+updated: 2026-10-24
 issues: [5, 6, 7, 8, 9, 30, 99, 113]
 tags: [tech, onboarding]
 ---
@@ -58,6 +58,22 @@ The app never logs in as `postgres` (ADR 0006). After running `migrations/0006_a
 2. Restart the backend. It prints `bank sync every 6h` and syncs every linked bank straight away
 3. For testing, `SYNC_EVERY=2m` in `.env` makes it sync more often (minimum 1m)
 4. A new link syncs within a minute or two; the log shows counts only (`sync: bank <id>: 16 added or changed, ...`)
+
+## Savings goals (#14)
+1. Run `migrations/0018_goals.sql` on the Supabase project, after 0001–0017
+2. Goals that follow an account get their monthly history from the bank sync's daily job, so `DATABASE_URL_SYNC` must be set where it should run. The forecast shows after a goal's second month
+
+## Plan from your income (#133)
+1. Run `migrations/0017_income_plans.sql` on the Supabase project, after 0001–0016
+2. Budgets → Plan your month suggests an income from the last 3 full months of pay. Sandbox banks have little pay history, so expect "no suggestion" and type one in
+
+## Closing an account (#56)
+1. Run `migrations/0016_close_account.sql` on the Supabase project, after 0001–0015
+2. Closing needs bank linking set up (Plaid keys and `TOKEN_ENCRYPTION_KEY`) and `SUPABASE_SERVICE_ROLE_KEY`; without them, Close account answers 503
+3. Closing records older than 3 years are purged daily by the bank sync, so `DATABASE_URL_SYNC` must be set where it should run ([[0015-closing-an-account]])
+
+> [!warning] Closing can't be undone
+> Try it only with test accounts. It unlinks the banks at Plaid (sandbox in dev) and deletes the Supabase sign-in.
 
 ## Supabase Auth settings (#7)
 In the Supabase dashboard, for each project (dev and prod). See [[Feature - Auth]].

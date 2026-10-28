@@ -1,6 +1,7 @@
 import Markdown from '../components/Markdown.jsx'
 import { LEGAL } from '../lib/legal.js'
 import { Link } from '../lib/router.jsx'
+import Heading from '../components/Heading.jsx'
 
 // /terms and /privacy (#36, layout A): one readable column, open to everyone,
 // signed in or not. The text comes from legal/*.md.
@@ -15,7 +16,7 @@ export default function LegalPage({ doc }) {
         <span aria-hidden="true"> · </span>
         <Link to={other.path}>{other.title}</Link>
       </nav>
-      <h1 id="legal-h">{d.title}</h1>
+      <Heading id="legal-h">{d.title}</Heading>
       <p className="small muted">
         Version {d.version} · Effective {d.effective}
       </p>

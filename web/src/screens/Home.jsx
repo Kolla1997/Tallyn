@@ -9,6 +9,7 @@ import HomePage from './HomePage.jsx'
 import Join from './Join.jsx'
 import Shell, { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
+import Heading from '../components/Heading.jsx'
 
 // Faster first load (#99): Home comes with the app; the other pages load the
 // first time they're opened, with the Tallyn loader meanwhile.
@@ -18,6 +19,7 @@ const DebtsPage = lazy(() => import('./DebtsPage.jsx'))
 const TransactionsPage = lazy(() => import('./TransactionsPage.jsx'))
 const FamilyPage = lazy(() => import('./FamilyPage.jsx'))
 const Settings = lazy(() => import('./Settings.jsx'))
+const GoalsPage = lazy(() => import('./GoalsPage.jsx'))
 
 const HOUSEHOLD_KEY = 'tallyn.household'
 
@@ -84,9 +86,9 @@ export default function Home({ email, onSignOut }) {
     return (
       <AuthPage>
         <section className="card">
-          <h1>Something went wrong</h1>
+          <Heading>Something went wrong</Heading>
           <p className="error" role="alert">
-            We couldn&apos;t load your details ({error}). Try again in a moment.
+            We couldn&apos;t load your details. Try again in a moment.
           </p>
           <button className="btn btn-secondary" onClick={onSignOut}>
             Sign out
@@ -104,7 +106,7 @@ export default function Home({ email, onSignOut }) {
     return (
       <AuthPage>
         <section className="card">
-          <h1>Create your household</h1>
+          <Heading>Create your household</Heading>
           <p className="muted">Signed in as {email}, with 2FA.</p>
           <CreateHousehold onCreated={load} />
           <button className="btn btn-secondary" onClick={onSignOut}>
@@ -147,17 +149,7 @@ export default function Home({ email, onSignOut }) {
       )
       break
     case '/goals':
-      page = (
-        <>
-          <PageHead title="Goals" />
-          <section className="panel empty-state">
-            <h2>Savings goals are on the way</h2>
-            <p className="muted">
-              Soon you&apos;ll set goals like a family trip or a school fund, and follow a savings account so progress updates on its own.
-            </p>
-          </section>
-        </>
-      )
+      page = <GoalsPage me={me} household={household} refreshKey={refreshKey} />
       break
     case '/settings':
       page = <Settings me={me} household={household} email={email} onSaved={load} onSignOut={onSignOut} />

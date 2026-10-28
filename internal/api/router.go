@@ -46,6 +46,23 @@ type Store interface {
 	UpdateBudget(ctx context.Context, userID, budgetID string, b db.NewBudget) error
 	DeleteBudget(ctx context.Context, userID, budgetID string) error
 	SetCountInBudgets(ctx context.Context, userID, householdID string, on bool) error
+	Export(ctx context.Context, userID string) (db.Export, error) // #54
+	// Closing an account (#56).
+	ClosingBlocker(ctx context.Context, userID string) (string, error)
+	ClosingBanks(ctx context.Context, userID string) ([]db.ClosingBank, error)
+	PrepareClosing(ctx context.Context, userID string, emailHMAC []byte) error
+	// Plan from your income (#133).
+	Plans(ctx context.Context, userID, householdID string, today time.Time) ([]db.Plan, error)
+	PlanSuggestion(ctx context.Context, userID, householdID, memberUserID string, today time.Time) (int64, error)
+	SavePlan(ctx context.Context, userID, householdID string, p db.NewPlan) (string, error)
+	DeletePlan(ctx context.Context, userID, planID string) error
+	RenameHousehold(ctx context.Context, userID, householdID, name string) (string, error) // #53
+	// Savings goals (#14).
+	Goals(ctx context.Context, userID, householdID string) ([]db.Goal, error)
+	CreateGoal(ctx context.Context, userID, householdID string, g db.NewGoal) (string, error)
+	UpdateGoal(ctx context.Context, userID, goalID string, g db.NewGoal) error
+	SetGoalSaved(ctx context.Context, userID, goalID string, savedMinor int64, today time.Time) error
+	DeleteGoal(ctx context.Context, userID, goalID string) error
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -67,6 +84,10 @@ type Deps struct {
 	BackupCodes     BackupCodeStore                 // *db.DB
 	Factors         FactorRemover                   // *supabaseadmin.Client
 	CodeKey         []byte                          // DeriveBackupCodeKey(token key)
+
+	// Closing an account (#56, ADR 0015). Without both, closing answers 503.
+	Accounts   AccountDeleter // *supabaseadmin.Client
+	ClosingKey []byte         // DeriveClosingKey(token key)
 }
 
 // NewRouter returns the server's handler: JSON API under /api/ and the
@@ -84,6 +105,9 @@ func NewRouter(d Deps) http.Handler {
 	api := http.NewServeMux()
 	api.HandleFunc("GET /api/me", me(d.Store))
 	api.HandleFunc("PUT /api/me", setMe(d.Store))
+	api.HandleFunc("GET /api/me/export", exportData(d.Store, lim.exports)) // #54
+	c := closer{store: d.Store, plaid: d.Plaid, tokens: d.Tokens, accounts: d.Accounts, key: d.ClosingKey}
+	api.HandleFunc("POST /api/me/close", c.close) // #56
 	api.HandleFunc("GET /api/consent", consent(d.Store))
 	api.HandleFunc("POST /api/consent", acceptConsent(d.Store))
 	api.HandleFunc("GET /api/sharing", sharing(d.Store))
@@ -96,6 +120,7 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("DELETE /api/invites/{id}", revokeInvite(d.Store))
 	api.Handle("POST /api/invites/accept", limited(lim.accepts, acceptInvite(d.Store)))
 	api.HandleFunc("POST /api/households", createHousehold(d.Store))
+	api.HandleFunc("PUT /api/households/{id}", renameHousehold(d.Store)) // #53
 	b := banks{store: d.Store, plaid: d.Plaid, tokens: d.Tokens, syncNow: d.SyncNow, reconnected: d.Reconnected}
 	api.Handle("POST /api/plaid/link-token", limited(lim.plaid, b.needsPlaid(b.linkToken)))
 	api.Handle("POST /api/plaid/exchange", limited(lim.plaid, b.needsPlaid(b.exchange)))
@@ -112,6 +137,15 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("PUT /api/budgets/counting", setBudgetCounting(d.Store))
 	api.HandleFunc("PUT /api/budgets/{id}", updateBudget(d.Store))
 	api.HandleFunc("DELETE /api/budgets/{id}", deleteBudget(d.Store))
+	api.HandleFunc("GET /api/plans", plans(d.Store)) // #133
+	api.HandleFunc("GET /api/plans/suggestion", planSuggestion(d.Store))
+	api.HandleFunc("PUT /api/plans", savePlan(d.Store))
+	api.HandleFunc("DELETE /api/plans/{id}", deletePlan(d.Store))
+	api.HandleFunc("GET /api/goals", goals(d.Store)) // #14
+	api.HandleFunc("POST /api/goals", createGoal(d.Store))
+	api.HandleFunc("PUT /api/goals/{id}", updateGoal(d.Store))
+	api.HandleFunc("PUT /api/goals/{id}/saved", setGoalSaved(d.Store))
+	api.HandleFunc("DELETE /api/goals/{id}", deleteGoal(d.Store))
 	api.HandleFunc("/api/", func(w http.ResponseWriter, _ *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found")
 	})

@@ -7,6 +7,10 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 // hook rules. Formatting is Prettier's job (.prettierrc), not ESLint's.
 export default [
   { ignores: ['dist/**', 'e2e-dist/**', 'test-results/**', 'playwright-report/**', 'e2e-full-dist/**', 'test-results-e2e/**', 'playwright-report-e2e/**'] },
+  // Third-party components added by the shadcn CLI from the Bklit and Kokonut
+  // registries (#183, ADR 0016). They follow their authors' style; update them
+  // with the CLI, not by hand.
+  { ignores: ['src/components/charts/**', 'src/components/kokonutui/**', 'src/components/shimmering-text.jsx'] },
   js.configs.recommended,
   {
     files: ['**/*.{js,jsx}'],

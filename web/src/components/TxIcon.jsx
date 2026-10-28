@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { IconTile } from './calm/ui.jsx'
 
 // Transaction icons (#42): the merchant's logo from Plaid when there is one,
 // otherwise an icon for the spending category. Logos only ever load from
@@ -7,8 +8,7 @@ import { useState } from 'react'
 
 const LOGO_RE = /^https:\/\/plaid-(merchant|counterparty)-logos\.plaid\.com\/[A-Za-z0-9._-]+\.png$/
 
-// One stroke path per Plaid category, drawn on a 24px grid. tone picks the
-// circle's colours from the brand palette.
+// One stroke path per Plaid category, drawn on a 24px grid.
 const CATEGORIES = {
   FOOD_AND_DRINK: { tone: 'clay', d: 'M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M16 21V3c-2 1.5-3 4-3 7h3' },
   GENERAL_MERCHANDISE: { tone: 'clay', d: 'M6 7h12l-1 13H7L6 7ZM9 7a3 3 0 0 1 6 0' },
@@ -35,13 +35,23 @@ const OTHER = { tone: 'sand', d: 'M6 12h.01M12 12h.01M18 12h.01' }
 // The stroke path for a category's icon, for other places that draw it.
 export const categoryPath = (category) => (CATEGORIES[category] ?? OTHER).d
 
-export function CategoryIcon({ category }) {
-  const c = CATEGORIES[category] ?? OTHER
+// A transaction's icon in the calm tile (#187): the merchant's logo when Plaid has one (only from
+// its logo hosts, no referrer), otherwise the category's icon.
+export default function TxIcon({ tx }) {
+  const [failed, setFailed] = useState(false)
+  const logo = tx.logo_url && LOGO_RE.test(tx.logo_url) && !failed ? tx.logo_url : null
+  if (logo) {
+    return (
+      <span className="flex size-8 shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-zinc-200 dark:ring-zinc-700" aria-hidden="true">
+        <img src={logo} alt="" width="32" height="32" loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
+      </span>
+    )
+  }
   return (
-    <span className={`tx-icon tone-${c.tone}`} aria-hidden="true">
+    <IconTile>
       <svg
-        width="20"
-        height="20"
+        width="18"
+        height="18"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -50,19 +60,8 @@ export function CategoryIcon({ category }) {
         strokeLinejoin="round"
         focusable="false"
       >
-        <path d={c.d} />
+        <path d={categoryPath(tx.category_primary)} />
       </svg>
-    </span>
-  )
-}
-
-export default function TxIcon({ tx }) {
-  const [failed, setFailed] = useState(false)
-  const logo = tx.logo_url && LOGO_RE.test(tx.logo_url) && !failed ? tx.logo_url : null
-  if (!logo) return <CategoryIcon category={tx.category_primary} />
-  return (
-    <span className="tx-icon tx-logo" aria-hidden="true">
-      <img src={logo} alt="" width="40" height="40" loading="lazy" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
-    </span>
+    </IconTile>
   )
 }

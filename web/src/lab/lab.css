@@ -1,0 +1,291 @@
+/* Draft lab (#183): Tailwind and shadcn's theme, loaded only by lab.html. */
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --chart-positive: oklch(0.696 0.17 162.48);
+  --chart-negative: oklch(0.637 0.237 25.331);
+  --chart-background: oklch(1 0 0);
+  --chart-foreground: oklch(0.145 0.004 285);
+  --chart-foreground-muted: oklch(0.55 0.014 260);
+  --chart-line-primary: var(--chart-1);
+  --chart-line-secondary: var(--chart-2);
+  --chart-crosshair: oklch(0.4 0.1828 274.34);
+  --chart-grid: oklch(0.9 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-tooltip-background: var(--popover);
+  --chart-tooltip-foreground: var(--popover-foreground);
+  --chart-tooltip-muted: var(--muted-foreground);
+  --chart-marker-background: oklch(0.97 0.005 260);
+  --chart-marker-border: oklch(0.85 0.01 260);
+  --chart-marker-foreground: oklch(0.3 0.01 260);
+  --chart-label: oklch(0.45 0.01 260);
+  --chart-scale-mix: oklch(1 0 0);
+  --chart-scale-01: oklch(0.922 0 0);
+  --chart-scale-02: color-mix(in oklab, var(--chart-1) 35%, var(--chart-scale-mix));
+  --chart-scale-03: color-mix(in oklab, var(--chart-1) 55%, var(--chart-scale-mix));
+  --chart-scale-04: color-mix(in oklab, var(--chart-1) 78%, var(--chart-scale-mix));
+  --chart-scale-05: var(--chart-1);
+  --chart-scale-pattern-color: oklch(1 0 0);
+  --chart-indicator-color: oklch(0.21 0.006 285);
+  --chart-indicator-secondary-color: oklch(0.913 0 0);
+  --chart-marker-badge-background: oklch(0 0 0);
+  --chart-marker-badge-foreground: oklch(0.84 0 0);
+  --chart-segment-background: oklch(0.756 0 0 / 0.06);
+  --chart-segment-line: oklch(0.5 0 0 / 0.25);
+}
+
+@theme inline {
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: Montserrat, ui-sans-serif, system-ui, sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-line-primary: var(--chart-line-primary);
+  --color-chart-line-secondary: var(--chart-line-secondary);
+  --color-chart-brush-border: var(--chart-brush-border);
+  --color-chart-tooltip-background: var(--chart-tooltip-background);
+  --color-chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --color-chart-tooltip-muted: var(--chart-tooltip-muted);
+  --color-chart-scale-02: var(--chart-scale-02);
+  --color-chart-scale-03: var(--chart-scale-03);
+  --color-chart-scale-04: var(--chart-scale-04);
+  --color-chart-scale-05: var(--chart-scale-05);
+  --color-chart-segment-line: var(--chart-segment-line);
+  --color-chart-segment-background: var(--chart-segment-background);
+  --color-chart-marker-badge-foreground: var(--chart-marker-badge-foreground);
+  --color-chart-marker-badge-background: var(--chart-marker-badge-background);
+  --color-chart-indicator-secondary-color: var(--chart-indicator-secondary-color);
+  --color-chart-indicator-color: var(--chart-indicator-color);
+  --color-chart-scale-pattern-color: var(--chart-scale-pattern-color);
+  --chart-scale-05: var(--chart-scale-05);
+  --chart-scale-04: var(--chart-scale-04);
+  --chart-scale-03: var(--chart-scale-03);
+  --chart-scale-02: var(--chart-scale-02);
+  --color-chart-scale-01: var(--chart-scale-01);
+  --color-chart-scale-mix: var(--chart-scale-mix);
+  --color-chart-label: var(--chart-label);
+  --color-chart-marker-foreground: var(--chart-marker-foreground);
+  --color-chart-marker-border: var(--chart-marker-border);
+  --color-chart-marker-background: var(--chart-marker-background);
+  --chart-tooltip-muted: var(--chart-tooltip-muted);
+  --chart-tooltip-foreground: var(--chart-tooltip-foreground);
+  --chart-tooltip-background: var(--chart-tooltip-background);
+  --chart-brush-border: var(--chart-brush-border);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-crosshair: var(--chart-crosshair);
+  --chart-line-secondary: var(--chart-line-secondary);
+  --chart-line-primary: var(--chart-line-primary);
+  --color-chart-foreground-muted: var(--chart-foreground-muted);
+  --color-chart-foreground: var(--chart-foreground);
+  --color-chart-background: var(--chart-background);
+  --color-chart-negative: var(--chart-negative);
+  --color-chart-positive: var(--chart-positive);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --chart-foreground: oklch(0.985 0 0);
+  --chart-foreground-muted: oklch(0.708 0 0);
+  --chart-1: oklch(0.585 0.233 277.117);
+  --chart-2: oklch(0.852 0.199 91.936);
+  --chart-3: oklch(0.667 0.295 322.15);
+  --chart-4: oklch(0.56 0.021 213.5);
+  --chart-5: oklch(1 0 0);
+  --chart-positive: oklch(0.765 0.177 163.223);
+  --chart-negative: oklch(0.704 0.191 22.216);
+  --chart-background: oklch(0.145 0 0);
+  --chart-foreground: oklch(0.45 0 0);
+  --chart-foreground-muted: oklch(0.65 0.01 260);
+  --chart-crosshair: oklch(0.45 0 0);
+  --chart-grid: oklch(0.25 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-marker-background: oklch(0.25 0.01 260);
+  --chart-marker-border: oklch(0.4 0.01 260);
+  --chart-marker-foreground: oklch(0.9 0 0);
+  --chart-label: oklch(0.75 0.01 260);
+  --chart-scale-mix: oklch(0.25 0 0);
+  --chart-scale-01: oklch(0.3 0 0);
+  --chart-scale-02: color-mix(in oklab, var(--chart-1) 35%, var(--chart-scale-mix));
+  --chart-scale-03: color-mix(in oklab, var(--chart-1) 55%, var(--chart-scale-mix));
+  --chart-scale-04: color-mix(in oklab, var(--chart-1) 78%, var(--chart-scale-mix));
+  --chart-scale-05: var(--chart-1);
+  --chart-scale-pattern-color: oklch(0.145 0 0);
+  --chart-indicator-color: oklch(1 0 0);
+  --chart-indicator-secondary-color: oklch(0.145 0 0);
+  --chart-marker-badge-background: oklch(1 0 0);
+  --chart-marker-badge-foreground: oklch(0.15 0 0);
+  --chart-segment-background: oklch(0.41 0.0127 248.14 / 0.25);
+  --chart-segment-line: oklch(1 0 0 / 0.25);
+}
+
+/* Page size (#185): Dinesh picked C (compact controls, trimmed visuals, width caps), then asked
+   for Debts' one-size-up type and spacing everywhere. Type and spacing apply at every width;
+   controls stay compact from 1024px. The draft bar and sidebar keep their own sizes. */
+[data-compact] main .py-3 {
+  padding-block: 14px;
+}
+[data-compact] main .p-4 {
+  padding: 18px;
+}
+[data-compact] main .text-\[11px\] {
+  font-size: 12px;
+}
+[data-compact] main .text-\[12px\] {
+  font-size: 13px;
+}
+[data-compact] main .text-\[13px\] {
+  font-size: 14px;
+  line-height: 1.45;
+}
+[data-compact] main .text-sm {
+  font-size: 15px;
+  line-height: 1.45;
+}
+[data-compact] main .text-xl {
+  font-size: 22px;
+  line-height: 1.3;
+}
+[data-compact] main .text-2xl {
+  font-size: 26px;
+  line-height: 1.25;
+}
+[data-compact] main h1.text-2xl {
+  font-size: 24px;
+}
+@media (min-width: 1024px) {
+  [data-compact] main .h-10 {
+    height: 36px;
+  }
+  [data-compact] main .h-9 {
+    height: 32px;
+  }
+  [data-compact] main .h-8 {
+    height: 28px;
+  }
+}
+
+/* Hallmark Floor (#185): no sideways scroll, and a focus ring on every control that shows at once. */
+html,
+body {
+  overflow-x: clip;
+}
+[data-compact] :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Glass draft (#185): Tallyn's glass finish (#61) in the redesign's colours. Soft: faint glows, every
+   card frosted. Tallyn: #61 at full strength, the sidebar too. Mix: glows, the sidebar and summary
+   cards frosted; cards that hold a list or a table stay solid, as #61 keeps what people must read
+   carefully solid. Solid again without blur support or with reduced transparency. */
+[data-glass='soft'],
+[data-glass='tallyn'],
+[data-glass='mix'] {
+  background-image:
+    radial-gradient(42rem 30rem at 8% 0%, var(--glow-green), transparent 70%), radial-gradient(40rem 28rem at 96% 4%, var(--glow-red), transparent 70%),
+    radial-gradient(60rem 26rem at 50% 105%, var(--glow-grey), transparent 70%);
+  background-attachment: fixed;
+}
+[data-glass='soft'] {
+  background-image:
+    radial-gradient(42rem 30rem at 8% 0%, color-mix(in srgb, var(--glow-green) 50%, transparent), transparent 70%),
+    radial-gradient(40rem 28rem at 96% 4%, color-mix(in srgb, var(--glow-red) 50%, transparent), transparent 70%),
+    radial-gradient(60rem 26rem at 50% 105%, color-mix(in srgb, var(--glow-grey) 50%, transparent), transparent 70%);
+}
+:is([data-glass='soft'], [data-glass='tallyn']) main :is(.rounded-2xl, .rounded-3xl).bg-white,
+[data-glass='tallyn'] aside.bg-white,
+[data-glass='mix'] aside.bg-white,
+[data-glass='mix'] main :is(.rounded-2xl, .rounded-3xl).bg-white:not(:has(table, ul, ol)) {
+  background-color: var(--glass-surface);
+  border-color: var(--glass-border);
+  box-shadow: var(--glass-highlight), var(--card-shade);
+  backdrop-filter: blur(18px) saturate(1.2);
+}
+[data-glass='mix'] main :is(.rounded-2xl, .rounded-3xl).bg-white:has(table, ul, ol) {
+  box-shadow: var(--card-shade);
+}
+@supports not (backdrop-filter: blur(1px)) {
+  [data-glass] {
+    background-image: none;
+  }
+  [data-glass] :is(main, aside) :is(.rounded-2xl, .rounded-3xl).bg-white,
+  [data-glass] aside.bg-white {
+    background-color: revert-layer;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  [data-glass] {
+    background-image: none;
+  }
+  [data-glass] main :is(.rounded-2xl, .rounded-3xl).bg-white,
+  [data-glass] aside.bg-white {
+    background-color: revert-layer;
+    backdrop-filter: none;
+  }
+}

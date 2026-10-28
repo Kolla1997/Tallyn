@@ -23,7 +23,7 @@ const testUser = "11111111-1111-4111-8111-111111111111" // fake
 // is a 401.
 func fakeAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s := auth.Session{UserID: testUser, AAL: "aal2"}
+		s := auth.Session{UserID: testUser, AAL: "aal2", Email: "sam@example.test"}
 		switch r.Header.Get("Authorization") {
 		case "Bearer ok":
 			s.TOTPAt = time.Now().Add(-time.Hour)

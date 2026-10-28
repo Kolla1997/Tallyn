@@ -54,6 +54,7 @@ type Session struct {
 	// password sign-in). A 2FA step-up (#38) adds a newer entry, so it
 	// doesn't restart the clock.
 	SignedInAt time.Time
+	Email      string // the sign-in email, from the token; for the data download (#54)
 }
 
 type claims struct {
@@ -61,6 +62,7 @@ type claims struct {
 	Role        string `json:"role"`
 	AAL         string `json:"aal"`
 	SessionID   string `json:"session_id"`
+	Email       string `json:"email"`
 	IsAnonymous bool   `json:"is_anonymous"`
 	// AMR lists how and when the session authenticated. Supabase updates the
 	// TOTP entry's timestamp each time the user enters a new code, which is
@@ -155,7 +157,7 @@ func (v *Verifier) verify(token string, needMFA bool) (Session, error) {
 	if signedInAt.IsZero() || time.Since(signedInAt) > MaxSession+sessionLeeway {
 		return Session{}, ErrSessionExpired
 	}
-	return Session{UserID: c.Subject, SessionID: c.SessionID, AAL: c.AAL, TOTPAt: totpAt, SignedInAt: signedInAt}, nil
+	return Session{UserID: c.Subject, SessionID: c.SessionID, AAL: c.AAL, TOTPAt: totpAt, SignedInAt: signedInAt, Email: c.Email}, nil
 }
 
 // Require lets a request through only with a verified, 2FA-completed session,

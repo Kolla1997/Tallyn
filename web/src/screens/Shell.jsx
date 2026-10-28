@@ -1,11 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import logo from '../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg'
 import mark from '../../../brand/logo/svg/tallyn-mark-light.svg'
+import logoDark from '../../../brand/logo/svg/tallyn-lockup-horizontal-dark.svg'
+import markDark from '../../../brand/logo/svg/tallyn-mark-dark.svg'
 import { AccountsIcon, BudgetsIcon, DebtsIcon, FamilyIcon, GoalsIcon, HomeIcon, MenuIcon, SettingsIcon, TransactionsIcon } from '../components/Icons.jsx'
 import { Link } from '../lib/router.jsx'
+import Heading from '../components/Heading.jsx'
+import ThemeSwitch from '../components/calm/ThemeSwitch.jsx'
 
-// App layout (#39): sidebar on web (1024px and up), header and bottom tab bar
-// on phones. Matches docs/03 Design/Comps/web-*-draft.html.
+// App layout (#39), in the calm redesign (#187): a floating frosted rail on web (1024px and up),
+// collapsed by default; header and bottom tab bar on phones. One 1280px content width. Built from
+// the #185 drafts (web/src/lab/calm/ui.jsx).
 // The phone tab bar keeps these five; Debts (#27) and Goals are in the
 // sidebar on web and in the ☰ menu on phones (Dinesh's choice). Budgets (#13)
 // took Goals' place in the tab bar.
@@ -26,17 +31,40 @@ const SIDEBAR = [
 
 const SIDEBAR_KEY = 'tallyn.sidebar'
 
-// Collapsed or expanded, remembered per device. Without a saved choice,
-// medium screens (under 1280px) start collapsed to give the cards room.
+// The logo file for the theme (Logo Guide: the dark files on dark grounds, never recoloured).
+const Logo = ({ light, dark, className }) => (
+  <>
+    <img className={`${className} dark:hidden`} src={light} alt="Tallyn" />
+    <img className={`${className} hidden dark:block`} src={dark} alt="Tallyn" />
+  </>
+)
+
+// Collapsed or expanded, remembered per device. Without a saved choice it
+// starts collapsed (#187, Dinesh picked the rail).
 function initialCollapsed() {
   try {
     const saved = localStorage.getItem(SIDEBAR_KEY)
     if (saved) return saved === 'collapsed'
   } catch {
-    // storage blocked: fall back to the screen size
+    // storage blocked: start collapsed
   }
-  return window.innerWidth < 1280
+  return true
 }
+
+const NAV_LINK =
+  'group relative flex h-8 items-center gap-3 rounded-xl text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 no-underline transition-colors duration-150 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white aria-[current=page]:bg-zinc-100 dark:aria-[current=page]:bg-zinc-800 aria-[current=page]:text-[var(--color-redesign-owe-text)]'
+const MENU = 'absolute z-50 grid min-w-56 gap-0.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-1.5 text-[13px] shadow-xl'
+const MENU_ITEM =
+  'flex w-full items-center gap-2.5 rounded-lg border-0 bg-transparent px-2.5 py-2 text-left font-semibold text-zinc-800 dark:text-zinc-100 no-underline hover:bg-zinc-100 dark:hover:bg-zinc-800 aria-checked:text-[var(--color-redesign-owe-text)]'
+const Avatar = ({ initial, size = 'size-7' }) => (
+  <span
+    className={`flex ${size} shrink-0 items-center justify-center rounded-full text-xs font-bold text-white`}
+    style={{ background: 'var(--color-redesign-accent)' }}
+    aria-hidden="true"
+  >
+    {initial}
+  </span>
+)
 
 function isTyping(el) {
   return el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName))
@@ -75,26 +103,29 @@ export default function Shell({ me, household, households, onChooseHousehold, on
   }, [])
 
   return (
-    <div className={collapsed ? 'app-shell is-collapsed' : 'app-shell'}>
-      <a className="skip-link" href="#main">
+    <div className="calm-page min-h-svh">
+      <a className="skip-link text-zinc-900 dark:text-white" href="#main">
         Skip to content
       </a>
-      <aside id="sidebar" className="sidebar" aria-label="Main">
+      <aside
+        id="sidebar"
+        aria-label="Main"
+        className={`calm-glass fixed top-3 bottom-3 left-3 z-40 hidden flex-col rounded-3xl p-3 lg:flex ${collapsed ? 'w-[60px] items-center' : 'w-[208px]'}`}
+      >
         {/* Logo, with Collapse beside it (#72). */}
-        <div className="sidebar-top">
-          {collapsed ? <img className="sidebar-mark" src={mark} alt="Tallyn" /> : <img className="sidebar-logo" src={logo} alt="Tallyn" />}
+        <div className={`mb-4 flex items-center ${collapsed ? 'flex-col gap-2' : 'justify-between pl-2'}`}>
+          {collapsed ? <Logo light={mark} dark={markDark} className="size-8" /> : <Logo light={logo} dark={logoDark} className="h-7" />}
           <button
-            className="sidebar-toggle"
+            className="flex size-8 items-center justify-center rounded-lg border-0 bg-transparent p-0 text-zinc-500 dark:text-zinc-400 transition-colors duration-150 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white"
             onClick={() => toggle()}
             aria-expanded={!collapsed}
             aria-controls="sidebar"
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            data-tip={collapsed ? 'Expand sidebar' : undefined}
-            title={collapsed ? undefined : 'Collapse sidebar  ['}
+            title={collapsed ? 'Expand sidebar  [' : 'Collapse sidebar  ['}
           >
             <svg
-              width="18"
-              height="18"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -104,21 +135,30 @@ export default function Shell({ me, household, households, onChooseHousehold, on
               aria-hidden="true"
               focusable="false"
             >
-              {/* Double chevrons, no circle around them (#122): » to expand
-                  (Dinesh picked R3), « to collapse (E1). */}
+              {/* Double chevrons, no circle around them (#122): » to expand (R3), « to collapse (E1). */}
               {collapsed ? <path d="m6 6 6 6-6 6M12 6l6 6-6 6" /> : <path d="m18 6-6 6 6 6M12 6l-6 6 6 6" />}
             </svg>
           </button>
         </div>
-        <nav className="nav">
+        <nav className="flex flex-col gap-0.5">
           {SIDEBAR.map(([to, label, Icon]) => (
-            <Link key={to} to={to} data-tip={collapsed ? label : undefined}>
-              <Icon />
-              <span className={collapsed ? 'sr-only' : undefined}>{label}</span>
+            <Link key={to} to={to} className={`${NAV_LINK} ${collapsed ? 'w-[42px] justify-center' : 'px-3'}`}>
+              <Icon width={18} height={18} />
+              {collapsed ? (
+                // The name, on hover and on keyboard focus, beside the icon.
+                <span className="pointer-events-none absolute left-full z-50 ml-3 rounded-md bg-zinc-900 dark:bg-white px-2 py-1 text-[12px] whitespace-nowrap text-white dark:text-zinc-900 opacity-0 transition-opacity duration-100 group-hover:opacity-100 group-focus-visible:opacity-100">
+                  {label}
+                </span>
+              ) : (
+                <span>{label}</span>
+              )}
             </Link>
           ))}
         </nav>
-        <div className="sidebar-bottom">
+        <div className={`mt-auto flex flex-col gap-2 ${collapsed ? 'items-center' : ''}`}>
+          <div className={collapsed ? '' : 'px-1.5'}>
+            <ThemeSwitch />
+          </div>
           <ProfileMenu
             name={name}
             initial={initial}
@@ -131,22 +171,30 @@ export default function Shell({ me, household, households, onChooseHousehold, on
         </div>
       </aside>
 
-      <div className="app-main">
-        <header className="mobile-header">
-          <img src={logo} alt="Tallyn" />
+      <header className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 lg:hidden">
+        <Logo light={logo} dark={logoDark} className="h-7" />
+        <div className="flex items-center gap-2">
+          <ThemeSwitch size="size-10" />
           <MobileMenu name={name} initial={initial} household={household} onSignOut={onSignOut} />
-        </header>
-        {/* No footer in the signed-in app (#122): Terms and Privacy are in
-            the profile menu, the ☰ menu on phones, and Settings → Legal. */}
-        <main id="main" className="content">
-          {children}
-        </main>
-      </div>
+        </div>
+      </header>
+      {/* No footer in the signed-in app (#122): Terms and Privacy are in
+          the profile menu, the ☰ menu on phones, and Settings → Legal. */}
+      <main id="main" className={`px-4 pt-5 pb-24 md:px-6 lg:pr-6 lg:pb-12 ${collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}>
+        <div className="mx-auto max-w-[1280px]">{children}</div>
+      </main>
 
-      <nav className="tabbar" aria-label="Main">
+      <nav
+        aria-label="Main"
+        className="tabbar fixed inset-x-0 bottom-0 z-40 flex h-16 items-center justify-around border-t border-zinc-200 dark:border-zinc-800 bg-white/95 dark:bg-zinc-950/90 backdrop-blur lg:hidden"
+      >
         {NAV.map(([to, label, Icon]) => (
-          <Link key={to} to={to}>
-            <Icon width={22} height={22} />
+          <Link
+            key={to}
+            to={to}
+            className="flex min-h-11 min-w-14 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 no-underline aria-[current=page]:text-zinc-900 dark:aria-[current=page]:text-white"
+          >
+            <Icon width={20} height={20} />
             {label}
           </Link>
         ))}
@@ -196,24 +244,22 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
   }
 
   return (
-    <div className={collapsed ? 'profile is-collapsed' : 'profile'} ref={box}>
+    <div className="relative" ref={box}>
       <button
         ref={button}
-        className="profile-card"
+        className={`profile-card flex h-12 items-center gap-2.5 rounded-2xl border-0 bg-transparent p-0 text-left text-zinc-900 dark:text-white transition-colors duration-150 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${collapsed ? 'w-[42px] justify-center' : 'w-full px-2'}`}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={collapsed ? `${name}, ${summary}. Open menu` : undefined}
-        data-tip={collapsed && !open ? name : undefined}
+        title={collapsed && !open ? name : undefined}
         onClick={() => setOpen((o) => !o)}
       >
-        <span className="avatar" aria-hidden="true">
-          {initial}
-        </span>
+        <Avatar initial={initial} />
         {!collapsed && (
           <>
-            <span className="grow profile-text">
-              <strong className="block">{name}</strong>
-              <span className="small muted block">{summary}</span>
+            <span className="min-w-0 grow leading-tight">
+              <strong className="block truncate text-[13px]">{name}</strong>
+              <span className="block truncate text-[12px] text-zinc-500 dark:text-zinc-400">{summary}</span>
             </span>
             <svg
               width="16"
@@ -233,10 +279,10 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
         )}
       </button>
       {open && (
-        <div className="profile-menu" role="menu" aria-label="Your account" onKeyDown={onMenuKey}>
+        <div className={`${MENU} bottom-full left-0 mb-2`} role="menu" aria-label="Your account" onKeyDown={onMenuKey}>
           {households?.length > 1 && (
             <>
-              <p className="profile-menu-label small muted" aria-hidden="true">
+              <p className="px-2.5 pt-1 text-[12px] text-zinc-500 dark:text-zinc-400" aria-hidden="true">
                 Household
               </p>
               {households.map((h) => (
@@ -244,7 +290,7 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
                   key={h.id}
                   role="menuitemradio"
                   aria-checked={h.id === household?.id}
-                  className="profile-item"
+                  className={MENU_ITEM}
                   onClick={() => {
                     onChooseHousehold(h.id)
                     close()
@@ -254,10 +300,10 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
                   {h.id === household?.id && <span aria-hidden="true">✓</span>}
                 </button>
               ))}
-              <hr />
+              <hr className="my-1 border-zinc-100 dark:border-zinc-800" />
             </>
           )}
-          <button role="menuitem" className="profile-item" onClick={onSignOut}>
+          <button role="menuitem" className={MENU_ITEM} onClick={onSignOut}>
             <svg
               width="16"
               height="16"
@@ -274,7 +320,7 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
             </svg>
             Sign out
           </button>
-          <hr />
+          <hr className="my-1 border-zinc-100 dark:border-zinc-800" />
           <LegalLinks />
         </div>
       )}
@@ -316,35 +362,42 @@ function MobileMenu({ name, initial, household, onSignOut }) {
   }
 
   return (
-    <div className="mobile-menu" ref={box}>
-      <button ref={button} className="menu-button" aria-haspopup="menu" aria-expanded={open} aria-label="Menu" onClick={() => setOpen((o) => !o)}>
+    <div className="relative" ref={box}>
+      <button
+        ref={button}
+        className="flex size-10 items-center justify-center rounded-full border border-zinc-300 dark:border-zinc-700 bg-transparent p-0 text-zinc-900 dark:text-white"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label="Menu"
+        onClick={() => setOpen((o) => !o)}
+      >
         <MenuIcon />
       </button>
       {open && (
-        <div className="mobile-menu-list" role="menu" aria-label="More" onKeyDown={onMenuKey}>
-          <Link to="/debts" role="menuitem" className="profile-item" onClick={() => close(false)}>
+        <div className={`${MENU} top-full right-0 mt-2`} role="menu" aria-label="More" onKeyDown={onMenuKey}>
+          <Link to="/debts" role="menuitem" className={MENU_ITEM} onClick={() => close(false)}>
             <DebtsIcon width={18} height={18} />
             Debts
           </Link>
-          <Link to="/goals" role="menuitem" className="profile-item" onClick={() => close(false)}>
+          <Link to="/goals" role="menuitem" className={MENU_ITEM} onClick={() => close(false)}>
             <GoalsIcon width={18} height={18} />
             Goals
           </Link>
-          <Link to="/settings" role="menuitem" className="profile-item" onClick={() => close(false)}>
+          <Link to="/settings" role="menuitem" className={MENU_ITEM} onClick={() => close(false)}>
             <SettingsIcon width={18} height={18} />
             Settings
           </Link>
-          <hr />
-          <p className="mobile-menu-me">
-            <span className="avatar" aria-hidden="true">
-              {initial}
-            </span>
-            <span className="grow">
-              <strong className="block">{name}</strong>
-              <span className="small muted block">{household ? `${ROLE[household.role] ?? household.role} · ${household.name}` : 'No household yet'}</span>
+          <hr className="my-1 border-zinc-100 dark:border-zinc-800" />
+          <p className="flex items-center gap-2.5 px-2.5 py-2">
+            <Avatar initial={initial} />
+            <span className="min-w-0 grow leading-tight">
+              <strong className="block truncate text-[13px]">{name}</strong>
+              <span className="block truncate text-[12px] text-zinc-500 dark:text-zinc-400">
+                {household ? `${ROLE[household.role] ?? household.role} · ${household.name}` : 'No household yet'}
+              </span>
             </span>
           </p>
-          <button role="menuitem" className="profile-item" onClick={onSignOut}>
+          <button role="menuitem" className={MENU_ITEM} onClick={onSignOut}>
             <svg
               width="16"
               height="16"
@@ -361,7 +414,7 @@ function MobileMenu({ name, initial, household, onSignOut }) {
             </svg>
             Sign out
           </button>
-          <hr />
+          <hr className="my-1 border-zinc-100 dark:border-zinc-800" />
           <LegalLinks />
         </div>
       )}
@@ -370,11 +423,12 @@ function MobileMenu({ name, initial, household, onSignOut }) {
 }
 
 // One page's heading row: title, optional line under it, and actions.
-export function PageHead({ title, sub, children }) {
+// `tab` names the browser tab when it differs from the title (#153).
+export function PageHead({ title, tab, sub, children }) {
   return (
     <div className="page-head">
       <div>
-        <h1>{title}</h1>
+        <Heading title={tab ?? title}>{title}</Heading>
         {sub && <p className="muted">{sub}</p>}
       </div>
       {children && <div className="page-actions">{children}</div>}
@@ -387,7 +441,7 @@ export function PageHead({ title, sub, children }) {
 // lib/legal.js, so the documents' text stays out of the first download (#99).
 function LegalLinks() {
   return (
-    <p className="menu-legal">
+    <p className="px-2.5 py-1.5 text-[12px] text-zinc-500 dark:text-zinc-400 [&_a]:text-zinc-600 [&_a]:underline [&_a]:underline-offset-2">
       <a role="menuitem" href="/terms" target="_blank" rel="noopener">
         Terms of Service
       </a>

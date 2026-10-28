@@ -1,0 +1,547 @@
+/* The calm redesign in the app (#187, ADR 0017). The old stylesheet sits in a lower layer, so
+   Tailwind's utilities win where a screen has moved and old screens keep their look. No preflight
+   (Tailwind's reset): the old stylesheet keeps its own base rules until every screen has moved. */
+@layer legacy, theme, base, components, utilities;
+@import './styles.css' layer(legacy);
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+@source './App.jsx';
+@source './screens';
+@source './components';
+@source './preview.jsx';
+
+/* Light and dark (#187): lib/theme.js puts a .dark class on <html>; dark: variants (the screens'
+   and the libraries') apply under it. */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: Montserrat, ui-sans-serif, system-ui, sans-serif;
+}
+
+/* The chart and UI libraries' colour variables (#187), in Tallyn's colours. The drafts' lab set
+   these in lab.css; without them a ring's empty track, axis labels and grid lines fell back to
+   black or nothing. The redesign tokens switch with the theme, so most follow it on their own. */
+:root {
+  --border: var(--color-redesign-track);
+  --foreground: var(--color-redesign-ink);
+  --muted-foreground: #71717a;
+  --chart-1: var(--color-redesign-ink);
+  --chart-2: var(--color-redesign-in);
+  --chart-3: var(--color-redesign-accent);
+  --chart-4: var(--color-redesign-grey-3);
+  --chart-5: var(--color-redesign-grey-2);
+  --chart-positive: var(--color-redesign-in);
+  --chart-negative: var(--color-redesign-accent);
+  --chart-background: #ffffff;
+  --chart-foreground: var(--color-redesign-ink);
+  --chart-foreground-muted: #71717a;
+  --chart-line-primary: var(--chart-1);
+  --chart-line-secondary: var(--chart-5);
+  --chart-crosshair: #a1a1aa;
+  --chart-grid: #e4e4e7;
+  --chart-brush-border: var(--chart-grid);
+  --chart-tooltip-background: #ffffff;
+  --chart-tooltip-foreground: var(--color-redesign-ink);
+  --chart-tooltip-muted: #71717a;
+  --chart-marker-background: #f4f4f5;
+  --chart-marker-border: #d4d4d8;
+  --chart-marker-foreground: #3f3f46;
+  --chart-label: #52525b;
+  --chart-indicator-color: var(--color-redesign-ink);
+  --chart-indicator-secondary-color: #e4e4e7;
+  --chart-marker-badge-background: #18181b;
+  --chart-marker-badge-foreground: #e4e4e7;
+  --chart-segment-background: rgb(161 161 170 / 0.08);
+  --chart-segment-line: rgb(113 113 122 / 0.3);
+}
+.dark {
+  --muted-foreground: #a1a1aa;
+  --chart-background: #18181b;
+  --chart-foreground-muted: #a1a1aa;
+  --chart-crosshair: #71717a;
+  --chart-grid: #27272a;
+  --chart-tooltip-background: #18181b;
+  --chart-tooltip-muted: #a1a1aa;
+  --chart-marker-background: #27272a;
+  --chart-marker-border: #52525b;
+  --chart-marker-foreground: #e4e4e7;
+  --chart-label: #a1a1aa;
+  --chart-indicator-secondary-color: #27272a;
+  --chart-marker-badge-background: #fafafa;
+  --chart-marker-badge-foreground: #18181b;
+  --chart-segment-background: rgb(63 63 70 / 0.25);
+  --chart-segment-line: rgb(255 255 255 / 0.25);
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+/* Phase A of the move (#187): the old stylesheet is built on Tallyn's token variables, so every
+   screen takes the redesign's colours, card glass and radii from here at once. Declared on body,
+   which overrides the values applyTokens puts on the root. Screens then move one by one where the
+   drafts change their layout. */
+body {
+  --color-clay: var(--color-redesign-accent);
+  --color-clay-deep: var(--color-redesign-button);
+  --color-sage: var(--color-redesign-in);
+  --color-sage-deep: var(--color-redesign-in-text);
+  --color-sage-light: #bbf7d0;
+  --color-cocoa: var(--color-redesign-ink);
+  --color-cream: var(--color-redesign-page);
+  --color-sand: #f4f4f5;
+  --color-white: #ffffff;
+  --color-text-secondary: #52525b;
+  --color-border: #e4e4e7;
+  --color-success: var(--color-redesign-in-text);
+  --color-warning: #b45309;
+  --color-error: var(--color-redesign-owe-text);
+  --glass-surface: var(--redesign-glass-surface);
+  --glass-border: var(--redesign-glass-border);
+  --glass-highlight: var(--redesign-glass-highlight);
+  --card-shade: var(--redesign-card-shade);
+  --glass-surface-dark: rgba(9, 9, 11, 0.92);
+  --glow-opacity: 1;
+  --radius-card: 16px;
+  --radius-input: 12px;
+  --font-button: var(--font-body);
+}
+
+/* The dark theme for what the old stylesheet still draws (loaders, banners, the month picker). */
+.dark body {
+  --color-sand: #27272a;
+  --color-sage-light: #14532d;
+  --color-text-secondary: #a1a1aa;
+  --color-border: #27272a;
+  --color-warning: #f59e0b;
+}
+/* --color-white is also Tailwind's white (text-white on red buttons), so these few old parts get
+   their dark ground by name. */
+.dark :is(.skip-link, .stale-banner, .load-failed, .month-field, .month-panel, .month-cell) {
+  background-color: #18181b;
+  color: #fafafa;
+}
+
+/* Under the redesign's shell, the page itself takes its ground (the old cream stays on unmoved
+   sign-in pages until they move). */
+body:has(.calm-page) {
+  background-color: var(--color-redesign-page);
+}
+
+/* Page: the redesign's ground with three soft glows behind the cards (glass Mix). */
+.calm-page {
+  background-color: var(--color-redesign-page);
+  background-image:
+    radial-gradient(42rem 30rem at 8% 0%, var(--redesign-glow-green), transparent 70%),
+    radial-gradient(40rem 28rem at 96% 4%, var(--redesign-glow-red), transparent 70%),
+    radial-gradient(60rem 26rem at 50% 105%, var(--redesign-glow-grey), transparent 70%);
+  background-attachment: fixed;
+  color: var(--color-redesign-ink);
+  font-family: var(--font-body);
+}
+
+/* Frosted: the sidebar and summary cards. Lists and tables stay on solid cards (.calm-solid). */
+.calm-glass {
+  background-color: var(--redesign-glass-surface);
+  border: 1px solid var(--redesign-glass-border);
+  box-shadow: var(--redesign-glass-highlight), var(--redesign-card-shade);
+  backdrop-filter: blur(18px) saturate(1.2);
+}
+.calm-solid {
+  background-color: #fff;
+  border: 1px solid #e4e4e7;
+  box-shadow: var(--redesign-card-shade);
+}
+.dark .calm-solid {
+  background-color: #18181b;
+  border-color: #27272a;
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .calm-page {
+    background-image: none;
+  }
+  .calm-glass {
+    background-color: #fff;
+  }
+  .dark .calm-glass {
+    background-color: #18181b;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .calm-page {
+    background-image: none;
+  }
+  .calm-glass {
+    background-color: #fff;
+    backdrop-filter: none;
+  }
+  .dark .calm-glass {
+    background-color: #18181b;
+  }
+}
+
+/* A focus ring on every control in the redesign, shown at once. */
+.calm-page :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-redesign-focus);
+  outline-offset: 2px;
+}
+
+/* Glass Mix on the old cards (#187): summaries frosted, cards holding lists or tables solid. */
+@layer components {
+  /* The redesign's sizes over the old compact desktop scale (#187): small text 13px, card titles
+     15px, buttons 13px. */
+  @media (min-width: 1024px) {
+    .calm-page :is(.small, .chip) {
+      font-size: 13px;
+    }
+    .calm-page :is(h2, .panel-head h2) {
+      font-size: 15px;
+    }
+    .calm-page .btn {
+      font-size: 13px;
+      padding: 7px 14px;
+    }
+  }
+  .calm-page :is(.amount, .money, [class*='amount']) {
+    font-variant-numeric: tabular-nums;
+  }
+  .calm-page .panel:has(.rows, ul, ol, table) {
+    background: #fff;
+    backdrop-filter: none;
+  }
+  .dark .calm-page .panel:has(.rows, ul, ol, table) {
+    background: #18181b;
+  }
+}
+
+/* Sign-in and setup (#187, the #185 draft): the logo, one centred white card, the footer. The
+   screens keep their markup; these rules give it the draft's look over the old stylesheet. */
+@layer components {
+  .calm-auth.page {
+    padding: 48px 16px 24px;
+    gap: 24px;
+  }
+  .calm-auth .logo {
+    width: auto;
+    height: 32px;
+    margin: 0;
+  }
+  .calm-auth .card {
+    max-width: 360px;
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid var(--color-zinc-200);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    color: var(--color-zinc-900);
+    font-size: 14px;
+  }
+  .calm-auth .card h1 {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .calm-auth .card :is(.muted, .small.muted) {
+    color: var(--color-zinc-500);
+    font-size: 13px;
+    font-weight: 400;
+  }
+  .calm-auth .card form {
+    gap: 16px;
+  }
+  .calm-auth .card :is(label, .field) {
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .calm-auth .card :is(input:not([type='checkbox']):not([type='radio']), select) {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--color-zinc-300);
+    border-radius: 12px;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .calm-auth .card .btn {
+    height: 40px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--color-redesign-button);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .calm-auth .card .btn:disabled,
+  .calm-auth .card .btn.btn-waiting:disabled {
+    opacity: 0.4;
+    background: var(--color-redesign-button);
+    color: #fff;
+  }
+  .calm-auth .card .btn-secondary {
+    border: 1px solid var(--color-zinc-300);
+    background: #fff;
+    color: var(--color-zinc-900);
+  }
+  .calm-auth .card .btn-small {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+  .calm-auth .card :is(.link, .link-quiet, .switch-link, a) {
+    color: var(--color-zinc-600);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--color-zinc-300);
+    text-underline-offset: 4px;
+  }
+  .calm-auth .card :is(.link, .link-quiet, .switch-link, a):hover {
+    color: var(--color-zinc-900);
+    text-decoration-color: currentColor;
+  }
+  .calm-auth .card .agree a {
+    color: var(--color-zinc-900);
+    text-underline-offset: 2px;
+  }
+  .calm-auth .card .switch-link {
+    color: var(--color-zinc-900);
+    font-size: 14px;
+    text-decoration: none;
+  }
+  .calm-auth .card .or-divider {
+    color: var(--color-zinc-500);
+  }
+  .calm-auth .card .or-divider::before,
+  .calm-auth .card .or-divider::after {
+    background: var(--color-zinc-200);
+  }
+  .calm-auth .card :is(.info-note, .warn-note) {
+    margin: 0;
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--color-zinc-50);
+    color: var(--color-zinc-700);
+    font-size: 13px;
+  }
+  .calm-auth .card .info-note svg {
+    color: var(--color-zinc-700);
+  }
+  .calm-auth .card .error {
+    color: var(--color-redesign-owe-text);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .calm-auth .card .code-label {
+    font-weight: 600;
+  }
+  .calm-auth .card .code-boxes {
+    gap: 6px;
+  }
+  .calm-auth .card .code-box {
+    height: 48px;
+    padding: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .calm-auth .card .code-box.is-filled {
+    border-color: var(--color-zinc-900);
+  }
+  .calm-auth .card .code-boxes-error .code-box {
+    border-color: var(--color-redesign-owe-text);
+  }
+  .calm-auth .card .card-links {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .calm-auth .card .password-rule {
+    margin: -8px 0 0;
+    color: var(--color-zinc-500);
+  }
+  .calm-auth .card .password-rule-ok {
+    color: var(--color-redesign-in-text);
+    font-weight: 600;
+  }
+  .calm-auth .card .agree {
+    gap: 10px;
+    color: var(--color-zinc-700);
+    font-size: 13px;
+    font-weight: 400;
+  }
+  .calm-auth .card .agree input {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--color-redesign-button);
+  }
+  .calm-auth .card .reset-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--color-zinc-100);
+    color: var(--color-zinc-900);
+  }
+  .calm-auth .card .qr {
+    width: 160px;
+    height: 160px;
+    padding: 10px;
+    border: 1px solid var(--color-zinc-200);
+    border-radius: 12px;
+  }
+  .calm-auth .card .secret {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    word-break: break-all;
+  }
+  .calm-auth .card ol:not(.codes-grid) {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .calm-auth .card .codes-grid {
+    gap: 6px 20px;
+    padding: 16px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--color-zinc-50);
+  }
+  .calm-auth .card .codes-grid li::before {
+    color: var(--color-zinc-400);
+  }
+  .calm-auth .card .codes-grid code {
+    font-size: 14px;
+    letter-spacing: 0;
+  }
+  .calm-auth .site-footer {
+    max-width: 768px;
+    padding-top: 16px;
+    border-top-color: var(--color-zinc-200);
+    color: var(--color-zinc-500);
+  }
+  .calm-auth .site-footer a {
+    color: var(--color-zinc-500);
+  }
+  .calm-auth .site-footer a:hover {
+    color: var(--color-zinc-900);
+  }
+  /* Dark (#187): the drafts' dark card. */
+  .dark .calm-auth .card {
+    border-color: #27272a;
+    background: #18181b;
+    color: #fafafa;
+  }
+  .dark .calm-auth .card :is(input:not([type='checkbox']):not([type='radio']), select) {
+    border-color: #3f3f46;
+    background: #09090b;
+    color: #fafafa;
+  }
+  .dark .calm-auth .card :is(.muted, .small.muted, .password-rule, .or-divider) {
+    color: #a1a1aa;
+  }
+  .dark .calm-auth .card .btn-secondary {
+    border-color: #3f3f46;
+    background: transparent;
+    color: #fafafa;
+  }
+  .dark .calm-auth .card :is(.link, .link-quiet, a) {
+    color: #d4d4d8;
+    text-decoration-color: #52525b;
+  }
+  .dark .calm-auth .card :is(.switch-link, .agree a) {
+    color: #fafafa;
+  }
+  .dark .calm-auth .card :is(.info-note, .warn-note, .codes-grid) {
+    background: rgba(39, 39, 42, 0.6);
+    color: #e4e4e7;
+  }
+  .dark .calm-auth .card .info-note svg {
+    color: #e4e4e7;
+  }
+  .dark .calm-auth .card .agree {
+    color: #d4d4d8;
+  }
+  .dark .calm-auth .card .code-box.is-filled {
+    border-color: #fafafa;
+  }
+  .dark .calm-auth .card .or-divider::before,
+  .dark .calm-auth .card .or-divider::after {
+    background: #27272a;
+  }
+  .dark .calm-auth .card .reset-icon {
+    background: #27272a;
+    color: #fafafa;
+  }
+  .dark .calm-auth .card .qr {
+    border-color: #3f3f46;
+    background: #fff;
+  }
+  .dark .calm-auth .site-footer {
+    border-top-color: #27272a;
+    color: #a1a1aa;
+  }
+  .dark .calm-auth .site-footer a {
+    color: #a1a1aa;
+  }
+  .dark .calm-auth .site-footer a:hover {
+    color: #fafafa;
+  }
+}
+
+/* Tailwind's reset, scoped to rebuilt screens (#187): the libraries' components and the rebuilt
+   pages expect it; screens that haven't moved keep the old base rules. Zero specificity, so
+   utilities still win. */
+@layer base {
+  .calm :where(*, ::before, ::after) {
+    box-sizing: border-box;
+    border: 0 solid;
+    margin: 0;
+    padding: 0;
+  }
+  .calm :where(h1, h2, h3, h4, h5, h6) {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  .calm :where(ol, ul, menu) {
+    list-style: none;
+  }
+  /* The old stylesheet stacks every form and label as a column; calm screens lay them out themselves. */
+  .calm :where(form, label) {
+    display: block;
+    flex-direction: row;
+    gap: 0;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  .calm :where(a) {
+    color: inherit;
+    text-decoration: inherit;
+  }
+  .calm :where(button, input, select, optgroup, textarea) {
+    font: inherit;
+    font-feature-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+  .calm :where(button, [role='button']) {
+    cursor: pointer;
+  }
+  .calm :where(img, svg, video, canvas) {
+    display: block;
+    vertical-align: middle;
+  }
+  .calm :where(img, video) {
+    max-width: 100%;
+    height: auto;
+  }
+}

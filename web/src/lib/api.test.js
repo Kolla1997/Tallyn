@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { api } from './api.js'
+import { api, apiFile } from './api.js'
 
 // When the API says the session is over (12 hours, #92), Tallyn ends only
 // this device's session and leaves the note (#116).
@@ -58,5 +58,34 @@ describe('api', () => {
     )
     await expect(api('/api/me')).rejects.toThrow('internal')
     expect(signOut).not.toHaveBeenCalled()
+  })
+
+  it('errors carry the HTTP status (#151)', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => answer(403, { error: 'forbidden' })),
+    )
+    await expect(api('/api/invites/accept', { method: 'POST', body: {} })).rejects.toMatchObject({ message: 'forbidden', status: 403 })
+  })
+
+  it('apiFile returns the file and the name the server gives it (#54)', async () => {
+    const res = {
+      status: 200,
+      ok: true,
+      headers: new Headers({ 'Content-Disposition': 'attachment; filename="tallyn-data-2026-10-24.zip"' }),
+      blob: () => Promise.resolve(new Blob(['zip'])),
+    }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(res)),
+    )
+    const file = await apiFile('/api/me/export', 'fallback.zip')
+    expect(file.name).toBe('tallyn-data-2026-10-24.zip')
+    expect(await file.blob.text()).toBe('zip')
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => answer(429, { error: 'too_many_requests' })),
+    )
+    await expect(apiFile('/api/me/export', 'fallback.zip')).rejects.toMatchObject({ message: 'too_many_requests', status: 429 })
   })
 })
