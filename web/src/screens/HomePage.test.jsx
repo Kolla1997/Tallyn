@@ -113,6 +113,26 @@ describe('HomePage', () => {
     expect(within(screen.getByRole('region', { name: `Your spending in ${month}` })).getByText('$2,379.26')).toBeInTheDocument()
   })
 
+  it('the spending trend asks for everyone without an owner, and one failing half never blanks the other', async () => {
+    const today = new Date().toLocaleDateString('en-CA')
+    routeApi(api, [
+      ['/api/banks', { banks: BANKS }],
+      ['/api/households/hh-1/members', { members: MEMBERS }],
+      ['/api/transactions/summary', SPENDING],
+      // The server rejects owner=all (it isn't a member); yours answers.
+      [/\/api\/transactions\/daily.*owner=all/, Object.assign(new Error('bad_request'), { status: 400 })],
+      [/\/api\/transactions\/daily.*owner=u-me/, { days: [{ date: today, currency: 'USD', amount_minor: 5000 }] }],
+      ['/api/transactions/daily', Object.assign(new Error('internal'), { status: 500 })], // everyone's half fails
+      ['/api/transactions', { transactions: [] }],
+      ['/api/goals', { goals: [] }],
+    ])
+    await open()
+    const daily = api.mock.calls.map(([p]) => p).filter((p) => p.startsWith('/api/transactions/daily'))
+    expect(daily.some((p) => p.includes('owner=all'))).toBe(false)
+    const month = new Date().toLocaleDateString('en-US', { month: 'long' })
+    has(screen.getByRole('region', { name: `Your spending in ${month}` }), '$50')
+  })
+
   it('nothing spent this month: no figure', async () => {
     answers()
     await open()

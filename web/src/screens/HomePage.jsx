@@ -60,14 +60,12 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
     const hh = encodeURIComponent(household.id)
     const owner = encodeURIComponent(me.user_id)
     const year = now.getFullYear()
-    // The spending trend loads on its own, so Home never waits for it.
+    // The spending trend loads on its own, so Home never waits for it. Each half stands alone: one
+    // failing never blanks the other. The last 90 days can start in last year, so that year too.
     Promise.all([
-      api(`/api/transactions/daily?household_id=${hh}&year=${year}&owner=${owner}`),
-      api(`/api/transactions/daily?household_id=${hh}&year=${year}&owner=all`),
-    ]).then(
-      ([y, e]) => setDaily({ yours: y?.days ?? [], everyone: e?.days ?? [] }),
-      () => {},
-    )
+      dailyFor(hh, year, `&owner=${owner}`),
+      dailyFor(hh, year, ''), // everyone you can see: no owner filter
+    ]).then(([yours, everyone]) => setDaily({ yours, everyone }))
     return Promise.all([
       api(`/api/banks?household_id=${hh}`),
       api(`/api/households/${hh}/members`),
@@ -154,6 +152,20 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
       )}
     </div>
   )
+}
+
+// Daily spending for the chart: this year and, early in the year, last year. Never rejects: a part
+// that fails just leaves those days out.
+function dailyFor(hh, year, owner) {
+  const years = new Date(Date.now() - 90 * DAY).getFullYear() < year ? [year - 1, year] : [year]
+  return Promise.all(
+    years.map((y) =>
+      api(`/api/transactions/daily?household_id=${hh}&year=${y}${owner}`).then(
+        (d) => d?.days ?? [],
+        () => [],
+      ),
+    ),
+  ).then((parts) => parts.flat())
 }
 
 // Row 1: the total on dark, as split-flap figures, with Yours / Everyone (#68).
@@ -375,7 +387,6 @@ function YourAccounts({ banks, home, everyone, canLink }) {
           <See to={everyone ? '/accounts?person=everyone' : '/accounts'}>{`All ${all.length} ${all.length === 1 ? 'account' : 'accounts'}`}</See>
         )
       }
-      className="h-full"
     >
       {all.length === 0 ? (
         <p className={`m-0 text-[13px] ${MUTED}`}>{canLink ? 'You haven’t linked a bank yet. Use Link a bank above.' : 'You don’t have any banks linked.'}</p>
@@ -399,12 +410,18 @@ function YourAccounts({ banks, home, everyone, canLink }) {
 
 // Each credit card: what's owed, what's available of the limit, when it's due, a notched gauge.
 function Cards({ banks }) {
-  const cards = banks.flatMap((b) => b.accounts.filter((a) => a.type === 'credit').map((a) => ({ ...a, bankName: b.institution_name })))
+  const cards = banks
+    .flatMap((b) => b.accounts.filter((a) => a.type === 'credit').map((a) => ({ ...a, bankName: b.institution_name })))
+    .sort((x, y) => (y.current_balance_minor ?? 0) - (x.current_balance_minor ?? 0))
   if (cards.length === 0) return null
   return (
-    <Panel id="card-h" title={cards.length === 1 ? 'Credit card' : 'Credit cards'} meta={<See to="/debts">Debts</See>}>
+    <Panel
+      id="card-h"
+      title={cards.length === 1 ? 'Credit card' : 'Credit cards'}
+      meta={<See to="/debts">{cards.length > 3 ? `All ${cards.length} on Debts` : 'Debts'}</See>}
+    >
       <ul className="m-0 grid list-none gap-3 p-0">
-        {cards.map((a) => {
+        {cards.slice(0, 3).map((a) => {
           const limit = a.credit_limit_minor
           const used = limit > 0 ? Math.round(((a.current_balance_minor ?? 0) / limit) * 100) : null
           return (
@@ -457,9 +474,9 @@ function SharedWithYou({ banks, me, people, roles }) {
     .flatMap((b) => b.accounts.map((a) => ({ ...a, owner: b.owner_user_id, bankName: b.institution_name })))
   if (theirs.length === 0) return null
   return (
-    <Panel id="shared-h" title="Shared with you" meta={<See to="/family">Sharing</See>}>
+    <Panel id="shared-h" title="Shared with you" meta={<See to="/accounts?person=everyone">{theirs.length > 5 ? `All ${theirs.length}` : 'Accounts'}</See>}>
       <Rows>
-        {theirs.map((a) => {
+        {theirs.slice(0, 5).map((a) => {
           const m = people[a.owner] ?? { user_id: a.owner }
           const kid = ['teen', 'child'].includes(roles[a.owner])
           return (
