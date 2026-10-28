@@ -63,6 +63,27 @@ def board_urls(e):
     return {(i.get("content") or {}).get("url") for i in items(e["BOARD_NUMBER"], e["BOARD_OWNER"])}
 
 
+def add_missing_ideas(e=None):
+    """Put every open type:idea issue that isn't on Tallyn Ideas yet under Stage 'New'. Returns added numbers."""
+    e = e or load_env()
+    if "IDEAS_NUMBER" not in e:
+        return []
+    owner = e["BOARD_OWNER"]
+    on_ideas = {(i.get("content") or {}).get("url") for i in items(e["IDEAS_NUMBER"], owner)}
+    open_ideas = gh("issue", "list", "--label", "type:idea", "--state", "open", "--limit", "500",
+                    "--json", "number,title,url", as_json=True)
+    done = []
+    for issue in open_ideas:
+        if issue["url"] in on_ideas:
+            continue
+        item = gh("project", "item-add", e["IDEAS_NUMBER"], "--owner", owner, "--url", issue["url"],
+                  "--format", "json", as_json=True)["id"]
+        set_stage(item, e["IDEAS_NUMBER"], owner, "New")
+        done.append(issue["number"])
+        print(f"+ added #{issue['number']} {issue['title']} → Tallyn Ideas (New)")
+    return done
+
+
 def auto_promote(e=None):
     """Move every idea in Stage 'Promoted' that isn't on Tallyn Board yet. Returns promoted numbers."""
     e = e or load_env()
