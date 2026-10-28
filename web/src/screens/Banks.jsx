@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { usePlaidLink } from 'react-plaid-link'
+import { Link2 } from 'lucide-react'
 import { api } from '../lib/api.js'
 
 // Link a bank (#8). Bank logins happen inside Plaid's own window; Tallyn
@@ -63,6 +64,7 @@ export function LinkBank({ householdId, onLinked, onError, label = 'Link a bank'
 
   return (
     <button type="button" className={className} onClick={start} disabled={Boolean(busy)}>
+      <Link2 className="size-3.5" aria-hidden="true" />
       {busy === 'linking' ? 'Linking…' : busy ? 'Opening…' : label}
     </button>
   )
