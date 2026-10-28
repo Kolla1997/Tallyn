@@ -10,6 +10,10 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-10-28
+- #193 Tabular figures for dynamic numbers (option C, Dinesh): added the Numbers section and Decisions row in the Design System, one line in CLAUDE.md §6, `.money` and `.count` shared rule in `web/src/styles.css`, `CountUp` sets `tabular-nums` on its visible number, `CountUp.test.jsx` (2 tests), Test Plan row and a release-checklist item. Figures inside sentences are left as they are (noted in the Design System).
+- Open: none. Remaining prose money sentences could move to `.money` later if the layout needs it.
+
 ## 2026-10-25
 - #187 Follow-ups from Dinesh: the theme switch is one icon (moon in light, sun in dark), top right on sign-in pages; an eye on password fields that hides the password again after 10 seconds or on submit.
 - #187 Cleanup: removed 494 old CSS rules nothing uses (styles.css 5,083 → 2,143 lines) and the unused `CreditCards`, `DebtStack`, `NotchGauge`, `RingChart`, `SpendingDots`. Merchant logos were dropped by the rebuild by mistake; they're back in the calm icon tile (`TxIcon`). Added `BudgetsPage.test.jsx`.

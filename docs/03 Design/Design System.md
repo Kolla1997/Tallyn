@@ -54,6 +54,15 @@ The web app uses two densities ([#39](https://github.com/Kolla1997/Tallyn/issues
 
 Layout: content up to 1600px wide, centred beyond that. Home is one column under 1280px, two from 1280px, three from 1440px. Long lists (Transactions) cap at 1000px so lines stay readable.
 
+## Numbers
+Every dynamic number in the app uses **tabular figures**, so a layout doesn't shift as digits change (#193). This covers live prices, financial tables, counters, timers, and any number that updates while you watch.
+
+- **Money and counters:** the shared `.money` and `.count` classes, `.amount`, `Money` (`components/calm/ui.jsx`) and `CountUp` set `font-variant-numeric: tabular-nums` on their own. Use them for any money value or counter.
+- **Anything else that updates:** add Tailwind `tabular-nums` (CSS `font-variant-numeric: tabular-nums`).
+- **Design files:** in Figma, Text → Type settings → Details → Numbers → Monospace. Tabular figures keep the font's own shapes, so Space Grotesk stays Space Grotesk.
+- **Native apps (not built yet):** SwiftUI `.monospacedDigit()`; Android `android:fontFeatureSettings="tnum"`.
+- **Not covered:** figures inside a sentence ("You've saved £40 of £200") stay as they are. They don't count, so the layout doesn't shift from them.
+
 ## Components
 * **Primary button:** Clay Deep background, white text, Bricolage Grotesque 700 15px.
 * **Secondary button:** 2px Cocoa outline, pill.
@@ -138,3 +147,4 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-25 | Redesign layouts (#185): lists are rows in one card, never one stretched card per item. Debts: a summary strip (waffle for cards vs loans, four figures) over a table with bullet bars (Dinesh picked F, the mix). Accounts: the same strip with Bklit rings for what you have, then one card per bank holding its accounts as tiles, each card as wide as its accounts (picked F, the bank bento, a mix of "by bank" and "tiles") | Single items stretched edge to edge read huge; banks listed once where their accounts are |
 | 2026-10-25 | Redesign charts (#185): spending by day as one red bar per day with a daily average line and three facts (picked the mix of four forms); spending reads in a red scale, empty days grey; numbers always written beside the marks | Dinesh asked for red instead of black, then for less wasted space; ui-ux-pro-max: never colour alone |
 | 2026-10-26 | Light and dark (#187): the drafts' dark theme in the app, switched with the sun and moon (in the rail, the phone header and the sign-in footer); follows the device until you choose. Dark values live beside the light ones in `design-tokens.json` (`dark`). Avatars use colours that keep white letters readable in both | Dinesh picked the sun and moon switch in the drafts; the first build left dark out by mistake |
+| 2026-10-28 | Tabular figures (#193): every dynamic number uses tabular figures: money and counters through `.money`, `.count`, `.amount`, `Money` and `CountUp`, anything else with `tabular-nums`. Figma: Numbers → Monospace; SwiftUI `.monospacedDigit()`; Android `tnum` | Dinesh picked C: a global rule for money and counters, with an opt-in class for the rest; scoped to Tallyn |

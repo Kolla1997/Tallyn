@@ -175,6 +175,7 @@ Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand,
 ## 6. Brand and design guardrails
 
 - Use only values from `design-tokens.json`. If one is missing, propose it in `docs/03 Design/Design System.md` first.
+- Every dynamic number uses tabular figures (`tabular-nums`), so layouts don't shift as digits change: money, counters, timers, live prices. See `docs/03 Design/Design System.md` → Numbers (#193).
 - Use the logo only as described in `docs/02 Brand/Logo Guide.md`, from the files in `brand/logo/`. Never redraw, recolor or stretch it.
 - Write copy in the voice set out in `docs/02 Brand/Voice and Tone.md`. This is a money app for families, so be clear and calm, never pushy.
 - Every card is frosted glass over a soft glow (`docs/03 Design/Design System.md` → Glass finish, #61). Keep text AA readable on it, keep dialogs, inputs and buttons solid, and keep the fallbacks for browsers without blur and for reduced transparency.

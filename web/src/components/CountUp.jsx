@@ -30,7 +30,7 @@ export default function CountUp({ value, format }) {
   }, [value])
   return (
     <>
-      <span aria-hidden="true">{format(shown)}</span>
+      <span aria-hidden="true" className="tabular-nums">{format(shown)}</span>
       <span className="sr-only">{format(value)}</span>
     </>
   )
