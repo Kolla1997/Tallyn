@@ -56,7 +56,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Use case | P | Unit | Integration | End-to-end | Tests today |
 |---|---|---|---|---|---|
 | Sign up, confirm email, agree to Terms | P1 | Yes | Yes | No | `SignIn.test.jsx` (8-character rule, notes), `ConsentGate.test.jsx` (asks, records the versions, agreed at sign-up, changed documents, can't check); `consent_test.go` |
-| Sign in with password, then the 2FA code | P0 | Yes | Yes | Planned (#113) | `CodeForm.test.jsx`; `auth_test.go` (`aal2` required); `e2e-full/p0.spec.js` (sign in with password and 2FA code: a wrong code is refused) |
+| Sign in with password, then the 2FA code | P0 | Yes | Yes | Yes (#113) | `CodeForm.test.jsx`; `auth_test.go` (`aal2` required); `e2e-full/p0.spec.js` (sign in with password and 2FA code: a wrong code is refused) |
 | Sign-in, sign-up, reset and 2FA errors use Tallyn’s words, never Supabase’s text; sign-up never reveals an existing account (#152) | P0 | Yes | — | — | `authErrors.test.js`, `SignIn.errors.test.jsx`, `SetUp2FA.test.jsx` (`says so calmly when setup can’t start`) |
 | Set up 2FA (QR, then a code) | P0 | Yes | — | No (#113) | `SetUp2FA.test.jsx` (QR and key, half-finished setup cleared, backup codes next, after recovery), `CodeForm.test.jsx` |
 | Every `/api/` route refuses no token, a bad token, no 2FA | P0 | — | Yes | — | `router_test.go` (`TestAPIRequiresAuth`), `auth_test.go` |
@@ -99,16 +99,16 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Rename a household: owners only; the name is trimmed, 1–80 characters, never blank; Settings shows Rename to owners only (#53) | P2 | Yes | Yes | No | `db/households_test.go` (`TestRenameHousehold`), `api/households_test.go`, `Settings.test.jsx` (rename) |
 | One household's data never reaches another | P0 | — | Yes | No | `db_test.go` (`TestHouseholdIsolation`, `TestEveryTableHasRLS`) |
 | Joining on a network error keeps the invite and offers Try again; a refused invite is cleared (#151) | P1 | Yes | — | — | `Join.test.jsx` |
-| Invite, accept, refuse, revoke | P0 | — | Yes | Planned (#113) | `invites_test.go`, `members_test.go` (`TestInviteRoutes`); `e2e-full/p0.spec.js` (invite a member, who accepts: link from the Family page, joined in a second browser) |
+| Invite, accept, refuse, revoke | P0 | — | Yes | Yes (#113) | `invites_test.go`, `members_test.go` (`TestInviteRoutes`); `e2e-full/p0.spec.js` (invite a member, who accepts: link from the Family page, joined in a second browser) |
 | Change a member's role, remove a member | P0 | — | Yes | No | `invites_test.go` (`TestMemberManagement`), `members_test.go` |
-| Sharing is the owner's choice, step by step | P0 | — | Yes | Planned (#113) | `sharing_test.go` (db: 7 tests; api: `TestSharingRoutes`); `e2e-full/p0.spec.js` (share balances with a member, then stop sharing: the member's Home shows it, then doesn't) |
+| Sharing is the owner's choice, step by step | P0 | — | Yes | Yes (#113) | `sharing_test.go` (db: 7 tests; api: `TestSharingRoutes`); `e2e-full/p0.spec.js` (share balances with a member, then stop sharing: the member's Home shows it, then doesn't) |
 | Leaving removes your shares | P0 | — | Yes | No | `sharing_test.go` (`TestLeavingRemovesShares`) |
-| Family page and sharing screen | P1 | Yes | — | Planned (#113) | `FamilyPage.test.jsx` (switches save, transactions before time and location, failure reverts, owner-only actions, remove needs name and code, no sharing with teens) |
+| Family page and sharing screen | P1 | Yes | — | Yes (#113) | `FamilyPage.test.jsx` (switches save, transactions before time and location, failure reverts, owner-only actions, remove needs name and code, no sharing with teens) |
 
 ### Banks, sync and Plaid (ADR 0004, 0005, 0010)
 | Use case | P | Unit | Integration | End-to-end | Tests today |
 |---|---|---|---|---|---|
-| Connect a bank (link token, exchange) | P0 | Yes | Yes | Planned (#113) | `plaid_test.go`, `api/banks_test.go` (`TestLinkToken`, `TestExchange`); `e2e-full/p0.spec.js` (connect a sandbox bank through Plaid Link, then its accounts and transactions) |
+| Connect a bank (link token, exchange) | P0 | Yes | Yes | Yes (#113) | `plaid_test.go`, `api/banks_test.go` (`TestLinkToken`, `TestExchange`); `e2e-full/p0.spec.js` (connect a sandbox bank through Plaid Link, then its accounts and transactions) |
 | Plaid access tokens encrypted at rest | P0 | Yes | Yes | — | `tokencrypt_test.go`, `db/banks_test.go` |
 | Reconnect a bank that needs attention | P1 | Yes | Yes | No | `api/banks_test.go` (`TestReconnect`), `sync_test.go` (`TestReconnected`) |
 | Unlink a bank, and who may | P0 | — | Yes | No | `TestUnlink` (db, api), `TestUnlinkRules` |
@@ -120,8 +120,8 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Use case | P | Unit | Integration | End-to-end | Tests today |
 |---|---|---|---|---|---|
 | Amounts in minor units, any currency's decimals | P0 | Yes | — | — | `money_test.go`, `money.test.js` |
-| Totals in the home currency, across currencies | P0 | Yes | Partly | Planned (#113), one currency | `HomePage.test.jsx`, `AccountsPage.test.jsx` (home currency, have − owe); `TestTransactionSummary`; `e2e-full/p0.spec.js` (Home shows the total in the home currency, matching the API's balances). Several currencies at once: not yet (#11) |
-| Transactions: filters, paging, owner, logo, bank | P1 | Partly | Yes | Planned (#113), list only | `db/transactions_test.go` (7), `api/transactions_test.go`, `TransactionsPage.test.js`, `TransactionRow.test.jsx` (names), `TxIcon.test.jsx` (logos only from Plaid) |
+| Totals in the home currency, across currencies | P0 | Yes | Partly | Yes (#113), one currency | `HomePage.test.jsx`, `AccountsPage.test.jsx` (home currency, have − owe); `TestTransactionSummary`; `e2e-full/p0.spec.js` (Home shows the total in the home currency, matching the API's balances). Several currencies at once: not yet (#11) |
+| Transactions: filters, paging, owner, logo, bank | P1 | Partly | Yes | Yes (#113), list only | `db/transactions_test.go` (7), `api/transactions_test.go`, `TransactionsPage.test.js`, `TransactionRow.test.jsx` (names), `TxIcon.test.jsx` (logos only from Plaid) |
 | Summary: spent, money in, transfers left out | P0 | Yes | Yes | No | `TxSummary.test.jsx`, `TestTransactionSummary`, `TestSummaryRoute` |
 | Home’s “spent this month” on the balance card comes from the month summary, so every transaction counts, not just recent ones (#147) | P0 | Yes | Yes (summary) | — | `HomePage.test.jsx` (`spent this month comes from the month summary`, `nothing spent this month`); `TestTransactionSummary` |
 | Spending by day (#187; replaced the year of dots, #75, #98): a bar per day, keyboard included, picking a day filters the list | P2 | Yes | Yes | No | `SpendingBars.test.jsx`, `TestDailyAndDayFilter`, `TestDailyRoute` |
@@ -164,7 +164,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - Load and penetration testing: separate tickets, closer to launch.
 
 ## Gap tickets (agreed 2026-10-12)
-1. [#113](https://github.com/Kolla1997/Tallyn/issues/113) **Browser end-to-end tests** for the P0 paths: sign-in with 2FA, Home totals, connecting a sandbox bank, inviting a member, sharing. They use a separate Supabase test project, with keys in GitHub secrets and never in the repo. **Written (2026-10-23)** in `web/e2e-full/`, nightly (`.github/workflows/e2e.yml`); the rows say **Planned (#113)** until the first green run against the test project.
+1. [#113](https://github.com/Kolla1997/Tallyn/issues/113) **Browser end-to-end tests** for the P0 paths: sign-in with 2FA, Home totals, connecting a sandbox bank, inviting a member, sharing. They use a separate Supabase test project, with keys in GitHub secrets and never in the repo. **Done (2026-10-23):** `web/e2e-full/`, nightly (`.github/workflows/e2e.yml`); all five paths green against the `tallyn-e2e` test project.
 2. [#114](https://github.com/Kolla1997/Tallyn/issues/114) **Tests for the untested screens:** Home, Accounts, Family and sharing, Settings, ConsentGate, IdleGuard, SetUp2FA. Plus a `PUT /api/me` handler test. **Done (2026-10-16).** `PUT /api/me` already had a success test; #114 added its failure cases.
 3. [#115](https://github.com/Kolla1997/Tallyn/issues/115) **Fix the Plaid link-token bug** (ask only on Connect a bank), with a test.
 4. [#116](https://github.com/Kolla1997/Tallyn/issues/116) **Automatic sign-outs end only this device:** tests for `scope: 'local'`. **Done (2026-10-16).**
