@@ -10,6 +10,10 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-10-28
+- #193 Tabular figures for dynamic numbers (option C, Dinesh): added the Numbers section and Decisions row in the Design System, one line in CLAUDE.md §6, `.money` and `.count` shared rule in `web/src/styles.css`, `CountUp` sets `tabular-nums` on its visible number, `CountUp.test.jsx` (2 tests), Test Plan row and a release-checklist item. Figures inside sentences are left as they are (noted in the Design System).
+- Open: none. Remaining prose money sentences could move to `.money` later if the layout needs it.
+
 ## 2026-10-25
 - #187 Link a bank got its draft link icon back (the only draft button icon the rebuild dropped).
 - #187 Accounts: bank cards show their accounts in one sideways-scrolling row by default, with a switch to the grid (Dinesh's ask). The rings' empty track was black because the app never defined the chart libraries' colour variables (the lab did, in lab.css); they're now set in Tallyn's colours for both themes.

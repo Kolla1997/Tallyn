@@ -198,6 +198,12 @@ select:focus-visible {
   white-space: nowrap;
 }
 
+/* Money and counters keep their digit widths as they change, so nothing shifts (#193). */
+.money,
+.count {
+  font-variant-numeric: tabular-nums;
+}
+
 .confirm {
   background: var(--color-sand);
   border-radius: var(--radius-input);
