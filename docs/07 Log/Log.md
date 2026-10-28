@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-25
+- #187 Link a bank got its draft link icon back (the only draft button icon the rebuild dropped).
 - #187 Accounts: bank cards show their accounts in one sideways-scrolling row by default, with a switch to the grid (Dinesh's ask). The rings' empty track was black because the app never defined the chart libraries' colour variables (the lab did, in lab.css); they're now set in Tallyn's colours for both themes.
 - #187 Real-data fixes: Home's spending showed $0 because it asked for everyone with `owner=all` (the API answers 400) and that failure dropped your half too; the bottom row's lists are capped so Your accounts no longer stretches; bank cards wrap many accounts. The preview's fake API accepted anything, so it hid the first bug.
 - #187 Follow-ups from Dinesh: the theme switch is one icon (moon in light, sun in dark), top right on sign-in pages; an eye on password fields that hides the password again after 10 seconds or on submit.
