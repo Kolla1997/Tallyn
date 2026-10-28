@@ -1,5 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath, URL } from 'node:url'
 
 // In dev, Vite serves the app and forwards /api to the Go server on :8080.
 // In production, the Go server serves the built app from web/dist.
@@ -34,7 +36,13 @@ function devPolicy(supabaseURL) {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
   return {
-    plugins: [react()],
+    // Tailwind (#183) only reaches files that import it: the draft lab
+    // (lab.html, src/lab/lab.css). The app keeps its own stylesheet, and the
+    // build only includes index.html, so the lab never ships.
+    plugins: [react(), tailwindcss()],
+    resolve: {
+      alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    },
     server: {
       proxy: {
         '/api': 'http://localhost:8080',
@@ -64,8 +72,8 @@ export default defineConfig(({ mode }) => {
     // Web tests (#100): npm test.
     test: {
       environment: 'jsdom',
-      // Playwright's layout checks (#117) run in a real browser, not here.
-      exclude: ['**/node_modules/**', 'e2e/**'],
+      // Playwright's layout checks (#117) and end-to-end tests (#113) run in a real browser, not here.
+      exclude: ['**/node_modules/**', 'e2e/**', 'e2e-full/**'],
       setupFiles: ['./src/test-setup.js'],
     },
   }

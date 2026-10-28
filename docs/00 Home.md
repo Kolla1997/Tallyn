@@ -2,7 +2,7 @@
 type: guide
 status: active
 owner: Dinesh
-updated: 2026-10-08
+updated: 2026-10-24
 tags: [home]
 ---
 
@@ -22,6 +22,10 @@ tags: [home]
 - [[Feature - Bank Sync]]: transactions, spending by category, time and location
 - [[Feature - Sharing]]: who sees whose money, by choice
 - [[Feature - Household Members]]: invitations, roles, leaving
+- [[Feature - Your Data]]: download everything Tallyn holds about you (#54)
+- [[Feature - Close Account]]: close your account; what goes and what's kept (#56)
+- [[Feature - Budgets]]: category budgets and the plan from your income (#13, #133)
+- [[Feature - Goals]]: savings goals that follow an account or are updated by hand (#14)
 
 ## Brand
 - [[Brand Guide]]: positioning, personality, brand basics
@@ -31,6 +35,7 @@ tags: [home]
 
 ## Design
 - [[Design System]]: color, type, spacing, components
+- [[UI Audit 2026-10]]: findings from the full UI audit and proposed follow-up tickets (#145)
 - [[Design Comps]]: app and website screen comps
 - [[UI Patterns]]: recurring layouts and interactions
 

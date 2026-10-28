@@ -41,6 +41,88 @@
     },
     "error": {
       "value": "#B93A32"
+    },
+    "redesign-accent": {
+      "value": "#dc2626",
+      "$description": "Calm redesign (#187): red for the one action and what is owed (graphics)"
+    },
+    "redesign-button": {
+      "value": "#b91c1c",
+      "$description": "Primary button background"
+    },
+    "redesign-owe-text": {
+      "value": "#b91c1c",
+      "$description": "Owed amounts as text, AA on white",
+      "dark": "#f87171"
+    },
+    "redesign-in": {
+      "value": "#16a34a",
+      "$description": "Money in and progress (graphics)"
+    },
+    "redesign-in-text": {
+      "value": "#15803d",
+      "$description": "Money in as text, AA on white",
+      "dark": "#4ade80"
+    },
+    "redesign-ink": {
+      "value": "#18181b",
+      "$description": "Near-black: text and the darkest marks",
+      "dark": "#e4e4e7"
+    },
+    "redesign-track": {
+      "value": "#e4e4e7",
+      "$description": "Empty part of bars and gauges",
+      "dark": "#3f3f46"
+    },
+    "redesign-page": {
+      "value": "#fafafa",
+      "$description": "Page background under the glows",
+      "dark": "#09090b"
+    },
+    "redesign-grey-1": {
+      "value": "#d4d4d8",
+      "$description": "Neutral marks"
+    },
+    "redesign-grey-2": {
+      "value": "#a1a1aa",
+      "$description": "Neutral marks"
+    },
+    "redesign-grey-3": {
+      "value": "#71717a",
+      "$description": "Neutral marks, visible on white and black"
+    },
+    "redesign-grey-4": {
+      "value": "#52525b",
+      "$description": "Neutral marks"
+    },
+    "redesign-grey-5": {
+      "value": "#3f3f46",
+      "$description": "Neutral badges"
+    },
+    "redesign-spend-1": {
+      "value": "#fecaca",
+      "$description": "Spending scale, least",
+      "dark": "#3b1414"
+    },
+    "redesign-spend-2": {
+      "value": "#f87171",
+      "$description": "Spending scale",
+      "dark": "#6b1d1d"
+    },
+    "redesign-spend-3": {
+      "value": "#dc2626",
+      "$description": "Spending scale",
+      "dark": "#b91c1c"
+    },
+    "redesign-spend-4": {
+      "value": "#7f1d1d",
+      "$description": "Spending scale, most",
+      "dark": "#f87171"
+    },
+    "redesign-focus": {
+      "value": "#18181b",
+      "$description": "Focus ring",
+      "dark": "#ffffff"
     }
   },
   "font": {
@@ -131,6 +213,41 @@
     "card-shade": {
       "value": "0 6px 20px rgba(59, 47, 47, 0.10), 0 1px 3px rgba(59, 47, 47, 0.08)",
       "$description": "Soft shade under cards and the floating sidebar, lifting them off the glow (#64)"
+    },
+    "redesign-glass-surface": {
+      "value": "rgba(255, 255, 255, 0.7)",
+      "$description": "Calm redesign glass (Mix, #187): frosted card and sidebar surface",
+      "dark": "rgba(24, 24, 27, 0.62)"
+    },
+    "redesign-glass-border": {
+      "value": "rgba(255, 255, 255, 0.8)",
+      "$description": "Glass edge",
+      "dark": "rgba(255, 255, 255, 0.08)"
+    },
+    "redesign-glass-highlight": {
+      "value": "inset 0 1px 0 rgba(255, 255, 255, 0.9)",
+      "$description": "Glass top highlight",
+      "dark": "inset 0 1px 0 rgba(255, 255, 255, 0.06)"
+    },
+    "redesign-card-shade": {
+      "value": "0 6px 20px rgba(24, 24, 27, 0.08), 0 1px 3px rgba(24, 24, 27, 0.06)",
+      "$description": "Soft shade under cards",
+      "dark": "0 6px 20px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3)"
+    },
+    "redesign-glow-green": {
+      "value": "rgba(22, 163, 74, 0.22)",
+      "$description": "Page glow, top left",
+      "dark": "rgba(22, 163, 74, 0.16)"
+    },
+    "redesign-glow-red": {
+      "value": "rgba(220, 38, 38, 0.16)",
+      "$description": "Page glow, top right",
+      "dark": "rgba(220, 38, 38, 0.14)"
+    },
+    "redesign-glow-grey": {
+      "value": "rgba(161, 161, 170, 0.3)",
+      "$description": "Page glow, bottom",
+      "dark": "rgba(161, 161, 170, 0.1)"
     }
   }
 }

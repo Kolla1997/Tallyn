@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import SignIn from './SignIn.jsx'
 
 // After signing out for inactivity (#91), the sign-in page says why, once,
@@ -49,5 +49,22 @@ describe('SignIn after an idle sign-out', () => {
     fireEvent.click(screen.getByRole('button', { name: /Create a new account/ }))
     expect(screen.getByText(/At least 8 characters/)).toBeInTheDocument()
     expect(screen.getByLabelText('Password')).toHaveAttribute('minlength', '8')
+  })
+})
+
+// The eye shows the typed password, and it hides itself again after 10 seconds.
+describe('SignIn password eye', () => {
+  afterEach(() => vi.useRealTimers())
+
+  it('shows the password, then hides it again on its own', () => {
+    vi.useFakeTimers()
+    render(<SignIn />)
+    const field = screen.getByLabelText('Password')
+    expect(field).toHaveAttribute('type', 'password')
+    fireEvent.click(screen.getByRole('button', { name: 'Show password' }))
+    expect(field).toHaveAttribute('type', 'text')
+    expect(screen.getByRole('button', { name: 'Hide password' })).toHaveAttribute('aria-pressed', 'true')
+    act(() => vi.advanceTimersByTime(10_000))
+    expect(field).toHaveAttribute('type', 'password')
   })
 })

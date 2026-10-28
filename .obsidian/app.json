@@ -11,6 +11,7 @@
     "internal/",
     "migrations/",
     "scripts/",
-    ".github/"
+    ".github/",
+    "PROGRESS.md"
   ]
 }

@@ -5,8 +5,10 @@ import Settings from './Settings.jsx'
 // Settings → Sign-in and security (#23, Dinesh picked A): your authenticators
 // (never remove the last), adding another, and backup codes.
 const api = vi.fn()
-vi.mock('../lib/api.js', () => ({ api: (...a) => api(...a) }))
+const apiFile = vi.fn()
+vi.mock('../lib/api.js', () => ({ api: (...a) => api(...a), apiFile: (...a) => apiFile(...a) }))
 const mfa = { listFactors: vi.fn(), enroll: vi.fn(), unenroll: vi.fn(), challengeAndVerify: vi.fn() }
+const signOut = vi.fn()
 vi.mock('../lib/supabase.js', () => ({
   supabase: {
     auth: {
@@ -19,7 +21,7 @@ vi.mock('../lib/supabase.js', () => ({
               mfa[k](...a),
         },
       ),
-      signOut: vi.fn(),
+      signOut: (...a) => signOut(...a),
     },
   },
 }))
@@ -67,7 +69,7 @@ describe('Settings: authenticators', () => {
     await openSecurity([phone])
     mfa.enroll.mockResolvedValue({ data: { id: 'f9', totp: { qr_code: 'data:image/svg+xml;utf-8,<svg/>', secret: 'FAKESECRET' } }, error: null })
     mfa.unenroll.mockResolvedValue({ error: null })
-    fireEvent.click(screen.getByRole('button', { name: '+ Add another' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add another' }))
     const dialog = screen.getByRole('dialog', { name: 'Add another authenticator' })
     fireEvent.change(within(dialog).getByLabelText('Give it a name'), { target: { value: 'iphone' } })
     await act(async () => fireEvent.click(within(dialog).getByRole('button', { name: 'Show the QR code' })))
@@ -152,8 +154,113 @@ describe('Settings: profile, legal and coming soon (#114)', () => {
   })
 
   it('what isn’t built yet says so, without links to tickets', async () => {
-    await openSection('data')
+    await openSection('notifications')
     expect(screen.getAllByText('Coming soon').length).toBeGreaterThan(0)
     expect(document.querySelector('a[href*="github.com"]')).toBeNull()
+  })
+
+  // Download your data (#54): a fresh code first, then the ZIP from the server.
+  describe('download your data', () => {
+    const enterCode = async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Download' }))
+      const dialog = screen.getByRole('dialog', { name: 'Download your data?' })
+      expect(within(dialog).getByText(/Only your own data/)).toBeInTheDocument()
+      fireEvent.change(within(dialog).getByLabelText(/6-digit code/), { target: { value: '123456' } })
+      await act(async () => fireEvent.click(within(dialog).getByRole('button', { name: 'Download' })))
+      return dialog
+    }
+
+    beforeEach(() => {
+      apiFile.mockReset()
+      mfa.listFactors.mockResolvedValue({ data: { totp: [phone] } })
+      mfa.challengeAndVerify.mockResolvedValue({ error: null })
+      URL.createObjectURL = vi.fn(() => 'blob:fake')
+      URL.revokeObjectURL = vi.fn()
+    })
+
+    it('saves the ZIP after a fresh code', async () => {
+      const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+      apiFile.mockResolvedValue({ blob: new Blob(['zip']), name: 'tallyn-data-2026-10-24.zip' })
+      await openSection('data')
+      await enterCode()
+      expect(mfa.challengeAndVerify).toHaveBeenCalledWith({ factorId: 'f1', code: '123456' })
+      expect(apiFile).toHaveBeenCalledWith('/api/me/export', expect.stringMatching(/^tallyn-data-\d{4}-\d{2}-\d{2}\.zip$/))
+      expect(click).toHaveBeenCalled()
+      expect(screen.queryByRole('dialog', { name: 'Download your data?' })).not.toBeInTheDocument()
+      click.mockRestore()
+    })
+
+    it('says so calmly after 3 downloads an hour', async () => {
+      apiFile.mockRejectedValue(Object.assign(new Error('too_many_requests'), { status: 429 }))
+      await openSection('data')
+      const dialog = await enterCode()
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('You can download your data 3 times an hour. Try again later.')
+    })
+  })
+
+  // Close your account (#56): type your email, a fresh code, then signed out
+  // with the "closed" note on the sign-in page.
+  describe('close your account', () => {
+    const confirmClose = async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Close account' }))
+      const dialog = screen.getByRole('dialog', { name: 'Close your Tallyn account?' })
+      expect(within(dialog).getByText(/can.t be undone/)).toBeInTheDocument()
+      expect(within(dialog).getByRole('link', { name: 'Download your data first' })).toHaveAttribute('href', '/settings?section=data')
+      const go = within(dialog).getByRole('button', { name: 'Close account' })
+      fireEvent.change(within(dialog).getByLabelText(/6-digit code/), { target: { value: '123456' } })
+      expect(go).toBeDisabled() // the email isn't typed yet
+      fireEvent.change(within(dialog).getByLabelText(/to confirm/), { target: { value: 'You@Example.com' } })
+      await act(async () => fireEvent.click(go))
+      return dialog
+    }
+
+    beforeEach(() => {
+      localStorage.clear()
+      signOut.mockReset()
+      signOut.mockResolvedValue({ error: null })
+      mfa.listFactors.mockResolvedValue({ data: { totp: [phone] } })
+      mfa.challengeAndVerify.mockResolvedValue({ error: null })
+    })
+
+    it('closes, signs out here and leaves the note for the sign-in page', async () => {
+      api.mockResolvedValue(null)
+      await openSection('leave')
+      await confirmClose()
+      expect(api).toHaveBeenCalledWith('/api/me/close', { method: 'POST', body: { email: 'you@example.com' } })
+      expect(signOut).toHaveBeenCalledWith({ scope: 'local' })
+      expect(localStorage.getItem('tallyn.signOutNote')).toBe('closed')
+    })
+
+    it('the only owner of a shared household is told to hand it over first', async () => {
+      api.mockRejectedValue(Object.assign(new Error('last_owner'), { status: 409 }))
+      await openSection('leave')
+      const dialog = await confirmClose()
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('make someone else an owner first')
+      expect(signOut).not.toHaveBeenCalled()
+    })
+  })
+
+  // Rename the household (#53): owners only.
+  describe('rename the household', () => {
+    it('an owner renames it, and the app reloads the name', async () => {
+      api.mockImplementation(async (path, opts) => (opts?.method === 'PUT' ? { name: 'The Riveras' } : { members: [] }))
+      const onSaved = await openSection('household')
+      fireEvent.click(screen.getByRole('button', { name: 'Rename' }))
+      fireEvent.change(screen.getByLabelText('Household name'), { target: { value: '  The Riveras ' } })
+      await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Save' })))
+      expect(api).toHaveBeenCalledWith('/api/households/hh-1', { method: 'PUT', body: { name: '  The Riveras ' } })
+      expect(onSaved).toHaveBeenCalled()
+      expect(screen.queryByLabelText('Household name')).not.toBeInTheDocument()
+    })
+
+    it('a blank name is refused before it leaves the page', async () => {
+      api.mockResolvedValue({ members: [] })
+      await openSection('household')
+      fireEvent.click(screen.getByRole('button', { name: 'Rename' }))
+      fireEvent.change(screen.getByLabelText('Household name'), { target: { value: '   ' } })
+      await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Save' })))
+      expect(screen.getByRole('alert')).toHaveTextContent('Give your household a name.')
+      expect(api).not.toHaveBeenCalledWith('/api/households/hh-1', expect.anything())
+    })
   })
 })

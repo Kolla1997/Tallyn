@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-21
+updated: 2026-10-26
 issue: 10
 tags: [design]
 ---
@@ -69,6 +69,35 @@ AA contrast: 4.5:1 for text under 18.66px bold. Clay with white is 4.4:1 (large 
 ## Motion
 See [[Animation Guide]]. UI transitions are 200 to 300ms, ease-out. Respect reduced motion.
 
+## Designing a screen
+How to design or redesign any Tallyn screen ([#180](https://github.com/Kolla1997/Tallyn/issues/180)). It borrows the app-screen method from taste-skill (`.claude/skills/design-taste-frontend/`, `references/app-screens.md`) but keeps Tallyn's look. Follow the steps in order; when they disagree, the earlier step wins.
+
+**1. Tallyn decides the look.** Colours, type, spacing and shape come from `design-tokens.json`, this note (glass finish, density, components), the [[Brand Guide]], the [[Logo Guide]], [[Voice and Tone]] and [[UI Patterns]]. Nothing from an outside skill changes them.
+
+**2. Plan the content before drawing.** These come from taste-skill and suit a money app:
+
+| Step | What it means in Tallyn |
+|---|---|
+| Know the data and the people | List what the screen shows (accounts, transactions, budgets, goals), with realistic amounts and currencies, and who opens it: you, a partner, a parent, a teen |
+| One question per screen | Name the question the screen answers ("Are we on track this month?"). The biggest block answers it; everything else supports it or moves elsewhere |
+| Honest numbers | Totals add up from the rounded amounts shown. A fact shown twice (a total, a date range) comes from one value. Every relative figure says what it's compared with ("£40 less than last month") |
+| The main job is one click away | Name the most frequent next step (add a goal, check a budget, invite a partner) and put it within reach |
+| Every state | Design the empty, loading and error states with the screen, following [[UI Patterns]] and the 2026-10-23 load-error decision below |
+| One colour for the data that matters | The main data gets one chart colour, the rest stay neutral; status colours keep their meaning (red only for what you owe or an over-budget) |
+| People stay themselves | Each family member keeps the same initial and tint everywhere |
+
+**3. Outside layouts are references only.** When drafting options, taste-skill's `library/app.json` shells and patterns can suggest structure. Dress every option in Tallyn's glass and tokens. Its palettes, fonts, photos, section blueprints and direction deal (`draw.mjs`, `scenes.mjs`) stay off, and `assets.mjs` is never run.
+
+**4. Check the draft.** Run both, then fix what they find before showing Dinesh:
+- `node .claude/skills/design-taste-frontend/scripts/lint.mjs <files>` on the source.
+- `node .claude/skills/design-taste-frontend/scripts/inspect.mjs <url> --app --allow glass,gradient,shadow,heavy-shadow,button-fx,palette-terracotta,palette-cream` on the built page (`npm run build && npm run preview` in `web/`, not the dev server). Needs Node 22+ and Chrome.
+- Hallmark's Floor and `sloplint` (CLAUDE.md §6).
+
+> [!warning] Rules that clash with Tallyn
+> The `--allow` list above turns off the inspector's rules against the glass finish (#61), the soft glow and card shade, and Tallyn's Clay and Cream palette. Never remove glass, glow or Clay because a check flagged it. Everything else it reports (contrast, cut-off or covered text, sideways scroll, tiny text, number alignment, tabular figures, chart colours, placeholder data) is worth fixing.
+
+Then draft 2–3 options with at least one mix, as CLAUDE.md §0 asks.
+
 ## Reference
 Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy alongside). Screens: [[Design Comps]]. Patterns: [[UI Patterns]].
 
@@ -98,3 +127,14 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-11 | **Cards are frosted glass** over a soft sage, clay and sand glow (replaces "flat white cards" from 2026-10-08; still no drop shadows) | Dinesh chose option B: more depth and a modern feel. Kept readable with a 70% surface, solid dialogs and fallbacks (#61) |
 | 2026-10-11 | Compact density on web (1024px+), comfortable on phones; up to 1600px wide; Home in three columns from 1440px | Dinesh: use the screen and show more at a glance; phones keep sizes that are easy to read and tap |
 | 2026-10-11 | Spending isn't shown in red; red is only for what you owe | Calm, not alarming: ordinary purchases aren't a warning |
+| 2026-10-23 | A page that can't load shows a glass card with Try again; when money is already on screen, it stays under a solid sand banner. Retrying waits in sand (#151) | Dinesh picked D, a mix of the card (B) and the banner (C): never an endless loader, never hide numbers people already have |
+| 2026-10-24 | Plan from your income reads answer first (a sentence), then the logic (a labelled split bar), then the data (a plain bar and words per job). No chart key to learn (#133) | Dinesh picked 3A: people look for the logic first, then the numbers; the waffle, flow, bullet, treemap and waterfall drafts read slower |
+| 2026-10-24 | Goals: "This month" checklist on top, goals as glass pots that fill, and one goal up close as a forecast with its next milestone (#14) | Dinesh picked the mix of draft 2, part by part: each part answers a different question (what to do this month; how are my goals; will this one make it) |
+| 2026-10-24 | Month fields: a field in words ("June 2027 · 8 months away") opening quick picks (No date, 6 months, 1 year, 2 years) over a year-by-year month grid; past months off (`web/src/components/MonthPicker.jsx`, #14) | Dinesh picked the mix of the month draft (`docs/03 Design/Comps/web-goals-month-draft.html`): the browser's month box looks different everywhere and offers days a goal doesn't need |
+| 2026-10-24 | Screens are designed by [[#Designing a screen]]: Tallyn's look first, then taste-skill's app-screen method for content, its layouts as references only, and its checks with the glass, glow and palette rules allowed (#180) | Dinesh: use taste-skill as a reference while the Tallyn design doc stays in charge; layered, not merged, so the pinned copy stays unchanged |
+| 2026-10-25 | Calm redesign, drafted for every screen in the draft lab (`web/src/lab/calm/`, #185): red, green, white and black, red for the one action and what's owed, green for money in and progress; cards are plain white or near-black, no glass. **Applies to the app only when the redesign is built**; until then the rules above stand | Dinesh: the bold drafts were overwhelming, he likes the calm approach |
+| 2026-10-25 | Redesign sizes: one 1280px content width on every page, centred; body 14px, small 13px, names 15px, figures 22px, page titles 24px; buttons 13px text with 14px icons; rows and cards a little roomier (#185). Replaces the compact column of [[#App type and density]] when built | Dinesh asked for "one size smaller" (size C), then one step up everywhere, then less empty space at the sides; one width keeps pages lined up (Hallmark Floor 14) |
+| 2026-10-25 | Redesign sidebar: the rail is collapsed by default (icon names on hover and keyboard focus, » opens it); menu text 13px; rows 34px (32px items, 2px apart). Replaces the 40px items and 14px text of 2026-10-16 when built (#185) | Dinesh picked the rail over a labelled rail and a top bar, then asked for smaller text and less space |
+| 2026-10-25 | Redesign layouts (#185): lists are rows in one card, never one stretched card per item. Debts: a summary strip (waffle for cards vs loans, four figures) over a table with bullet bars (Dinesh picked F, the mix). Accounts: the same strip with Bklit rings for what you have, then one card per bank holding its accounts as tiles, each card as wide as its accounts (picked F, the bank bento, a mix of "by bank" and "tiles") | Single items stretched edge to edge read huge; banks listed once where their accounts are |
+| 2026-10-25 | Redesign charts (#185): spending by day as one red bar per day with a daily average line and three facts (picked the mix of four forms); spending reads in a red scale, empty days grey; numbers always written beside the marks | Dinesh asked for red instead of black, then for less wasted space; ui-ux-pro-max: never colour alone |
+| 2026-10-26 | Light and dark (#187): the drafts' dark theme in the app, switched with the sun and moon (in the rail, the phone header and the sign-in footer); follows the device until you choose. Dark values live beside the light ones in `design-tokens.json` (`dark`). Avatars use colours that keep white letters readable in both | Dinesh picked the sun and moon switch in the drafts; the first build left dark out by mistake |

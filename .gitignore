@@ -12,6 +12,9 @@
 # Claude local settings
 .claude/settings.local.json
 
+# Session handoff note (personal, see CLAUDE.md §3)
+PROGRESS.md
+
 # Build / deps
 node_modules/
 web/dist/
@@ -19,9 +22,17 @@ web/dist/
 web/e2e-dist/
 web/test-results/
 web/playwright-report/
+web/e2e-full-dist/
+web/test-results-e2e/
+web/playwright-report-e2e/
 /server
 *.log
 .DS_Store
 
 # Python
 __pycache__/
+
+# Hallmark skill working files: log, screenshots, image cache (#141)
+.hallmark/
+# design-taste-frontend skill working files: screenshots, reports (#141)
+.taste-skill/

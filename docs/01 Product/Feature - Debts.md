@@ -2,7 +2,7 @@
 type: spec
 status: active
 owner: Dinesh
-updated: 2026-10-12
+updated: 2026-10-26
 issue: 27
 tags: [spec, plaid, debts]
 ---
@@ -47,7 +47,7 @@ Plain SVG with brand tokens, no chart library. See [[Design System]] and [[Anima
   - **Never stored:** account numbers, payment reference numbers, servicer or property addresses, escrow, PMI.
 - **`internal/plaid`:** `Liabilities()` returns `{Cards, Loans}`. Rates are exact strings, and implausible values are dropped. A mortgage with an amount past due is treated as overdue.
 - **`internal/db`:** `SaveLiabilities` writes cards and loans in one transaction. `GET /api/banks` returns a `loan` object per account.
-- **Web:** `screens/DebtsPage.jsx`, `components/RingChart.jsx`, `components/NotchGauge.jsx`, plus the ☰ menu in `screens/Shell.jsx`.
+- **Web:** `screens/DebtsPage.jsx`, its summary strip and rows (calm redesign, #187), plus the ☰ menu in `screens/Shell.jsx`.
 
 ## Rollout
 1. Run `0013_loans.sql` on dev (done 2026-10-12, with Dinesh's OK). It resets the daily fetch time, so loans fill in on the next sync.

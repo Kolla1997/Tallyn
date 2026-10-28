@@ -37,7 +37,9 @@ function answers({ banks = BANKS, error } = {}) {
     ['/api/banks', error ?? { banks }],
     ['/api/households/hh-1/members', { members: MEMBERS }],
     ['/api/transactions/summary', SPENDING],
+    ['/api/transactions/daily', { days: [] }],
     ['/api/transactions', { transactions: [] }],
+    ['/api/goals', { goals: [] }],
   ])
 }
 
@@ -53,7 +55,9 @@ describe('HomePage', () => {
     api.mockReset()
   })
 
-  it('your balance, net worth and what you can see, in the home currency', async () => {
+  // Home in the calm redesign (#187): the total on dark with net worth and what's owed, Yours /
+  // Everyone, your accounts biggest first, cards, money shared with you, the spending trend.
+  it('your balance and net worth, in the home currency', async () => {
     answers()
     await open()
     expect(screen.getByRole('heading', { name: 'Test family' })).toBeInTheDocument()
@@ -61,9 +65,7 @@ describe('HomePage', () => {
     const total = screen.getByRole('region', { name: 'Your balance' })
     has(total, '$3,500.00') // checking + savings, not the card
     has(total, '$3,200.00') // net worth: 3,500 - 300
-    has(total, '$3,900.00') // everyone you can see: + Pat's 400
-    has(total, '$400.00') // shared with you
-    expect(within(total).getByText(/minus what you owe, \$300\.00/)).toBeInTheDocument()
+    expect(within(total).getByText(/after \$300\.00 owed on cards and loans/)).toBeInTheDocument()
   })
 
   it('Everyone switches the whole page to everyone you can see', async () => {
@@ -71,47 +73,70 @@ describe('HomePage', () => {
     await open()
     fireEvent.click(screen.getByRole('button', { name: 'Everyone' }))
     const total = screen.getByRole('region', { name: 'Total balance' })
-    has(total, '$3,900.00')
+    has(total, '$3,900.00') // + Pat's 400
     has(total, '$3,600.00')
     expect(screen.getByRole('heading', { name: 'Everyone’s accounts' })).toBeInTheDocument()
   })
 
-  it('your accounts: have, owe, and the biggest balances first', async () => {
+  it('your accounts: what you have, biggest first, and a link to all of them', async () => {
     answers()
     await open()
     const yours = screen.getByRole('region', { name: 'Your accounts' })
-    expect(within(yours).getByRole('link', { name: /You have.*\$3,500\.00.*2 accounts/ })).toBeInTheDocument()
-    expect(within(yours).getByRole('link', { name: /You owe.*\$300\.00.*1 account/ })).toBeInTheDocument()
     const names = within(yours)
       .getAllByRole('listitem')
       .map((li) => li.querySelector('.name').textContent)
-    expect(names).toEqual(['Rainy day savings', 'Everyday checking', 'Fake card'])
+    expect(names).toEqual(['Rainy day savings', 'Everyday checking'])
     expect(within(yours).getByRole('link', { name: 'All 3 accounts' })).toBeInTheDocument()
+    const card = screen.getByRole('region', { name: 'Credit card' })
+    expect(within(card).getByText('$300.00')).toBeInTheDocument()
   })
 
-  it('money shared with you is kept apart, per person', async () => {
+  it('money shared with you is kept apart, with whose it is', async () => {
     answers()
     await open()
     const shared = screen.getByRole('region', { name: 'Shared with you' })
-    expect(within(shared).getByText('Pat')).toBeInTheDocument()
-    expect(within(shared).getByText(/Shares balances · 1 account/)).toBeInTheDocument()
+    expect(within(shared).getByText('Pat checking')).toBeInTheDocument()
+    expect(within(shared).getByText(/From Pat/)).toBeInTheDocument()
     expect(within(shared).getByText('$400.00')).toBeInTheDocument()
-    expect(within(shared).getByText('owes nothing')).toBeInTheDocument()
   })
 
-  it('spending this month by category, with shares and counts', async () => {
+  it('spent this month comes from the month summary, not recent transactions (#147)', async () => {
+    routeApi(api, [
+      ['/api/banks', { banks: BANKS }],
+      ['/api/households/hh-1/members', { members: MEMBERS }],
+      ['/api/transactions/summary', { summary: [{ ...SPENDING.summary[0], spent_minor: 237926, money_in_minor: 500000 }] }],
+      ['/api/transactions', { transactions: [] }], // older spending is past the recent list
+    ])
+    await open()
+    expect(screen.getByText(/−\$2,379\.26 spent this month/)).toBeInTheDocument()
+    const month = new Date().toLocaleDateString('en-US', { month: 'long' })
+    expect(within(screen.getByRole('region', { name: `Your spending in ${month}` })).getByText('$2,379.26')).toBeInTheDocument()
+  })
+
+  it('the spending trend asks for everyone without an owner, and one failing half never blanks the other', async () => {
+    const today = new Date().toLocaleDateString('en-CA')
+    routeApi(api, [
+      ['/api/banks', { banks: BANKS }],
+      ['/api/households/hh-1/members', { members: MEMBERS }],
+      ['/api/transactions/summary', SPENDING],
+      // The server rejects owner=all (it isn't a member); yours answers.
+      [/\/api\/transactions\/daily.*owner=all/, Object.assign(new Error('bad_request'), { status: 400 })],
+      [/\/api\/transactions\/daily.*owner=u-me/, { days: [{ date: today, currency: 'USD', amount_minor: 5000 }] }],
+      ['/api/transactions/daily', Object.assign(new Error('internal'), { status: 500 })], // everyone's half fails
+      ['/api/transactions', { transactions: [] }],
+      ['/api/goals', { goals: [] }],
+    ])
+    await open()
+    const daily = api.mock.calls.map(([p]) => p).filter((p) => p.startsWith('/api/transactions/daily'))
+    expect(daily.some((p) => p.includes('owner=all'))).toBe(false)
+    const month = new Date().toLocaleDateString('en-US', { month: 'long' })
+    has(screen.getByRole('region', { name: `Your spending in ${month}` }), '$50')
+  })
+
+  it('nothing spent this month: no figure', async () => {
     answers()
     await open()
-    const month = new Date().toLocaleDateString('en-US', { month: 'long' })
-    const spending = screen.getByRole('region', { name: `Your spending in ${month}` })
-    has(spending, '$60.00')
-    expect(within(spending).getByText('Food and drink')).toBeInTheDocument()
-    expect(within(spending).getByText('100% · 3 purchases')).toBeInTheDocument()
-    expect(
-      within(spending)
-        .getByRole('link', { name: /Food and drink/ })
-        .getAttribute('href'),
-    ).toMatch(/category=FOOD_AND_DRINK&month=\d{4}-\d{2}/)
+    expect(screen.queryByText(/spent this month/)).not.toBeInTheDocument()
   })
 
   it('only owners and adults can link a bank', async () => {
@@ -133,9 +158,23 @@ describe('HomePage', () => {
     expect(screen.getByText('You haven’t linked a bank yet. Use Link a bank above.')).toBeInTheDocument()
   })
 
-  it('says so when the money can’t load', async () => {
+  it('a first load that fails offers Try again, not a loader that never stops (#151)', async () => {
     answers({ error: new Error('internal') })
     await open()
-    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't load your household's money.")
+    expect(screen.getByRole('heading', { name: "We couldn't load your money" })).toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    answers()
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Try again' })))
+    expect(screen.queryByRole('heading', { name: "We couldn't load your money" })).not.toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Your accounts' })).toBeInTheDocument()
+  })
+
+  it('a reload that fails keeps the money on screen, with a banner (#151)', async () => {
+    answers()
+    const { rerender } = await act(async () => render(<HomePage me={me} household={owner} refreshKey={0} onChanged={() => {}} />))
+    answers({ error: new Error('internal') })
+    await act(async () => rerender(<HomePage me={me} household={owner} refreshKey={1} onChanged={() => {}} />))
+    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't update your money just now.")
+    expect(screen.getByRole('region', { name: 'Your accounts' })).toBeInTheDocument()
   })
 })

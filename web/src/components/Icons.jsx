@@ -93,3 +93,9 @@ export const PhoneIcon = (p) => (
     <path d="M11 18h2" />
   </svg>
 )
+// Try again (#151): a circular arrow.
+export const RetryIcon = (p) => (
+  <svg {...base} width={18} height={18} {...p}>
+    <path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4" />
+  </svg>
+)

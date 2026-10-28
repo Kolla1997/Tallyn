@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Failed states draft</title>
+<link rel="stylesheet" href="/web/src/fonts.css" />
+<link rel="stylesheet" href="/web/src/styles.css" />
+<style>
+  :root {
+    --color-clay: #C8553D;
+    --color-sage: #6F9575;
+    --color-clay-deep: #B04A34;
+    --color-sage-deep: #4F7355;
+    --color-sage-light: #A9C5AC;
+    --color-cocoa: #3B2F2F;
+    --color-cream: #F6F1E9;
+    --color-sand: #ECE5D6;
+    --color-white: #FFFFFF;
+    --color-text-secondary: #55494A;
+    --color-border: #DDD3C3;
+    --color-success: #267A4C;
+    --color-warning: #D9962B;
+    --color-error: #B93A32;
+    --font-heading: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Montserrat', system-ui, sans-serif;
+    --font-button: 'Bricolage Grotesque', system-ui, sans-serif;
+    --radius-card: 22px;
+    --radius-button: 999px;
+    --radius-input: 14px;
+    --space-s1: 4px;
+    --space-s2: 8px;
+    --space-s3: 12px;
+    --space-s4: 16px;
+    --space-s5: 24px;
+    --space-s6: 32px;
+    --space-s7: 48px;
+    --space-s8: 64px;
+    --glass-surface: rgba(255, 255, 255, 0.7);
+    --glass-surface-dark: rgba(59, 47, 47, 0.86);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --glass-blur: blur(18px) saturate(1.2);
+    --glow-opacity: 0.55;
+    --card-shade: 0 6px 20px rgba(59, 47, 47, 0.10), 0 1px 3px rgba(59, 47, 47, 0.08);
+  }
+  /* Draft-only layout: tokens only. */
+  .d-intro { max-width: 760px; margin: 0 0 var(--space-s5); }
+  .d-intro p { margin: var(--space-s2) 0 0; }
+  .d-banner-top { background: var(--color-sand); color: var(--color-text-secondary); padding: var(--space-s2) var(--space-s4); font-size: 13px; position: relative; z-index: 2; }
+  .d-opt { margin-bottom: var(--space-s7); }
+  .d-h { font-size: 20px; }
+  .d-why { max-width: 760px; margin: var(--space-s2) 0 var(--space-s4); color: var(--color-text-secondary); }
+  .d-frame { border: 1px dashed var(--color-border); border-radius: var(--radius-card); }
+  .d-frame .content { max-width: none; }
+  .d-start { align-self: flex-start; margin-top: var(--space-s3); }
+  .d-fail { align-items: center; text-align: center; max-width: 520px; margin: var(--space-s5) auto 0; padding: var(--space-s6) var(--space-s5); }
+  .d-fail h2, .d-fail p { margin: 0; }
+  .d-mark { opacity: 0.9; }
+  .d-row .btn { display: inline-flex; gap: var(--space-s2); align-items: center; }
+  .d-caption { text-align: center; margin: var(--space-s5) 0 0; }
+  .d-banner { display: flex; gap: var(--space-s4); align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--color-sand); border-radius: var(--radius-card); padding: var(--space-s3) var(--space-s4); margin-bottom: var(--space-s5); }
+  .d-banner p { margin: 0; color: var(--color-text); }
+  .d-big { font-size: 40px; margin: var(--space-s1) 0; }
+  .d-step { font-weight: 600; margin: var(--space-s5) 0 var(--space-s2); }
+  .d-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-s5); }
+  .d-auth .card { max-width: 440px; }
+  .d-auth .btn { display: inline-flex; gap: var(--space-s2); align-items: center; justify-content: center; }
+  .d-mix { background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: var(--space-s4) var(--space-s5); max-width: 760px; margin-bottom: var(--space-s7); }
+</style>
+</head>
+<body>
+<div class="d-banner-top">Draft for <strong>#151</strong> · not production code · names and amounts are made up</div>
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Main">
+    <div class="sidebar-top"><img class="sidebar-logo" src="/brand/logo/svg/tallyn-lockup-horizontal-light.svg" alt="Tallyn" /></div>
+    <nav class="nav"><a href="#" aria-current="page"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></svg><span>Home</span></a><a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h18M7 15h3M5.5 5.5h13a2.5 2.5 0 0 1 2.5 2.5v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 16V8a2.5 2.5 0 0 1 2.5-2.5z"/></svg><span>Accounts</span></a><a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h14M14.5 4.5 18 8l-3.5 3.5M20 16H6M9.5 12.5 6 16l3.5 3.5"/></svg><span>Transactions</span></a><a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V5M4 19h16M8 15v-4M12 15V8M16 15v-6"/></svg><span>Budgets</span></a><a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 19c.7-3 2.9-4.6 5.5-4.6s4.8 1.6 5.5 4.6M12 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/></svg><span>Family</span></a></nav>
+    <div class="sidebar-bottom"><div class="profile"><button class="profile-card"><span class="avatar" aria-hidden="true">M</span><span class="grow profile-text"><strong class="block">Maya</strong><span class="small muted block">Owner · The Rivera family</span></span></button></div></div>
+  </aside>
+  <div class="app-main">
+    <main class="content">
+      <div class="d-intro">
+        <h1>When a page can't load (#151)</h1>
+        <p class="muted">Today the error shows with a loader that never stops. Option D (the mix) first, then A, B and C it's built from.</p>
+      </div>
+      
+      
+<section class="d-opt" aria-labelledby="opt-D">
+  <h2 class="d-h" id="opt-D">Option D · Mix (recommended)</h2>
+  <p class="d-why">One rule everywhere: <strong>nothing on screen yet</strong> → B's calm card with Try again; <strong>money already on screen</strong> → keep it, with C's sand banner. Sign-in steps use the same card language inside their own card.</p>
+
+  <p class="d-step">D1 · First load fails (Home shown; Accounts, Transactions, Budgets, Debts and Family match)</p>
+  <div class="d-frame"><main class="content"><div class="page-head"><div><h1>The Rivera family</h1><p class="muted">Hello, Maya</p></div><div class="page-actions"><button class="btn">Link a bank</button><button class="btn btn-secondary">Family and sharing</button></div></div>
+<section class="panel d-fail" aria-labelledby="b-h">
+  <img src="/brand/logo/svg/tallyn-mark-light.svg" alt="" width="56" height="56" class="d-mark" />
+  <h2 id="b-h">We couldn't load your money</h2>
+  <p class="muted">Your accounts are safe. This is usually a connection hiccup, so it's worth another try.</p>
+  <div class="d-row"><button class="btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg>Try again</button></div>
+</section>
+</main></div>
+
+  <p class="d-step">D2 · A reload, household switch or Refresh fails while money is on screen</p>
+  <div class="d-frame"><main class="content"><div class="page-head"><div><h1>The Rivera family</h1><p class="muted">Hello, Maya</p></div><div class="page-actions"><button class="btn">Link a bank</button><button class="btn btn-secondary">Family and sharing</button></div></div>
+<div class="d-banner" role="alert"><p>We couldn't update your money just now. You're seeing what we had a moment ago.</p><button class="link">Try again</button></div>
+<div class="cols">
+  <div class="col">
+    <section class="panel"><p class="small muted">Your balance · USD</p><p class="amount d-big">$48,210.55</p><p class="small muted">−$2,379.26 spent this month</p></section>
+    <section class="panel"><h2>Your accounts</h2><p class="muted">Checking, savings and 2 cards</p></section>
+  </div>
+  <div class="col"><section class="panel"><h2>Your spending in October</h2><p class="muted">Food and drink, transport, bills</p></section></div>
+</div></main></div>
+
+  <div class="d-pair">
+    <div>
+      <p class="d-step">D3 · Backup codes couldn't be made (new account)</p>
+      <div class="d-auth"><section class="card">
+        <h1>Save your backup codes</h1>
+        <p class="muted">If you lose your phone, each of these codes gets you in once. Keep them somewhere safe, like a password manager or a printed copy at home.</p>
+        <p class="error" role="alert">We couldn't make your codes. Try again in a moment.</p>
+        <button class="btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg>Try again</button>
+      </section></div>
+      <p class="d-step">D3b · The server wants a fresh code first</p>
+      <div class="d-auth"><section class="card">
+        <h1>Save your backup codes</h1>
+        <p class="muted">That took a little long, so we need one more code from your authenticator app before we make them.</p>
+        <div class="code-field"><span class="code-label"><span class="nowrap">6-digit</span> code</span><div class="code-boxes"><input class="code-box" inputmode="numeric" aria-label="Digit 1 of 6" /><input class="code-box" inputmode="numeric" aria-label="Digit 2 of 6" /><input class="code-box" inputmode="numeric" aria-label="Digit 3 of 6" /><input class="code-box" inputmode="numeric" aria-label="Digit 4 of 6" /><input class="code-box" inputmode="numeric" aria-label="Digit 5 of 6" /><input class="code-box" inputmode="numeric" aria-label="Digit 6 of 6" /></div></div>
+        <button class="btn btn-waiting" disabled>Make my codes</button>
+      </section></div>
+    </div>
+    <div>
+      <p class="d-step">D4 · Joining fails on a network error (invite kept)</p>
+      <div class="d-auth"><section class="card">
+        <h1>You've been invited</h1>
+        <p class="muted">Someone invited you to their household on Tallyn. Joining doesn't share any of your money: you choose that later in Sharing.</p>
+        <p class="error" role="alert">We couldn't reach Tallyn just now. Your invite is still here.</p>
+        <button class="btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg>Try again</button>
+      </section></div>
+      <p class="d-step">D5 · 2FA code check fails on a network error (form no longer locks)</p>
+      <div class="d-auth"><section class="card">
+        <h1>Enter your code</h1>
+        <div class="code-field"><span class="code-label"><span class="nowrap">6-digit</span> code</span><div class="code-boxes"><input value="4" class="code-box" inputmode="numeric" aria-label="Digit 1 of 6" /><input value="4" class="code-box" inputmode="numeric" aria-label="Digit 2 of 6" /><input value="4" class="code-box" inputmode="numeric" aria-label="Digit 3 of 6" /><input value="4" class="code-box" inputmode="numeric" aria-label="Digit 4 of 6" /><input value="4" class="code-box" inputmode="numeric" aria-label="Digit 5 of 6" /><input value="4" class="code-box" inputmode="numeric" aria-label="Digit 6 of 6" /></div></div>
+        <p class="error" role="alert">We couldn't check the code. Try again.</p>
+        <button class="btn">Continue</button>
+      </section></div>
+    </div>
+  </div>
+</section>
+<section class="d-opt" aria-labelledby="opt-A">
+  <h2 class="d-h" id="opt-A">Option A · Error line + Try again</h2>
+  <p class="d-why">Smallest change. Keeps today's red line under the header; the endless loader goes and a secondary Try again button sits under the message. Nothing else on the page.</p>
+  <div class="d-frame"><main class="content"><div class="page-head"><div><h1>The Rivera family</h1><p class="muted">Hello, Maya</p></div><div class="page-actions"><button class="btn">Link a bank</button><button class="btn btn-secondary">Family and sharing</button></div></div>
+<p class="error" role="alert">We couldn't load your household's money. Try again in a moment.</p>
+<button class="btn btn-secondary d-start">Try again</button></main></div>
+</section>
+<section class="d-opt" aria-labelledby="opt-B">
+  <h2 class="d-h" id="opt-B">Option B · Calm glass card</h2>
+  <p class="d-why">The empty content area becomes one glass card: still Tallyn mark, a short heading, a reassuring line and a primary Try again. While retrying the button turns sand ("Trying again…"), the 2FA waiting style from #108.</p>
+  <div class="d-frame"><main class="content"><div class="page-head"><div><h1>The Rivera family</h1><p class="muted">Hello, Maya</p></div><div class="page-actions"><button class="btn">Link a bank</button><button class="btn btn-secondary">Family and sharing</button></div></div>
+<section class="panel d-fail" aria-labelledby="b-h">
+  <img src="/brand/logo/svg/tallyn-mark-light.svg" alt="" width="56" height="56" class="d-mark" />
+  <h2 id="b-h">We couldn't load your money</h2>
+  <p class="muted">Your accounts are safe. This is usually a connection hiccup, so it's worth another try.</p>
+  <div class="d-row"><button class="btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg>Try again</button></div>
+</section>
+<p class="small muted d-caption">While it retries:</p>
+<section class="panel d-fail">
+  <img src="/brand/logo/svg/tallyn-mark-light.svg" alt="" width="56" height="56" class="d-mark" />
+  <h2>We couldn't load your money</h2>
+  <p class="muted">Your accounts are safe. This is usually a connection hiccup, so it's worth another try.</p>
+  <div class="d-row"><button class="btn btn-waiting" disabled>Trying again…</button></div>
+</section></main></div>
+</section>
+<section class="d-opt" aria-labelledby="opt-C">
+  <h2 class="d-h" id="opt-C">Option C · Keep what we had + quiet banner</h2>
+  <p class="d-why">For when a reload or household switch fails after money is already on screen: keep the last numbers and show a solid sand banner above them with a Try again link. Doesn't help a first load (nothing to keep).</p>
+  <div class="d-frame"><main class="content"><div class="page-head"><div><h1>The Rivera family</h1><p class="muted">Hello, Maya</p></div><div class="page-actions"><button class="btn">Link a bank</button><button class="btn btn-secondary">Family and sharing</button></div></div>
+<div class="d-banner" role="alert"><p>We couldn't update your money just now. You're seeing what we had a moment ago.</p><button class="link">Try again</button></div>
+<div class="cols">
+  <div class="col">
+    <section class="panel"><p class="small muted">Your balance · USD</p><p class="amount d-big">$48,210.55</p><p class="small muted">−$2,379.26 spent this month</p></section>
+    <section class="panel"><h2>Your accounts</h2><p class="muted">Checking, savings and 2 cards</p></section>
+  </div>
+  <div class="col"><section class="panel"><h2>Your spending in October</h2><p class="muted">Food and drink, transport, bills</p></section></div>
+</div></main></div>
+</section>
+    </main>
+  </div>
+</div>
+</body>
+</html>

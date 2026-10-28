@@ -1,0 +1,210 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Goal month picker draft</title><link rel="stylesheet" href="/web/src/fonts.css"/><link rel="stylesheet" href="/web/src/styles.css"/>
+<style>
+:root { --color-clay: #C8553D;
+    --color-sage: #6F9575;
+    --color-clay-deep: #B04A34;
+    --color-sage-deep: #4F7355;
+    --color-sage-light: #A9C5AC;
+    --color-cocoa: #3B2F2F;
+    --color-cream: #F6F1E9;
+    --color-sand: #ECE5D6;
+    --color-white: #FFFFFF;
+    --color-text-secondary: #55494A;
+    --color-border: #DDD3C3;
+    --color-success: #267A4C;
+    --color-warning: #D9962B;
+    --color-error: #B93A32;
+    --font-heading: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Montserrat', system-ui, sans-serif;
+    --font-button: 'Bricolage Grotesque', system-ui, sans-serif;
+    --radius-card: 22px;
+    --radius-button: 999px;
+    --radius-input: 14px;
+    --space-s1: 4px;
+    --space-s2: 8px;
+    --space-s3: 12px;
+    --space-s4: 16px;
+    --space-s5: 24px;
+    --space-s6: 32px;
+    --space-s7: 48px;
+    --space-s8: 64px;
+    --glass-surface: rgba(255, 255, 255, 0.7);
+    --glass-surface-dark: rgba(59, 47, 47, 0.86);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --glass-blur: blur(18px) saturate(1.2);
+    --glow-opacity: 0.55;
+    --card-shade: 0 6px 20px rgba(59, 47, 47, 0.10), 0 1px 3px rgba(59, 47, 47, 0.08); }
+html, body { overflow-x: clip; }
+.d-top { background: var(--color-sand); color: var(--color-text-secondary); padding: var(--space-s2) var(--space-s4); font-size: 13px; position: relative; z-index: 2; }
+.d-wrap { max-width: 1100px; margin: 0 auto; padding: var(--space-s6) var(--space-s4); position: relative; z-index: 1; }
+.d-opt { margin-bottom: var(--space-s7); }
+.d-h { font-size: 20px; margin: 0; }
+.d-why { max-width: 760px; color: var(--color-text-secondary); margin: var(--space-s2) 0 var(--space-s4); }
+.d-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-s5); align-items: start; }
+.d-cap { font-size: 13px; color: var(--color-text-secondary); margin: 0 0 var(--space-s2); }
+.sheet { background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-card); padding: var(--space-s5); box-shadow: var(--card-shade); display: flex; flex-direction: column; gap: var(--space-s3); max-width: 420px; }
+.sheet > label > span, .lbl { font-weight: 500; font-size: 14px; }
+/* The field: a button that looks like an input */
+.mfield { display: flex; align-items: center; justify-content: space-between; gap: var(--space-s2); width: 100%; font: inherit; font-size: 14px; text-align: left; color: var(--color-cocoa);
+  background: var(--color-white); border: 1px solid var(--color-border); border-radius: var(--radius-input); padding: var(--space-s3) var(--space-s4); cursor: pointer; min-height: 48px; }
+.mfield:hover { border-color: var(--color-text-secondary); }
+.mfield:focus-visible { outline: 2px solid var(--color-clay-deep); outline-offset: 2px; }
+.mfield[aria-expanded='true'] { border-color: var(--color-cocoa); }
+.mfield .ph { color: var(--color-text-secondary); }
+.mfield .sub { color: var(--color-text-secondary); font-size: 13px; }
+.mfield svg { flex: none; width: 20px; height: 20px; stroke: var(--color-cocoa); fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+/* Popover (solid, like dialogs) */
+.pop { background: var(--color-white); border: 1px solid var(--color-border); border-radius: 18px; box-shadow: var(--card-shade); padding: var(--space-s3); display: flex; flex-direction: column; gap: var(--space-s3); }
+.yr { display: flex; align-items: center; justify-content: space-between; }
+.yr b { font-family: var(--font-heading); font-size: 17px; }
+.step { width: 44px; height: 44px; border-radius: 50%; border: 0; background: transparent; font-size: 20px; color: var(--color-cocoa); cursor: pointer; }
+.step:hover { background: var(--color-sand); } .step:disabled { opacity: .35; cursor: default; background: transparent; }
+.months { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-s1); }
+.m { min-height: 44px; border: 0; border-radius: var(--radius-button); background: transparent; font: inherit; font-size: 14px; color: var(--color-cocoa); cursor: pointer; }
+.m:hover:not(:disabled) { background: var(--color-sand); }
+.m:disabled { color: color-mix(in srgb, var(--color-text-secondary) 45%, var(--color-white)); cursor: default; }
+.m[aria-pressed='true'] { background: var(--color-cocoa); color: var(--color-cream); font-weight: 600; }
+.m.is-now { box-shadow: inset 0 0 0 1px var(--color-border); }
+.m:focus-visible, .step:focus-visible, .qc:focus-visible { outline: 2px solid var(--color-clay-deep); outline-offset: 2px; }
+.pop-foot { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--color-text-secondary); }
+.quick { display: flex; flex-wrap: wrap; gap: var(--space-s2); }
+.qc { min-height: 36px; padding: 0 var(--space-s3); border-radius: var(--radius-button); border: 1px solid var(--color-border); background: var(--color-white); font: inherit; font-size: 13px; color: var(--color-cocoa); cursor: pointer; }
+.qc[aria-pressed='true'] { background: var(--color-cocoa); border-color: var(--color-cocoa); color: var(--color-cream); }
+.selects { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-s2); }
+.hint { font-size: 13px; color: var(--color-text-secondary); margin: 0; }
+/* Radios fix */
+.fills { border: 0; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-s2); }
+.fills legend { font-weight: 600; font-size: 14px; margin-bottom: var(--space-s2); padding: 0; }
+.fill { display: flex; flex-direction: row; align-items: flex-start; gap: var(--space-s3); padding: var(--space-s3); border: 1px solid var(--color-border); border-radius: var(--radius-input); cursor: pointer; font-weight: 400; }
+.fill:has(input:checked) { border-color: var(--color-cocoa); box-shadow: inset 0 0 0 1px var(--color-cocoa); }
+.fill input { padding: 0; margin: 2px 0 0; width: 18px; height: 18px; flex: none; accent-color: var(--color-cocoa); }
+.fill b { display: block; font-weight: 600; } .fill small { color: var(--color-text-secondary); font-size: 13px; }
+.bad .bradio { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 14px; }
+.bad .bradio input { padding: 12px 16px; border: 1px solid var(--color-border); border-radius: 14px; }
+.made { font-size: 12px; color: var(--color-text-secondary); }
+</style></head><body>
+<div class="d-top">Draft · #14 Savings goals · the "By" month field in the goal dialog · Made-up: the goal and dates (today is 24 Oct 2026)</div>
+<main class="d-wrap">
+  <h1 style="margin:0 0 var(--space-s2)">The "By" month: options</h1>
+  <p class="d-why">Today it is the browser's own month box: dashes, a tiny icon, and a different popup in every browser (Safari on iPhone shows a wheel, Chrome a calendar of days). A goal needs a month, not a day, so a calendar of days is the wrong tool anyway. All options below are clickable.</p>
+
+  <section class="d-opt">
+    <h2 class="d-h">A · Tidy field, browser popup</h2>
+    <p class="d-why">Keeps the browser's picker but the field reads in words: "Any time" or "June 2027", with Tallyn's calendar icon. Smallest change; the popup still looks different per browser.</p>
+    <div class="d-grid"><div class="sheet">
+      <span class="lbl">By (optional)</span>
+      <label style="position:relative"><span class="sr-only">By month</span>
+        <button type="button" class="mfield" id="a-btn"><span class="ph" id="a-txt">Any time</span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
+        <input type="month" id="a-in" min="2026-11" style="position:absolute;opacity:0;pointer-events:none;inset:0;padding:0"/>
+      </label>
+    </div></div>
+  </section>
+
+  <section class="d-opt">
+    <h2 class="d-h">B · Month grid (like Apple Calendar's month view)</h2>
+    <p class="d-why">The field opens a small Tallyn panel: the year with arrows, then 12 months. Past months are greyed out, this month has a ring. "No date" clears it. Same look in every browser, big targets for thumbs.</p>
+    <div class="d-grid"><div class="sheet">
+      <span class="lbl">By (optional)</span>
+      <button type="button" class="mfield" aria-expanded="true" data-pick="b"><span class="ph" data-txt>Any time</span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
+      <div class="pop" data-pop="b"></div>
+    </div></div>
+  </section>
+
+  <section class="d-opt">
+    <h2 class="d-h">C · Quick picks (like Google's "remind me" chips)</h2>
+    <p class="d-why">Most goals are "in about a year". Chips set it in one tap; "Pick a month" shows two plain menus (month, year).</p>
+    <div class="d-grid"><div class="sheet">
+      <span class="lbl">By (optional)</span>
+      <div class="quick" data-quick="c"></div>
+      <div class="selects" data-sel="c" hidden>
+        <label>Month<select data-m></select></label><label>Year<select data-y></select></label>
+      </div>
+      <p class="hint" data-hint="c">No date: Tallyn won't say how much to put aside each month.</p>
+    </div></div>
+  </section>
+
+  <section class="d-opt">
+    <h2 class="d-h">Mix (recommended)</h2>
+    <p class="d-why"><b>Field from A</b> (reads in words, and adds how far away it is: "June 2027 · 8 months away"). <b>Panel from B</b> (year arrows and the month grid, same in every browser). <b>Chips from C</b> on top of the grid, for the one-tap "1 year". The grid shows which month a chip picked, so nothing is hidden.</p>
+    <div class="d-grid"><div class="sheet">
+      <span class="lbl">By (optional)</span>
+      <button type="button" class="mfield" aria-expanded="true" data-pick="x"><span data-txt class="ph">Any time</span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></button>
+      <div class="pop" data-pop="x" data-chips></div>
+    </div></div>
+  </section>
+
+  <section class="d-opt">
+    <h2 class="d-h">Also: "How it fills" (a bug, one fix)</h2>
+    <p class="d-why">The radio buttons pick up the text box padding, so each sits on its own line, centered above its words (left, as in your screenshot). Fix: two left-aligned choices with a one-line hint each; the picked one gets a dark outline. The account menu shows under "Follow a savings account" when it's picked, as now.</p>
+    <div class="d-grid">
+      <div><p class="d-cap">Now</p><div class="sheet bad"><span class="lbl">How it fills</span>
+        <label class="bradio"><input type="radio" name="bad" checked/>Follow a savings account</label>
+        <label class="bradio"><input type="radio" name="bad"/>I'll update it myself</label></div></div>
+      <div><p class="d-cap">Fixed</p><div class="sheet"><fieldset class="fills"><legend>How it fills</legend>
+        <label class="fill"><input type="radio" name="good" checked/><span><b>Follow a savings account</b><small>Fills on its own from the balance.</small></span></label>
+        <label class="fill"><input type="radio" name="good"/><span><b>I'll update it myself</b><small>For cash, or money Tallyn can't see.</small></span></label>
+      </fieldset></div></div>
+    </div>
+  </section>
+  <p class="made">Made up: the dates and hints are drafts; today is fixed at 24 October 2026.</p>
+</main>
+<script>
+const NOW = { y: 2026, m: 9 } // October (0-based)
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+const LONG = ['January','February','March','April','May','June','July','August','September','October','November','December']
+const idx = (y, m) => y * 12 + m
+const away = (y, m) => { const n = idx(y, m) - idx(NOW.y, NOW.m); return n >= 12 && n % 12 === 0 ? `${n/12} year${n>12?'s':''} away` : `${n} month${n>1?'s':''} away` }
+const QUICK = [['No date', 0], ['6 months', 6], ['1 year', 12], ['2 years', 24]]
+
+// A
+const aIn = document.getElementById('a-in'), aTxt = document.getElementById('a-txt')
+document.getElementById('a-btn').onclick = () => { try { aIn.showPicker() } catch { aIn.focus() } }
+aIn.onchange = () => { if (!aIn.value) return; const [y, m] = aIn.value.split('-').map(Number); aTxt.textContent = `${LONG[m-1]} ${y}`; aTxt.className = '' }
+
+// B and Mix
+function picker(key, chips) {
+  const btn = document.querySelector(`[data-pick="${key}"]`), txt = btn.querySelector('[data-txt]'), pop = document.querySelector(`[data-pop="${key}"]`)
+  let year = NOW.y + 1, sel = null
+  btn.onclick = () => { const open = btn.getAttribute('aria-expanded') !== 'true'; btn.setAttribute('aria-expanded', open); pop.hidden = !open }
+  function draw() {
+    const n = sel ? idx(sel.y, sel.m) - idx(NOW.y, NOW.m) : 0
+    pop.innerHTML = (chips ? `<div class="quick">${QUICK.map(([l, k]) => `<button type="button" class="qc" aria-pressed="${k === 0 ? !sel : n === k}" data-k="${k}">${l}</button>`).join('')}</div>` : '') +
+      `<div class="yr"><button type="button" class="step" data-d="-1" aria-label="Previous year" ${year <= NOW.y ? 'disabled' : ''}>‹</button><b>${year}</b><button type="button" class="step" data-d="1" aria-label="Next year" ${year >= NOW.y + 10 ? 'disabled' : ''}>›</button></div>` +
+      `<div class="months">${MON.map((s, m) => `<button type="button" class="m${year === NOW.y && m === NOW.m ? ' is-now' : ''}" data-m="${m}" aria-label="${LONG[m]} ${year}" aria-pressed="${!!sel && sel.y === year && sel.m === m}" ${idx(year, m) <= idx(NOW.y, NOW.m) ? 'disabled' : ''}>${s}</button>`).join('')}</div>` +
+      (chips ? '' : `<div class="pop-foot"><span>${sel ? away(sel.y, sel.m) : 'No month picked'}</span><button type="button" class="link" data-clear>No date</button></div>`)
+    if (sel) { txt.className = ''; txt.innerHTML = `${LONG[sel.m]} ${sel.y}${chips ? ` <span class="sub">· ${away(sel.y, sel.m)}</span>` : ''}` } else { txt.className = 'ph'; txt.textContent = 'Any time' }
+  }
+  pop.onclick = (e) => {
+    const t = e.target.closest('button'); if (!t) return
+    if (t.dataset.d) year += +t.dataset.d
+    else if (t.dataset.m) sel = { y: year, m: +t.dataset.m }
+    else if ('clear' in t.dataset) sel = null
+    else if (t.dataset.k != null) { const k = +t.dataset.k; if (!k) sel = null; else { const i = idx(NOW.y, NOW.m) + k; sel = { y: Math.floor(i / 12), m: i % 12 }; year = sel.y } }
+    draw()
+  }
+  draw()
+}
+picker('b', false); picker('x', true)
+
+// C
+;(() => {
+  const q = document.querySelector('[data-quick="c"]'), s = document.querySelector('[data-sel="c"]'), h = document.querySelector('[data-hint="c"]')
+  const ms = s.querySelector('[data-m]'), ys = s.querySelector('[data-y]')
+  ms.innerHTML = LONG.map((l, i) => `<option value="${i}">${l}</option>`).join(''); ys.innerHTML = Array.from({ length: 10 }, (_, i) => `<option>${NOW.y + i}</option>`).join('')
+  let pick = 0
+  const say = (y, m) => { h.textContent = `By ${LONG[m]} ${y}, ${away(y, m)}.` }
+  function draw() {
+    q.innerHTML = [...QUICK, ['Pick a month', -1]].map(([l, k]) => `<button type="button" class="qc" aria-pressed="${pick === k}" data-k="${k}">${l}</button>`).join('')
+    s.hidden = pick !== -1
+    if (pick === 0) h.textContent = "No date: Tallyn won't say how much to put aside each month."
+    else if (pick > 0) { const i = idx(NOW.y, NOW.m) + pick; say(Math.floor(i / 12), i % 12) }
+    else say(+ys.value, +ms.value)
+  }
+  q.onclick = (e) => { const t = e.target.closest('button'); if (t) { pick = +t.dataset.k; draw() } }
+  ms.onchange = ys.onchange = draw
+  ys.value = NOW.y + 1; ms.value = 5; draw()
+})()
+</script>
+</body></html>

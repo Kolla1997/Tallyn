@@ -13,6 +13,7 @@ import Home from './screens/Home.jsx'
 import TallynLoader from './components/TallynLoader.jsx'
 import ConsentGate from './components/ConsentGate.jsx'
 import { usePath } from './lib/router.jsx'
+import Heading from './components/Heading.jsx'
 
 // Loaded only when needed (#99): the legal pages and first-time 2FA setup.
 const LegalPage = lazy(() => import('./screens/LegalPage.jsx'))
@@ -150,7 +151,7 @@ function AuthFlow() {
 function NotConfigured() {
   return (
     <section className="card">
-      <h1>Almost there</h1>
+      <Heading>Almost there</Heading>
       <p className="muted">
         Sign-in isn&apos;t set up yet. Copy <code>web/.env.example</code> to <code>web/.env.local</code> and add your Supabase project URL and publishable key.
       </p>

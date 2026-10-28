@@ -2,8 +2,8 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-16
-issues: [5, 6, 7, 8, 9, 30, 99]
+updated: 2026-10-24
+issues: [5, 6, 7, 8, 9, 30, 99, 113]
 tags: [tech, onboarding]
 ---
 
@@ -59,6 +59,22 @@ The app never logs in as `postgres` (ADR 0006). After running `migrations/0006_a
 3. For testing, `SYNC_EVERY=2m` in `.env` makes it sync more often (minimum 1m)
 4. A new link syncs within a minute or two; the log shows counts only (`sync: bank <id>: 16 added or changed, ...`)
 
+## Savings goals (#14)
+1. Run `migrations/0018_goals.sql` on the Supabase project, after 0001–0017
+2. Goals that follow an account get their monthly history from the bank sync's daily job, so `DATABASE_URL_SYNC` must be set where it should run. The forecast shows after a goal's second month
+
+## Plan from your income (#133)
+1. Run `migrations/0017_income_plans.sql` on the Supabase project, after 0001–0016
+2. Budgets → Plan your month suggests an income from the last 3 full months of pay. Sandbox banks have little pay history, so expect "no suggestion" and type one in
+
+## Closing an account (#56)
+1. Run `migrations/0016_close_account.sql` on the Supabase project, after 0001–0015
+2. Closing needs bank linking set up (Plaid keys and `TOKEN_ENCRYPTION_KEY`) and `SUPABASE_SERVICE_ROLE_KEY`; without them, Close account answers 503
+3. Closing records older than 3 years are purged daily by the bank sync, so `DATABASE_URL_SYNC` must be set where it should run ([[0015-closing-an-account]])
+
+> [!warning] Closing can't be undone
+> Try it only with test accounts. It unlinks the banks at Plaid (sandbox in dev) and deletes the Supabase sign-in.
+
 ## Supabase Auth settings (#7)
 In the Supabase dashboard, for each project (dev and prod). See [[Feature - Auth]].
 - Auth → Providers → Email: on, with **Confirm email** on, and **minimum password length 8** (#22; the app asks for 8 too)
@@ -72,11 +88,34 @@ In the Supabase dashboard, for each project (dev and prod). See [[Feature - Auth
 
 To try the single-deployment setup: `cd web && npm run build`, then `go run ./cmd/server` serves the built app from `web/dist`.
 
+## Browser end-to-end tests (#113)
+The P0 paths (sign-in with 2FA, Home totals, connecting a sandbox bank, inviting a member, sharing) in a real browser, against the Go API, a **Supabase project just for tests** and the Plaid sandbox. They run nightly and by hand (GitHub → Actions → **End-to-end** → Run workflow), never on pull requests. Rows in [[Test Plan]].
+
+> [!warning] Test project only
+> Never point these at tallyn-dev or production. Each test makes its own people (`e2e-…@example.test`) with the project's secret key, and deletes them afterwards. Households they made stay behind, empty.
+
+**Set up the test project once:**
+1. Create a new Supabase project (e.g. `tallyn-e2e`) and set it up like the others: migrations in order, Auth settings and database logins (sections above). Plaid stays on **sandbox**.
+2. Add these **repository secrets** (Settings → Secrets and variables → Actions). Values come from the test project and the Plaid dashboard, never from chat or the repo:
+
+| Secret | What it is |
+|---|---|
+| `E2E_SUPABASE_URL` | The test project's URL |
+| `E2E_SUPABASE_PUBLISHABLE_KEY` | Its publishable key |
+| `E2E_SUPABASE_SECRET_KEY` | Its secret key: makes and deletes test people, and the server uses it for backup-code recovery |
+| `E2E_DATABASE_URL` | `tallyn_api` login for the test project |
+| `E2E_DATABASE_URL_SYNC` | `tallyn_sync` login for the test project |
+| `E2E_PLAID_CLIENT_ID` / `E2E_PLAID_SECRET` | Plaid client ID and **sandbox** secret |
+| `E2E_TOKEN_ENCRYPTION_KEY` | A test-only key: `openssl rand -base64 32` |
+
+**Run locally:** export the same `E2E_*` values in your shell (not in a file in the repo), then `cd web && npx playwright install chromium && npm run test:e2e`. It builds the app, starts the Go server on port 8090 and runs the tests one at a time. Failures keep screenshots and traces in `web/test-results-e2e/`.
+
 ## Common tasks
 | Task | Command |
 |---|---|
 | Sync board into docs | Automatic (hourly GitHub Action, `git pull` to get it). By hand: `python3 scripts/sync_board.py` |
 | Test | `go test ./...` (database tests skip unless `TALLYN_TEST_DATABASE_URL` is set) |
+| Browser end-to-end tests | `cd web && npm run test:e2e` (needs the `E2E_*` values, above) |
 | Test the schema and RLS | Start a throwaway Postgres: `docker run --rm -d -p 5433:5432 -e POSTGRES_PASSWORD=postgres postgres:16`, then `TALLYN_TEST_DATABASE_URL=postgres://postgres:postgres@localhost:5433/postgres go test ./internal/db`. Without Docker, Homebrew `postgresql@16` works too (steps in [PR #20](https://github.com/Kolla1997/Tallyn/pull/20)) |
 | Lint | `go vet ./...` and `gofmt -l cmd internal`; web: `cd web && npm run lint` (ESLint, #100) |
 | Format the web app | `cd web && npm run format` (Prettier: single quotes, no semicolons; check with `npm run format:check`) |

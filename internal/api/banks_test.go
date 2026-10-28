@@ -29,6 +29,42 @@ const (
 type stubStore struct{}
 
 func (stubStore) Me(context.Context, string) (db.Me, error) { return db.Me{}, errors.New("stub") }
+func (stubStore) Export(context.Context, string) (db.Export, error) {
+	return db.Export{}, errors.New("stub")
+}
+func (stubStore) ClosingBlocker(context.Context, string) (string, error) {
+	return "", errors.New("stub")
+}
+func (stubStore) ClosingBanks(context.Context, string) ([]db.ClosingBank, error) {
+	return nil, errors.New("stub")
+}
+func (stubStore) PrepareClosing(context.Context, string, []byte) error { return errors.New("stub") }
+func (stubStore) Plans(context.Context, string, string, time.Time) ([]db.Plan, error) {
+	return nil, errors.New("stub")
+}
+func (stubStore) PlanSuggestion(context.Context, string, string, string, time.Time) (int64, error) {
+	return 0, errors.New("stub")
+}
+func (stubStore) SavePlan(context.Context, string, string, db.NewPlan) (string, error) {
+	return "", errors.New("stub")
+}
+func (stubStore) DeletePlan(context.Context, string, string) error { return errors.New("stub") }
+func (stubStore) RenameHousehold(context.Context, string, string, string) (string, error) {
+	return "", errors.New("stub")
+}
+func (stubStore) Goals(context.Context, string, string) ([]db.Goal, error) {
+	return nil, errors.New("stub")
+}
+func (stubStore) CreateGoal(context.Context, string, string, db.NewGoal) (string, error) {
+	return "", errors.New("stub")
+}
+func (stubStore) UpdateGoal(context.Context, string, string, db.NewGoal) error {
+	return errors.New("stub")
+}
+func (stubStore) SetGoalSaved(context.Context, string, string, int64, time.Time) error {
+	return errors.New("stub")
+}
+func (stubStore) DeleteGoal(context.Context, string, string) error { return errors.New("stub") }
 func (stubStore) CreateHousehold(context.Context, string, string, string) (db.MyHousehold, error) {
 	return db.MyHousehold{}, errors.New("stub")
 }

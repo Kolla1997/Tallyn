@@ -60,8 +60,9 @@ describe('FamilyPage', () => {
   it('what Pat shares with you, and the switches for what you share', async () => {
     answers({ received: ['balances', 'transactions'] })
     await open()
-    expect(within(person()).getByText('✓ Balances')).toBeInTheDocument()
-    expect(within(person()).getByText('✓ Transactions')).toBeInTheDocument()
+    const theirs = within(within(person()).getByRole('list', { name: 'Pat shares with you' }))
+    expect(theirs.getByText('Balances')).toBeInTheDocument()
+    expect(theirs.getByText('Transactions')).toBeInTheDocument()
     expect(within(person()).getByRole('switch', { name: 'Balances' })).not.toBeChecked()
     // Time and location only together with transactions.
     expect(within(person()).getByRole('switch', { name: 'Time and location' })).toBeDisabled()

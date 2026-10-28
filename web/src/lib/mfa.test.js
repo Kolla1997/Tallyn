@@ -45,4 +45,9 @@ describe('mfa', () => {
     mfa.challengeAndVerify.mockResolvedValue({ error: new Error('Invalid TOTP code') })
     expect(await verifyCode('000000', ['a', 'c'])).toBe(false)
   })
+
+  it('not reaching Supabase throws instead of saying the code was wrong (#151)', async () => {
+    mfa.challengeAndVerify.mockResolvedValue({ error: Object.assign(new Error('Failed to fetch'), { name: 'AuthRetryableFetchError' }) })
+    await expect(verifyCode('123456', ['a'])).rejects.toThrow('Failed to fetch')
+  })
 })

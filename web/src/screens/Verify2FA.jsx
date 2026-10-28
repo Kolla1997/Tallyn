@@ -3,6 +3,8 @@ import { LockIcon } from '../components/Icons.jsx'
 import { verifiedAuthenticators } from '../lib/mfa.js'
 import { UseBackupCode } from './BackupCodes.jsx'
 import CodeForm from './CodeForm.jsx'
+import { TryAgain } from '../components/LoadFailed.jsx'
+import Heading from '../components/Heading.jsx'
 
 // Later sign-ins: the password was right, now the authenticator code (any of
 // your authenticators, #23).
@@ -12,22 +14,35 @@ import CodeForm from './CodeForm.jsx'
 export default function Verify2FA({ onSignOut, recovering = false, onCancelReset }) {
   const [factorIds, setFactorIds] = useState(null)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const [help, setHelp] = useState(false)
   const [backup, setBackup] = useState(false)
   const helpId = useId()
 
-  useEffect(() => {
+  // Can fail to load (#152): calm words and Try again, never Supabase's text.
+  const load = () =>
     verifiedAuthenticators().then(
       (list) => setFactorIds(list.map((f) => f.id)),
-      (e) => setError(e.message),
+      (e) => {
+        console.error(e)
+        setError("We couldn't load your sign-in step. Try again in a moment.")
+      },
     )
+  function retry() {
+    setLoading(true)
+    setError('')
+    load().finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    load()
   }, [])
 
   if (backup) return <UseBackupCode onBack={() => setBackup(false)} />
 
   return (
     <section className="card">
-      <h1>Enter your code</h1>
+      <Heading>Enter your code</Heading>
       {recovering && (
         <p className="info-note">
           <LockIcon />
@@ -42,6 +57,7 @@ export default function Verify2FA({ onSignOut, recovering = false, onCancelReset
           {error}
         </p>
       )}
+      {error && !factorIds && <TryAgain busy={loading} onRetry={retry} />}
       {factorIds?.length > 0 && <CodeForm factorIds={factorIds} button="Continue" />}
       {help && (
         <div id={helpId} className="code-help">

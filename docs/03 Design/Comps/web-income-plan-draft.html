@@ -1,0 +1,146 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Income plan draft</title><link rel="stylesheet" href="/web/src/fonts.css"/><link rel="stylesheet" href="/web/src/styles.css"/>
+<style>
+:root { --color-clay: #C8553D;
+    --color-sage: #6F9575;
+    --color-clay-deep: #B04A34;
+    --color-sage-deep: #4F7355;
+    --color-sage-light: #A9C5AC;
+    --color-cocoa: #3B2F2F;
+    --color-cream: #F6F1E9;
+    --color-sand: #ECE5D6;
+    --color-white: #FFFFFF;
+    --color-text-secondary: #55494A;
+    --color-border: #DDD3C3;
+    --color-success: #267A4C;
+    --color-warning: #D9962B;
+    --color-error: #B93A32;
+    --font-heading: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Montserrat', system-ui, sans-serif;
+    --font-button: 'Bricolage Grotesque', system-ui, sans-serif;
+    --radius-card: 22px;
+    --radius-button: 999px;
+    --radius-input: 14px;
+    --space-s1: 4px;
+    --space-s2: 8px;
+    --space-s3: 12px;
+    --space-s4: 16px;
+    --space-s5: 24px;
+    --space-s6: 32px;
+    --space-s7: 48px;
+    --space-s8: 64px;
+    --glass-surface: rgba(255, 255, 255, 0.7);
+    --glass-surface-dark: rgba(59, 47, 47, 0.86);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    --glass-blur: blur(18px) saturate(1.2);
+    --glow-opacity: 0.55;
+    --card-shade: 0 6px 20px rgba(59, 47, 47, 0.10), 0 1px 3px rgba(59, 47, 47, 0.08); }
+.d-top { background: var(--color-sand); color: var(--color-text-secondary); padding: var(--space-s2) var(--space-s4); font-size: 13px; position: relative; z-index: 2; }
+.d-wrap { max-width: 1100px; margin: 0 auto; padding: var(--space-s6) var(--space-s4); position: relative; z-index: 1; }
+.d-opt { margin-bottom: var(--space-s7); } .d-h { font-size: 20px; }
+.d-why { max-width: 760px; color: var(--color-text-secondary); margin: var(--space-s2) 0 var(--space-s4); }
+.d-frame { border: 1px dashed var(--color-border); border-radius: var(--radius-card); padding: var(--space-s4); }
+.d-gap { height: var(--space-s4); }
+.d-planhead { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-s4); flex-wrap: wrap; }
+.d-planhead p { margin: 0; }
+.d-income { font-family: var(--font-heading); font-weight: 700; font-size: 34px; font-variant-numeric: tabular-nums; }
+.d-tmpl { background: var(--color-sand); border-radius: var(--radius-button); padding: 3px 10px; }
+.d-split { display: flex; gap: 3px; height: 14px; }
+.d-split-big { height: 22px; }
+.d-seg { position: relative; border-radius: 6px; overflow: hidden; background: color-mix(in srgb, var(--c) 22%, var(--color-white)); }
+.d-seg i { position: absolute; inset: 0 auto 0 0; background: var(--c); }
+.d-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.d-row { display: flex; align-items: center; gap: var(--space-s3); padding: var(--space-s3) 0; border-top: 1px solid var(--color-border); }
+.d-row:first-child { border-top: 0; }
+.d-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); flex: none; }
+.d-nums { text-align: right; }
+.d-done { color: var(--color-sage-deep); }
+.d-fill { height: 14px; border-radius: 7px; overflow: hidden; background: color-mix(in srgb, var(--c) 22%, var(--color-white)); margin: 22px 0; }
+.d-fill i { display: block; height: 100%; background: var(--c); border-radius: 7px; }
+.d-cant { margin: 0; }
+.d-legend { display: flex; flex-wrap: wrap; gap: var(--space-s3); }
+.d-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.d-legend b { width: 10px; height: 10px; border-radius: 50%; background: var(--c); display: inline-block; }
+.d-ringwrap { display: grid; grid-template-columns: 180px 1fr; gap: var(--space-s5); align-items: center; }
+@media (max-width: 640px) { .d-ringwrap { grid-template-columns: 1fr; justify-items: center; } }
+.d-ringbig { font-family: var(--font-heading); font-weight: 700; font-size: 18px; fill: var(--color-cocoa); }
+.d-ringsmall { font-size: 10px; fill: var(--color-text-secondary); }
+.d-tcards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--space-s3); }
+.d-tcard { display: flex; flex-direction: column; gap: var(--space-s2); padding: var(--space-s3) var(--space-s4); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-white); cursor: pointer; }
+.d-tcard.is-on { border: 2px solid var(--color-clay-deep); }
+.d-tcard input { position: absolute; opacity: 0; }
+.d-mini { display: flex; gap: 2px; height: 8px; } .d-mini span { border-radius: 4px; }
+</style></head><body>
+<div class="d-top">Draft for <strong>#133</strong> · not production code · all amounts are made up (income $6,400, day 24 of October)</div>
+<div class="d-wrap">
+<h1>Plan from your income (#133)</h1>
+<p class="muted">Sits above your category budgets on the Budgets page. First, setting it up (same in every option), then four ways to show it during the month.</p>
+<section class="d-opt" id="setup"><h2 class="d-h">Setting it up</h2><p class="d-why">Income suggested from the last 3 full months of pay, editable; three templates; "not advice" in plain words.</p><div class="d-frame"><section class="panel"><h2>Plan your month</h2>
+<p class="muted">Give every dollar a job. Start from your income, then pick a common way to split it. You can change every amount.</p>
+<label>Monthly income<input value="6,400" inputmode="decimal"/></label>
+<p class="small muted">Suggested from your pay in July–September. Tax refunds and one-offs are left out.</p>
+<div class="d-tcards"><label class="d-tcard is-on"><input type="radio" name="t" checked/><span class="name block">55 / 5 / 10 / 15 / 15</span><span class="d-mini"><span style="flex:55;background:var(--color-cocoa)"></span><span style="flex:5;background:var(--color-clay)"></span><span style="flex:10;background:var(--color-clay-deep)"></span><span style="flex:15;background:var(--color-sage)"></span><span style="flex:15;background:var(--color-sage-deep)"></span></span></label><label class="d-tcard"><input type="radio" name="t" /><span class="name block">50 / 30 / 20</span><span class="d-mini"><span style="flex:50;background:var(--color-cocoa)"></span><span style="flex:30;background:var(--color-clay)"></span><span style="flex:20;background:var(--color-sage-deep)"></span></span></label><label class="d-tcard"><input type="radio" name="t" /><span class="name block">Your own</span><span class="d-mini"><span style="flex:100;background:var(--color-sand)"></span></span></label></div>
+<p class="small muted">A common way to split income, not financial advice.</p>
+<div><button class="btn">Start my plan</button></div></section></div></section>
+<section class="d-opt" id="opt-A"><h2 class="d-h">Option A · Split bar and list</h2><p class="d-why">One glass card: income on top, one bar split into the five jobs (each part fills as the month goes), then a row per bucket with what's left. Calm and compact; the least new to learn.</p><div class="d-frame"><section class="panel"><div class="d-planhead">
+  <div><p class="small muted">Your plan for October · day 24 of 31</p>
+  <p class="d-income">$6,400 <span class="small muted">a month</span></p>
+  <p class="small muted">Suggested from your pay in July–September · <button class="link small">Change</button></p></div>
+  <span class="small muted d-tmpl">55 / 5 / 10 / 15 / 15</span>
+</div><div class="d-split d-split-big" aria-hidden="true"><span class="d-seg" style="flex:55;--c:var(--color-cocoa)"><i style="width:79%"></i></span><span class="d-seg" style="flex:5;--c:var(--color-clay)"><i style="width:100%"></i></span><span class="d-seg" style="flex:10;--c:var(--color-clay-deep)"><i style="width:94%"></i></span><span class="d-seg" style="flex:15;--c:var(--color-sage)"><i style="width:42%"></i></span><span class="d-seg" style="flex:15;--c:var(--color-sage-deep)"><i style="width:100%"></i></span></div><ul class="d-rows"><li class="d-row"><span class="d-dot" style="--c:var(--color-cocoa)"></span>
+        <span class="grow"><span class="name block">Essentials <span class="small muted">55%</span></span><span class="small muted block">Rent, groceries, bills, transport</span></span>
+        <span class="d-nums"><span class="budget-left">$740 left</span><span class="small muted block">$2,780 of $3,520</span></span></li><li class="d-row"><span class="d-dot" style="--c:var(--color-clay)"></span>
+        <span class="grow"><span class="name block">Guilt-free <span class="small muted">5%</span></span><span class="small muted block">Eating out, fun, shopping</span></span>
+        <span class="d-nums"><span class="budget-left is-over">$45 over</span><span class="small muted block">$365 of $320</span></span></li><li class="d-row"><span class="d-dot" style="--c:var(--color-clay-deep)"></span>
+        <span class="grow"><span class="name block">Debt / Invest <span class="small muted">10%</span></span><span class="small muted block">Loan payments (not card bills)</span></span>
+        <span class="d-nums"><span class="budget-left">$40 to go</span><span class="small muted block">$600 of $640</span></span></li><li class="d-row"><span class="d-dot" style="--c:var(--color-sage)"></span>
+        <span class="grow"><span class="name block">Short-term goals <span class="small muted">15%</span></span><span class="small muted block">Moved to savings</span></span>
+        <span class="d-nums"><span class="budget-left">$560 to go</span><span class="small muted block">$400 of $960</span></span></li><li class="d-row"><span class="d-dot" style="--c:var(--color-sage-deep)"></span>
+        <span class="grow"><span class="name block">Long-term wealth <span class="small muted">15%</span></span><span class="small muted block">Moved to investments</span></span>
+        <span class="d-nums"><span class="budget-left d-done">Done</span><span class="small muted block">$960 of $960</span></span></li></ul><p class="small muted d-cant">Tallyn can only see what reaches your bank. Retirement taken from your pay first, like a 401(k), isn't counted here.</p></section></div></section><section class="d-opt" id="opt-B"><h2 class="d-h">Option B · Bucket tiles</h2><p class="d-why">The five buckets as tiles, like your household budgets: a pace line for the spending buckets, a fill bar for money you move. Most detail; takes the most room.</p><div class="d-frame"><section class="panel"><div class="d-planhead">
+  <div><p class="small muted">Your plan for October · day 24 of 31</p>
+  <p class="d-income">$6,400 <span class="small muted">a month</span></p>
+  <p class="small muted">Suggested from your pay in July–September · <button class="link small">Change</button></p></div>
+  <span class="small muted d-tmpl">55 / 5 / 10 / 15 / 15</span>
+</div><p class="small muted d-cant">Tallyn can only see what reaches your bank. Retirement taken from your pay first, like a 401(k), isn't counted here.</p></section><div class="d-gap"></div><div class="budget-tiles"><article class="budget-tile"><div class="budget-top"><span class="d-dot" style="--c:var(--color-cocoa)"></span><h3>Essentials</h3><span class="pace pace-on">On pace</span></div>
+        <div class="budget-nums"><span class="budget-left">$740 left</span><span class="small muted">$2,780 of $3,520</span></div><svg class="pace-line tone-line-on" viewBox="0 0 260 58" preserveAspectRatio="none" aria-hidden="true">
+<line x1="4.0" y1="7.7037037037037095" x2="256.0" y2="7.7037037037037095" class="pace-limit"/><line x1="4.0" y1="54.0" x2="256.0" y2="7.7037037037037095" class="pace-even"/>
+<polyline points="4.0,54.0 28.4,50.3 52.8,46.0 77.2,41.6 101.5,36.9 125.9,32.2 150.3,27.4 174.7,22.4 199.1,17.4 199.1,17.4" class="pace-spent"/><circle cx="199.1" cy="17.4" r="3.5" class="pace-dot"/></svg><span class="small muted">Rent, groceries, bills, transport</span></article><article class="budget-tile"><div class="budget-top"><span class="d-dot" style="--c:var(--color-clay)"></span><h3>Guilt-free</h3><span class="pace pace-over">Over</span></div>
+        <div class="budget-nums"><span class="budget-left is-over">$45 over</span><span class="small muted">$365 of $320</span></div><svg class="pace-line tone-line-over" viewBox="0 0 260 58" preserveAspectRatio="none" aria-hidden="true">
+<line x1="4.0" y1="13.411466260781332" x2="256.0" y2="13.411466260781332" class="pace-limit"/><line x1="4.0" y1="54.0" x2="256.0" y2="13.411466260781332" class="pace-even"/>
+<polyline points="4.0,54.0 28.4,49.3 52.8,43.9 77.2,38.3 101.5,32.4 125.9,26.4 150.3,20.3 174.7,14.0 199.1,7.7 199.1,7.7" class="pace-spent"/><circle cx="199.1" cy="7.7" r="3.5" class="pace-dot"/></svg><span class="small muted">Eating out, fun, shopping</span></article><article class="budget-tile"><div class="budget-top"><span class="d-dot" style="--c:var(--color-clay-deep)"></span><h3>Debt / Invest</h3><span class="pace pace-full">On its way</span></div>
+        <div class="budget-nums"><span class="budget-left">$40 to go</span><span class="small muted">$600 of $640</span></div><div class="d-fill" style="--c:var(--color-clay-deep)" aria-hidden="true"><i style="width:94%"></i></div><span class="small muted">Loan payments (not card bills)</span></article><article class="budget-tile"><div class="budget-top"><span class="d-dot" style="--c:var(--color-sage)"></span><h3>Short-term goals</h3><span class="pace pace-full">On its way</span></div>
+        <div class="budget-nums"><span class="budget-left">$560 to go</span><span class="small muted">$400 of $960</span></div><div class="d-fill" style="--c:var(--color-sage)" aria-hidden="true"><i style="width:42%"></i></div><span class="small muted">Moved to savings</span></article><article class="budget-tile"><div class="budget-top"><span class="d-dot" style="--c:var(--color-sage-deep)"></span><h3>Long-term wealth</h3><span class="pace pace-on">Done</span></div>
+        <div class="budget-nums"><span class="budget-left d-done">Done</span><span class="small muted">$960 of $960</span></div><div class="d-fill" style="--c:var(--color-sage-deep)" aria-hidden="true"><i style="width:100%"></i></div><span class="small muted">Moved to investments</span></article></div></div></section><section class="d-opt" id="opt-C"><h2 class="d-h">Option C · Ring and list</h2><p class="d-why">A ring shows how your income is split, with the list beside it. Uses the ring style from Debts and Spending. Shows the split well, but not progress inside the ring.</p><div class="d-frame"><section class="panel"><div class="d-planhead">
+  <div><p class="small muted">Your plan for October · day 24 of 31</p>
+  <p class="d-income">$6,400 <span class="small muted">a month</span></p>
+  <p class="small muted">Suggested from your pay in July–September · <button class="link small">Change</button></p></div>
+  <span class="small muted d-tmpl">55 / 5 / 10 / 15 / 15</span>
+</div><div class="d-ringwrap"><svg viewBox="0 0 140 140" width="180" height="180" aria-hidden="true"><circle r="54" cx="70" cy="70" fill="none" stroke="var(--color-cocoa)" stroke-width="16" stroke-dasharray="184.6 154.7" stroke-dashoffset="0.0" transform="rotate(-90 70 70)"/><circle r="54" cx="70" cy="70" fill="none" stroke="var(--color-clay)" stroke-width="16" stroke-dasharray="15.0 324.3" stroke-dashoffset="-186.6" transform="rotate(-90 70 70)"/><circle r="54" cx="70" cy="70" fill="none" stroke="var(--color-clay-deep)" stroke-width="16" stroke-dasharray="31.9 307.4" stroke-dashoffset="-203.6" transform="rotate(-90 70 70)"/><circle r="54" cx="70" cy="70" fill="none" stroke="var(--color-sage)" stroke-width="16" stroke-dasharray="48.9 290.4" stroke-dashoffset="-237.5" transform="rotate(-90 70 70)"/><circle r="54" cx="70" cy="70" fill="none" stroke="var(--color-sage-deep)" stroke-width="16" stroke-dasharray="48.9 290.4" stroke-dashoffset="-288.4" transform="rotate(-90 70 70)"/>
+<text x="70" y="66" text-anchor="middle" class="d-ringbig">$6,400</text><text x="70" y="84" text-anchor="middle" class="d-ringsmall">a month</text></svg><ul class="d-rows"><li class="d-row"><span class="d-dot" style="--c:var(--color-cocoa)"></span>
+        <span class="grow"><span class="name block">Essentials <span class="small muted">55%</span></span><span class="small muted block">Rent, groceries, bills, transport</span></span>
+        <span class="d-nums"><span class="budget-left">$740 left</span><span class="small muted block">$2,780 of $3,520</span></span></li><li class="d-row"><span class="d-dot" style="--c:var(--color-clay)"></span>
+        <span class="grow"><span class="name block">Guilt-free <span class="small muted">5%</span></span><span class="small muted block">Eating out, fun, shopping</span></span>
+        <span class="d-nums"><span class="budget-left is-over">$45 over</span><span class="small muted block">$365 of $320</span></span></li><li class="d-row"><span class="d-dot" style="--c:var(--color-clay-deep)"></span>
+        <span class="grow"><span class="name block">Debt / Invest <span class="small muted">10%</span></span><span class="small muted block">Loan payments (not card bills)</span></span>
+        <span class="d-nums"><span class="budget-left">$40 to go</span><span class="small muted block">$600 of $640</span></span></li><li class="d-row"><span class="d-dot" style="--c:var(--color-sage)"></span>
+        <span class="grow"><span class="name block">Short-term goals <span class="small muted">15%</span></span><span class="small muted block">Moved to savings</span></span>
+        <span class="d-nums"><span class="budget-left">$560 to go</span><span class="small muted block">$400 of $960</span></span></li><li class="d-row"><span class="d-dot" style="--c:var(--color-sage-deep)"></span>
+        <span class="grow"><span class="name block">Long-term wealth <span class="small muted">15%</span></span><span class="small muted block">Moved to investments</span></span>
+        <span class="d-nums"><span class="budget-left d-done">Done</span><span class="small muted block">$960 of $960</span></span></li></ul></div><p class="small muted d-cant">Tallyn can only see what reaches your bank. Retirement taken from your pay first, like a 401(k), isn't counted here.</p></section></div></section><section class="d-opt" id="opt-D"><h2 class="d-h">Option D · Mix (recommended): A's bar + B's tiles</h2><p class="d-why">A's split bar as the summary (how your income splits and how full each part is, at a glance), then B's tiles for detail. Spending buckets keep the pace line people already know from budgets; money-moved buckets get a simple fill bar. On phones the tiles stack.</p><div class="d-frame"><section class="panel"><div class="d-planhead">
+  <div><p class="small muted">Your plan for October · day 24 of 31</p>
+  <p class="d-income">$6,400 <span class="small muted">a month</span></p>
+  <p class="small muted">Suggested from your pay in July–September · <button class="link small">Change</button></p></div>
+  <span class="small muted d-tmpl">55 / 5 / 10 / 15 / 15</span>
+</div><div class="d-split d-split-big" aria-hidden="true"><span class="d-seg" style="flex:55;--c:var(--color-cocoa)"><i style="width:79%"></i></span><span class="d-seg" style="flex:5;--c:var(--color-clay)"><i style="width:100%"></i></span><span class="d-seg" style="flex:10;--c:var(--color-clay-deep)"><i style="width:94%"></i></span><span class="d-seg" style="flex:15;--c:var(--color-sage)"><i style="width:42%"></i></span><span class="d-seg" style="flex:15;--c:var(--color-sage-deep)"><i style="width:100%"></i></span></div><div class="d-legend small muted"><span><b style="--c:var(--color-cocoa)"></b>Essentials</span><span><b style="--c:var(--color-clay)"></b>Guilt-free</span><span><b style="--c:var(--color-clay-deep)"></b>Debt / Invest</span><span><b style="--c:var(--color-sage)"></b>Short-term goals</span><span><b style="--c:var(--color-sage-deep)"></b>Long-term wealth</span></div><p class="small muted d-cant">Tallyn can only see what reaches your bank. Retirement taken from your pay first, like a 401(k), isn't counted here.</p></section><div class="d-gap"></div><div class="budget-tiles"><article class="budget-tile"><div class="budget-top"><span class="d-dot" style="--c:var(--color-cocoa)"></span><h3>Essentials</h3><span class="pace pace-on">On pace</span></div>
+        <div class="budget-nums"><span class="budget-left">$740 left</span><span class="small muted">$2,780 of $3,520</span></div><svg class="pace-line tone-line-on" viewBox="0 0 260 58" preserveAspectRatio="none" aria-hidden="true">
+<line x1="4.0" y1="7.7037037037037095" x2="256.0" y2="7.7037037037037095" class="pace-limit"/><line x1="4.0" y1="54.0" x2="256.0" y2="7.7037037037037095" class="pace-even"/>
+<polyline points="4.0,54.0 28.4,50.3 52.8,46.0 77.2,41.6 101.5,36.9 125.9,32.2 150.3,27.4 174.7,22.4 199.1,17.4 199.1,17.4" class="pace-spent"/><circle cx="199.1" cy="17.4" r="3.5" class="pace-dot"/></svg><span class="small muted">Rent, groceries, bills, transport</span></article><article class="budget-tile"><div class="budget-top"><span class="d-dot" style="--c:var(--color-clay)"></span><h3>Guilt-free</h3><span class="pace pace-over">Over</span></div>
+        <div class="budget-nums"><span class="budget-left is-over">$45 over</span><span class="small muted">$365 of $320</span></div><svg class="pace-line tone-line-over" viewBox="0 0 260 58" preserveAspectRatio="none" aria-hidden="true">
+<line x1="4.0" y1="13.411466260781332" x2="256.0" y2="13.411466260781332" class="pace-limit"/><line x1="4.0" y1="54.0" x2="256.0" y2="13.411466260781332" class="pace-even"/>
+<polyline points="4.0,54.0 28.4,49.3 52.8,43.9 77.2,38.3 101.5,32.4 125.9,26.4 150.3,20.3 174.7,14.0 199.1,7.7 199.1,7.7" class="pace-spent"/><circle cx="199.1" cy="7.7" r="3.5" class="pace-dot"/></svg><span class="small muted">Eating out, fun, shopping</span></article><article class="budget-tile"><div class="budget-top"><span class="d-dot" style="--c:var(--color-clay-deep)"></span><h3>Debt / Invest</h3><span class="pace pace-full">On its way</span></div>
+        <div class="budget-nums"><span class="budget-left">$40 to go</span><span class="small muted">$600 of $640</span></div><div class="d-fill" style="--c:var(--color-clay-deep)" aria-hidden="true"><i style="width:94%"></i></div><span class="small muted">Loan payments (not card bills)</span></article><article class="budget-tile"><div class="budget-top"><span class="d-dot" style="--c:var(--color-sage)"></span><h3>Short-term goals</h3><span class="pace pace-full">On its way</span></div>
+        <div class="budget-nums"><span class="budget-left">$560 to go</span><span class="small muted">$400 of $960</span></div><div class="d-fill" style="--c:var(--color-sage)" aria-hidden="true"><i style="width:42%"></i></div><span class="small muted">Moved to savings</span></article><article class="budget-tile"><div class="budget-top"><span class="d-dot" style="--c:var(--color-sage-deep)"></span><h3>Long-term wealth</h3><span class="pace pace-on">Done</span></div>
+        <div class="budget-nums"><span class="budget-left d-done">Done</span><span class="small muted">$960 of $960</span></div><div class="d-fill" style="--c:var(--color-sage-deep)" aria-hidden="true"><i style="width:100%"></i></div><span class="small muted">Moved to investments</span></article></div></div></section>
+</div></body></html>
