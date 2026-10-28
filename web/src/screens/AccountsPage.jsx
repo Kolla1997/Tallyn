@@ -275,7 +275,9 @@ function AccountTile({ a, owner, meId }) {
       <span className="flex min-w-0 items-center gap-2.5">
         <AccountIcon account={a} />
         <span className="min-w-0">
-          <span className="name block truncate text-[14px] font-semibold">{a.name}</span>
+          <span className="name block truncate text-[14px] font-semibold" title={a.name}>
+            {a.name}
+          </span>
           <span className={`flex flex-wrap items-center gap-1.5 text-[13px] ${MUTED}`}>
             {KIND_LABEL[groupOf(a)] ?? 'Account'}
             {a.mask && ` ··${a.mask}`}
@@ -330,7 +332,8 @@ function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnecte
         {banks.map((b) => {
           const name = b.institution_name || 'Bank'
           const whose = b.owner_user_id === me.user_id ? 'yours' : nameOf(people[b.owner_user_id] ?? { user_id: b.owner_user_id })
-          const n = Math.max(1, b.accounts.length)
+          // A card grows with its accounts up to four across; more accounts wrap onto new rows.
+          const n = Math.min(4, Math.max(1, b.accounts.length))
           const ok = b.status === 'active'
           return (
             <li
@@ -348,8 +351,8 @@ function ConnectedBanks({ banks, me, people, showOwner, onUnlinked, onReconnecte
                 </span>
               </div>
               <ul
-                className="m-0 grid grow list-none divide-x divide-zinc-100 dark:divide-zinc-800 p-0"
-                style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}
+                className="-mt-px -ml-px m-0 grid grow list-none p-0 [&>li]:border-t [&>li]:border-l [&>li]:border-zinc-100 dark:[&>li]:border-zinc-800"
+                style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}
               >
                 {b.accounts.map((a) => (
                   <AccountTile key={a.id} a={a} meId={me.user_id} owner={showOwner ? (people[b.owner_user_id] ?? { user_id: b.owner_user_id }) : null} />
