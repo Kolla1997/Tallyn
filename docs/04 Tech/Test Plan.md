@@ -3,7 +3,7 @@ type: spec
 status: draft
 owner: Dinesh
 updated: 2026-10-29
-issues: [111, 113, 200]
+issues: [111, 113, 200, 201]
 tags: [spec, tech, testing]
 ---
 
@@ -152,6 +152,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Keyboard and screen reader basics on every page: each screen names its tab, its heading takes focus when the screen or step changes, phone transaction details keep focus inside and return it (#153) | P1 | Partly | — | No | Dots, code boxes, sign-in notes; `Heading.test.jsx`, `takeover.test.jsx` (#153, part 1 of 3) |
 | The app is called Coinroof everywhere people look: page titles, screen copy, sign-in and authenticator text, downloaded files (`coinroof-data-….zip`, `coinroof-backup-codes.txt`) (#200) | P2 | Yes | Yes | No | `Heading.test.jsx` (tab title), `SignIn.test.jsx`, `SetUp2FA.test.jsx`, `BackupCodes.test.jsx`, `Settings.test.jsx` and `api.test.js` (export file name), `TestExportZip` in `export_test.go` (`coinroof-data.json`, README); the stored-hash salts keep their old "tallyn" text on purpose |
 | The Coinroof logo shows on sign-in, the rail (open and collapsed), the phone header and the loader, in light and dark (#200) | P2 | No | — | Partly | `web/e2e/layout.spec.js` checks the pages render; the logo itself is a release-checklist item (gap: no test checks which logo file shows) |
+| The app's red and green are the Coinroof logo's, and money text and button text stay AA readable in light and dark (#201) | P2 | Yes | — | No | `tokens.test.js` (logo values applied, dark-mode text values, 4.5:1 on cards and page in both themes) |
 | Money and counters use tabular figures, so digits don't shift the layout (#193) | P2 | Yes | — | No | `CountUp.test.jsx` (visible number has `tabular-nums`, final value read once); shared `.money` / `.count` rule in `web/src/styles.css` |
 | Settings: your name, legal links, Soon items | P2 | Yes | Yes | No | `Settings.test.jsx`; `TestSetMe`, `TestSharingRoutes`, `TestSharingScreenData` (80-character limit) |
 

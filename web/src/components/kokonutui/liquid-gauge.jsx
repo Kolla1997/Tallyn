@@ -563,7 +563,7 @@ export default function LiquidGauge({
         aria-hidden="true"
         className={cn(
           'pointer-events-none absolute inset-0 transition-colors duration-300 ease-out',
-          warn ? 'bg-red-500 text-white' : 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900',
+          warn ? 'bg-[var(--color-redesign-accent)] text-white' : 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900',
         )}
         ref={liquidRef}
         style={{ clipPath: flatPolygon(initial) }}

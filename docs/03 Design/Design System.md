@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-26
+updated: 2026-10-29
 issue: 10
 tags: [design]
 ---
@@ -148,3 +148,4 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-25 | Redesign charts (#185): spending by day as one red bar per day with a daily average line and three facts (picked the mix of four forms); spending reads in a red scale, empty days grey; numbers always written beside the marks | Dinesh asked for red instead of black, then for less wasted space; ui-ux-pro-max: never colour alone |
 | 2026-10-26 | Light and dark (#187): the drafts' dark theme in the app, switched with the sun and moon (in the rail, the phone header and the sign-in footer); follows the device until you choose. Dark values live beside the light ones in `design-tokens.json` (`dark`). Avatars use colours that keep white letters readable in both | Dinesh picked the sun and moon switch in the drafts; the first build left dark out by mistake |
 | 2026-10-28 | Tabular figures (#193): every dynamic number uses tabular figures: money and counters through `.money`, `.count`, `.amount`, `Money` and `CountUp`, anything else with `tabular-nums`. Figma: Numbers → Monospace; SwiftUI `.monospacedDigit()`; Android `tnum` | Dinesh picked C: a global rule for money and counters, with an opt-in class for the rest; scoped to Tallyn |
+| 2026-10-29 | Coinroof colours (#201): the app's red and green are the logo's. Red `#CB0900` for the one action, what's owed and spending (scale `#F7C6C2`, `#E06B66`, `#CB0900`, `#6B0500`); green `#067B00` for money in and progress; the glows take the same hues. Dark mode text: red `#E06B66` (5.5:1 on cards), green `#6AB066` (6.8:1). Red still marks the one action | Dinesh picked A over B (glows and button only) and C (green main button), from drafts on the real app in light and dark |
