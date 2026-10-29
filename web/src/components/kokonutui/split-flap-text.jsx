@@ -38,10 +38,12 @@ function Half({ char, half, className, ref, style }) {
   )
 }
 
-function Tile({ target, delay, reduceMotion, className }) {
-  const [shown, setShown] = useState(target)
+// Tallyn edit (#221): fromZero starts digits at 0, so a figure flips up to its value on load.
+function Tile({ target, delay, reduceMotion, className, fromZero = false }) {
+  const start = fromZero && /\d/.test(target) ? '0' : target
+  const [shown, setShown] = useState(start)
   const [flip, setFlip] = useState(null)
-  const shownRef = useRef(target)
+  const shownRef = useRef(start)
   const topRef = useRef(null)
   const bottomRef = useRef(null)
   const shadeRef = useRef(null)
@@ -137,6 +139,7 @@ export default function SplitFlapText({
   length,
   className,
   tileClassName,
+  fromZero = false,
 }) {
   const [index, setIndex] = useState(0)
   const [reduceMotion, setReduceMotion] = useState(false)
@@ -169,7 +172,7 @@ export default function SplitFlapText({
         {value}
       </span>
       {[...padded].map((char, i) => (
-        <Tile className={tileClassName} delay={i * STAGGER} key={i.toString()} reduceMotion={reduceMotion} target={char} />
+        <Tile className={tileClassName} delay={i * STAGGER} fromZero={fromZero} key={i.toString()} reduceMotion={reduceMotion} target={char} />
       ))}
     </span>
   )

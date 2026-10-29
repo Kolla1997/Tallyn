@@ -207,7 +207,7 @@ function Total({ banks, me, roles, home, scope, onScope, spent }) {
       ) : (
         <>
           <div className="overflow-x-auto">
-            <SplitFlapText text={formatMoney(t.have, cur)} className="text-2xl md:text-4xl" />
+            <SplitFlapText text={formatMoney(t.have, cur)} className="text-2xl md:text-4xl" fromZero />
             <span className="sr-only">{formatMoney(t.have, cur)}</span>
           </div>
           <p className="m-0 text-[13px] text-zinc-400">
