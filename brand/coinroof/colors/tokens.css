@@ -1,0 +1,8 @@
+/* Coinroof colour tokens (#195). Measured from the logo artwork. */
+:root {
+  --coinroof-green: #067B00; /* Brand colour, logo stripes, money in, progress, primary buttons */
+  --coinroof-red: #CB0900; /* Logo stripes, money owed, the one main action */
+  --coinroof-ink: #1B1B1B; /* Wordmark on light, body text, dark cards */
+  --coinroof-black: #000000; /* Logo bars, dark background */
+  --coinroof-white: #FFFFFF; /* Page and cards, text on green, red and black */
+}

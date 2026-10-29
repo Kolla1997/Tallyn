@@ -1,0 +1,56 @@
+{
+  "name": "Coinroof",
+  "ticket": 195,
+  "colors": [
+    {
+      "name": "green",
+      "hex": "#067B00",
+      "rgb": [
+        6,
+        123,
+        0
+      ],
+      "use": "Brand colour, logo stripes, money in, progress, primary buttons"
+    },
+    {
+      "name": "red",
+      "hex": "#CB0900",
+      "rgb": [
+        203,
+        9,
+        0
+      ],
+      "use": "Logo stripes, money owed, the one main action"
+    },
+    {
+      "name": "ink",
+      "hex": "#1B1B1B",
+      "rgb": [
+        27,
+        27,
+        27
+      ],
+      "use": "Wordmark on light, body text, dark cards"
+    },
+    {
+      "name": "black",
+      "hex": "#000000",
+      "rgb": [
+        0,
+        0,
+        0
+      ],
+      "use": "Logo bars, dark background"
+    },
+    {
+      "name": "white",
+      "hex": "#FFFFFF",
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "use": "Page and cards, text on green, red and black"
+    }
+  ]
+}
