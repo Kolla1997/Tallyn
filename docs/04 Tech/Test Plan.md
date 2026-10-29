@@ -185,6 +185,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - [ ] Home totals match the bank sandbox's balances in the home currency.
 - [ ] Wait 30 minutes idle: the warning, then the sign-out note.
 - [ ] Phone (375px) and desktop: every page, no sideways scroll.
+- [ ] Page background (#213): the two-tone mesh shows green top left and red bottom right, in light and dark; card text stays readable where it is strongest.
 - [ ] Live counters (Transactions totals, Accounts net worth): while a filter changes, the digits count without the layout moving (#193).
 - [ ] **Coinroof name and logo (#200):** sign-in, the rail open and collapsed, the phone header, the loader (tile arcs ripple in) and the favicon show Coinroof, in light and dark. A new authenticator entry is named Coinroof; an old one still says Tallyn and still works.
 - [ ] **Heading focus (#209):** sign in by pressing Enter; Home's heading (the household name) shows no black focus ring, and Tab still shows the ring on links and buttons.
