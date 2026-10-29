@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Coinroof colours (#195) -->
+<resources>
+    <color name="coinroof_green">#067B00</color>
+    <color name="coinroof_red">#CB0900</color>
+    <color name="coinroof_ink">#1B1B1B</color>
+    <color name="coinroof_black">#000000</color>
+    <color name="coinroof_white">#FFFFFF</color>
+</resources>
