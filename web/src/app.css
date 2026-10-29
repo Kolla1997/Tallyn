@@ -182,8 +182,9 @@ body:has(.calm-page) {
   }
 }
 
-/* A focus ring on every control in the redesign, shown at once. */
-.calm-page :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+/* A focus ring on every control in the redesign, shown at once. Not on headings and other parts the app focuses
+   with tabindex="-1" for screen readers (#209): they aren't controls, and a ring made them look clickable. */
+.calm-page :is(a, button, input, select, textarea, [tabindex]:not([tabindex='-1'])):focus-visible {
   outline: 2px solid var(--color-redesign-focus);
   outline-offset: 2px;
 }
