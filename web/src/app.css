@@ -682,6 +682,23 @@ body:has(.calm-page) {
     animation-delay: calc(900ms + var(--n, 8) * 90ms);
   }
 }
+/* Spending by day on load (#230): bars grow up from the line left to right (22ms apart), and the
+   capped day's label fades in once they're up. */
+@keyframes calm-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .calm-grow {
+    transform-origin: bottom;
+    animation: calm-grow 500ms cubic-bezier(0.23, 1, 0.32, 1) both;
+    animation-delay: calc(200ms + var(--n, 0) * 22ms);
+  }
+  .calm-late {
+    animation: calm-in 300ms ease-out 1250ms both;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .calm-card,
   .calm-row {
