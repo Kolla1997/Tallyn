@@ -64,3 +64,4 @@ Before anything goes out (site, social, deck, email, app store):
 | 2026-10-08 | Add Clay Deep and Sage Deep | Clay with white text is 4.4:1, below AA for small text |
 | 2026-10-08 | Currency amounts fixed to Space Grotesk | Consistent, tabular numbers |
 | 2026-10-29 | Rename to **Coinroof**; logo is Dinesh's Canva striped tile + COINROOF wordmark; palette green #067B00, red #CB0900, ink #1B1B1B. Kit in `brand/coinroof/` (#195). This guide still describes Tallyn until the app switches | Another product already uses the Tallyn name |
+| 2026-10-29 | In the app, the plain Coinroof lockup (no bar) on sign-in, the rail and the phone header; the logo animation is **Ripple** (#200, [[Animation Guide]]) | Dinesh picked A for both from drafts |
