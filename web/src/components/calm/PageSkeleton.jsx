@@ -1,49 +1,50 @@
+import { useEffect, useState } from 'react'
+import { reducedMotion } from '../../lib/motion.js'
 import mark from '../../../../brand/coinroof/animation/SVG/coinroof-mark-animated-light.svg'
 import markDark from '../../../../brand/coinroof/animation/SVG/coinroof-mark-animated-dark.svg'
 
-// While a page loads (#212, #221): the animated Coinroof mark first, so a quick load is just the
-// mark. After 900ms it hands over (CSS only, no timers): a small mark by the top of the page and
-// grey bars in the shape of the page's cards, with a faint sweep of the mark's green and red.
-// Rows then fade up one after another (.calm-row in app.css). Screen readers hear the words once.
-const CARDS = [
-  ['lg:col-span-8', 3],
-  ['lg:col-span-4', 3],
-  ['lg:col-span-4', 4],
-  ['lg:col-span-4', 4],
-  ['lg:col-span-4', 4],
-]
+// The mark builds in about 1.9s (brand/coinroof/animation); hold it a moment, then build it again.
+const LOOP_MS = 2600
+// The words type out with each build, a letter every 60ms.
+const TYPE_MS = 60
 
-function Mark({ size }) {
-  return (
-    <>
-      <img className="dark:hidden" src={mark} alt="" width={size} height={size} />
-      <img className="hidden dark:block" src={markDark} alt="" width={size} height={size} />
-    </>
-  )
-}
-
+// While a page loads (#212, #221): just the animated Coinroof mark and "Adding it all up…", where the
+// cards will appear (Dinesh dropped the grey card shapes). The mark builds and the words type out, again and again until the
+// data arrives and this unmounts; with reduced motion it stands still. Rows then fade up one after
+// another (.calm-row in app.css). Screen readers hear the words once.
 export default function PageSkeleton({ text = 'Adding it all up' }) {
+  const words = `${text}…`
+  const [round, setRound] = useState(0)
+  const [typed, setTyped] = useState(() => (reducedMotion() ? words.length : 0))
+  useEffect(() => {
+    if (reducedMotion()) return
+    const id = setInterval(() => setRound((r) => r + 1), LOOP_MS)
+    return () => clearInterval(id)
+  }, [])
+  useEffect(() => {
+    if (reducedMotion()) return
+    let n = 0
+    const id = setInterval(() => {
+      n += 1
+      setTyped(n)
+      if (n >= words.length) clearInterval(id)
+    }, TYPE_MS)
+    return () => clearInterval(id)
+  }, [round, words])
+  // A new address each round loads a fresh copy of the SVG, so its animation starts over. (A file
+  // under 4 KB would be inlined as a data: URL, which can't take a query; ours are just over.)
+  const again = (url) => (round && !url.startsWith('data:') ? `${url}?round=${round}` : url)
   return (
-    <div role="status" className="calm-skeleton relative">
+    <div role="status" className="calm-skeleton">
       <span className="sr-only">{text}…</span>
       <div aria-hidden="true" className="calm-skeleton-mark">
-        <Mark size={72} />
-        <p>{text}…</p>
-      </div>
-      <div aria-hidden="true" className="calm-skeleton-shapes">
-        <div className="calm-skeleton-mini">
-          <Mark size={20} />
-        </div>
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
-          {CARDS.map(([span, bars], i) => (
-            <div key={i} className={`calm-solid flex flex-col gap-3 rounded-2xl p-4 ${span}`}>
-              <i className="calm-bar w-2/5" />
-              {Array.from({ length: bars }, (_, j) => (
-                <i key={j} className={`calm-bar ${['w-4/5', 'w-3/5', 'w-full'][j % 3]}`} />
-              ))}
-            </div>
-          ))}
-        </div>
+        <img className="dark:hidden" src={again(mark)} alt="" width={72} height={72} />
+        <img className="hidden dark:block" src={again(markDark)} alt="" width={72} height={72} />
+        {/* The full line holds its width while it types, so nothing moves. */}
+        <p className="m-0 grid">
+          <span className="invisible col-start-1 row-start-1">{words}</span>
+          <span className="col-start-1 row-start-1">{words.slice(0, typed)}</span>
+        </p>
       </div>
     </div>
   )
