@@ -85,7 +85,7 @@ Patterns already in the app, to reuse before inventing new ones:
 
 | What | How it loads | Where |
 |---|---|---|
-| A page | Only the animated Coinroof mark and "Adding it all up…" where the cards will be, no grey card shapes (`PageSkeleton`) | Every page (#221) |
+| A page | Only the animated Coinroof mark and "Adding it all up…" where the cards will be, no grey card shapes; the mark builds again every 2.6s until the data arrives (`PageSkeleton`) | Every page (#221) |
 | Cards and rows | Cards fade in, rows fade up one after another (`load-reveal`: 200ms, then 700ms, 90ms apart; `.calm-card`, `.calm-row`) | Every page (#212) |
 | A line chart | The line rises from flat over 900ms | Home spending (#221) |
 | Money figures | Roll up from $0: `CountUp start={0}`, the metric card's rolling digits, or the split-flap `fromZero` | Home, Accounts (#221, #228) |
