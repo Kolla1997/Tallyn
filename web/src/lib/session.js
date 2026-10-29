@@ -45,8 +45,8 @@ export function sessionOver(now, at) {
 const NOTE = 'tallyn.signOutNote'
 export const NOTES = {
   idle: 'You were signed out after 30 minutes without activity, to keep your money private.', // #91
-  max: 'For your security, Tallyn asks you to sign in again every 12 hours.', // #92
-  closed: 'Your Tallyn account is closed. Your banks are disconnected and your data is deleted.', // #56
+  max: 'For your security, Coinroof asks you to sign in again every 12 hours.', // #92
+  closed: 'Your Coinroof account is closed. Your banks are disconnected and your data is deleted.', // #56
 }
 
 export function rememberSignOutNote(reason) {

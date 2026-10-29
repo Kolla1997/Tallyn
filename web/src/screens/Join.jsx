@@ -21,7 +21,7 @@ export default function Join({ token, onJoined, onDismiss }) {
     } catch (e) {
       // Not reached (#151): keep the invite so they can try again.
       if (!e.status || e.status >= 500) {
-        setError("We couldn't reach Tallyn just now. Your invite is still here.")
+        setError("We couldn't reach Coinroof just now. Your invite is still here.")
         setKept(true)
         setBusy(false)
         return
@@ -35,7 +35,9 @@ export default function Join({ token, onJoined, onDismiss }) {
   return (
     <section className="card">
       <Heading>You&apos;ve been invited</Heading>
-      <p className="muted">Someone invited you to their household on Tallyn. Joining doesn&apos;t share any of your money: you choose that later in Sharing.</p>
+      <p className="muted">
+        Someone invited you to their household on Coinroof. Joining doesn&apos;t share any of your money: you choose that later in Sharing.
+      </p>
       {error && (
         <p className="error" role="alert">
           {error}

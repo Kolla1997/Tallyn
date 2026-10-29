@@ -28,7 +28,7 @@ describe('SignIn after an idle sign-out', () => {
   it('says why after 12 hours (#92)', () => {
     localStorage.setItem('tallyn.signOutNote', 'max')
     render(<SignIn />)
-    expect(screen.getByRole('status')).toHaveTextContent('For your security, Tallyn asks you to sign in again every 12 hours.')
+    expect(screen.getByRole('status')).toHaveTextContent('For your security, Coinroof asks you to sign in again every 12 hours.')
   })
 
   it('Forgot password? opens the reset form, and back returns (#22)', () => {

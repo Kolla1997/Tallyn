@@ -35,7 +35,7 @@ export const remindedLater = () => read(LATER) === '1'
 // The codes as a text file to keep.
 export function codesFile(codes, email) {
   return [
-    'Tallyn backup codes',
+    'Coinroof backup codes',
     email ? `For ${email}` : null,
     `Made ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`,
     '',

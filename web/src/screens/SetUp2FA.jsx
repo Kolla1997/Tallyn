@@ -46,7 +46,7 @@ export default function SetUp2FA({ onSignOut }) {
       )}
       <Heading>{recovered ? 'Set up your authenticator' : 'Protect your account'}</Heading>
       <p className="muted">
-        Tallyn asks for a code from an authenticator app each time you sign in, so your password alone isn&apos;t enough. Microsoft Authenticator, Google
+        Coinroof asks for a code from an authenticator app each time you sign in, so your password alone isn&apos;t enough. Microsoft Authenticator, Google
         Authenticator and 1Password all work.
       </p>
       {error && (
@@ -60,12 +60,12 @@ export default function SetUp2FA({ onSignOut }) {
           <ol>
             <li>In your authenticator app, add an account and scan this code.</li>
           </ol>
-          <img className="qr" src={factor.qr} alt="QR code to add Tallyn to your authenticator app" />
+          <img className="qr" src={factor.qr} alt="QR code to add Coinroof to your authenticator app" />
           <p className="muted">Can&apos;t scan it? Enter this key instead:</p>
           <p className="secret">{factor.secret}</p>
           <ol start={2}>
             <li>
-              Enter the <span className="nowrap">6-digit</span> code your app shows for Tallyn.
+              Enter the <span className="nowrap">6-digit</span> code your app shows for Coinroof.
             </li>
           </ol>
           <CodeForm factorIds={[factor.id]} button="Turn on 2FA" />
@@ -93,7 +93,7 @@ async function enrol() {
     }
   }
 
-  const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', issuer: 'Tallyn' })
+  const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', issuer: 'Coinroof' })
   if (error) throw error
   const qr = data.totp.qr_code.startsWith('data:') ? data.totp.qr_code : `data:image/svg+xml;utf-8,${encodeURIComponent(data.totp.qr_code)}`
   return { id: data.id, qr, secret: data.totp.secret }

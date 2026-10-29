@@ -78,7 +78,7 @@ export default function ConsentGate({ onSignOut, children }) {
       {state === 'needed' && (
         <section className="card">
           <Heading>Before you start</Heading>
-          <p>Please read and agree to how Tallyn works and how we look after your data.</p>
+          <p>Please read and agree to how Coinroof works and how we look after your data.</p>
           <p>
             <Link to={LEGAL.terms.path} target="_blank" rel="noopener">
               Terms of Service

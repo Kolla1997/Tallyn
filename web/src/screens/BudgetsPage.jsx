@@ -320,7 +320,7 @@ export default function BudgetsPage({ me, household, refreshKey }) {
               </>
             )}
 
-            <p className={NOTE}>Tallyn can&apos;t stop a payment. It shows how each budget is going, so you can decide what to do.</p>
+            <p className={NOTE}>Coinroof can&apos;t stop a payment. It shows how each budget is going, so you can decide what to do.</p>
           </>
         )}
       </div>

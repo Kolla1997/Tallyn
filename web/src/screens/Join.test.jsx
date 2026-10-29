@@ -22,7 +22,7 @@ describe('Join', () => {
   it('not reached: keeps the invite and offers Try again', async () => {
     api.mockRejectedValueOnce(new TypeError('Failed to fetch')).mockResolvedValueOnce({ household_id: 'hh-1' })
     await join()
-    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't reach Tallyn just now. Your invite is still here.")
+    expect(screen.getByRole('alert')).toHaveTextContent("We couldn't reach Coinroof just now. Your invite is still here.")
     expect(clearInvite).not.toHaveBeenCalled()
     await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Try again' })))
     expect(api).toHaveBeenCalledTimes(2)

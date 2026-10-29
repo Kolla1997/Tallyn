@@ -165,7 +165,7 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
               <Link to={LEGAL.privacy.path} target="_blank" rel="noopener">
                 Privacy Policy
               </Link>
-              . Tallyn is for people 18 and over.
+              . Coinroof is for people 18 and over.
             </span>
           </label>
         )}

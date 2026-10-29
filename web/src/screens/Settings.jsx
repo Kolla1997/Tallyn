@@ -281,7 +281,7 @@ function Authenticators() {
           onConfirm={remove}
           onClose={() => setRemoving(null)}
         >
-          <p>Its codes will stop working for Tallyn. Your other authenticators and backup codes still work.</p>
+          <p>Its codes will stop working for Coinroof. Your other authenticators and backup codes still work.</p>
         </ConfirmDialog>
       )}
     </li>
@@ -388,7 +388,7 @@ function AddAuthenticator({ names, onAdded, onClose }) {
     }
     setError('')
     setBusy(true)
-    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', issuer: 'Tallyn', friendlyName: n })
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp', issuer: 'Coinroof', friendlyName: n })
     setBusy(false)
     if (error) {
       setError("We couldn't start adding it. Try again in a moment.")
@@ -440,7 +440,7 @@ function AddAuthenticator({ names, onAdded, onClose }) {
         <div className="grid gap-3 text-[14px]">
           <p className={`m-0 ${MUTED}`}>In {name.trim()}, add an account and scan this code.</p>
           <div className="flex flex-wrap items-center gap-4">
-            <img className="size-36 rounded-lg bg-white dark:bg-zinc-900 p-1" src={factor.qr} alt="QR code to add Tallyn to your other authenticator app" />
+            <img className="size-36 rounded-lg bg-white dark:bg-zinc-900 p-1" src={factor.qr} alt="QR code to add Coinroof to your other authenticator app" />
             <div className="min-w-0">
               <p className={NOTE}>Can&apos;t scan it? Enter this key instead:</p>
               <p className="m-0 mt-1 font-mono text-[13px] font-semibold break-all">{factor.secret}</p>
@@ -568,7 +568,7 @@ const EXPORT_ERRORS = {
 async function downloadData() {
   let file
   try {
-    file = await apiFile('/api/me/export', `tallyn-data-${new Date().toISOString().slice(0, 10)}.zip`)
+    file = await apiFile('/api/me/export', `coinroof-data-${new Date().toISOString().slice(0, 10)}.zip`)
   } catch (e) {
     throw new Error(EXPORT_ERRORS[e.message] ?? "We couldn't make your download. Try again in a moment.")
   }
@@ -584,7 +584,7 @@ function YourData() {
   const [confirming, setConfirming] = useState(false)
   return (
     <Section id="data-h" title="Your data">
-      <p className={NOTE}>Tallyn reads balances and transactions from your banks. It can&apos;t move money.</p>
+      <p className={NOTE}>Coinroof reads balances and transactions from your banks. It can&apos;t move money.</p>
       <Rows>
         <Row label="Connected banks" note="Link, check or unlink your banks">
           <Link to="/accounts" className={TEXT_LINK}>
@@ -596,7 +596,7 @@ function YourData() {
             Family
           </Link>
         </Row>
-        <Row label="Download your data" note="Everything Tallyn holds about you">
+        <Row label="Download your data" note="Everything Coinroof holds about you">
           <Pill quiet onClick={() => setConfirming(true)}>
             Download
           </Pill>
@@ -679,7 +679,7 @@ function LeaveOrClose({ me, household, email }) {
             </Link>
           </Row>
         )}
-        <Row label="Close your Tallyn account" note="Removes your banks, transactions and sign-in">
+        <Row label="Close your Coinroof account" note="Removes your banks, transactions and sign-in">
           <button type="button" className={TEXT_LINK} style={OWE} onClick={() => setClosing(true)}>
             Close account
           </button>
@@ -687,7 +687,7 @@ function LeaveOrClose({ me, household, email }) {
       </Rows>
       {closing && (
         <ConfirmDialog
-          title="Close your Tallyn account?"
+          title="Close your Coinroof account?"
           action="Close account"
           typeToConfirm={email}
           needsCode

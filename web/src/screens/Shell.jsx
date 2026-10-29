@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import logo from '../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg'
-import mark from '../../../brand/logo/svg/tallyn-mark-light.svg'
-import logoDark from '../../../brand/logo/svg/tallyn-lockup-horizontal-dark.svg'
-import markDark from '../../../brand/logo/svg/tallyn-mark-dark.svg'
+import logo from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-light.svg'
+import mark from '../../../brand/coinroof/logo/svg/coinroof-mark-outline.svg'
+import logoDark from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-dark.svg'
+import markDark from '../../../brand/coinroof/logo/svg/coinroof-mark.svg'
 import { AccountsIcon, BudgetsIcon, DebtsIcon, FamilyIcon, GoalsIcon, HomeIcon, MenuIcon, SettingsIcon, TransactionsIcon } from '../components/Icons.jsx'
 import { Link } from '../lib/router.jsx'
 import Heading from '../components/Heading.jsx'
@@ -34,8 +34,8 @@ const SIDEBAR_KEY = 'tallyn.sidebar'
 // The logo file for the theme (Logo Guide: the dark files on dark grounds, never recoloured).
 const Logo = ({ light, dark, className }) => (
   <>
-    <img className={`${className} dark:hidden`} src={light} alt="Tallyn" />
-    <img className={`${className} hidden dark:block`} src={dark} alt="Tallyn" />
+    <img className={`${className} dark:hidden`} src={light} alt="Coinroof" />
+    <img className={`${className} hidden dark:block`} src={dark} alt="Coinroof" />
   </>
 )
 

@@ -47,13 +47,13 @@ func exportData(store Store, lim *limiter) http.HandlerFunc {
 		}
 		log.Printf("api: export: %d accounts, %d transactions", len(e.Accounts), len(e.Transactions))
 		w.Header().Set("Content-Type", "application/zip")
-		w.Header().Set("Content-Disposition", `attachment; filename="tallyn-data-`+e.ExportedAt.Format("2006-01-02")+`.zip"`)
+		w.Header().Set("Content-Disposition", `attachment; filename="coinroof-data-`+e.ExportedAt.Format("2006-01-02")+`.zip"`)
 		w.Header().Set("Cache-Control", "no-store")
 		_, _ = w.Write(zipped)
 	}
 }
 
-// exportZip packs the export as tallyn-data.json, transactions.csv and a
+// exportZip packs the export as coinroof-data.json, transactions.csv and a
 // README that says what each part means.
 func exportZip(e db.Export) ([]byte, error) {
 	var buf bytes.Buffer
@@ -70,7 +70,7 @@ func exportZip(e db.Export) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := add("tallyn-data.json", data); err != nil {
+	if err := add("coinroof-data.json", data); err != nil {
 		return nil, err
 	}
 	if err := add("transactions.csv", transactionsCSV(e.Transactions)); err != nil {
@@ -155,10 +155,10 @@ func stamp(t *time.Time) string {
 	return t.UTC().Format(time.RFC3339)
 }
 
-const exportReadme = `Your Tallyn data
-================
+const exportReadme = `Your Coinroof data
+==================
 
-This is everything Tallyn holds about you: your own profile, banks, accounts,
+This is everything Coinroof holds about you: your own profile, banks, accounts,
 transactions, card and loan details, budgets you made, your savings goals,
 what you share and with whom, and the Terms and Privacy versions you agreed to.
 
@@ -167,7 +167,7 @@ invites you sent (they hold other people's email addresses), or anything
 secret: no bank passwords or access tokens, and no backup codes (only how many
 are left).
 
-tallyn-data.json
+coinroof-data.json
   Everything, as JSON. Amounts are in minor units (cents for USD) in fields
   ending in _minor, with their currency. For transactions, a positive
   amount_minor is money out and a negative one is money in, as your bank

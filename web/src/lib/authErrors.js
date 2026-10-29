@@ -2,7 +2,7 @@
 // Matched on error codes, which are stable, not on the message. The raw
 // error still goes to the console for debugging.
 
-export const UNREACHABLE = "We couldn't reach Tallyn just now. Check your connection and try again."
+export const UNREACHABLE = "We couldn't reach Coinroof just now. Check your connection and try again."
 export const SOMETHING_WRONG = 'Something went wrong. Try again in a moment.'
 
 const BY_CODE = {

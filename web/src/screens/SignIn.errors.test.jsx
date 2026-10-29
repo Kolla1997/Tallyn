@@ -22,7 +22,7 @@ describe('SignIn errors', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
-  it('a wrong password gets Tallyn’s words, not Supabase’s', async () => {
+  it('a wrong password gets Coinroof’s words, not Supabase’s', async () => {
     auth.signInWithPassword.mockResolvedValue({ data: {}, error: supabaseError('invalid_credentials') })
     render(<SignIn />)
     fill()

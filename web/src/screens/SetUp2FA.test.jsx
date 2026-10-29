@@ -33,7 +33,7 @@ describe('SetUp2FA', () => {
   it('clears a half-finished setup, then shows the QR code and key', async () => {
     await act(async () => render(<SetUp2FA onSignOut={() => {}} />))
     expect(mfa.unenroll).toHaveBeenCalledWith({ factorId: 'old' })
-    expect(mfa.enroll).toHaveBeenCalledWith({ factorType: 'totp', issuer: 'Tallyn' })
+    expect(mfa.enroll).toHaveBeenCalledWith({ factorType: 'totp', issuer: 'Coinroof' })
     expect(screen.getByRole('heading', { name: 'Protect your account' })).toBeInTheDocument()
     expect(screen.getByRole('img', { name: /QR code/ })).toBeInTheDocument()
     expect(screen.getByText('FAKESECRETKEY')).toBeInTheDocument()

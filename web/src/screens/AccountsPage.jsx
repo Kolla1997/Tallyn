@@ -414,7 +414,7 @@ function ConnectedBanks({ view, banks, me, people, showOwner, onUnlinked, onReco
           )
         })}
       </ul>
-      <p className={`m-0 mt-3 text-[13px] ${MUTED}`}>Tallyn reads balances and transactions. It can&apos;t move money.</p>
+      <p className={`m-0 mt-3 text-[13px] ${MUTED}`}>Coinroof reads balances and transactions. It can&apos;t move money.</p>
       {unlinking && (
         <ConfirmDialog
           title={`Unlink ${unlinking.institution_name || 'this bank'}?`}
@@ -423,7 +423,7 @@ function ConnectedBanks({ view, banks, me, people, showOwner, onUnlinked, onReco
           onConfirm={() => unlink(unlinking)}
           onClose={() => setUnlinking(null)}
         >
-          <p>Tallyn will disconnect it and remove its accounts and transactions. You can link it again later, but older history may not come back.</p>
+          <p>Coinroof will disconnect it and remove its accounts and transactions. You can link it again later, but older history may not come back.</p>
         </ConfirmDialog>
       )}
     </section>

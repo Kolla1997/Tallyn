@@ -81,7 +81,7 @@ export default function GoalsPage({ me, household, refreshKey }) {
 
   return (
     <div className="calm">
-      <Head title="Goals" sub="Save toward what matters. Tallyn can't move money: move it in your bank's app.">
+      <Head title="Goals" sub="Save toward what matters. Coinroof can't move money: move it in your bank's app.">
         {canCreate && (
           <Pill icon={Plus} onClick={() => setDialog({ kind: 'goal' })}>
             New goal
@@ -491,7 +491,7 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
             <input type="radio" name="fills" className="mt-1 accent-zinc-900 dark:accent-white" checked={fills === 'hand'} onChange={() => setFills('hand')} />
             <span>
               <strong className="block">I&apos;ll update it myself</strong>
-              <small className={NOTE}>For cash, or money Tallyn can&apos;t see.</small>
+              <small className={NOTE}>For cash, or money Coinroof can&apos;t see.</small>
             </span>
           </label>
         </fieldset>

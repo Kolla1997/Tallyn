@@ -2,8 +2,8 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-26
-issues: [111, 113]
+updated: 2026-10-29
+issues: [111, 113, 200]
 tags: [spec, tech, testing]
 ---
 
@@ -150,6 +150,8 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Phone layout: no sideways scroll, nothing hidden (#97, #94) | P1 | — | — | Yes | `web/e2e/layout.spec.js` (#117): every page at 375, 1024 and 1440 px: no sideways scroll, no error, key parts really visible (size, on screen, not hidden by display, visibility or opacity); menus with Terms and Privacy; sign-in, 2FA, reset, legal pages. Fake data and session, every PR |
 | A page that can’t load offers Try again (glass card); a reload that fails keeps the money on screen under a banner (#151) | P1 | Yes | — | No | `HomePage.test.jsx` (`a first load that fails offers Try again`, `a reload that fails keeps the money on screen`); other pages share `LoadFailed.jsx` |
 | Keyboard and screen reader basics on every page: each screen names its tab, its heading takes focus when the screen or step changes, phone transaction details keep focus inside and return it (#153) | P1 | Partly | — | No | Dots, code boxes, sign-in notes; `Heading.test.jsx`, `takeover.test.jsx` (#153, part 1 of 3) |
+| The app is called Coinroof everywhere people look: page titles, screen copy, sign-in and authenticator text, downloaded files (`coinroof-data-….zip`, `coinroof-backup-codes.txt`) (#200) | P2 | Yes | Yes | No | `Heading.test.jsx` (tab title), `SignIn.test.jsx`, `SetUp2FA.test.jsx`, `BackupCodes.test.jsx`, `Settings.test.jsx` and `api.test.js` (export file name), `TestExportZip` in `export_test.go` (`coinroof-data.json`, README); the stored-hash salts keep their old "tallyn" text on purpose |
+| The Coinroof logo shows on sign-in, the rail (open and collapsed), the phone header and the loader, in light and dark (#200) | P2 | No | — | Partly | `web/e2e/layout.spec.js` checks the pages render; the logo itself is a release-checklist item (gap: no test checks which logo file shows) |
 | Money and counters use tabular figures, so digits don't shift the layout (#193) | P2 | Yes | — | No | `CountUp.test.jsx` (visible number has `tabular-nums`, final value read once); shared `.money` / `.count` rule in `web/src/styles.css` |
 | Settings: your name, legal links, Soon items | P2 | Yes | Yes | No | `Settings.test.jsx`; `TestSetMe`, `TestSharingRoutes`, `TestSharingScreenData` (80-character limit) |
 
@@ -183,6 +185,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - [ ] Wait 30 minutes idle: the warning, then the sign-out note.
 - [ ] Phone (375px) and desktop: every page, no sideways scroll.
 - [ ] Live counters (Transactions totals, Accounts net worth): while a filter changes, the digits count without the layout moving (#193).
+- [ ] **Coinroof name and logo (#200):** sign-in, the rail open and collapsed, the phone header, the loader (tile arcs ripple in) and the favicon show Coinroof, in light and dark. A new authenticator entry is named Coinroof; an old one still says Tallyn and still works.
 - [ ] Production build: security headers present, fonts are WOFF2, pages load on demand.
 
 ## Open questions

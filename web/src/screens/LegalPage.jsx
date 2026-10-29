@@ -12,7 +12,7 @@ export default function LegalPage({ doc }) {
   return (
     <article className="panel legal" aria-labelledby="legal-h">
       <nav className="small legal-nav" aria-label="Legal">
-        <Link to="/">← Tallyn</Link>
+        <Link to="/">← Coinroof</Link>
         <span aria-hidden="true"> · </span>
         <Link to={other.path}>{other.title}</Link>
       </nav>

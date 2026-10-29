@@ -183,7 +183,7 @@ func (v *Verifier) require(next http.Handler, needMFA bool) http.Handler {
 			if errors.Is(err, ErrSessionExpired) {
 				code = "session_expired" // the web app shows why (#92)
 			}
-			w.Header().Set("WWW-Authenticate", `Bearer realm="tallyn"`)
+			w.Header().Set("WWW-Authenticate", `Bearer realm="coinroof"`)
 			writeError(w, http.StatusUnauthorized, code)
 			return
 		}

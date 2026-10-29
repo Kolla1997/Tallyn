@@ -1127,7 +1127,8 @@ label.agree input {
 }
 
 .site-footer-brand img {
-  height: 20px;
+  /* The Coinroof wordmark is wide capitals, so 14px tall sits level with the tagline (#200). */
+  height: 14px;
   width: auto;
 }
 
