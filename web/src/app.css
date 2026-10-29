@@ -710,7 +710,8 @@ body:has(.calm-page) {
   align-items: stretch;
   gap: 0;
 }
-.launch > * {
+/* Not the fixed theme button, which keeps its own size. */
+.launch > :not(button) {
   width: 100%;
   max-width: 1120px;
   margin-inline: auto;
