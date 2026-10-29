@@ -11,6 +11,8 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-29
+- #209 Focus ring around page headings after a keyboard sign-in (PR #210): headings focused for screen readers (`tabindex="-1"`) no longer get the 2px ring; real controls keep it. Release-checklist step added.
+- #1 Sign-in card buttons (PR #208): centred and sized to their label instead of full width, 36px tall, never under 140px; small buttons keep their size. Dinesh picked C from drafts on the real sign-in.
 - #201 Coinroof colours (PR #206): Dinesh picked A (logo colours everywhere) from drafts on the real app, light and dark. Red #CB0900 for the one action, owed and spending (scale built from it), green #067B00 for money in and progress, glows in the same hues; dark-mode text #E06B66 / #6AB066 (AA on cards). New `tokens.test.js` checks values and contrast. Red still marks the one action.
 - #200 #201 #202 #203 Rename split agreed with Dinesh: #200 app people see, #201 colours, #202 Terms and Privacy, #203 repo, docs and services (last). No public launch as Coinroof until trademark/domain checks and the Monr licence.
 - #200 Coinroof in the app (PR #204): Dinesh picked logo placement A (plain lockup on sign-in, rail and phone header; tile when collapsed) and logo animation A. Ripple (arcs spread out of the corner, stripes slide in, letters rise; loop: arcs brighten in turn), now in `brand/coinroof/animation/` (SVG, HTML, GIF) and the loader. Visible copy, page titles, authenticator issuer, download names and the export README say Coinroof; favicons and a web manifest added. Kept on purpose: the stored-hash salts, `tallyn.*` storage keys, database logins.
@@ -18,7 +20,7 @@ Newest first. One entry per working session or decision.
 - #195 Tile refit (PR #198): the first redraw matched the Canva tile only 43% (stripes too thin, nine arcs instead of seven, arc centre on the corner). Fitted the geometry to the original: now a 98.7% pixel match (seven arcs centred just outside the top-right corner, 18.75/15.25 stripes). 61 kit files regenerated.
 - #195 Brand guide written as a Claude doc: [Coinroof Brand & Design Guide](https://claude.ai/artifact/KYYx5TuBicoMrbbeRm78ta) (logo, usage, palette, type, voice, app rules, files, open decisions).
 - Explored on the way: logo concepts (roof, coin, woven links), the red/green/white/black screen comps in (drafts since deleted), and fonts (Monr, Monare, Bebas Neue). Dinesh then chose his own Canva logo over all of them.
-- Open: Monr (and Monare) are personal-use demo licences, so a commercial licence is needed before launch; trademark and domain checks for Coinroof; tagline; MP4 and Lottie versions of the animation (need ffmpeg and python-lottie).
+- Open: Monr (and Monare) are personal-use demo licences, so a commercial licence is needed before launch; trademark and domain checks for Coinroof; tagline; MP4 and Lottie versions of the animation (need ffmpeg and python-lottie); while the API was down the app sent ~2,500 `/api/consent` requests (possible retry loop, not ticketed yet).
 
 ## 2026-10-28
 - #193 Tabular figures for dynamic numbers (option C, Dinesh): added the Numbers section and Decisions row in the Design System, one line in CLAUDE.md §6, `.money` and `.count` shared rule in `web/src/styles.css`, `CountUp` sets `tabular-nums` on its visible number, `CountUp.test.jsx` (2 tests), Test Plan row and a release-checklist item. Figures inside sentences are left as they are (noted in the Design System).
