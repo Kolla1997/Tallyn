@@ -11,10 +11,21 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-29
+- #221 Home loading motion, five parts, each picked by Dinesh from a draft:
+  - Loader (C, PR #222): the animated Coinroof mark shows for the first 900ms, then a small mark above grey card shapes with a faint green and red sweep. It's CSS only and applies to every page. Budgets' income plan no longer shows a second loader.
+  - Spending chart (A, PR #223): the line rises from flat over 900ms and the total rolls up from $0. The 7D/30D/90D switch keeps its quick morph.
+  - Balance (B, PR #224): the split-flap digits flip up from $0, left to right (`SplitFlapText` `fromZero`). Home keeps the split-flap; no count-up.
+  - Dotted bars (C, PR #225): each bar fills square by square after its row arrives and after the bar above it finishes (`Gauge` `fillDelay`).
+  - Sidebar (A, PR #226): the sidebar's width and the page's padding glide over 300ms, and names fade in after it widens. Dinesh chose width over the draft's clip, because a clip would cut off the names that show on hover.
+- #212 Layout check (PR #218): the opacity check now waits up to 3s for the load fade instead of reading it once.
+- #1 Removed a committed `web/node_modules` link to an old scratchpad (PR #219). `.gitignore` now ignores `node_modules` links too.
+- #220 Launch-style sign-in page ticket agreed: placeholder video, About, three "what it does" blocks, safety, a closing call, and a footer at the content's width. Tagline in Bricolage Grotesque 500. Draft not started.
+- Open:
+  - The spending chart's peak jumps about 14px at the end of a morph, because it swaps the simplified shape for the full path.
+  - #220: does the sign-in card stay first?
 - #212 Smooth loading (PR #216): pages show still grey card shapes while loading (`PageSkeleton`), then cards fade in (500ms) and rows fade up one after another (700ms, 90ms apart, after 200ms). New `load-reveal` motion token, slower than `ui-transition` on purpose. Dinesh picked C from drafts and asked for it slower twice. The start-up loader stays.
 - #213 Page background (PR #215): two-tone mesh (green top left, red bottom right, faint amber; new `redesign-glow-amber`). Dinesh picked C over calmer glow, ledger paper and a mix.
 - #1 Home gap (PR #214): the Your spending card now fills its row, so no empty band under "October so far".
-- Open: the balance count-up from the loading draft wasn't built (Home keeps its split-flap). Watch `web/e2e/layout.spec.js` for flakiness from the row fade.
 - #209 Focus ring around page headings after a keyboard sign-in (PR #210): headings focused for screen readers (`tabindex="-1"`) no longer get the 2px ring; real controls keep it. Release-checklist step added.
 - #1 Sign-in card buttons (PR #208): centred and sized to their label instead of full width, 36px tall, never under 140px; small buttons keep their size. Dinesh picked C from drafts on the real sign-in.
 - #201 Coinroof colours (PR #206): Dinesh picked A (logo colours everywhere) from drafts on the real app, light and dark. Red #CB0900 for the one action, owed and spending (scale built from it), green #067B00 for money in and progress, glows in the same hues; dark-mode text #E06B66 / #6AB066 (AA on cards). New `tokens.test.js` checks values and contrast. Red still marks the one action.
