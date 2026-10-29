@@ -17,7 +17,7 @@ import SplitFlapText from '@/components/kokonutui/split-flap-text'
 import NotificationStack from '@/components/kokonutui/notification-stack'
 import MetricCard from '@/components/kokonutui/metric-card'
 import SmoothTab from '@/components/kokonutui/smooth-tab'
-import { Gauge } from '@/components/charts/gauge'
+import { FILL_STEP, Gauge } from '@/components/charts/gauge'
 import OpensOver from '../components/calm/OpensOver.jsx'
 
 // Home in the calm redesign (#187), built from the #185/#182 draft (web/src/lab/home/CalmHome.jsx):
@@ -156,6 +156,18 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
 
 // Daily spending for the chart: this year and, early in the year, last year. Never rejects: a part
 // that fails just leaves those days out.
+// Bars fill on load (#221): each starts once its row has faded up (load-reveal: 200ms, then 700ms,
+// rows 90ms apart) and after the bar above has finished, so a card fills one bar at a time.
+const NOTCHES = 28
+function fillDelays(values) {
+  let end = 0
+  return values.map((v, k) => {
+    const start = Math.max(0.9 + k * 0.09, end)
+    end = start + Math.round((v / 100) * NOTCHES) * FILL_STEP
+    return start
+  })
+}
+
 function dailyFor(hh, year, owner) {
   const years = new Date(Date.now() - 90 * DAY).getFullYear() < year ? [year - 1, year] : [year]
   return Promise.all(
@@ -414,6 +426,9 @@ function Cards({ banks }) {
     .flatMap((b) => b.accounts.filter((a) => a.type === 'credit').map((a) => ({ ...a, bankName: b.institution_name })))
     .sort((x, y) => (y.current_balance_minor ?? 0) - (x.current_balance_minor ?? 0))
   if (cards.length === 0) return null
+  const cardDelays = fillDelays(
+    cards.slice(0, 3).map((a) => (a.credit_limit_minor > 0 ? Math.min(100, Math.round(((a.current_balance_minor ?? 0) / a.credit_limit_minor) * 100)) : 0)),
+  )
   return (
     <Panel
       id="card-h"
@@ -421,7 +436,7 @@ function Cards({ banks }) {
       meta={<See to="/debts">{cards.length > 3 ? `All ${cards.length} on Debts` : 'Debts'}</See>}
     >
       <ul className="m-0 grid list-none gap-3 p-0">
-        {cards.slice(0, 3).map((a) => {
+        {cards.slice(0, 3).map((a, k) => {
           const limit = a.credit_limit_minor
           const used = limit > 0 ? Math.round(((a.current_balance_minor ?? 0) / limit) * 100) : null
           return (
@@ -450,7 +465,8 @@ function Cards({ banks }) {
                     orientation="linear"
                     inactiveFill="var(--color-redesign-track)"
                     value={Math.min(100, used)}
-                    totalNotches={28}
+                    totalNotches={NOTCHES}
+                    fillDelay={cardDelays[k]}
                     activeFill="var(--color-redesign-accent)"
                     defaultLabel="Limit used"
                     suffix="%"
@@ -525,6 +541,7 @@ function Goals({ household }) {
     )
   }, [household.id, today])
   const list = goals ?? []
+  const goalDelays = fillDelays(list.map((g) => (g.saved_minor != null ? Math.min(100, Math.round((g.saved_minor / g.target_minor) * 100)) : 0)))
   return (
     <Panel id="goals-h" title="Goals" meta={list.length > 0 && <See to="/goals">See goals</See>}>
       {list.length === 0 ? (
@@ -533,7 +550,7 @@ function Goals({ household }) {
         </p>
       ) : (
         <ul className="m-0 grid list-none gap-3 p-0">
-          {list.map((g) => {
+          {list.map((g, k) => {
             const known = g.saved_minor != null
             const pct = known ? Math.min(100, Math.round((g.saved_minor / g.target_minor) * 100)) : 0
             return (
@@ -556,7 +573,8 @@ function Goals({ household }) {
                       orientation="linear"
                       inactiveFill="var(--color-redesign-track)"
                       value={pct}
-                      totalNotches={28}
+                      totalNotches={NOTCHES}
+                      fillDelay={goalDelays[k]}
                       activeFill="var(--color-redesign-in)"
                       defaultLabel={g.name}
                       suffix="%"
