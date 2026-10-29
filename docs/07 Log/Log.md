@@ -11,6 +11,10 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-29
+- #212 Smooth loading (PR #216): pages show still grey card shapes while loading (`PageSkeleton`), then cards fade in (500ms) and rows fade up one after another (700ms, 90ms apart, after 200ms). New `load-reveal` motion token, slower than `ui-transition` on purpose. Dinesh picked C from drafts and asked for it slower twice. The start-up loader stays.
+- #213 Page background (PR #215): two-tone mesh (green top left, red bottom right, faint amber; new `redesign-glow-amber`). Dinesh picked C over calmer glow, ledger paper and a mix.
+- #1 Home gap (PR #214): the Your spending card now fills its row, so no empty band under "October so far".
+- Open: the balance count-up from the loading draft wasn't built (Home keeps its split-flap). Watch `web/e2e/layout.spec.js` for flakiness from the row fade.
 - #209 Focus ring around page headings after a keyboard sign-in (PR #210): headings focused for screen readers (`tabindex="-1"`) no longer get the 2px ring; real controls keep it. Release-checklist step added.
 - #1 Sign-in card buttons (PR #208): centred and sized to their label instead of full width, 36px tall, never under 140px; small buttons keep their size. Dinesh picked C from drafts on the real sign-in.
 - #201 Coinroof colours (PR #206): Dinesh picked A (logo colours everywhere) from drafts on the real app, light and dark. Red #CB0900 for the one action, owed and spending (scale built from it), green #067B00 for money in and progress, glows in the same hues; dark-mode text #E06B66 / #6AB066 (AA on cards). New `tokens.test.js` checks values and contrast. Red still marks the one action.
