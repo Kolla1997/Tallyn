@@ -31,6 +31,7 @@ kanban-plugin: board
 - [ ] [#201 Coinroof colours in the app](https://github.com/Kolla1997/Tallyn/issues/201) #type/design #area/design #priority/p1
 - [ ] [#202 Rename Terms and Privacy to Coinroof](https://github.com/Kolla1997/Tallyn/issues/202) #type/docs #area/backend #priority/p1
 - [ ] [#203 Rename the repo, docs and outside services to Coinroof](https://github.com/Kolla1997/Tallyn/issues/203) #type/tech-debt #area/infra #priority/p2
+- [ ] [#209 Focus ring shows around page headings after a keyboard sign-in](https://github.com/Kolla1997/Tallyn/issues/209) #type/bug #area/frontend #priority/p2
 
 
 ## In Progress
