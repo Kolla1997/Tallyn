@@ -17,6 +17,8 @@
 @theme inline {
   --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
   --font-body: Montserrat, ui-sans-serif, system-ui, sans-serif;
+  /* The tagline "It all adds up." (#220): the button face from design-tokens.json. */
+  --font-tagline: 'Bricolage Grotesque', var(--font-body);
 }
 
 /* The chart and UI libraries' colour variables (#187), in Tallyn's colours. The drafts' lab set
@@ -426,6 +428,19 @@ body:has(.calm-page) {
     font-size: 14px;
     letter-spacing: 0;
   }
+  .calm-auth .site-footer-brand {
+    display: grid;
+    gap: 4px;
+  }
+  .calm-auth .site-footer-tag {
+    font-family: var(--font-tagline);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-zinc-900);
+  }
+  .dark .calm-auth .site-footer-tag {
+    color: #fafafa;
+  }
   .calm-auth .site-footer {
     max-width: 768px;
     padding-top: 16px;
@@ -685,5 +700,211 @@ body:has(.calm-page) {
   .calm-card,
   .calm-row {
     animation: calm-in 150ms linear both;
+  }
+}
+
+/* The signed-out launch page (#220, C): headline across the top; video and the auth card side by
+   side, same height; then About, features, safety and a closing call, all 1120px wide. Outside the
+   components layer, so it wins over the old stylesheet's plain h2 rule. */
+.calm-auth.launch {
+  align-items: stretch;
+  gap: 0;
+}
+.launch > * {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+}
+.launch-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+  gap: 22px 28px;
+  padding-bottom: 56px;
+}
+.launch-hero .launch-logo {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+.launch-pitch {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 12px;
+}
+.launch-pitch h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5vw, 56px);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.launch-pitch p {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 18px;
+  color: var(--color-zinc-600);
+}
+.launch-video {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 320px;
+  border: 1px solid var(--color-zinc-200);
+  border-radius: 22px;
+  background: linear-gradient(135deg, var(--color-zinc-100), var(--color-zinc-200));
+}
+.launch-play {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--color-zinc-900);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
+}
+.launch-video small {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-zinc-500);
+}
+.launch-slot {
+  display: grid;
+  align-content: start;
+}
+.calm-auth .launch-slot .card {
+  max-width: none;
+  height: 100%;
+}
+.launch-section {
+  padding: 56px 0;
+}
+.launch-section h2 {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.4vw, 34px);
+  line-height: 1.15;
+}
+.launch-lead {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 17px;
+  color: var(--color-zinc-600);
+}
+.launch-features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+}
+.launch-feature {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 22px;
+  border-radius: 22px;
+}
+.launch-feature h3 {
+  margin: 0;
+  font-size: 18px;
+}
+.launch-feature p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-zinc-600);
+}
+.launch-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--color-zinc-100);
+}
+.launch-safe {
+  padding: 28px;
+  border-radius: 22px;
+}
+.launch-safe ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 28px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+}
+.launch-safe li {
+  display: flex;
+  gap: 10px;
+}
+.launch-safe li::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 8px;
+  border-radius: 2px;
+  background: var(--color-redesign-in);
+}
+.launch-cta {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  margin: 56px auto;
+  padding: 36px;
+  border-radius: 22px;
+  text-align: center;
+}
+.launch-cta h2 {
+  margin: 0;
+}
+.launch .site-footer {
+  max-width: 1120px;
+}
+.dark .launch-pitch p,
+.dark .launch-lead,
+.dark .launch-feature p {
+  color: #a1a1aa;
+}
+.dark .launch-video {
+  border-color: #27272a;
+  background: linear-gradient(135deg, #18181b, #27272a);
+}
+.dark .launch-icon {
+  background: #27272a;
+}
+@media (max-width: 860px) {
+  .launch-hero,
+  .launch-features,
+  .launch-safe ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* On a phone the card comes first, so a returning person never scrolls to sign in. */
+  .launch-hero .launch-logo {
+    order: -2;
+    justify-self: center;
+  }
+  .launch-slot {
+    order: -1;
+  }
+  .launch-video {
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .launch-rise:not(.in) {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  .launch-rise {
+    transition:
+      opacity 0.7s cubic-bezier(0.23, 1, 0.32, 1),
+      transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+    transition-delay: var(--d, 0ms);
   }
 }

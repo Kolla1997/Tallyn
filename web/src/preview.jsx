@@ -7,7 +7,7 @@ import { fakeApi } from './preview/fakeApi.js'
 import './fonts.css'
 import './app.css'
 import Home from './screens/Home.jsx'
-import AuthPage from './components/AuthPage.jsx'
+import LaunchPage from './components/LaunchPage.jsx'
 import SignIn from './screens/SignIn.jsx'
 
 globalThis.__tallynPreviewApi = fakeApi
@@ -20,14 +20,14 @@ history.replaceState(null, '', start === 'signin' ? '/' : `/${start && start !==
 if (theme === 'dark' || theme === 'light') setTheme(theme)
 else startTheme()
 
-// ?p=signin shows the sign-in screen in its page frame instead.
+// ?p=signin shows the sign-in screen in its launch page (#220) instead.
 const signIn = start === 'signin'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     {signIn ? (
-      <AuthPage>
+      <LaunchPage>
         <SignIn />
-      </AuthPage>
+      </LaunchPage>
     ) : (
       <Home email="maya.rivera@fastmail.com" onSignOut={() => {}} />
     )}

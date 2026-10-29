@@ -20,8 +20,8 @@ export default function AuthPage({ children, wide = false, centred = false }) {
   )
 }
 
-// The page footer (#25, option B): the Coinroof wordmark (#200) and the tagline, then the Terms of
-// Service and Privacy Policy (#36). At the very bottom of every screen.
+// The page footer (#25, option B): the Coinroof wordmark (#200) with the tagline under it (#220, in
+// the button font, no middle dot), then the Terms of Service and Privacy Policy (#36).
 export function SiteFooter() {
   return (
     <footer className="site-footer">
@@ -29,7 +29,7 @@ export function SiteFooter() {
         {/* The wordmark file, never retyped (Logo Guide). */}
         <img className="dark:hidden" src={wordmark} alt="Coinroof" height="14" />
         <img className="hidden dark:block" src={wordmarkDark} alt="Coinroof" height="14" />
-        <span>· It all adds up.</span>
+        <span className="site-footer-tag">It all adds up.</span>
       </span>
       <nav aria-label="Legal" className="flex gap-3">
         <Link to="/terms">Terms of Service</Link>
