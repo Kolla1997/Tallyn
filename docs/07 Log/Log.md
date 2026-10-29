@@ -12,9 +12,10 @@ Newest first. One entry per working session or decision.
 
 ## 2026-10-29
 - #195 Coinroof brand asset kit merged (PR #196): Tallyn is being renamed Coinroof because another product uses the Tallyn name. The logo is Dinesh's Canva design (a striped coin-rim tile with COINROOF in Monr), redrawn as SVG in `brand/coinroof/`. It includes the four bar versions (red fade, green fade, black, white), plain and stacked lockups, one-colour and small-size tiles, iOS/Android/web icons, colour files and social images. Palette measured from the logo: green #067B00, red #CB0900, ink #1B1B1B.
+- #195 Tile refit (PR #198): the first redraw matched the Canva tile only 43% (stripes too thin, nine arcs instead of seven, arc centre on the corner). Fitted the geometry to the original: now a 98.7% pixel match (seven arcs centred just outside the top-right corner, 18.75/15.25 stripes). 61 kit files regenerated.
 - #195 Brand guide written as a Claude doc: [Coinroof Brand & Design Guide](https://claude.ai/artifact/KYYx5TuBicoMrbbeRm78ta) (logo, usage, palette, type, voice, app rules, files, open decisions).
-- Explored on the way: logo concepts (roof, coin, woven links), the red/green/white/black screen comps in `docs/03 Design/Comps/coinroof-*-draft.html` (untracked), and fonts (Monr, Monare, Bebas Neue). Dinesh then chose his own Canva logo over all of them.
-- Open: Monr (and Monare) are personal-use demo licences, so a commercial licence is needed before launch; trademark and domain checks for Coinroof; tagline; scope of the rename (code, repo, legal); compare the redrawn tile with the Canva original.
+- Explored on the way: logo concepts (roof, coin, woven links), the red/green/white/black screen comps in (drafts since deleted), and fonts (Monr, Monare, Bebas Neue). Dinesh then chose his own Canva logo over all of them.
+- Open: Monr (and Monare) are personal-use demo licences, so a commercial licence is needed before launch; trademark and domain checks for Coinroof; tagline; scope of the rename (code, repo, legal).
 
 ## 2026-10-28
 - #193 Tabular figures for dynamic numbers (option C, Dinesh): added the Numbers section and Decisions row in the Design System, one line in CLAUDE.md §6, `.money` and `.count` shared rule in `web/src/styles.css`, `CountUp` sets `tabular-nums` on its visible number, `CountUp.test.jsx` (2 tests), Test Plan row and a release-checklist item. Figures inside sentences are left as they are (noted in the Design System).
