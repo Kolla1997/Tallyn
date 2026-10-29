@@ -91,6 +91,7 @@ Patterns already in the app, to reuse before inventing new ones:
 | Money figures | Roll up from $0: `CountUp start={0}`, the metric card's rolling digits, or the split-flap `fromZero` | Home, Accounts (#221, #228) |
 | Day bars | Grow up from the line left to right once the data has arrived (`.calm-grow`); a capped day's label fades in last (`.calm-late`) | Transactions (#230) |
 | Budget rows | Split segments and job bars sweep in (`.calm-sweep`), job cards rise (`.calm-rise`), each start set by `--d`; one-person rows fill notch by notch one row after another (`.calm-pop`), then today's outline (`.calm-ring`) and the pace tag (`.calm-late-at`) | Budgets (#232) |
+| Waffle | Fills square by square, 6ms apart (`.calm-pop` with `--d`) | Debts (#234) |
 | Bars and notches | Fill from the left only once their row has landed (`.calm-fill`, `Gauge fillDelay`); in a list, one bar after another | Home, Accounts (#221, #228) |
 | Rings | Sweep round from the top, outer first (the ring chart's own entry) | Accounts |
 | Sidebar | Glides between narrow and wide (300ms); names fade in after | Shell (#221) |

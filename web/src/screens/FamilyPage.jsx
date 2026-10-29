@@ -3,6 +3,7 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import { UserPlus, Mail, Check } from 'lucide-react'
 import { api } from '../lib/api.js'
 import { formatMoney } from '../lib/money.js'
+import CountUp from '../components/CountUp.jsx'
 import { Avatar, nameOf } from '../lib/people.jsx'
 import { Link } from '../lib/router.jsx'
 import { isOwed } from '../lib/summary.js'
@@ -91,18 +92,20 @@ function Switch({ label, checked, disabled, onChange }) {
   )
 }
 
-// Has and owes, each a link to the accounts behind it.
+// Has and owes, each a link to the accounts behind it. Both count up from 0 on load (#234).
 function HaveOwe({ have, owe, cur, haveTo, oweTo, you }) {
   return (
     <div className="grid grid-cols-2 gap-3">
       <Link to={haveTo} className="block rounded-xl bg-zinc-50 dark:bg-zinc-800/60 p-3 no-underline hover:bg-zinc-100 dark:hover:bg-zinc-800">
         <span className={`block ${NOTE}`}>{you ? 'You have' : 'Has'}</span>
-        <Money className="text-[20px]">{formatMoney(have, cur)}</Money>
+        <Money className="text-[20px]">
+          <CountUp value={have} start={0} format={(v) => formatMoney(v, cur)} />
+        </Money>
       </Link>
       <Link to={oweTo} className="block rounded-xl bg-zinc-50 dark:bg-zinc-800/60 p-3 no-underline hover:bg-zinc-100 dark:hover:bg-zinc-800">
         <span className={`block ${NOTE}`}>{you ? 'You owe' : 'Owes'}</span>
         <Money className="text-[20px]" tone={owe > 0 ? OWE : undefined}>
-          {formatMoney(owe, cur)}
+          <CountUp value={owe} start={0} format={(v) => formatMoney(v, cur)} />
         </Money>
       </Link>
     </div>

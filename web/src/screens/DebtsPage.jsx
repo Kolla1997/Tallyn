@@ -6,6 +6,7 @@ import { useRetry } from '../lib/retry.js'
 import { api } from '../lib/api.js'
 import { canAddCardDetails, dueState, shortDate, todayISO } from '../lib/cards.js'
 import { formatMoney } from '../lib/money.js'
+import CountUp from '../components/CountUp.jsx'
 import { nameOf } from '../lib/people.jsx'
 import { ReconnectBank } from './Banks.jsx'
 import { Head, Panel, Chips } from '../components/calm/ui.jsx'
@@ -160,17 +161,23 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
               <Figure
                 label={who === 'everyone' ? 'Everyone owes' : who === 'yours' ? 'You owe' : `${nameOf(people[who] ?? { user_id: who })} owes`}
                 value={money(total)}
+                count={total}
+                money={money}
                 tone="var(--color-redesign-owe-text)"
                 first
               />
               <Figure
                 label="Payments due this month"
                 value={knowsDates ? money(due.reduce((t, [v]) => t + v, 0)) : '—'}
+                count={knowsDates ? due.reduce((t, [v]) => t + v, 0) : null}
+                money={money}
                 note={knowsDates ? `${due.length} ${due.length === 1 ? 'payment' : 'payments'}` : 'Your banks haven’t shared due dates'}
               />
               <Figure
                 label="Interest paid this year"
                 value={interest.length ? money(interest.reduce((t, a) => t + a.loan.ytd_interest_minor, 0)) : '—'}
+                count={interest.length ? interest.reduce((t, a) => t + a.loan.ytd_interest_minor, 0) : null}
+                money={money}
                 note={interest.length ? 'on loans' : 'Your banks haven’t shared it'}
               />
               <Figure
@@ -178,6 +185,7 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
                 value={overdue ? `${overdue} ${overdue === 1 ? 'debt' : 'debts'}` : 'None'}
                 note={overdue ? 'Check with your bank' : 'All on time'}
                 tone={overdue ? 'var(--color-redesign-owe-text)' : 'var(--color-redesign-in-text)'}
+                late
               />
             </dl>
           </section>
@@ -225,12 +233,13 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
 }
 
 // One figure in the summary strip.
-function Figure({ label, value, note, tone, first }) {
+// On load (#234) money figures count up from 0 (`count`), and the `late` one (Overdue) lands last.
+function Figure({ label, value, note, tone, first, count, money, late }) {
   return (
-    <div className={first ? 'sm:pr-4' : 'sm:px-3'}>
+    <div className={`${first ? 'sm:pr-4' : 'sm:px-3'}${late ? ' calm-late-at' : ''}`} style={late ? { '--e': '1000ms' } : undefined}>
       <dt className={`text-[13px] whitespace-nowrap ${MUTED}`}>{label}</dt>
       <dd className={`m-0 text-[22px] whitespace-nowrap ${NUM}`} style={tone ? { color: tone } : undefined}>
-        {value}
+        {count == null ? value : <CountUp value={count} start={0} format={money} />}
       </dd>
       {note && <dd className={`m-0 text-[13px] ${MUTED}`}>{note}</dd>}
     </div>
@@ -248,7 +257,8 @@ function Waffle({ groups, total, money }) {
     <div className="flex items-center gap-4">
       <span className="grid shrink-0 grid-cols-10 gap-[2px]" aria-hidden="true">
         {cells.map((c, i) => (
-          <i key={i} className="block size-[8px] rounded-[1.5px]" style={{ background: c }} />
+          // The cells fill one by one, a square every 6ms (#234, Dinesh picked B for the waffle).
+          <i key={i} className="calm-pop block size-[8px] rounded-[1.5px]" style={{ background: c, '--d': `${i * 6}ms` }} />
         ))}
       </span>
       <ul className="m-0 grid list-none gap-1.5 p-0 text-[13px]">
@@ -256,7 +266,9 @@ function Waffle({ groups, total, money }) {
           <li key={g.key} className="flex items-center gap-2">
             <i className="block size-2 shrink-0 rounded-[2px]" style={{ background: g.color }} />
             <span>{g.label}</span>
-            <b className={`ml-auto pl-4 ${NUM}`}>{money(g.value)}</b>
+            <b className={`ml-auto pl-4 ${NUM}`}>
+              <CountUp value={g.value} start={0} format={money} />
+            </b>
             <span className={`w-10 text-right tabular-nums ${MUTED}`}>{total ? Math.round((g.value / total) * 100) : 0}%</span>
           </li>
         ))}
@@ -279,7 +291,7 @@ function DebtRow({ account: a, money, onChanged, onError }) {
   return (
     <li
       aria-label={`${a.name}${a.mask ? ` ending ${a.mask}` : ''}`}
-      className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-2 border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_240px_140px]"
+      className="calm-row grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-2 border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_240px_140px]"
     >
       <div className="flex min-w-0 items-center gap-3">
         <AccountIcon account={a} />
@@ -295,7 +307,7 @@ function DebtRow({ account: a, money, onChanged, onError }) {
           <>
             <span className="relative block h-2 overflow-hidden rounded-full" style={{ background: 'var(--color-redesign-track)' }} aria-hidden="true">
               <span
-                className="block h-full rounded-full"
+                className="calm-fill block h-full rounded-full"
                 style={{ width: `${Math.min(100, m.percent)}%`, background: m.kind === 'used' ? 'var(--color-redesign-accent)' : 'var(--color-redesign-in)' }}
               />
             </span>
