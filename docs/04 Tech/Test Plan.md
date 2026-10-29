@@ -194,6 +194,8 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - [ ] Accounts on load (#228): at laptop width, the rings sweep round, net worth, have and owe roll up from $0, the tiles arrive left to right, and each limit bar fills after its tile lands; with Reduce motion on, the page appears drawn.
 - [ ] Transactions on load (#230): once the days arrive, Spending by day's bars grow up left to right, the three figures and All time count up from $0, and a capped day's label fades in last; with Reduce motion on, all appear drawn.
 - [ ] Active page in dark mode (#230): the current page's sidebar icon and name are green with a small green bar on the left; light mode stays red.
+- [ ] Budgets on load (#232): the income split fills left to right with its amounts counting up; job cards arrive left to right and each bar fills after its card; one-person budget rows fill notch by notch, one row after another, then today's outline and the Over budget / On pace tag land; with Reduce motion on, all appear drawn.
+- [ ] Active page edge bar (#232): the current page in the sidebar has a small bar on its left, red in light mode and green in dark.
 - [ ] Smooth loading (#212, #221): moving between pages shows the animated mark, then after about 1s a small mark and sweeping grey card shapes, then rows fade up slowly one after another (about 1.2s for a 6-row card); with Reduce motion on, only a short fade.
 - [ ] Page background (#213): the two-tone mesh shows green top left and red bottom right, in light and dark; card text stays readable where it is strongest.
 - [ ] Home at 1024px and up: the Your spending card reaches the bottom of Recent transactions, with no empty band under "October so far" before the next row (#1).

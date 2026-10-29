@@ -25,6 +25,13 @@ const PLAN = {
 
 const open = async (household = owner) => act(async () => render(<IncomePlan me={me} household={household} today={today} />))
 
+// What a person sees: an element's text without the screen-reader copy a count-up adds (#232).
+const seen = (el) => {
+  const c = el.cloneNode(true)
+  c.querySelectorAll('.sr-only').forEach((n) => n.remove())
+  return c.textContent
+}
+
 describe('IncomePlan', () => {
   beforeEach(() => {
     api.mockReset()
@@ -37,7 +44,7 @@ describe('IncomePlan', () => {
     expect(screen.getByText('Guilt-free is $45.00 over, and $560.00 is still to move to savings. 24 of 31 days gone.')).toBeInTheDocument()
     expect(screen.getByText('55 / 5 / 10 / 15 / 15')).toBeInTheDocument()
     const rows = screen.getAllByRole('listitem').filter((li) => li.classList.contains('plan-row'))
-    expect(rows.map((r) => r.querySelector('.plan-words').textContent)).toEqual(['$740.00 left', '$45.00 over', '$40.00 to move', '$560.00 to move', 'Done'])
+    expect(rows.map((r) => seen(r.querySelector('.plan-words')))).toEqual(['$740.00 left', '$45.00 over', '$40.00 to move', '$560.00 to move', 'Done'])
     expect(screen.getByText(/isn.t counted here/)).toBeInTheDocument()
   })
 

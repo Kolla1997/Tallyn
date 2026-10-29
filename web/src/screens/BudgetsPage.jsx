@@ -12,6 +12,12 @@ import { todayISO } from '../lib/cards.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import { Head, Panel, Chips, Pill, NUM, MUTED, OWE } from '../components/calm/ui.jsx'
+import CountUp from '../components/CountUp.jsx'
+
+// Budgets on load (#232): one-person rows fill one after another from 800ms, a notch every 14ms.
+const NOTCH_MS = 14
+const ROWS_FROM = 800
+const ROW_GAP = 150
 import IncomePlan from './IncomePlan.jsx'
 
 // Budgets (#13, ADR 0014), in the calm redesign (#187, the #185 draft): the plan from your
@@ -40,21 +46,25 @@ function Left({ b, money }) {
   if (b.spent_minor > b.amount_minor)
     return (
       <span className={cls} style={OWE}>
-        {money(b.spent_minor - b.amount_minor)} over
+        <CountUp value={b.spent_minor - b.amount_minor} start={0} format={money} /> over
       </span>
     )
   if (b.spent_minor === b.amount_minor) return <span className={cls}>All used</span>
-  return <span className={cls}>{money(b.amount_minor - b.spent_minor)} left</span>
+  return (
+    <span className={cls}>
+      <CountUp value={b.amount_minor - b.spent_minor} start={0} format={money} /> left
+    </span>
+  )
 }
 
 // Red only when it needs a look: ahead of pace or over.
-function PacePill({ b, today }) {
+function PacePill({ b, today, late }) {
   const p = pace(b.spent_minor, b.amount_minor, periodInfo(b, today).elapsed)
   const warn = p === 'over' || p === 'ahead'
   return (
     <span
-      className={`shrink-0 rounded-full px-2 py-0.5 text-[12px] font-semibold ${warn ? 'bg-red-50 dark:bg-red-950/40' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200'}`}
-      style={warn ? OWE : undefined}
+      className={`${late ? 'calm-late-at ' : ''}shrink-0 rounded-full px-2 py-0.5 text-[12px] font-semibold ${warn ? 'bg-red-50 dark:bg-red-950/40' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200'}`}
+      style={{ ...(warn ? OWE : {}), ...(late ? { '--e': late } : {}) }}
     >
       {PACE[p]}
     </span>
@@ -101,7 +111,9 @@ export function PaceLine({ b, today }) {
 }
 
 // One notch per day of the period. Filled notches show the share spent; the outlined notch is today.
-export function DayNotches({ b, today }) {
+// `start` (#232): on load the filled notches pop in one by one from that delay, 14ms apart, and the
+// today outline lands after them.
+export function DayNotches({ b, today, start }) {
   const { days, day } = periodInfo(b, today)
   const filled = Math.round(Math.min(1, b.spent_minor / b.amount_minor) * days)
   const fill = tone(b.spent_minor, b.amount_minor) === 'ok' ? 'bg-zinc-600' : 'bg-[var(--color-redesign-accent)]'
@@ -110,7 +122,8 @@ export function DayNotches({ b, today }) {
       {Array.from({ length: days }, (_, i) => (
         <i
           key={i}
-          className={`h-6 grow rounded-[3px] ${i < filled ? `on ${fill}` : 'bg-zinc-200 dark:bg-zinc-700'} ${i === day - 1 ? 'today ring-2 ring-zinc-900 dark:ring-white ring-offset-1 dark:ring-offset-zinc-900' : ''}`}
+          style={start == null ? undefined : { '--d': `${start + i * NOTCH_MS}ms`, '--e': `${start + filled * NOTCH_MS}ms` }}
+          className={`h-6 grow rounded-[3px] ${start != null && i < filled ? 'calm-pop ' : ''}${start != null && i === day - 1 ? 'calm-ring ' : ''}${i < filled ? `on ${fill}` : 'bg-zinc-200 dark:bg-zinc-700'} ${i === day - 1 ? 'today ring-2 ring-zinc-900 dark:ring-white ring-offset-1 dark:ring-offset-zinc-900' : ''}`}
         />
       ))}
     </div>
@@ -142,8 +155,9 @@ function HouseholdBudget({ b, today, money, onChange }) {
   )
 }
 
-function PersonBudget({ b, name, today, money, onChange }) {
-  const { left } = periodInfo(b, today)
+function PersonBudget({ b, name, today, money, onChange, start }) {
+  const { left, days } = periodInfo(b, today)
+  const done = `${start + Math.round(Math.min(1, b.spent_minor / b.amount_minor) * days) * NOTCH_MS}ms`
   return (
     <li className="calm-solid budget-row flex flex-col gap-3 rounded-2xl p-4 sm:flex-row sm:items-center">
       <div className="min-w-44">
@@ -152,7 +166,7 @@ function PersonBudget({ b, name, today, money, onChange }) {
           {what(b)}, {PERIOD[b.period]}
         </p>
       </div>
-      <DayNotches b={b} today={today} />
+      <DayNotches b={b} today={today} start={start} />
       <div className="flex flex-wrap items-center gap-3 sm:min-w-64 sm:justify-end">
         <span className="grid text-right">
           <Left b={b} money={money} />
@@ -160,7 +174,7 @@ function PersonBudget({ b, name, today, money, onChange }) {
             {money(b.spent_minor)} of {money(b.amount_minor)}, {toGo(left)}
           </span>
         </span>
-        <PacePill b={b} today={today} />
+        <PacePill b={b} today={today} late={done} />
         {b.can_manage && (
           <button type="button" className={CHANGE} onClick={onChange} aria-label={`Change ${name}'s ${what(b)} budget`}>
             Change
@@ -222,6 +236,12 @@ export default function BudgetsPage({ me, household, refreshKey }) {
   const budgets = data?.budgets ?? []
   const shared = budgets.filter((b) => !b.member_user_id)
   const personal = budgets.filter((b) => b.member_user_id)
+  const rowStarts = []
+  personal.reduce((at, b) => {
+    rowStarts.push(at)
+    const { days } = periodInfo(b, data.today)
+    return at + Math.round(Math.min(1, b.spent_minor / b.amount_minor) * days) * NOTCH_MS + ROW_GAP
+  }, ROWS_FROM)
   const mine = data?.counting.find((c) => c.user_id === me.user_id)
 
   async function setCount(on) {
@@ -309,10 +329,12 @@ export default function BudgetsPage({ me, household, refreshKey }) {
                   <section aria-labelledby="budgets-person">
                     <SectionHead id="budgets-person" title="Budgets for one person" note="One notch per day. Outlined: today." />
                     <ul className="m-0 grid list-none gap-3 p-0">
-                      {personal.map((b) => {
+                      {personal.map((b, k) => {
                         const p = people[b.member_user_id] ?? { user_id: b.member_user_id }
                         const name = b.member_user_id === me.user_id ? 'You' : nameOf(p)
-                        return <PersonBudget key={b.id} b={b} name={name} today={data.today} money={money} onChange={() => setEditing(b)} />
+                        return (
+                          <PersonBudget key={b.id} b={b} name={name} today={data.today} money={money} onChange={() => setEditing(b)} start={rowStarts[k]} />
+                        )
                       })}
                     </ul>
                   </section>
