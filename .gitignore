@@ -16,7 +16,7 @@
 PROGRESS.md
 
 # Build / deps
-node_modules/
+node_modules
 web/dist/
 # Layout checks (#117): their build, results and report
 web/e2e-dist/
