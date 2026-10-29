@@ -11,6 +11,13 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-29
+- #228 Accounts on load (C, PR #229): the rings sweep; net worth, have and owe count up from $0 (`CountUp start`); the tiles arrive left to right; each limit bar fills after its tile.
+- #228 Loading-effect rule: every new screen, card, chart or figure gets a planned loading effect in its draft, with a reduced-motion version. Added to CLAUDE.md §6 and Design System → Loading motion, which lists the patterns to reuse.
+- #230 Sidebar and Transactions (C for both, PR #231): in dark mode the active page is green with a 3px edge bar. On Transactions, Spending by day's bars grow left to right once the days arrive (they used to grow on the empty month), the figures count up, and the capped label lands last.
+- #232 Budgets on load (C, PR #233): the income split sweeps in; the job cards rise and their bars fill after them; the one-person rows fill notch by notch, one row after another, then today's outline and the pace tag. Light mode's active page gets the edge bar in red.
+- #234 Debts, Family and Goals on load (PR #236): Dinesh picked B for the Debts waffle (square by square, 6ms apart) and C for the rest. Figures count up; Debts rows arrive with their bars filling after; Overdue lands last; a goal's bar fills after its card and the forecast lines arrive one by one.
+- Process: two sessions shared one scratch clone, and the other session's commit briefly picked up the #234 edits. #236 was rebuilt from main in a separate clone. Port 5175 serves that shared clone (behind main); use 5176 (`app-234`) to see main.
+- Open: #235 (loading words, the other session) started before #232 and must keep #232's animation classes when it's updated to main. #220 sign-in launch page not started.
 - #221 Home loading motion, five parts, each picked by Dinesh from a draft:
   - Loader (C, PR #222): the animated Coinroof mark shows for the first 900ms, then a small mark above grey card shapes with a faint green and red sweep. It's CSS only and applies to every page. Budgets' income plan no longer shows a second loader.
   - Spending chart (A, PR #223): the line rises from flat over 900ms and the total rolls up from $0. The 7D/30D/90D switch keeps its quick morph.
