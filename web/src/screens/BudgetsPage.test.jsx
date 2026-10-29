@@ -67,6 +67,13 @@ function answers() {
 }
 const open = async () => act(async () => render(<BudgetsPage me={me} household={owner} refreshKey={0} />))
 
+// What a person sees: an element's text without the screen-reader copy a count-up adds (#232).
+const seen = (el) => {
+  const c = el.cloneNode(true)
+  c.querySelectorAll('.sr-only').forEach((n) => n.remove())
+  return c.textContent
+}
+
 describe('BudgetsPage', () => {
   beforeEach(() => {
     api.mockReset()
@@ -81,7 +88,7 @@ describe('BudgetsPage', () => {
     const household = within(screen.getByRole('region', { name: 'Household budgets' }))
     expect(household.getByRole('heading', { name: 'Food and drink' })).toBeInTheDocument()
     expect(household.getByText('Ahead of pace')).toBeInTheDocument()
-    expect(household.getByText('$40.00 left')).toBeInTheDocument()
+    expect(household.getAllByText((_, el) => el?.tagName === 'SPAN' && seen(el) === '$40.00 left').length).toBeGreaterThan(0)
     const person = within(screen.getByRole('region', { name: 'Budgets for one person' }))
     expect(person.getByRole('heading', { name: 'Leo' })).toBeInTheDocument()
     const notches = document.querySelectorAll('.day-notches i')

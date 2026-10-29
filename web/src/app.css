@@ -649,6 +649,38 @@ body:has(.calm-page) {
     animation: calm-in 300ms ease-out 1250ms both;
   }
 }
+/* Budgets on load (#232). Each element carries its own start in --d (and --e for what lands after
+   it): a segment or bar sweeping in from the left, a card rising, a notch popping, today's outline and
+   a tag arriving once the row has filled. */
+@keyframes calm-pop {
+  from {
+    transform: scaleY(0.2);
+    opacity: 0.3;
+  }
+}
+@keyframes calm-noring {
+  from {
+    box-shadow: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .calm-sweep {
+    transform-origin: left;
+    animation: calm-fill 450ms cubic-bezier(0.23, 1, 0.32, 1) var(--d, 0ms) both;
+  }
+  .calm-rise {
+    animation: calm-rise 700ms cubic-bezier(0.23, 1, 0.32, 1) var(--d, 0ms) both;
+  }
+  .calm-pop {
+    animation: calm-pop 220ms cubic-bezier(0.23, 1, 0.32, 1) var(--d, 0ms) both;
+  }
+  .calm-ring {
+    animation: calm-noring 250ms ease-out var(--e, 0ms) both;
+  }
+  .calm-late-at {
+    animation: calm-in 300ms ease-out var(--e, 0ms) both;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .calm-card,
   .calm-row {
