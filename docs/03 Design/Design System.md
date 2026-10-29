@@ -78,6 +78,23 @@ AA contrast: 4.5:1 for text under 18.66px bold. Clay with white is 4.4:1 (large 
 ## Motion
 See [[Animation Guide]]. UI transitions are 200 to 300ms, ease-out. Data arriving on a page is slower on purpose (`load-reveal`, #212): still grey card shapes while loading, then cards fade in (500ms) and rows fade up 8px over 700ms, 90ms apart, after 200ms. Respect reduced motion (a 150ms plain fade).
 
+### Loading motion (#228)
+> [!warning] Every new screen, card, chart or figure needs a planned loading effect, shown in its draft, with a reduced-motion version.
+
+Patterns already in the app, to reuse before inventing new ones:
+
+| What | How it loads | Where |
+|---|---|---|
+| A page | The animated Coinroof mark for 900ms, then a small mark over grey card shapes with a green and red sweep (`PageSkeleton`) | Every page (#221) |
+| Cards and rows | Cards fade in, rows fade up one after another (`load-reveal`: 200ms, then 700ms, 90ms apart; `.calm-card`, `.calm-row`) | Every page (#212) |
+| A line chart | The line rises from flat over 900ms | Home spending (#221) |
+| Money figures | Roll up from $0: `CountUp start={0}`, the metric card's rolling digits, or the split-flap `fromZero` | Home, Accounts (#221, #228) |
+| Bars and notches | Fill from the left only once their row has landed (`.calm-fill`, `Gauge fillDelay`); in a list, one bar after another | Home, Accounts (#221, #228) |
+| Rings | Sweep round from the top, outer first (the ring chart's own entry) | Accounts |
+| Sidebar | Glides between narrow and wide (300ms); names fade in after | Shell (#221) |
+
+Rules: each effect plays once per load, not on every re-render; switching a filter or person uses the quicker UI transition; reduced motion shows the finished state with no movement (or a short plain fade).
+
 ## Designing a screen
 How to design or redesign any Tallyn screen ([#180](https://github.com/Kolla1997/Tallyn/issues/180)). It borrows the app-screen method from taste-skill (`.claude/skills/design-taste-frontend/`, `references/app-screens.md`) but keeps Tallyn's look. Follow the steps in order; when they disagree, the earlier step wins.
 
@@ -151,3 +168,4 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-29 | Coinroof colours (#201): the app's red and green are the logo's. Red `#CB0900` for the one action, what's owed and spending (scale `#F7C6C2`, `#E06B66`, `#CB0900`, `#6B0500`); green `#067B00` for money in and progress; the glows take the same hues. Dark mode text: red `#E06B66` (5.5:1 on cards), green `#6AB066` (6.8:1). Red still marks the one action | Dinesh picked A over B (glows and button only) and C (green main button), from drafts on the real app in light and dark |
 | 2026-10-29 | Smooth loading (#212): still grey skeleton cards, then cards fade in and rows fade up slowly one after another (`load-reveal` token, slower than `ui-transition` on purpose) | Dinesh picked C (still skeleton + row ripple) over A and B, then asked for it slower twice, from drafts with real Home data |
 | 2026-10-29 | Page background (#213): a two-tone mesh. Green glow top left, red bottom right, a faint amber hint (`redesign-glow-amber`, new) near the top right. The grey bottom glow is no longer used on the page | Dinesh picked C over A (calmer glow), B (ledger paper) and D (mix), from drafts with real Home data in light and dark |
+| 2026-10-29 | Loading motion rule (#228): every new screen, card, chart or figure gets a planned loading effect in its draft, with a reduced-motion version; reuse the patterns under Motion → Loading motion | Dinesh asked for it after the Home (#221) and Accounts (#228) loading work |

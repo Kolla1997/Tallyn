@@ -668,6 +668,20 @@ body:has(.calm-page) {
     animation: calm-in 160ms ease-out 180ms both;
   }
 }
+/* Bars that fill once their row has arrived (#228): a row lands 900ms after its delay starts
+   (200ms + 700ms), and --n comes from the row, so each bar follows its own tile. */
+@keyframes calm-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .calm-fill {
+    transform-origin: left;
+    animation: calm-fill 500ms cubic-bezier(0.23, 1, 0.32, 1) both;
+    animation-delay: calc(900ms + var(--n, 8) * 90ms);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .calm-card,
   .calm-row {
