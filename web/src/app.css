@@ -551,3 +551,63 @@ body:has(.calm-page) {
     height: auto;
   }
 }
+
+/* Loading (#212): still grey bars while a page loads, then cards fade in and their rows fade up one
+   after another (load-reveal in design-tokens.json: 700ms, 90ms apart, after 200ms). Runs once when a
+   card or row appears, so re-renders don't replay it. Reduced motion: a short plain fade. */
+.calm-bar {
+  display: block;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--color-redesign-track);
+}
+@keyframes calm-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes calm-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .calm-card {
+    animation: calm-in 500ms ease-out both;
+  }
+  .calm-row {
+    animation: calm-rise 700ms cubic-bezier(0.23, 1, 0.32, 1) both;
+    animation-delay: calc(200ms + var(--n, 8) * 90ms);
+  }
+  .calm-row:nth-child(1) {
+    --n: 0;
+  }
+  .calm-row:nth-child(2) {
+    --n: 1;
+  }
+  .calm-row:nth-child(3) {
+    --n: 2;
+  }
+  .calm-row:nth-child(4) {
+    --n: 3;
+  }
+  .calm-row:nth-child(5) {
+    --n: 4;
+  }
+  .calm-row:nth-child(6) {
+    --n: 5;
+  }
+  .calm-row:nth-child(7) {
+    --n: 6;
+  }
+  .calm-row:nth-child(8) {
+    --n: 7;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .calm-card,
+  .calm-row {
+    animation: calm-in 150ms linear both;
+  }
+}

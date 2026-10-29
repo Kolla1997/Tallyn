@@ -8,7 +8,7 @@ import { Link } from '../lib/router.jsx'
 import { isOwed } from '../lib/summary.js'
 import { Invite } from './Members.jsx'
 import { Head, Panel, Rows, Row, Money, Pill, MUTED, OWE, IN } from '../components/calm/ui.jsx'
-import TallynLoader from '../components/TallynLoader.jsx'
+import PageSkeleton from '../components/calm/PageSkeleton.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
 
@@ -223,7 +223,7 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
         failed ? (
           <LoadFailed what="your family" busy={retrying} onRetry={retry} />
         ) : (
-          <TallynLoader />
+          <PageSkeleton />
         )
       ) : (
         <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-12 [&>*]:min-w-0">

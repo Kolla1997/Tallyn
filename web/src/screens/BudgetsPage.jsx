@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import { curveLinear } from '@visx/curve'
 import { LineChart } from '@/components/charts/line-chart'
 import { Line } from '@/components/charts/line'
-import TallynLoader from '../components/TallynLoader.jsx'
+import PageSkeleton from '../components/calm/PageSkeleton.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
 import { api } from '../lib/api.js'
@@ -259,7 +259,7 @@ export default function BudgetsPage({ me, household, refreshKey }) {
           failed ? (
             <LoadFailed busy={retrying} onRetry={retry} />
           ) : (
-            <TallynLoader />
+            <PageSkeleton />
           )
         ) : (
           <>
