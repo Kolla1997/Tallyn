@@ -561,6 +561,62 @@ body:has(.calm-page) {
   border-radius: 7px;
   background: var(--color-redesign-track);
 }
+/* Loader hand-over (#221): the mark alone for 900ms, then the small mark and the card shapes with a
+   faint green-and-red sweep. Reduced motion: the shapes straight away, no sweep (the SVG stands still). */
+.calm-skeleton-mark {
+  position: absolute;
+  inset: 0 0 auto;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding-top: 96px;
+  color: var(--color-zinc-500);
+  font-size: 13px;
+  font-weight: 500;
+  pointer-events: none;
+}
+.calm-skeleton-mini {
+  height: 20px;
+  margin-bottom: 12px;
+}
+@keyframes calm-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes calm-sweep {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .calm-skeleton-mark {
+    animation: calm-out 300ms ease-out 900ms both;
+  }
+  .calm-skeleton-shapes {
+    animation: calm-in 300ms ease-out 900ms both;
+  }
+  .calm-skeleton .calm-bar {
+    background: linear-gradient(
+        90deg,
+        var(--color-redesign-track) 0%,
+        color-mix(in srgb, var(--color-redesign-in) 35%, transparent) 20%,
+        color-mix(in srgb, var(--color-redesign-accent) 25%, transparent) 30%,
+        var(--color-redesign-track) 45%
+      )
+      0 0 / 300% 100%;
+    animation: calm-sweep 1.6s linear infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .calm-skeleton-mark {
+    display: none;
+  }
+}
 @keyframes calm-in {
   from {
     opacity: 0;

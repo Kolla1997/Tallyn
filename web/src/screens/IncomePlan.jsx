@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useId, useState } from 'react'
-import TallynLoader from '../components/TallynLoader.jsx'
 import { api } from '../lib/api.js'
 import { fromMinor, toMinor } from '../lib/budgets.js'
 import { formatMoney } from '../lib/money.js'
@@ -48,7 +47,8 @@ export default function IncomePlan({ me, household, today }) {
       </p>
     )
   }
-  if (!plans) return <TallynLoader small />
+  // The page's own loader covers this panel, so it shows one mark, not two (#221).
+  if (!plans) return null
 
   return (
     <section className="calm-glass min-w-0 rounded-2xl p-4" aria-labelledby={plan && !editing ? 'plan-title' : 'plan-h'}>

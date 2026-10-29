@@ -8,5 +8,7 @@ describe('PageSkeleton', () => {
     const { container } = render(<PageSkeleton />)
     expect(screen.getByRole('status')).toHaveTextContent('Adding it all up')
     expect(container.querySelectorAll('[aria-hidden="true"] .calm-bar').length).toBeGreaterThan(0)
+    // #221: the Coinroof mark shows first, then a small one; both are decoration
+    expect(container.querySelectorAll('[aria-hidden="true"] img[alt=""]').length).toBe(4)
   })
 })
