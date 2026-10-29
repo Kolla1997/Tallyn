@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useState } from 'react'
 import { api } from '../lib/api.js'
 import { fromMinor, toMinor } from '../lib/budgets.js'
 import { formatMoney } from '../lib/money.js'
+import CountUp from '../components/CountUp.jsx'
 import { Chips, Pill, NUM, MUTED, OWE, IN } from '../components/calm/ui.jsx'
 import { answer, BUCKETS, JOBS, jobs, ownSharesOk, suggestionMonths, TEMPLATES } from '../lib/plans.js'
 
@@ -133,32 +134,38 @@ function PlanView({ plan, today, money }) {
       <h4 className={STEP}>How your income is split</h4>
       <div className="flex h-3 gap-0.5 overflow-hidden rounded-full" aria-hidden="true">
         {list.map((j, i) => (
-          <span key={j.key} className={JOB_TONE[i % JOB_TONE.length]} style={{ flexGrow: j.share }} />
+          // On load (#232) the split fills left to right, a segment every 70ms.
+          <span key={j.key} className={`calm-sweep ${JOB_TONE[i % JOB_TONE.length]}`} style={{ flexGrow: j.share, '--d': `${i * 70}ms` }} />
         ))}
       </div>
       <ul className="m-0 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-zinc-600 dark:text-zinc-300">
         {list.map((j, i) => (
           <li key={j.key} className="flex items-center gap-1.5">
             <i className={`inline-block size-2 rounded-full ${JOB_TONE[i % JOB_TONE.length]}`} aria-hidden="true" />
-            {j.name} {j.share}%<span className={`${NUM} text-zinc-900 dark:text-white`}>{money(j.planned)}</span>
+            {j.name} {j.share}%
+            <span className={`${NUM} text-zinc-900 dark:text-white`}>
+              <CountUp value={j.planned} start={0} format={money} />
+            </span>
           </li>
         ))}
       </ul>
 
       <h4 className={STEP}>How each job is going</h4>
       <ul className="m-0 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-[repeat(var(--jobs),minmax(0,1fr))]" style={{ '--jobs': list.length }}>
-        {list.map((j) => {
+        {list.map((j, i) => {
           const over = j.state === 'over'
+          // Cards arrive left to right from 300ms; each bar fills once its card has landed (#232).
+          const d = 300 + i * 90
           return (
-            <li key={j.key} className="plan-row rounded-xl bg-white/70 dark:bg-zinc-800/60 p-3">
+            <li key={j.key} style={{ '--d': `${d}ms` }} className="calm-rise plan-row rounded-xl bg-white/70 dark:bg-zinc-800/60 p-3">
               <div className="flex items-baseline justify-between gap-2 text-[14px]">
                 <span className="font-semibold">{j.name}</span>
                 <Words j={j} money={money} />
               </div>
               <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700" aria-hidden="true">
                 <span
-                  className={`block h-full rounded-full ${over ? 'bg-[var(--color-redesign-accent)]' : j.kind === 'move' ? 'bg-[var(--color-redesign-in)]' : 'bg-zinc-500'}`}
-                  style={{ width: `${Math.min(100, j.planned ? (j.used / j.planned) * 100 : 0)}%` }}
+                  className={`calm-sweep block h-full rounded-full ${over ? 'bg-[var(--color-redesign-accent)]' : j.kind === 'move' ? 'bg-[var(--color-redesign-in)]' : 'bg-zinc-500'}`}
+                  style={{ width: `${Math.min(100, j.planned ? (j.used / j.planned) * 100 : 0)}%`, '--d': `${d + 350}ms` }}
                 />
               </span>
               <p className={`m-0 mt-1 text-[13px] ${MUTED}`}>
@@ -180,7 +187,7 @@ function Words({ j, money }) {
   if (j.state === 'over')
     return (
       <strong className={cls} style={OWE}>
-        {money(j.used - j.planned)} over
+        <CountUp value={j.used - j.planned} start={0} format={money} /> over
       </strong>
     )
   if (j.state === 'done')
@@ -191,7 +198,7 @@ function Words({ j, money }) {
     )
   return (
     <strong className={cls}>
-      {money(Math.max(0, j.planned - j.used))} {j.kind === 'spend' ? 'left' : 'to move'}
+      <CountUp value={Math.max(0, j.planned - j.used)} start={0} format={money} /> {j.kind === 'spend' ? 'left' : 'to move'}
     </strong>
   )
 }

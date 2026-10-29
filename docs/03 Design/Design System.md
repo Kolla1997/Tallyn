@@ -90,6 +90,7 @@ Patterns already in the app, to reuse before inventing new ones:
 | A line chart | The line rises from flat over 900ms | Home spending (#221) |
 | Money figures | Roll up from $0: `CountUp start={0}`, the metric card's rolling digits, or the split-flap `fromZero` | Home, Accounts (#221, #228) |
 | Day bars | Grow up from the line left to right once the data has arrived (`.calm-grow`); a capped day's label fades in last (`.calm-late`) | Transactions (#230) |
+| Budget rows | Split segments and job bars sweep in (`.calm-sweep`), job cards rise (`.calm-rise`), each start set by `--d`; one-person rows fill notch by notch one row after another (`.calm-pop`), then today's outline (`.calm-ring`) and the pace tag (`.calm-late-at`) | Budgets (#232) |
 | Bars and notches | Fill from the left only once their row has landed (`.calm-fill`, `Gauge fillDelay`); in a list, one bar after another | Home, Accounts (#221, #228) |
 | Rings | Sweep round from the top, outer first (the ring chart's own entry) | Accounts |
 | Sidebar | Glides between narrow and wide (300ms); names fade in after | Shell (#221) |
@@ -170,4 +171,4 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-29 | Smooth loading (#212): still grey skeleton cards, then cards fade in and rows fade up slowly one after another (`load-reveal` token, slower than `ui-transition` on purpose) | Dinesh picked C (still skeleton + row ripple) over A and B, then asked for it slower twice, from drafts with real Home data |
 | 2026-10-29 | Page background (#213): a two-tone mesh. Green glow top left, red bottom right, a faint amber hint (`redesign-glow-amber`, new) near the top right. The grey bottom glow is no longer used on the page | Dinesh picked C over A (calmer glow), B (ledger paper) and D (mix), from drafts with real Home data in light and dark |
 | 2026-10-29 | Loading motion rule (#228): every new screen, card, chart or figure gets a planned loading effect in its draft, with a reduced-motion version; reuse the patterns under Motion → Loading motion | Dinesh asked for it after the Home (#221) and Accounts (#228) loading work |
-| 2026-10-29 | Active page in dark mode (#230): the sidebar's current page is green (`redesign-in-text`) with a 3px green bar on its left; light mode stays red | Dinesh picked C (green plus edge mark) over A (green only) and B (green plus tint) |
+| 2026-10-29 | Active page in dark mode (#230): the sidebar's current page is green (`redesign-in-text`) with a 3px green bar on its left; light mode stays red, and gets the same bar in red (#232) | Dinesh picked C (green plus edge mark) over A (green only) and B (green plus tint) |
