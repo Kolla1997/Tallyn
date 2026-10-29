@@ -9,7 +9,7 @@
  * @github: https://github.com/kokonut-labs/kokonutui
  */
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { cn } from '@/lab/utils'
 
 // The chart's drawing box; it stretches to the card's width.
@@ -20,6 +20,8 @@ const PAD_Y = 10
 // into another.
 const SAMPLES = 90
 const MORPH_MS = 420
+// Tallyn edit (#221): on load the line rises from flat and the total rolls up from 0, once.
+const RISE_MS = 900
 const DAY = 86_400_000
 const DIGIT = /\d/
 const SNAP_PX = 6
@@ -178,7 +180,7 @@ function breakdown(points, span, count) {
 const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)
 
 /** Each digit rolls on its own wheel; separators sit still. */
-function RollingNumber({ value }) {
+function RollingNumber({ value, slow = false }) {
   const chars = value.split('')
   return (
     <span aria-hidden className="inline-flex tabular-nums">
@@ -192,7 +194,7 @@ function RollingNumber({ value }) {
           <span className="relative inline-block h-[1em] overflow-hidden leading-none" key={`d${key}`}>
             <span className="invisible">0</span>
             <span
-              className="absolute inset-x-0 top-0 flex flex-col transition-transform duration-[380ms] ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none"
+              className={`absolute inset-x-0 top-0 flex flex-col transition-transform ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${slow ? 'duration-[900ms]' : 'duration-[380ms]'}`}
               style={{ transform: `translateY(-${Number(char) * 10}%)` }}
             >
               {DIGITS.map((d) => (
@@ -334,7 +336,18 @@ export default function MetricCard({
   const areaRef = useRef(null)
   const previousRef = useRef(null)
   const chartRef = useRef(null)
-  const shown = useRef(info.shape)
+  // Starts flat, so the first morph is the rise on load (#221).
+  const shown = useRef({ current: info.shape.current.map(() => 0), previous: info.shape.previous })
+  const [intro, setIntro] = useState(true)
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setIntro(false))
+    return () => cancelAnimationFrame(raf)
+  }, [])
+  const [rolling, setRolling] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setRolling(false), RISE_MS)
+    return () => clearTimeout(t)
+  }, [])
   const morph = useRef({ raf: 0 })
 
   const money = useMemo(
@@ -346,6 +359,15 @@ export default function MetricCard({
       }),
     [format, currency],
   )
+
+  // Before the first paint, draw the line flat so the rise starts from the bottom (#221).
+  useLayoutEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const flat = toPath(shown.current.current)
+    currentRef.current?.setAttribute('d', flat)
+    currentDimRef.current?.setAttribute('d', flat)
+    areaRef.current?.setAttribute('d', toArea(flat))
+  }, [])
 
   // A new period or segment morphs the lines from where they are now.
   useEffect(() => {
@@ -363,13 +385,14 @@ export default function MetricCard({
       shown.current = to
       paint(info.paths)
     }
+    const rise = from.current.every((v) => v === 0)
     if (from === to || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       land()
       return
     }
     const start = performance.now()
     const frame = (now) => {
-      const t = easeInOut(Math.min(1, (now - start) / MORPH_MS))
+      const t = easeInOut(Math.min(1, (now - start) / (rise ? RISE_MS : MORPH_MS)))
       const mix = (a, b) => a.map((v, i) => v + (b[i] - v) * t)
       shown.current = {
         current: mix(from.current, to.current),
@@ -541,7 +564,7 @@ export default function MetricCard({
 
       <p className="mt-3 font-semibold text-4xl tracking-tight">
         <span className="sr-only">{formatted}</span>
-        <RollingNumber value={formatted} />
+        <RollingNumber slow={rolling} value={intro ? formatted.replace(/\d/g, '0') : formatted} />
       </p>
       <div className="mt-1.5 flex min-h-5 items-center gap-2 text-sm tabular-nums">
         <span className={cn('shrink-0 font-medium', up === upIsGood ? 'text-emerald-700 dark:text-emerald-400' : 'text-rose-700 dark:text-rose-400')}>
