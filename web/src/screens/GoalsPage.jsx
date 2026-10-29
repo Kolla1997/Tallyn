@@ -11,6 +11,7 @@ import { api } from '../lib/api.js'
 import { fromMinor, toMinor } from '../lib/budgets.js'
 import { forecast, forecastWords, monthName, nextMilestone, perMonth, summary, thisMonth, totals } from '../lib/goals.js'
 import { formatMoney } from '../lib/money.js'
+import CountUp from '../components/CountUp.jsx'
 import { nameOf } from '../lib/people.jsx'
 import { useRetry } from '../lib/retry.js'
 import { Head, Panel, Chips, Pill, NUM, MUTED, OWE } from '../components/calm/ui.jsx'
@@ -231,7 +232,13 @@ function Pot({ goal, owner, money, selected, onPick }) {
       }`}
     >
       <span className="relative block h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800" aria-hidden="true">
-        {!priv && <span className="absolute inset-y-0 left-0 block rounded-full bg-[var(--color-redesign-in)]" style={{ width: `${share * 100}%` }} />}
+        {/* On load (#234) the bar fills once the card has landed, and what's left counts up. */}
+        {!priv && (
+          <span
+            className="calm-sweep absolute inset-y-0 left-0 block rounded-full bg-[var(--color-redesign-in)]"
+            style={{ width: `${share * 100}%`, '--d': '450ms' }}
+          />
+        )}
       </span>
       <span className="flex items-center gap-1.5 text-[14px] font-semibold">
         {priv && <Lock className="size-3.5 text-zinc-500 dark:text-zinc-400" aria-hidden="true" />}
@@ -247,7 +254,15 @@ function Pot({ goal, owner, money, selected, onPick }) {
         </>
       ) : (
         <>
-          <span className={`text-[15px] ${NUM}`}>{left > 0 ? `${money(left, goal.currency)} to go` : 'Reached'}</span>
+          <span className={`text-[15px] ${NUM}`}>
+            {left > 0 ? (
+              <>
+                <CountUp value={left} start={0} format={(v) => money(v, goal.currency)} /> to go
+              </>
+            ) : (
+              'Reached'
+            )}
+          </span>
           <span className={NOTE}>
             {money(goal.saved_minor, goal.currency)} of {money(goal.target_minor, goal.currency)}
             {goal.by_month && ` by ${monthName(goal.by_month)}`}
@@ -276,19 +291,19 @@ function GoalDetail({ goal, now, money, whoName, onUpdate, onEdit }) {
       {f?.lands && <Forecast goal={goal} f={f} now={now} />}
       <ul className="m-0 mt-3 grid list-none gap-1.5 p-0 text-[14px]">
         {next && (
-          <li>
+          <li className="calm-row">
             <strong className={NUM}>{money(next.left, goal.currency)}</strong> to {next.name}.
           </li>
         )}
         {each > 0 && (
-          <li>
+          <li className="calm-row">
             Put aside <strong className={NUM}>{money(each, goal.currency)} a month</strong> to get there by {monthName(goal.by_month)}.
           </li>
         )}
-        <li className="text-zinc-600 dark:text-zinc-300">
+        <li className="calm-row text-zinc-600 dark:text-zinc-300">
           {goal.account_id ? `Follows ${goal.account ?? 'a savings account'}: updates at each bank update.` : 'Updated by hand.'}
         </li>
-        <li className="text-zinc-600 dark:text-zinc-300">Who can see it: {who}.</li>
+        <li className="calm-row text-zinc-600 dark:text-zinc-300">Who can see it: {who}.</li>
       </ul>
       {goal.can_manage && (
         <div className="mt-4 flex flex-wrap gap-2">
