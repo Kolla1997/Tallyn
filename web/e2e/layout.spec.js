@@ -10,19 +10,28 @@ import { prepare } from './fixtures.js'
 async function reallyVisible(locator, what) {
   await expect(locator, what).toBeVisible()
   await locator.scrollIntoViewIfNeeded()
-  const measure = () => locator.evaluate((el) => {
-    let opacity = 1
-    for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
-      const s = getComputedStyle(n)
-      if (s.display === 'none' || s.visibility === 'hidden') return { hidden: true }
-      opacity *= parseFloat(s.opacity)
-    }
-    const b = el.getBoundingClientRect()
-    return { hidden: false, opacity, w: b.width, h: b.height, left: b.left, right: b.right, vw: window.innerWidth }
-  })
+  const measure = () =>
+    locator.evaluate((el) => {
+      let opacity = 1
+      for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+        const s = getComputedStyle(n)
+        if (s.display === 'none' || s.visibility === 'hidden') return { hidden: true }
+        opacity *= parseFloat(s.opacity)
+      }
+      const b = el.getBoundingClientRect()
+      return { hidden: false, opacity, w: b.width, h: b.height, left: b.left, right: b.right, vw: window.innerWidth }
+    })
   // Cards and rows fade in on load (#212), so wait for the fade to end
   // instead of reading opacity mid-fade. Still fails if it never shows.
-  await expect.poll(async () => { const m = await measure(); return m.hidden ? 1 : m.opacity }, { message: `${what}: transparent`, timeout: 3000 }).toBeGreaterThan(0.1)
+  await expect
+    .poll(
+      async () => {
+        const m = await measure()
+        return m.hidden ? 1 : m.opacity
+      },
+      { message: `${what}: transparent`, timeout: 3000 },
+    )
+    .toBeGreaterThan(0.1)
   const r = await measure()
   expect(r.hidden, `${what}: hidden by CSS`).toBe(false)
   expect(r.w * r.h, `${what}: no size`).toBeGreaterThan(0)
