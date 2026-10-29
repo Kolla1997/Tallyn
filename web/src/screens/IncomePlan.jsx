@@ -169,7 +169,7 @@ function PlanView({ plan, today, money }) {
         })}
       </ul>
       <p className={`m-0 mt-3 text-[13px] ${MUTED}`}>
-        Tallyn can only see what reaches your bank. Retirement taken from your pay first, like a 401(k), isn&apos;t counted here.
+        Coinroof can only see what reaches your bank. Retirement taken from your pay first, like a 401(k), isn&apos;t counted here.
       </p>
     </>
   )

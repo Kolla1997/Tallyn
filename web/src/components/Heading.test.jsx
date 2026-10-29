@@ -10,7 +10,7 @@ describe('Heading', () => {
 
   it('names the tab and leaves focus alone on the first screen', () => {
     render(<Heading>Accounts</Heading>)
-    expect(document.title).toBe('Accounts · Tallyn')
+    expect(document.title).toBe('Accounts · Coinroof')
     expect(document.activeElement).toBe(document.body)
   })
 
@@ -19,7 +19,7 @@ describe('Heading', () => {
     unmount()
     render(<Heading>Family</Heading>)
     expect(document.activeElement).toBe(screen.getByRole('heading', { name: 'Family' }))
-    expect(document.title).toBe('Family · Tallyn')
+    expect(document.title).toBe('Family · Coinroof')
   })
 
   it('takes focus when the step changes in place, with its own tab name', () => {
@@ -30,10 +30,10 @@ describe('Heading', () => {
       return <Heading title={step === 'Welcome back' ? 'Sign in' : undefined}>{step}</Heading>
     }
     render(<Steps />)
-    expect(document.title).toBe('Sign in · Tallyn')
+    expect(document.title).toBe('Sign in · Coinroof')
     expect(document.activeElement).toBe(document.body)
     act(() => swap('Reset your password'))
     expect(document.activeElement).toBe(screen.getByRole('heading', { name: 'Reset your password' }))
-    expect(document.title).toBe('Reset your password · Tallyn')
+    expect(document.title).toBe('Reset your password · Coinroof')
   })
 })

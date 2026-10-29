@@ -50,7 +50,7 @@ export function ResetRequest({ initialEmail = '', expired = false, onBack }) {
         </span>
         <Heading>Check your email</Heading>
         <p className="muted">
-          If there&apos;s a Tallyn account for <strong className="text-strong">{sentTo}</strong>, we&apos;ve sent it a link to reset your password. The link
+          If there&apos;s a Coinroof account for <strong className="text-strong">{sentTo}</strong>, we&apos;ve sent it a link to reset your password. The link
           works for 1 hour.
         </p>
         <p className="info-note" role="status">
@@ -83,7 +83,7 @@ export function ResetRequest({ initialEmail = '', expired = false, onBack }) {
       <p className="muted">
         {expired
           ? 'Reset links work once, for 1 hour. Ask for a new one and use the newest email.'
-          : "Enter the email you use for Tallyn and we'll send you a link to choose a new password."}
+          : "Enter the email you use for Coinroof and we'll send you a link to choose a new password."}
       </p>
       <form onSubmit={send}>
         <label>

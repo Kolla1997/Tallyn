@@ -2,8 +2,8 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-12
-issues: [10, 66]
+updated: 2026-10-29
+issues: [10, 66, 200]
 tags: [brand, motion]
 ---
 # Animation Guide
@@ -24,6 +24,19 @@ Files exist in `light` and `dark`. The Lottie files animate the mark only.
 > The Lottie files were loaded and rendered with python-lottie, not on a phone. Test in your target players.
 
 Always show the last frame instead of animating when the user prefers reduced motion. See [[Brand Guide]].
+
+## Coinroof logo (#200)
+Dinesh picked **A. Ripple**: the tile's frame pops in, the arcs spread out of the top-right corner one by one (green, green, green, red, red, green, green), the level stripes slide in from the left, then COINROOF rises letter by letter. About 2 seconds, ending on the exact logo. Loop: each arc brightens in turn, like a ripple.
+
+| Use | File in `brand/coinroof/animation/` |
+|---|---|
+| Web app loading (#66) | `SVG/coinroof-mark-animated-light.svg` and `-dark.svg` in `web/src/components/TallynLoader.jsx` |
+| Website, intro | `SVG/coinroof-lockup-animated-*.svg` |
+| Preview in a browser (click to replay) | `HTML/coinroof-logo-intro-*.html` |
+| Social, presentations | `GIF/coinroof-logo-intro-*.gif` |
+
+> [!todo] No video or Lottie yet
+> The MP4 and Lottie files that Tallyn has need ffmpeg and python-lottie, which weren't available. Make them before the phone apps need a splash.
 
 ## When filters change (#87)
 Dinesh picked option A with count-up numbers. Code: `web/src/lib/motion.js`, `web/src/components/CountUp.jsx`.

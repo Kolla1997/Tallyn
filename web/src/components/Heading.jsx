@@ -17,7 +17,7 @@ export default function Heading({ children, title, ...rest }) {
   const name = title ?? (typeof children === 'string' ? children : '')
 
   useEffect(() => {
-    document.title = name ? `${name} · Tallyn` : 'Tallyn'
+    document.title = name ? `${name} · Coinroof` : 'Coinroof'
     if (last.current === name) return // StrictMode runs effects twice
     const moved = last.current !== null || !firstScreen
     firstScreen = false

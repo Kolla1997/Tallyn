@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { api, apiFile } from './api.js'
 
-// When the API says the session is over (12 hours, #92), Tallyn ends only
+// When the API says the session is over (12 hours, #92), Coinroof ends only
 // this device's session and leaves the note (#116).
 const signOut = vi.fn()
 vi.mock('./supabase.js', () => ({
@@ -72,7 +72,7 @@ describe('api', () => {
     const res = {
       status: 200,
       ok: true,
-      headers: new Headers({ 'Content-Disposition': 'attachment; filename="tallyn-data-2026-10-24.zip"' }),
+      headers: new Headers({ 'Content-Disposition': 'attachment; filename="coinroof-data-2026-10-24.zip"' }),
       blob: () => Promise.resolve(new Blob(['zip'])),
     }
     vi.stubGlobal(
@@ -80,7 +80,7 @@ describe('api', () => {
       vi.fn(() => Promise.resolve(res)),
     )
     const file = await apiFile('/api/me/export', 'fallback.zip')
-    expect(file.name).toBe('tallyn-data-2026-10-24.zip')
+    expect(file.name).toBe('coinroof-data-2026-10-24.zip')
     expect(await file.blob.text()).toBe('zip')
     vi.stubGlobal(
       'fetch',

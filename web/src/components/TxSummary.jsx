@@ -168,7 +168,7 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
           >
             Open in Maps
           </a>
-          <p className={`text-[13px] ${MUTED}`}>Opens your maps app. Tallyn doesn&apos;t send the location anywhere until you tap.</p>
+          <p className={`text-[13px] ${MUTED}`}>Opens your maps app. Coinroof doesn&apos;t send the location anywhere until you tap.</p>
         </div>
       ) : (
         <p className="mt-4 flex items-center gap-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 px-3 py-2.5 text-[13px] text-zinc-600 dark:text-zinc-300">

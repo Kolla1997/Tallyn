@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import mark from '../../../brand/logo/svg/tallyn-mark-light.svg'
+import mark from '../../../brand/coinroof/logo/svg/coinroof-mark-outline.svg'
 import { RetryIcon } from './Icons.jsx'
 
 // When a page can't load (#151, Dinesh picked D). Nothing on screen yet: a

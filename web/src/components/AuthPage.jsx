@@ -1,7 +1,7 @@
-import logo from '../../../brand/logo/svg/tallyn-lockup-horizontal-light.svg'
-import wordmark from '../../../brand/logo/svg/tallyn-wordmark-light.svg'
-import logoDark from '../../../brand/logo/svg/tallyn-lockup-horizontal-dark.svg'
-import wordmarkDark from '../../../brand/logo/svg/tallyn-wordmark-dark.svg'
+import logo from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-light.svg'
+import wordmark from '../../../brand/coinroof/logo/svg/coinroof-wordmark-ink.svg'
+import logoDark from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-dark.svg'
+import wordmarkDark from '../../../brand/coinroof/logo/svg/coinroof-wordmark-white.svg'
 import ThemeSwitch from './calm/ThemeSwitch.jsx'
 import { Link } from '../lib/router.jsx'
 
@@ -12,23 +12,23 @@ export default function AuthPage({ children, wide = false, centred = false }) {
   return (
     <main className={`page calm-page calm-auth${wide ? ' page-wide' : ''}${centred ? ' page-centred' : ''}`}>
       <ThemeSwitch className="fixed top-4 right-4 z-10" />
-      <img className="logo dark:hidden" src={logo} alt="Tallyn" />
-      <img className="logo hidden dark:block" src={logoDark} alt="Tallyn" />
+      <img className="logo dark:hidden" src={logo} alt="Coinroof" />
+      <img className="logo hidden dark:block" src={logoDark} alt="Coinroof" />
       {children}
       <SiteFooter />
     </main>
   )
 }
 
-// The page footer (#25, option B): Tallyn and the tagline, then the Terms of
+// The page footer (#25, option B): the Coinroof wordmark (#200) and the tagline, then the Terms of
 // Service and Privacy Policy (#36). At the very bottom of every screen.
 export function SiteFooter() {
   return (
     <footer className="site-footer">
       <span className="site-footer-brand">
         {/* The wordmark file, never retyped (Logo Guide). */}
-        <img className="dark:hidden" src={wordmark} alt="Tallyn" height="20" />
-        <img className="hidden dark:block" src={wordmarkDark} alt="Tallyn" height="20" />
+        <img className="dark:hidden" src={wordmark} alt="Coinroof" height="14" />
+        <img className="hidden dark:block" src={wordmarkDark} alt="Coinroof" height="14" />
         <span>· It all adds up.</span>
       </span>
       <nav aria-label="Legal" className="flex gap-3">

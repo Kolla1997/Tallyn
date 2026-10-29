@@ -7,7 +7,7 @@ const err = (props) => Object.assign(new Error('raw supabase text'), props)
 describe('authMessage', () => {
   afterEach(() => vi.restoreAllMocks())
 
-  it('maps each known code to Tallyn copy, never the raw text', () => {
+  it('maps each known code to Coinroof copy, never the raw text', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     expect(authMessage(err({ code: 'invalid_credentials' }))).toBe("That email and password don't match. Check them and try again.")
     expect(authMessage(err({ code: 'email_not_confirmed' }))).toBe('Confirm your email first: open the link we sent you, then sign in.')

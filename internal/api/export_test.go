@@ -55,20 +55,20 @@ func TestExportZip(t *testing.T) {
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status %d %s", rec.Code, rec.Body)
 	}
-	if got := rec.Header().Get("Content-Disposition"); got != `attachment; filename="tallyn-data-2026-10-24.zip"` {
+	if got := rec.Header().Get("Content-Disposition"); got != `attachment; filename="coinroof-data-2026-10-24.zip"` {
 		t.Errorf("Content-Disposition = %q", got)
 	}
 	if rec.Header().Get("Cache-Control") != "no-store" {
 		t.Errorf("Cache-Control = %q, want no-store", rec.Header().Get("Cache-Control"))
 	}
 	files := unzip(t, rec.Body.Bytes())
-	for _, name := range []string{"tallyn-data.json", "transactions.csv", "README.txt"} {
+	for _, name := range []string{"coinroof-data.json", "transactions.csv", "README.txt"} {
 		if files[name] == "" {
 			t.Errorf("zip is missing %s", name)
 		}
 	}
 	var e db.Export
-	if err := json.Unmarshal([]byte(files["tallyn-data.json"]), &e); err != nil {
+	if err := json.Unmarshal([]byte(files["coinroof-data.json"]), &e); err != nil {
 		t.Fatalf("json: %v", err)
 	}
 	if e.Profile.Email != "sam@example.test" || len(e.Transactions) != 2 {

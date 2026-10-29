@@ -50,7 +50,8 @@ export default function Verify2FA({ onSignOut, recovering = false, onCancelReset
         </p>
       )}
       <p className="muted">
-        Open your authenticator app and enter the <span className="nowrap">6-digit</span> code for Tallyn.
+        Open your authenticator app and enter the <span className="nowrap">6-digit</span> code for Coinroof (called Tallyn if you set it up before the new
+        name).
       </p>
       {error && (
         <p className="error" role="alert">

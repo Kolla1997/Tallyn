@@ -18,7 +18,7 @@ const FRESH = 4 * 60 * 1000 // the API wants a 2FA code from the last 5 minutes
 
 // Makes a new set and shows it. `canDefer`: existing accounts may say
 // "Remind me next time" once per sign-in. `onDone` after the tick.
-export function SaveBackupCodes({ email, canDefer = false, newFeature = false, onDone, onDefer, done = 'Continue to Tallyn' }) {
+export function SaveBackupCodes({ email, canDefer = false, newFeature = false, onDone, onDefer, done = 'Continue to Coinroof' }) {
   const [codes, setCodes] = useState(null)
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
@@ -71,7 +71,7 @@ export function SaveBackupCodes({ email, canDefer = false, newFeature = false, o
     const url = URL.createObjectURL(new Blob([codesFile(codes, email)], { type: 'text/plain' }))
     const a = document.createElement('a')
     a.href = url
-    a.download = 'tallyn-backup-codes.txt'
+    a.download = 'coinroof-backup-codes.txt'
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -160,7 +160,7 @@ export function BackupCodesGate({ accessToken, email, page: Page, children }) {
     if (!fresh) return
     api('/api/backup-codes').then(
       (s) => setState(isNew || s.total === 0 ? 'ask' : 'done'),
-      () => setState('done'), // never block Tallyn on this
+      () => setState('done'), // never block Coinroof on this
     )
   }, [fresh, isNew])
 

@@ -26,7 +26,7 @@ describe('ResetRequest', () => {
     Object.values(auth).forEach((f) => f.mockReset())
   })
 
-  it('sends the link back to Tallyn and says the same thing whether or not the account exists', async () => {
+  it('sends the link back to Coinroof and says the same thing whether or not the account exists', async () => {
     for (const result of [{ error: null }, { error: { status: 400, message: 'User not found' } }]) {
       auth.resetPasswordForEmail.mockResolvedValueOnce(result)
       const { unmount } = render(<ResetRequest onBack={() => {}} />)
@@ -34,7 +34,7 @@ describe('ResetRequest', () => {
       await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Send reset link' })))
       expect(auth.resetPasswordForEmail).toHaveBeenLastCalledWith('you@example.com', { redirectTo: window.location.origin })
       expect(screen.getByRole('heading', { name: 'Check your email' })).toBeInTheDocument()
-      expect(screen.getByText(/If there's a Tallyn account for/)).toHaveTextContent('you@example.com')
+      expect(screen.getByText(/If there's a Coinroof account for/)).toHaveTextContent('you@example.com')
       expect(screen.getByRole('button', { name: /Send another link in 60s/ })).toBeDisabled()
       unmount()
     }

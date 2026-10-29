@@ -77,7 +77,7 @@ describe('Settings: authenticators', () => {
     expect(mfa.enroll).not.toHaveBeenCalled()
     fireEvent.change(within(dialog).getByLabelText('Give it a name'), { target: { value: '1Password' } })
     await act(async () => fireEvent.click(within(dialog).getByRole('button', { name: 'Show the QR code' })))
-    expect(mfa.enroll).toHaveBeenCalledWith({ factorType: 'totp', issuer: 'Tallyn', friendlyName: '1Password' })
+    expect(mfa.enroll).toHaveBeenCalledWith({ factorType: 'totp', issuer: 'Coinroof', friendlyName: '1Password' })
     expect(within(dialog).getByRole('img', { name: /QR code/ })).toBeInTheDocument()
     expect(within(dialog).getByText('FAKESECRET')).toBeInTheDocument()
     await act(async () => fireEvent.click(within(dialog).getAllByRole('button', { name: 'Cancel' })[0]))
@@ -180,11 +180,11 @@ describe('Settings: profile, legal and coming soon (#114)', () => {
 
     it('saves the ZIP after a fresh code', async () => {
       const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
-      apiFile.mockResolvedValue({ blob: new Blob(['zip']), name: 'tallyn-data-2026-10-24.zip' })
+      apiFile.mockResolvedValue({ blob: new Blob(['zip']), name: 'coinroof-data-2026-10-24.zip' })
       await openSection('data')
       await enterCode()
       expect(mfa.challengeAndVerify).toHaveBeenCalledWith({ factorId: 'f1', code: '123456' })
-      expect(apiFile).toHaveBeenCalledWith('/api/me/export', expect.stringMatching(/^tallyn-data-\d{4}-\d{2}-\d{2}\.zip$/))
+      expect(apiFile).toHaveBeenCalledWith('/api/me/export', expect.stringMatching(/^coinroof-data-\d{4}-\d{2}-\d{2}\.zip$/))
       expect(click).toHaveBeenCalled()
       expect(screen.queryByRole('dialog', { name: 'Download your data?' })).not.toBeInTheDocument()
       click.mockRestore()
@@ -203,7 +203,7 @@ describe('Settings: profile, legal and coming soon (#114)', () => {
   describe('close your account', () => {
     const confirmClose = async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Close account' }))
-      const dialog = screen.getByRole('dialog', { name: 'Close your Tallyn account?' })
+      const dialog = screen.getByRole('dialog', { name: 'Close your Coinroof account?' })
       expect(within(dialog).getByText(/can.t be undone/)).toBeInTheDocument()
       expect(within(dialog).getByRole('link', { name: 'Download your data first' })).toHaveAttribute('href', '/settings?section=data')
       const go = within(dialog).getByRole('button', { name: 'Close account' })
