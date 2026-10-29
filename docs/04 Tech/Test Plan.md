@@ -187,6 +187,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - [ ] Wait 30 minutes idle: the warning, then the sign-out note.
 - [ ] Phone (375px) and desktop: every page, no sideways scroll.
 - [ ] Spending chart on load (#221): when Home loads, the spending line rises from flat over about 1s and the total rolls up from $0; switching 7D/30D/90D still morphs quickly; with Reduce motion on, it appears already drawn.
+- [ ] Balance on load (#221): when Home loads, the balance tiles start at $0 and each digit flips up to its number, left to right, in under 1s; switching Yours/Everyone still flips from the current figure; with Reduce motion on, the figure appears at once.
 - [ ] Smooth loading (#212, #221): moving between pages shows the animated mark, then after about 1s a small mark and sweeping grey card shapes, then rows fade up slowly one after another (about 1.2s for a 6-row card); with Reduce motion on, only a short fade.
 - [ ] Page background (#213): the two-tone mesh shows green top left and red bottom right, in light and dark; card text stays readable where it is strongest.
 - [ ] Home at 1024px and up: the Your spending card reaches the bottom of Recent transactions, with no empty band under "October so far" before the next row (#1).
