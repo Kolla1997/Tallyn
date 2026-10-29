@@ -24,6 +24,9 @@ const DEFAULT_NOTCH_ENTER_TRANSITION = {
   damping: 20,
 }
 
+/** Seconds between squares when a bar fills after its row (#221). */
+export const FILL_STEP = 0.025
+
 function GaugeNotchSvg({
   notches,
   width,
@@ -33,6 +36,7 @@ function GaugeNotchSvg({
   geometryScrubbing,
   notchTransition,
   stagger,
+  fillDelay,
   defsChildren,
   useThemePaletteGradient,
   themeActiveGradientId,
@@ -97,7 +101,8 @@ function GaugeNotchSvg({
               }}
               transition={{
                 ...notchTransition,
-                delay: (0.3 + notch.index * 0.02) * stagger,
+                // Tallyn edit (#221): fillDelay starts the fill after the row has arrived, one square at a time.
+                delay: fillDelay == null ? (0.3 + notch.index * 0.02) * stagger : fillDelay + notch.index * FILL_STEP,
               }}
             />
           )
@@ -344,6 +349,7 @@ function GaugeLinearInner(props) {
     enterTransition,
     enterStaggerScale = 1,
     geometryScrubbing = false,
+    fillDelay,
   } = props
 
   const prefersReducedMotion = useReducedMotion()
@@ -478,6 +484,7 @@ function GaugeLinearInner(props) {
         resolveBgFill={resolveBgFill}
         resolvedActiveFillOpacity={fillState.resolvedActiveFillOpacity}
         resolvedInactiveFillOpacity={fillState.resolvedInactiveFillOpacity}
+        fillDelay={prefersReducedMotion ? null : fillDelay}
         stagger={stagger}
         themeActiveGradientId={fillState.themeActiveGradientId}
         useThemePaletteGradient={fillState.useThemePaletteGradient}
