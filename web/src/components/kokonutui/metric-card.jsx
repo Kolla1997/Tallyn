@@ -506,7 +506,7 @@ export default function MetricCard({
   return (
     <div
       className={cn(
-        'w-full max-w-md select-none rounded-3xl border border-zinc-200 bg-white p-5 text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100',
+        'flex w-full max-w-md select-none flex-col rounded-3xl border border-zinc-200 bg-white p-5 text-zinc-900 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100',
         className,
       )}
     >
@@ -568,7 +568,7 @@ export default function MetricCard({
         aria-valuemin={1}
         aria-valuenow={span ? span.hi + 1 : info.current.length}
         aria-valuetext={valueText}
-        className="relative mt-5 h-32 cursor-crosshair touch-pan-y rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-4 dark:focus-visible:ring-offset-zinc-950"
+        className="relative mt-5 min-h-32 flex-1 cursor-crosshair touch-pan-y rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-4 dark:focus-visible:ring-offset-zinc-950"
         onBlur={() => setCursor(null)}
         onKeyDown={handleKeyDown}
         onLostPointerCapture={release}
