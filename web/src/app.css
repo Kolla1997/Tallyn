@@ -552,70 +552,20 @@ body:has(.calm-page) {
   }
 }
 
-/* Loading (#212): still grey bars while a page loads, then cards fade in and their rows fade up one
+/* Loading (#212): while a page loads, the Coinroof mark (below); then cards fade in and their rows fade up one
    after another (load-reveal in design-tokens.json: 700ms, 90ms apart, after 200ms). Runs once when a
    card or row appears, so re-renders don't replay it. Reduced motion: a short plain fade. */
-.calm-bar {
-  display: block;
-  height: 14px;
-  border-radius: 7px;
-  background: var(--color-redesign-track);
-}
-/* Loader hand-over (#221): the mark alone for 900ms, then the small mark and the card shapes with a
-   faint green-and-red sweep. Reduced motion: the shapes straight away, no sweep (the SVG stands still). */
+/* Page loader (#221): only the animated Coinroof mark and its words, centred where the cards will
+   be (Dinesh dropped the grey card shapes). The SVG stands still with reduced motion. */
 .calm-skeleton-mark {
-  position: absolute;
-  inset: 0 0 auto;
   display: grid;
   justify-items: center;
   gap: 8px;
   padding-top: 96px;
+  min-height: 320px;
   color: var(--color-zinc-500);
   font-size: 13px;
   font-weight: 500;
-  pointer-events: none;
-}
-.calm-skeleton-mini {
-  height: 20px;
-  margin-bottom: 12px;
-}
-@keyframes calm-out {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-@keyframes calm-sweep {
-  from {
-    background-position: 100% 0;
-  }
-  to {
-    background-position: -50% 0;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .calm-skeleton-mark {
-    animation: calm-out 300ms ease-out 900ms both;
-  }
-  .calm-skeleton-shapes {
-    animation: calm-in 300ms ease-out 900ms both;
-  }
-  .calm-skeleton .calm-bar {
-    background: linear-gradient(
-        90deg,
-        var(--color-redesign-track) 0%,
-        color-mix(in srgb, var(--color-redesign-in) 35%, transparent) 20%,
-        color-mix(in srgb, var(--color-redesign-accent) 25%, transparent) 30%,
-        var(--color-redesign-track) 45%
-      )
-      0 0 / 300% 100%;
-    animation: calm-sweep 1.6s linear infinite;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .calm-skeleton-mark {
-    display: none;
-  }
 }
 @keyframes calm-in {
   from {

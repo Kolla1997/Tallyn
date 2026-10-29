@@ -76,7 +76,7 @@ Every dynamic number in the app uses **tabular figures**, so a layout doesn't sh
 AA contrast: 4.5:1 for text under 18.66px bold. Clay with white is 4.4:1 (large text only), so use Clay Deep for buttons and small text. Sage is for graphics only; use Sage Deep for text. Full ratios in `brand/colors/palette.json`.
 
 ## Motion
-See [[Animation Guide]]. UI transitions are 200 to 300ms, ease-out. Data arriving on a page is slower on purpose (`load-reveal`, #212): still grey card shapes while loading, then cards fade in (500ms) and rows fade up 8px over 700ms, 90ms apart, after 200ms. Respect reduced motion (a 150ms plain fade).
+See [[Animation Guide]]. UI transitions are 200 to 300ms, ease-out. Data arriving on a page is slower on purpose (`load-reveal`, #212): the animated Coinroof mark while loading, then cards fade in (500ms) and rows fade up 8px over 700ms, 90ms apart, after 200ms. Respect reduced motion (a 150ms plain fade).
 
 ### Loading motion (#228)
 > [!warning] Every new screen, card, chart or figure needs a planned loading effect, shown in its draft, with a reduced-motion version.
@@ -85,7 +85,7 @@ Patterns already in the app, to reuse before inventing new ones:
 
 | What | How it loads | Where |
 |---|---|---|
-| A page | The animated Coinroof mark for 900ms, then a small mark over grey card shapes with a green and red sweep (`PageSkeleton`) | Every page (#221) |
+| A page | Only the animated Coinroof mark and "Adding it all up…" where the cards will be, no grey card shapes (`PageSkeleton`) | Every page (#221) |
 | Cards and rows | Cards fade in, rows fade up one after another (`load-reveal`: 200ms, then 700ms, 90ms apart; `.calm-card`, `.calm-row`) | Every page (#212) |
 | A line chart | The line rises from flat over 900ms | Home spending (#221) |
 | Money figures | Roll up from $0: `CountUp start={0}`, the metric card's rolling digits, or the split-flap `fromZero` | Home, Accounts (#221, #228) |
