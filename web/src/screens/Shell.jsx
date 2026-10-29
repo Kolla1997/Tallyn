@@ -9,7 +9,7 @@ import Heading from '../components/Heading.jsx'
 import ThemeSwitch from '../components/calm/ThemeSwitch.jsx'
 
 // App layout (#39), in the calm redesign (#187): a floating frosted rail on web (1024px and up),
-// collapsed by default; header and bottom tab bar on phones. One 1280px content width. Built from
+// collapsed by default; opening and closing glide (#221, the sidebar's width and the page's left padding); header and bottom tab bar on phones. One 1280px content width. Built from
 // the #185 drafts (web/src/lab/calm/ui.jsx).
 // The phone tab bar keeps these five; Debts (#27) and Goals are in the
 // sidebar on web and in the ☰ menu on phones (Dinesh's choice). Budgets (#13)
@@ -110,7 +110,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
       <aside
         id="sidebar"
         aria-label="Main"
-        className={`calm-glass fixed top-3 bottom-3 left-3 z-40 hidden flex-col rounded-3xl p-3 lg:flex ${collapsed ? 'w-[60px] items-center' : 'w-[208px]'}`}
+        className={`calm-glass fixed top-3 bottom-3 left-3 z-40 hidden flex-col rounded-3xl p-3 lg:flex transition-[width] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${collapsed ? 'w-[60px] items-center' : 'w-[208px]'}`}
       >
         {/* Logo, with Collapse beside it (#72). */}
         <div className={`mb-4 flex items-center ${collapsed ? 'flex-col gap-2' : 'justify-between pl-2'}`}>
@@ -150,7 +150,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
                   {label}
                 </span>
               ) : (
-                <span>{label}</span>
+                <span className="calm-fade-in whitespace-nowrap">{label}</span>
               )}
             </Link>
           ))}
@@ -180,7 +180,10 @@ export default function Shell({ me, household, households, onChooseHousehold, on
       </header>
       {/* No footer in the signed-in app (#122): Terms and Privacy are in
           the profile menu, the ☰ menu on phones, and Settings → Legal. */}
-      <main id="main" className={`px-4 pt-5 pb-24 md:px-6 lg:pr-6 lg:pb-12 ${collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}>
+      <main
+        id="main"
+        className={`px-4 pt-5 pb-24 md:px-6 lg:pr-6 lg:pb-12 transition-[padding] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}
+      >
         <div className="mx-auto max-w-[1280px]">{children}</div>
       </main>
 
