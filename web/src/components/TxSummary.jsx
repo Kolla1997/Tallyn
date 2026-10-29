@@ -33,13 +33,13 @@ export function TxSummary({ totals, scope }) {
           <div>
             <p className={`text-[13px] ${MUTED}`}>Money in</p>
             <p className={`text-[22px] ${NUM}`} style={IN}>
-              <CountUp value={totals.money_in_minor} format={(v) => `+${formatMoney(v, cur)}`} />
+              <CountUp value={totals.money_in_minor} start={0} format={(v) => `+${formatMoney(v, cur)}`} />
             </p>
           </div>
           <div>
             <p className={`text-[13px] ${MUTED}`}>Spent</p>
             <p className={`text-[22px] ${NUM}`}>
-              <CountUp value={totals.spent_minor} format={(v) => `−${formatMoney(v, cur)}`} />
+              <CountUp value={totals.spent_minor} start={0} format={(v) => `−${formatMoney(v, cur)}`} />
             </p>
           </div>
         </div>

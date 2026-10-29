@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react'
 import { formatMoney } from '../lib/money.js'
+import CountUp from './CountUp.jsx'
 
 // Spending by day in the calm redesign (#187; Dinesh picked the mix in #185): one bar per day of
 // a month, as tall and as red as that day's spending, a dashed line for the daily average, and
 // three facts beside it. Pointing at a day shows its amount; picking one narrows the list to it
 // (picking it again shows every day). A day far above the rest (a bills day) is capped and
 // labelled so it doesn't flatten the others. Every day is a button that names its date and amount.
+// On load (#230) the bars grow up left to right, the figures count up from 0, and the capped
+// day's label lands last.
 
 const SHADES = ['var(--color-redesign-spend-1)', 'var(--color-redesign-spend-2)', 'var(--color-redesign-spend-3)', 'var(--color-redesign-spend-4)']
 const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -55,7 +58,8 @@ export default function SpendingBars({ month, days, home, selected, onPick }) {
             `${money(total)} spent in ${monthName} so far · taller, redder days spent more`
           )}
         </p>
-        <div className="relative mt-6 flex h-28 items-end gap-[3px]" onMouseLeave={() => setPointed('')}>
+        {/* Keyed on the days arriving, so the grow plays with the real bars, not the empty month (#230). */}
+        <div key={days ? 'days' : 'waiting'} className="relative mt-6 flex h-28 items-end gap-[3px]" onMouseLeave={() => setPointed('')}>
           <span
             className="pointer-events-none absolute inset-x-0 border-t border-dashed border-zinc-400 dark:border-zinc-600"
             style={{ bottom: `${Math.min(100, (avg / cap) * 100)}%` }}
@@ -79,17 +83,17 @@ export default function SpendingBars({ month, days, home, selected, onPick }) {
               >
                 {capped && (
                   <span
-                    className={`absolute -top-0.5 -translate-y-full ${i < 3 ? 'left-0' : i > list.length - 4 ? 'right-0' : 'left-1/2 -translate-x-1/2'} font-[family-name:var(--font-heading)] text-[11px] font-semibold whitespace-nowrap tabular-nums`}
+                    className={`calm-late absolute -top-0.5 -translate-y-full ${i < 3 ? 'left-0' : i > list.length - 4 ? 'right-0' : 'left-1/2 -translate-x-1/2'} font-[family-name:var(--font-heading)] text-[11px] font-semibold whitespace-nowrap tabular-nums`}
                   >
                     {money(d.amount)}
                   </span>
                 )}
                 <span
-                  className={`block w-full rounded-t-[3px] ${on ? 'outline-2 outline-offset-1 outline-zinc-900' : ''}`}
+                  className={`${days ? 'calm-grow ' : ''}block w-full rounded-t-[3px] ${on ? 'outline-2 outline-offset-1 outline-zinc-900' : ''}`}
                   style={
                     d.future || !d.amount
-                      ? { height: 4, background: 'var(--color-redesign-track)' }
-                      : { height: `${Math.max(4, (Math.min(d.amount, cap) / cap) * 100)}%`, background: SHADES[level(d.amount)] }
+                      ? { '--n': i, height: 4, background: 'var(--color-redesign-track)' }
+                      : { '--n': i, height: `${Math.max(4, (Math.min(d.amount, cap) / cap) * 100)}%`, background: SHADES[level(d.amount)] }
                   }
                 />
               </button>
@@ -110,13 +114,16 @@ export default function SpendingBars({ month, days, home, selected, onPick }) {
       <dl className="m-0 grid content-start gap-2.5 text-[13px] sm:border-l sm:border-zinc-200 dark:sm:border-zinc-800 sm:pl-4">
         <div>
           <dt className="text-zinc-500 dark:text-zinc-400">A day, on average</dt>
-          <dd className="m-0 font-[family-name:var(--font-heading)] text-[16px] font-semibold tabular-nums">{money(avg)}</dd>
+          <dd className="m-0 font-[family-name:var(--font-heading)] text-[16px] font-semibold tabular-nums">
+            <CountUp value={avg} start={0} format={money} />
+          </dd>
         </div>
         {biggest && (
           <div>
             <dt className="text-zinc-500 dark:text-zinc-400">Biggest day</dt>
             <dd className="m-0 font-semibold tabular-nums" style={{ color: 'var(--color-redesign-owe-text)' }}>
-              {money(biggest.amount)} <span className="font-normal text-zinc-500 dark:text-zinc-400">· {label(biggest.key)}</span>
+              <CountUp value={biggest.amount} start={0} format={money} />{' '}
+              <span className="font-normal text-zinc-500 dark:text-zinc-400">· {label(biggest.key)}</span>
             </dd>
           </div>
         )}
@@ -124,7 +131,8 @@ export default function SpendingBars({ month, days, home, selected, onPick }) {
           <div>
             <dt className="text-zinc-500 dark:text-zinc-400">Quietest day</dt>
             <dd className="m-0 font-semibold tabular-nums">
-              {money(quietest.amount)} <span className="font-normal text-zinc-500 dark:text-zinc-400">· {label(quietest.key)}</span>
+              <CountUp value={quietest.amount} start={0} format={money} />{' '}
+              <span className="font-normal text-zinc-500 dark:text-zinc-400">· {label(quietest.key)}</span>
             </dd>
           </div>
         )}
