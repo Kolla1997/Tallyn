@@ -245,20 +245,20 @@ function NetWorth({ have, owe, home, accounts }) {
         <div className="sm:pr-4">
           <dt className={`text-[13px] ${MUTED}`}>Net worth</dt>
           <dd className={`m-0 text-[22px] whitespace-nowrap ${NUM}`}>
-            <CountUp value={net} format={(v) => `${v < 0 ? '−' : ''}${money(Math.abs(v))}`} />
+            <CountUp value={net} start={0} format={(v) => `${v < 0 ? '−' : ''}${money(Math.abs(v))}`} />
           </dd>
           <dd className={`m-0 text-[13px] ${MUTED}`}>In {home}</dd>
         </div>
         <div className="sm:px-4">
           <dt className={`text-[13px] ${MUTED}`}>You have</dt>
           <dd className={`m-0 text-[22px] whitespace-nowrap ${NUM}`} style={{ color: 'var(--color-redesign-in-text)' }}>
-            <CountUp value={have} format={money} />
+            <CountUp value={have} start={0} format={money} />
           </dd>
         </div>
         <div className="sm:px-4">
           <dt className={`text-[13px] ${MUTED}`}>You owe</dt>
           <dd className={`m-0 text-[22px] whitespace-nowrap ${NUM}`} style={{ color: 'var(--color-redesign-owe-text)' }}>
-            <CountUp value={owe} format={money} />
+            <CountUp value={owe} start={0} format={money} />
           </dd>
         </div>
       </dl>
@@ -279,7 +279,7 @@ function AccountTile({ a, owner, meId }) {
       ? Math.round((a.current_balance_minor / a.credit_limit_minor) * 100)
       : null
   return (
-    <li className="grid content-start gap-2 p-3">
+    <li className="calm-row grid content-start gap-2 p-3">
       <span className="flex min-w-0 items-center gap-2.5">
         <AccountIcon account={a} />
         <span className="min-w-0">
@@ -304,7 +304,7 @@ function AccountTile({ a, owner, meId }) {
       {used != null && (
         <span className="block">
           <span className="block h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--color-redesign-track)' }} aria-hidden="true">
-            <span className="block h-full rounded-full" style={{ width: `${Math.min(100, used)}%`, background: 'var(--color-redesign-accent)' }} />
+            <span className="calm-fill block h-full rounded-full" style={{ width: `${Math.min(100, used)}%`, background: 'var(--color-redesign-accent)' }} />
           </span>
           <span className={`mt-1 block text-[13px] ${MUTED}`}>
             {used}% of {formatMoney(a.credit_limit_minor, a.currency)} limit used

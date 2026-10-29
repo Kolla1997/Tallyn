@@ -4,10 +4,10 @@ import { reducedMotion } from '../lib/motion.js'
 // A number that counts to its new value when it changes (#87), e.g. Spent
 // going from $13,259.66 to $6,587.88 when a filter changes. 600ms, easing
 // out. Screen readers get only the final value; reduced motion jumps
-// straight to it.
-export default function CountUp({ value, format }) {
-  const [shown, setShown] = useState(value)
-  const from = useRef(value)
+// straight to it. `start` (#228) counts up from it on the first show, e.g. from 0 when a page loads.
+export default function CountUp({ value, format, start }) {
+  const [shown, setShown] = useState(start ?? value)
+  const from = useRef(start ?? value)
   useEffect(() => {
     const start = from.current
     if (start === value || reducedMotion()) {

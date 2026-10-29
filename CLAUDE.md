@@ -175,6 +175,7 @@ Labels: `type:*` (idea, bug, feature, design, docs, tech-debt), `area:*` (brand,
 ## 6. Brand and design guardrails
 
 - Use only values from `design-tokens.json`. If one is missing, propose it in `docs/03 Design/Design System.md` first.
+- Every new screen, card, chart or figure needs a planned loading effect, shown in its draft, with a reduced-motion version. Reuse the patterns in `docs/03 Design/Design System.md` → Loading motion (#228).
 - Every dynamic number uses tabular figures (`tabular-nums`), so layouts don't shift as digits change: money, counters, timers, live prices. See `docs/03 Design/Design System.md` → Numbers (#193).
 - Use the logo only as described in `docs/02 Brand/Logo Guide.md`, from the files in `brand/logo/`. Never redraw, recolor or stretch it.
 - Write copy in the voice set out in `docs/02 Brand/Voice and Tone.md`. This is a money app for families, so be clear and calm, never pushy.
