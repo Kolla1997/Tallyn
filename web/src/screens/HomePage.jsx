@@ -296,7 +296,7 @@ function Spending({ days, summary, home, everyone }) {
   }, [days, home, end])
   const spent = summary?.spent_minor ?? 0
   return (
-    <section aria-label={`${everyone ? 'Spending' : 'Your spending'} in ${monthName(now)}`} className="min-w-0">
+    <section aria-label={`${everyone ? 'Spending' : 'Your spending'} in ${monthName(now)}`} className="flex h-full min-w-0 flex-col">
       <MetricCard
         label={everyone ? 'Spending' : 'Your spending'}
         segments={['Spending']}
@@ -307,7 +307,7 @@ function Spending({ days, summary, home, everyone }) {
         format="currency"
         currency={home}
         upIsGood={false}
-        className="w-full max-w-none"
+        className="w-full max-w-none flex-1"
       />
       <p className={`m-0 mt-1.5 px-1 text-[13px] ${MUTED}`}>
         {spent > 0 ? (

@@ -130,13 +130,14 @@ body:has(.calm-page) {
   background-color: var(--color-redesign-page);
 }
 
-/* Page: the redesign's ground with three soft glows behind the cards (glass Mix). */
+/* Page: the redesign's ground with a two-tone mesh behind the cards (#213): green top left,
+   red bottom right, a warm amber hint between them. */
 .calm-page {
   background-color: var(--color-redesign-page);
   background-image:
-    radial-gradient(42rem 30rem at 8% 0%, var(--redesign-glow-green), transparent 70%),
-    radial-gradient(40rem 28rem at 96% 4%, var(--redesign-glow-red), transparent 70%),
-    radial-gradient(60rem 26rem at 50% 105%, var(--redesign-glow-grey), transparent 70%);
+    radial-gradient(60% 70% at 0% 0%, var(--redesign-glow-green), transparent 60%),
+    radial-gradient(55% 65% at 100% 100%, var(--redesign-glow-red), transparent 60%),
+    radial-gradient(40% 40% at 70% 20%, var(--redesign-glow-amber), transparent 60%);
   background-attachment: fixed;
   color: var(--color-redesign-ink);
   font-family: var(--font-body);

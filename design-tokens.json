@@ -252,6 +252,11 @@
       "value": "rgba(161, 161, 170, 0.3)",
       "$description": "Page glow, bottom",
       "dark": "rgba(161, 161, 170, 0.1)"
+    },
+    "redesign-glow-amber": {
+      "value": "rgba(217, 150, 43, 0.12)",
+      "$description": "Page glow, a warm hint top right of centre (two-tone mesh, #213)",
+      "dark": "rgba(217, 150, 43, 0.07)"
     }
   }
 }
