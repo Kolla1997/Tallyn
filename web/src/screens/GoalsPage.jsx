@@ -6,7 +6,7 @@ import { Line } from '@/components/charts/line'
 import { XAxis } from '@/components/charts/x-axis'
 import LoadFailed from '../components/LoadFailed.jsx'
 import MonthPicker from '../components/MonthPicker.jsx'
-import TallynLoader from '../components/TallynLoader.jsx'
+import PageSkeleton from '../components/calm/PageSkeleton.jsx'
 import { api } from '../lib/api.js'
 import { fromMinor, toMinor } from '../lib/budgets.js'
 import { forecast, forecastWords, monthName, nextMilestone, perMonth, summary, thisMonth, totals } from '../lib/goals.js'
@@ -93,7 +93,7 @@ export default function GoalsPage({ me, household, refreshKey }) {
         failed ? (
           <LoadFailed what="your goals" busy={retrying} onRetry={retry} />
         ) : (
-          <TallynLoader />
+          <PageSkeleton />
         )
       ) : list.length === 0 ? (
         <Panel id="goals-empty" title="No goals yet">

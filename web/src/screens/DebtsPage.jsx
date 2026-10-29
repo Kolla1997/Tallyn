@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import AccountIcon from '../components/AccountIcon.jsx'
-import TallynLoader from '../components/TallynLoader.jsx'
+import PageSkeleton from '../components/calm/PageSkeleton.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
 import { api } from '../lib/api.js'
@@ -144,7 +144,7 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
         failed ? (
           <LoadFailed busy={retrying} onRetry={retry} />
         ) : (
-          <TallynLoader />
+          <PageSkeleton />
         )
       ) : debts.length === 0 ? (
         <Panel label="No debts">

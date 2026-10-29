@@ -8,7 +8,7 @@ import { isOwed } from '../lib/summary.js'
 import { LinkBank, ReconnectBank } from './Banks.jsx'
 import { canAddCardDetails, cardsWithoutDetails } from '../lib/cards.js'
 import { Head, Panel, Chips, PILL } from '../components/calm/ui.jsx'
-import TallynLoader from '../components/TallynLoader.jsx'
+import PageSkeleton from '../components/calm/PageSkeleton.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
 import CountUp from '../components/CountUp.jsx'
@@ -141,7 +141,7 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
         failed ? (
           <LoadFailed busy={retrying} onRetry={retry} />
         ) : (
-          <TallynLoader />
+          <PageSkeleton />
         )
       ) : accounts.length === 0 ? (
         <Panel label="No accounts">

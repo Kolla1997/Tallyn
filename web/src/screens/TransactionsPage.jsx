@@ -8,7 +8,7 @@ import { TxDetails, TxSummary } from '../components/TxSummary.jsx'
 import { api } from '../lib/api.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
-import TallynLoader from '../components/TallynLoader.jsx'
+import PageSkeleton from '../components/calm/PageSkeleton.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useBusy, useFadeOnChange } from '../lib/motion.js'
 
@@ -354,7 +354,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
             failed ? (
               <LoadFailed what="your transactions" busy={loading} onRetry={() => setAttempt((n) => n + 1)} />
             ) : (
-              <TallynLoader />
+              <PageSkeleton />
             )
           ) : list.length === 0 ? (
             <Panel label="No transactions">

@@ -8,7 +8,7 @@ import { categoryLabel, formatMoney } from '../lib/money.js'
 import { Avatar, nameOf } from '../lib/people.jsx'
 import { currencies, isOwed, summarize } from '../lib/summary.js'
 import { LinkBank } from './Banks.jsx'
-import TallynLoader from '../components/TallynLoader.jsx'
+import PageSkeleton from '../components/calm/PageSkeleton.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
 import { shortDate } from '../lib/cards.js'
@@ -119,7 +119,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
         failed ? (
           <LoadFailed busy={retrying} onRetry={retry} />
         ) : (
-          <TallynLoader />
+          <PageSkeleton />
         )
       ) : (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-12 [&>*]:min-w-0">

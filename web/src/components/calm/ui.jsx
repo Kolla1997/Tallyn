@@ -13,7 +13,7 @@ export const IN = { color: 'var(--color-redesign-in-text)' }
 
 const EASE = 'cubicBezier(0.23, 1, 0.32, 1)'
 const reduced = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-// Press feedback only (anime.js); nothing moves on load.
+// Press feedback (anime.js). Loading fades in through CSS (.calm-card, .calm-row in app.css, #212).
 export const press = (e) => !reduced() && animate(e.currentTarget, { scale: [1, 0.97, 1], duration: 160, ease: EASE })
 
 // A card. `glass` for summaries; lists and tables stay solid (glass Mix).
@@ -22,7 +22,7 @@ export function Panel({ id, title, meta, glass = false, className = '', children
     <section
       aria-labelledby={title ? id : undefined}
       aria-label={title ? undefined : label}
-      className={`min-w-0 rounded-2xl p-4 ${glass ? 'calm-glass' : 'calm-solid'} ${className}`}
+      className={`calm-card min-w-0 rounded-2xl p-4 ${glass ? 'calm-glass' : 'calm-solid'} ${className}`}
     >
       {title && (
         <header className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -64,7 +64,7 @@ export const IconTile = ({ children }) => (
 // One row: an icon (or avatar), a name and a line under it, and something on the right.
 export function Row({ lead, name, sub, children, className = '' }) {
   return (
-    <li className={`flex items-center gap-3 py-2 ${className}`}>
+    <li className={`calm-row flex items-center gap-3 py-2 ${className}`}>
       {lead}
       <span className="min-w-0 grow">
         <span className="name block truncate text-[14px] font-semibold">{name}</span>

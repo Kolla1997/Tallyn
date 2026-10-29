@@ -180,6 +180,10 @@
     "idle-breathe": {
       "value": "2.6s ease-in-out alternate"
     },
+    "load-reveal": {
+      "value": "700ms ease-out, rows 90ms apart after 200ms; cards 500ms; count-up 1.3s",
+      "$description": "Data arriving on a page (#212). Slower than ui-transition on purpose: calm, not snappy"
+    },
     "ui-transition": {
       "value": "200-300ms ease-out"
     }
