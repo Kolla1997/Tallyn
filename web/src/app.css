@@ -661,6 +661,13 @@ body:has(.calm-page) {
     --n: 7;
   }
 }
+/* Sidebar labels (#221): when the sidebar opens, its names fade in once it has mostly widened, so
+   they never spill past its edge. */
+@media (prefers-reduced-motion: no-preference) {
+  .calm-fade-in {
+    animation: calm-in 160ms ease-out 180ms both;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .calm-card,
   .calm-row {
