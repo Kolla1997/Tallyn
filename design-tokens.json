@@ -43,26 +43,26 @@
       "value": "#B93A32"
     },
     "redesign-accent": {
-      "value": "#dc2626",
-      "$description": "Calm redesign (#187): red for the one action and what is owed (graphics)"
+      "value": "#CB0900",
+      "$description": "Coinroof logo red (#201): the one action and what is owed (graphics)"
     },
     "redesign-button": {
-      "value": "#b91c1c",
-      "$description": "Primary button background"
+      "value": "#CB0900",
+      "$description": "Primary button background, logo red (white text 5.9:1)"
     },
     "redesign-owe-text": {
-      "value": "#b91c1c",
-      "$description": "Owed amounts as text, AA on white",
-      "dark": "#f87171"
+      "value": "#CB0900",
+      "$description": "Owed amounts as text: logo red, AA on white (5.9:1); dark 5.5:1 on cards",
+      "dark": "#E06B66"
     },
     "redesign-in": {
-      "value": "#16a34a",
-      "$description": "Money in and progress (graphics)"
+      "value": "#067B00",
+      "$description": "Coinroof logo green (#201): money in and progress (graphics)"
     },
     "redesign-in-text": {
-      "value": "#15803d",
-      "$description": "Money in as text, AA on white",
-      "dark": "#4ade80"
+      "value": "#067B00",
+      "$description": "Money in as text: logo green, AA on white (5.5:1); dark 6.8:1 on cards",
+      "dark": "#6AB066"
     },
     "redesign-ink": {
       "value": "#18181b",
@@ -100,24 +100,24 @@
       "$description": "Neutral badges"
     },
     "redesign-spend-1": {
-      "value": "#fecaca",
+      "value": "#F7C6C2",
       "$description": "Spending scale, least",
-      "dark": "#3b1414"
+      "dark": "#3A0E0B"
     },
     "redesign-spend-2": {
-      "value": "#f87171",
+      "value": "#E06B66",
       "$description": "Spending scale",
-      "dark": "#6b1d1d"
+      "dark": "#6E1610"
     },
     "redesign-spend-3": {
-      "value": "#dc2626",
+      "value": "#CB0900",
       "$description": "Spending scale",
-      "dark": "#b91c1c"
+      "dark": "#A80700"
     },
     "redesign-spend-4": {
-      "value": "#7f1d1d",
+      "value": "#6B0500",
       "$description": "Spending scale, most",
-      "dark": "#f87171"
+      "dark": "#E06B66"
     },
     "redesign-focus": {
       "value": "#18181b",
@@ -235,14 +235,14 @@
       "dark": "0 6px 20px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3)"
     },
     "redesign-glow-green": {
-      "value": "rgba(22, 163, 74, 0.22)",
+      "value": "rgba(6, 123, 0, 0.22)",
       "$description": "Page glow, top left",
-      "dark": "rgba(22, 163, 74, 0.16)"
+      "dark": "rgba(6, 123, 0, 0.18)"
     },
     "redesign-glow-red": {
-      "value": "rgba(220, 38, 38, 0.16)",
+      "value": "rgba(203, 9, 0, 0.16)",
       "$description": "Page glow, top right",
-      "dark": "rgba(220, 38, 38, 0.14)"
+      "dark": "rgba(203, 9, 0, 0.14)"
     },
     "redesign-glow-grey": {
       "value": "rgba(161, 161, 170, 0.3)",

@@ -33,7 +33,7 @@ const DEFAULT_NOTIFICATIONS = [
     body: 'Room 4B · Kokonut UI roadmap',
     time: '9:50',
     icon: (
-      <span className="flex size-8 items-center justify-center rounded-lg bg-red-500 text-white">
+      <span className="flex size-8 items-center justify-center rounded-lg bg-[var(--color-redesign-accent)] text-white">
         <CalendarDays className="size-4" />
       </span>
     ),
