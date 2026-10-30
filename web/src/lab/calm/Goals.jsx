@@ -2,7 +2,7 @@
 // aside, ticked when money lands, the answer first), every goal as a pot that fills (a private one
 // shows locked), the goal you open as a forecast with its chart, next milestone and per-month
 // amount, how it fills and who can see it, Update amount and Change goal, and the New / Change
-// goal dialog. Bklit draws the forecast. Tallyn never moves money. Made-up names and amounts.
+// goal dialog. Bklit draws the forecast. Coinroof never moves money. Made-up names and amounts.
 import { useMemo, useState } from 'react'
 import { Plus, Lock, Check, X } from 'lucide-react'
 import { curveLinear } from '@visx/curve'
@@ -277,7 +277,7 @@ function GoalDialog({ goal, update, onClose }) {
                 value={fills}
                 onChange={setFills}
               />
-              <Note>{fills === 'account' ? 'Fills on its own from the balance.' : 'For cash, or money Tallyn can’t see.'}</Note>
+              <Note>{fills === 'account' ? 'Fills on its own from the balance.' : 'For cash, or money Coinroof can’t see.'}</Note>
               {fills === 'account' && (
                 <select aria-label="Account it follows" className="h-10 rounded-xl border border-zinc-300 bg-white px-3 dark:border-zinc-700 dark:bg-zinc-900">
                   <option>High-yield savings · Ally ··1180</option>
@@ -326,7 +326,7 @@ export default function Goals() {
   const goal = GOALS.find((g) => g.id === picked)
   return (
     <>
-      <PageHead title="Goals" sub="Save toward what matters. Tallyn can’t move money: move it in your bank’s app.">
+      <PageHead title="Goals" sub="Save toward what matters. Coinroof can’t move money: move it in your bank’s app.">
         <Button icon={Plus} onClick={() => setDialog({ kind: 'new' })}>
           New goal
         </Button>

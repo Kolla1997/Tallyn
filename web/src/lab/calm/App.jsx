@@ -27,7 +27,7 @@ export default function App() {
     window.scrollTo(0, 0)
   }
   useEffect(() => {
-    document.title = `Tallyn draft · ${PAGES.find(([k]) => k === page)[1]}`
+    document.title = `Coinroof draft · ${PAGES.find(([k]) => k === page)[1]}`
   }, [page])
   const Page = PAGES.find(([k]) => k === page)[2]
   return (

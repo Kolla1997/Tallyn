@@ -1,9 +1,9 @@
-// Tallyn Home, calm full draft (#182, round 5). Dinesh liked the calm approach: now the whole Home,
+// Coinroof Home, calm full draft (#182, round 5). Dinesh liked the calm approach: now the whole Home,
 // one size smaller. Every job of web/src/screens/HomePage.jsx is here (total with Yours/Everyone,
 // your accounts, credit card, spending, recent transactions by kind, shared with you, family, goals)
 // plus Coming up. Built from Kokonut UI (split-flap text, notification stack, metric card, smooth tab)
 // and Bklit (linear gauge); anime.js only for press feedback (animate skill: nothing moves on load).
-// Red, green, white, black; the original sidebar; Tallyn's fonts and logo. Made-up names and amounts.
+// Red, green, white, black; the original sidebar; Coinroof's fonts and logo. Made-up names and amounts.
 //
 // 12-column grid, 12px gutter:
 //   1 Total (8)                  | Coming up (4)
@@ -489,9 +489,9 @@ function Sidebar({ dark, collapsed, onToggle }) {
     >
       <div className={`mb-4 flex items-center ${collapsed ? 'flex-col gap-2' : 'justify-between pl-2'}`}>
         {collapsed ? (
-          <img src={dark ? markDark : markLight} alt="Tallyn" className="size-8" />
+          <img src={dark ? markDark : markLight} alt="Coinroof" className="size-8" />
         ) : (
-          <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-7" />
+          <img src={dark ? lockupDark : lockupLight} alt="Coinroof" className="h-7" />
         )}
         <button
           type="button"
@@ -635,7 +635,7 @@ export default function CalmHome() {
 
       <Sidebar dark={dark} collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
       <header className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 lg:hidden dark:border-zinc-800">
-        <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-7" />
+        <img src={dark ? lockupDark : lockupLight} alt="Coinroof" className="h-7" />
         <button type="button" aria-label="Menu" className="flex size-10 items-center justify-center rounded-full border border-zinc-300 dark:border-zinc-700">
           <Menu className="size-5" aria-hidden="true" />
         </button>

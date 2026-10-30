@@ -239,8 +239,8 @@ body {
   outline-offset: 2px;
 }
 
-/* Glass draft (#185): Tallyn's glass finish (#61) in the redesign's colours. Soft: faint glows, every
-   card frosted. Tallyn: #61 at full strength, the sidebar too. Mix: glows, the sidebar and summary
+/* Glass draft (#185): Coinroof's glass finish (#61) in the redesign's colours. Soft: faint glows, every
+   card frosted. Coinroof: #61 at full strength, the sidebar too. Mix: glows, the sidebar and summary
    cards frosted; cards that hold a list or a table stay solid, as #61 keeps what people must read
    carefully solid. Solid again without blur support or with reduced transparency. */
 [data-glass='soft'],
