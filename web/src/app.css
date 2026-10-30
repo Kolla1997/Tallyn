@@ -758,7 +758,11 @@ body:has(.calm-page) {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 320px;
+  /* A fixed shape (about the sign-in card's height at full width), so a taller card, like
+     create an account, grows on its own without stretching the video (#220). */
+  align-self: start;
+  aspect-ratio: 1.92;
+  overflow: hidden;
   border: 1px solid var(--color-zinc-200);
   border-radius: 22px;
   background: linear-gradient(135deg, var(--color-zinc-100), var(--color-zinc-200));
@@ -784,10 +788,23 @@ body:has(.calm-page) {
 .launch-slot {
   display: grid;
   align-content: start;
+  align-self: start;
+}
+/* Wide screens (#220): the row is as tall as the video; a taller card (create an account) grows
+   down into the gap under the hero instead of pushing About further down. */
+@media (min-width: 861px) {
+  .launch-slot {
+    position: relative;
+    align-self: stretch;
+    z-index: 1;
+  }
+  .launch-slot > * {
+    position: absolute;
+    inset: 0 0 auto;
+  }
 }
 .calm-auth .launch-slot .card {
   max-width: none;
-  height: 100%;
 }
 .launch-section {
   padding: 56px 0;
