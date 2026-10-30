@@ -399,7 +399,12 @@ export default function TransactionsPage({ me, household, refreshKey }) {
           )}
         </div>
 
-        <aside aria-label={pickedTx ? 'Transaction details' : 'Summary'} className={`lg:sticky lg:top-3 lg:col-span-5 lg:self-start ${zone(busy, fading)}`}>
+        {/* The summary scrolls with the page, so all of it can be read (#1, Dinesh picked B); a picked
+            transaction's details still stay in view beside the list. */}
+        <aside
+          aria-label={pickedTx ? 'Transaction details' : 'Summary'}
+          className={`lg:col-span-5 lg:self-start ${pickedTx ? 'lg:sticky lg:top-3' : ''} ${zone(busy, fading)}`}
+        >
           {pickedTx ? (
             <TxDetails
               tx={pickedTx}
