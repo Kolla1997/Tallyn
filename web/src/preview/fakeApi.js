@@ -103,7 +103,10 @@ const TXS = [
   tx('t3', 23, 'Little Sprouts', 'GENERAL_SERVICES', 12000, 'u-james'),
   tx('t4', 23, 'Spotify', 'ENTERTAINMENT', 1699),
   tx('t5', 22, 'Nando’s', 'FOOD_AND_DRINK', 3875),
-  tx('t6', 22, 'Trader Joe’s', 'FOOD_AND_DRINK', 6430),
+  // A place, for the map in the details (#60). Made up, like the rest.
+  tx('t6', 22, 'Trader Joe’s', 'FOOD_AND_DRINK', 6430, ME, {
+    whereabouts: { address: '142 E 14th St', city: 'New York', region: 'NY', postal_code: '10003', lat: 40.7339, lon: -73.9887 },
+  }),
   tx('t7', 21, 'Con Edison', 'RENT_AND_UTILITIES', 14500, 'u-james'),
   tx('t8', 20, 'MTA', 'TRANSPORTATION', 3400),
   tx('t9', 18, 'Paycheck', 'INCOME', -320000, ME, { category_primary: 'INCOME' }),

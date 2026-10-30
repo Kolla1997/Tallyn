@@ -147,6 +147,7 @@ func main() {
 			SyncNow:     syncNow,
 			Reconnected: reconnected,
 			SupabaseURL: os.Getenv("SUPABASE_URL"),
+			MapURL:      os.Getenv("MAP_URL"), // #60
 
 			RequireSignedIn: requireSignedIn,
 			BackupCodes:     codes,

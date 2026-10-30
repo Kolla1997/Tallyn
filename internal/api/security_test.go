@@ -23,7 +23,7 @@ func TestSecurityHeaders(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(dir, "assets", "index-abc123.js"), []byte("1"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	h := NewRouter(Deps{WebDir: dir, RequireAuth: fakeAuth, Store: &fakeStore{}, SupabaseURL: "https://fake-project.supabase.co/some/path"})
+	h := NewRouter(Deps{WebDir: dir, RequireAuth: fakeAuth, Store: &fakeStore{}, SupabaseURL: "https://fake-project.supabase.co/some/path", MapURL: "https://pub-fake.r2.dev/us.pmtiles"})
 
 	for _, tc := range []struct{ path, auth, cache string }{
 		{"/", "", "no-cache"},
@@ -38,7 +38,8 @@ func TestSecurityHeaders(t *testing.T) {
 		csp := hd.Get("Content-Security-Policy")
 		for _, want := range []string{
 			"default-src 'self'", "script-src 'self' https://cdn.plaid.com", "frame-src https://cdn.plaid.com",
-			"frame-ancestors 'none'", "object-src 'none'", "connect-src 'self' https://*.plaid.com https://fake-project.supabase.co",
+			"frame-ancestors 'none'", "object-src 'none'", "connect-src 'self' https://*.plaid.com https://fake-project.supabase.co https://pub-fake.r2.dev;",
+			"worker-src 'self' blob:",
 			"img-src 'self' data: https://plaid-merchant-logos.plaid.com https://plaid-counterparty-logos.plaid.com",
 		} {
 			if !strings.Contains(csp, want) {
@@ -70,7 +71,7 @@ func TestSecurityHeaders(t *testing.T) {
 	}
 
 	// No Supabase URL (or not https): the policy simply leaves it out.
-	if csp := contentSecurityPolicy("http://insecure.example"); strings.Contains(csp, "insecure.example") {
+	if csp := contentSecurityPolicy("http://insecure.example", ""); strings.Contains(csp, "insecure.example") {
 		t.Fatalf("non-https origin allowed: %s", csp)
 	}
 }
