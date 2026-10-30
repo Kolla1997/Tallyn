@@ -2,6 +2,9 @@ import { act, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import SetUp2FA from './SetUp2FA.jsx'
 
+const api = vi.fn()
+vi.mock('../lib/api.js', () => ({ api: (...a) => api(...a) }))
+
 // Setting up 2FA (#7, #23, #114): the QR code and key, a half-finished setup
 // cleared first, backup codes next, and the note after a recovery.
 const mfa = { listFactors: vi.fn(), unenroll: vi.fn(), enroll: vi.fn(), challengeAndVerify: vi.fn() }
@@ -22,6 +25,8 @@ vi.mock('../lib/supabase.js', () => ({
 }))
 
 beforeEach(() => {
+  api.mockReset()
+  api.mockResolvedValue({ reset: null })
   Object.values(mfa).forEach((f) => f.mockReset())
   sessionStorage.clear()
   mfa.listFactors.mockResolvedValue({ data: { all: [{ id: 'old', factor_type: 'totp', status: 'unverified' }] }, error: null })
@@ -59,5 +64,20 @@ describe('SetUp2FA', () => {
     expect(screen.getByRole('alert')).toHaveTextContent("We couldn't start setting up your authenticator. Try again in a moment.")
     expect(screen.getByRole('alert')).not.toHaveTextContent('Enrollment is disabled')
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
+  })
+
+  it('after an owner reset it: who, and when (#120)', async () => {
+    api.mockResolvedValue({ reset: { reset_by_name: 'Sam', reset_at: '2026-10-30T15:00:00Z' } })
+    await act(async () => render(<SetUp2FA onSignOut={() => {}} />))
+    expect(api).toHaveBeenCalledWith('/api/recovery/2fa-reset')
+    expect(screen.getByText(/Sam reset your two-step sign-in on Oct 30/)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Set up your authenticator' })).toBeInTheDocument()
+  })
+
+  it("if the note can't load, setting up goes on (#120)", async () => {
+    api.mockRejectedValue(new Error('internal'))
+    await act(async () => render(<SetUp2FA onSignOut={() => {}} />))
+    expect(screen.getByRole('img', { name: /QR code/ })).toBeInTheDocument()
+    expect(screen.queryByText(/reset your two-step sign-in/)).toBeNull()
   })
 })

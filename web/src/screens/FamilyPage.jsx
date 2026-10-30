@@ -54,6 +54,7 @@ const fromAddress = () => new URLSearchParams(window.location.search).get('membe
 const MESSAGES = {
   last_owner: 'A household needs at least one owner. Make someone else an owner first.',
   reauth_required: 'That took a little long. Enter a new code from your app and try again.',
+  reset_failed: "We couldn't reset it just now. Nothing changed, so try again in a moment.",
 }
 const say = (err, fallback) => MESSAGES[err.message] ?? fallback
 
@@ -322,7 +323,8 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
 
 function Person({ person, members, onSelect, me, household, sharing, setSharing, banks, meId, onChanged, onLeft }) {
   const [error, setError] = useState('')
-  const [dialog, setDialog] = useState(null) // { kind: 'remove' | 'leave' | 'role', role? }
+  const [dialog, setDialog] = useState(null) // { kind: 'remove' | 'leave' | 'role' | 'reset', role? }
+  const [wasReset, setWasReset] = useState(false)
   const isOwner = household.role === 'owner'
   const name = nameOf(person)
   const you = person.is_you
@@ -371,6 +373,16 @@ function Person({ person, members, onSelect, me, household, sharing, setSharing,
   // need a typed name and a fresh code (#38, ADR 0009).
   function chooseRole(role) {
     if (role !== person.role) setDialog({ kind: 'role', role })
+  }
+
+  // An owner resets a teen's two-step sign-in (#120): a typed name and a fresh code, like Remove.
+  async function reset2FA() {
+    try {
+      await api(`/api/households/${household.id}/members/${person.user_id}/reset-2fa`, { method: 'POST' })
+    } catch (e) {
+      throw new Error(say(e, "We couldn't reset it just now. Try again in a moment."))
+    }
+    setWasReset(true)
   }
 
   async function remove() {
@@ -505,6 +517,28 @@ function Person({ person, members, onSelect, me, household, sharing, setSharing,
         <YourSummary members={members} me={me} household={household} sharing={sharing} theirs={theirs} have={have} owe={owe} meId={meId} onSelect={onSelect} />
       )}
 
+      {!you && isOwner && person.role === 'teen' && (
+        <div className={CARD}>
+          <h3 className={SUB}>Sign-in</h3>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="m-0 inline-flex items-center gap-2 text-[14px] font-semibold">
+              <span className={`size-2 rounded-full ${wasReset ? 'bg-amber-500' : 'bg-green-500'}`} aria-hidden="true" />
+              {wasReset ? 'Two-step sign-in was reset' : 'Two-step sign-in is on'}
+            </p>
+            {!wasReset && (
+              <Pill quiet onClick={() => setDialog({ kind: 'reset' })}>
+                Reset two-step sign-in
+              </Pill>
+            )}
+          </div>
+          <p className={`mt-2 ${NOTE}`}>
+            {wasReset
+              ? `${name} sets up a new authenticator at their next sign-in. We've emailed them.`
+              : `If ${name} loses their phone and their backup codes, you can reset it. They keep their password and set up a new authenticator.`}
+          </p>
+        </div>
+      )}
+
       {(you || (isOwner && person.role !== 'child')) && (
         <div className="px-1">
           <button
@@ -523,6 +557,22 @@ function Person({ person, members, onSelect, me, household, sharing, setSharing,
           <p>
             {name} will lose access to {household.name}. Their banks stay theirs.
           </p>
+        </ConfirmDialog>
+      )}
+      {dialog?.kind === 'reset' && (
+        <ConfirmDialog
+          title={`Reset ${name}'s two-step sign-in?`}
+          action="Reset"
+          typeToConfirm={name}
+          needsCode
+          onConfirm={reset2FA}
+          onClose={() => setDialog(null)}
+        >
+          <p>
+            Their authenticator app and backup codes stop working. Their password stays the same. Next time they sign in, they&apos;ll set up a new
+            authenticator and save new backup codes.
+          </p>
+          <p>We&apos;ll email {name} to tell them it was reset.</p>
         </ConfirmDialog>
       )}
       {dialog?.kind === 'leave' && (

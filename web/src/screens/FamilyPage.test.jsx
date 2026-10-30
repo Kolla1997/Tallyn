@@ -8,6 +8,8 @@ import FamilyPage from './FamilyPage.jsx'
 const api = vi.fn()
 vi.mock('../lib/api.js', () => ({ api: (...a) => api(...a) }))
 vi.mock('../lib/supabase.js', () => ({ supabase: { auth: { mfa: { listFactors: vi.fn(), challengeAndVerify: vi.fn() } } } }))
+// The fresh code in a dialog: any 6 digits pass here (the check itself is in mfa.test.js).
+vi.mock('../lib/mfa.js', () => ({ verifiedAuthenticators: async () => [{ id: 'f1' }], verifyCode: async () => true }))
 
 const me = { user_id: 'u-me', display_name: 'Sam' }
 const owner = { id: 'hh-1', name: 'Test family', role: 'owner', home_currency: 'USD' }
@@ -33,6 +35,7 @@ function answers({ given = [], received = ['balances'], role = 'owner', sharingP
     ],
     ['/api/banks?', { banks: [] }],
     ['/api/households/hh-1/invites', { invites: [] }],
+    ['/api/households/hh-1/members/u-kid/reset-2fa', null],
   ])
 }
 
@@ -118,5 +121,30 @@ describe('FamilyPage', () => {
     const robin = screen.getByRole('region', { name: /^Robin/ })
     expect(within(robin).queryByRole('switch')).toBeNull()
     expect(within(robin).getByText(/Teens and children only see their own money/)).toBeInTheDocument()
+  })
+
+  it("owners reset a teen's two-step sign-in with the name and a fresh code (#120)", async () => {
+    answers()
+    await open()
+    expect(within(person()).queryByRole('button', { name: 'Reset two-step sign-in' })).toBeNull() // Pat is an adult
+    fireEvent.click(within(screen.getByRole('region', { name: 'People in your household' })).getByText('Robin'))
+    const robin = screen.getByRole('region', { name: /^Robin/ })
+    fireEvent.click(within(robin).getByRole('button', { name: 'Reset two-step sign-in' }))
+    const dialog = screen.getByRole('dialog', { name: "Reset Robin's two-step sign-in?" })
+    const go = within(dialog).getByRole('button', { name: 'Reset' })
+    fireEvent.change(within(dialog).getByLabelText(/6-digit code/), { target: { value: '123456' } })
+    fireEvent.change(within(dialog).getByLabelText(/Type/), { target: { value: 'Robyn' } })
+    expect(go).toBeDisabled() // the wrong name
+    fireEvent.change(within(dialog).getByLabelText(/Type/), { target: { value: 'robin' } })
+    await act(async () => fireEvent.click(go))
+    expect(callsTo(api, '/api/households/hh-1/members/u-kid/reset-2fa', 'POST')).toHaveLength(1)
+    expect(within(robin).getByText('Two-step sign-in was reset')).toBeInTheDocument()
+  })
+
+  it('adults never see the reset, even for a teen (#120)', async () => {
+    answers({ role: 'adult' })
+    await open({ ...owner, role: 'adult' })
+    fireEvent.click(within(screen.getByRole('region', { name: 'People in your household' })).getByText('Robin'))
+    expect(within(screen.getByRole('region', { name: /^Robin/ })).queryByRole('button', { name: 'Reset two-step sign-in' })).toBeNull()
   })
 })

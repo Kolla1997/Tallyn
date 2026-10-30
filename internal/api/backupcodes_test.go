@@ -21,6 +21,25 @@ type codeStore struct {
 	hashes [][]byte
 	used   map[string]bool
 	err    error
+	resets []string // members whose 2FA was reset (#120)
+	note   *db.TwoFAReset
+}
+
+// ResetMember2FA allows only household "hh1" and member "teen", like the
+// database's rule, and keeps nothing if removing the factors fails.
+func (s *codeStore) ResetMember2FA(ctx context.Context, uid, hh, member string, removeFactors func(context.Context) error) error {
+	if hh != "hh1" || member != "teen" {
+		return db.ErrForbidden
+	}
+	if err := removeFactors(ctx); err != nil {
+		return err
+	}
+	s.resets = append(s.resets, member)
+	return nil
+}
+
+func (s *codeStore) My2FAReset(context.Context, string) (*db.TwoFAReset, error) {
+	return s.note, s.err
 }
 
 func (s *codeStore) BackupCodeStatus(_ context.Context, uid string) (db.BackupCodeStatus, error) {
