@@ -2,19 +2,19 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-11
+updated: 2026-10-30
 issue: 36
 tags: [legal]
 document: privacy
-version: "0.1-draft"
+version: "0.2-draft"
 effective: "[TO CONFIRM: effective date]"
 ---
 
 # Privacy Policy
 
-> **Draft, not yet in effect.** This document has not been reviewed by a lawyer. It will change before Tallyn opens to the public.
+> **Draft, not yet in effect.** This document has not been reviewed by a lawyer. It will change before Coinroof opens to the public.
 
-This policy explains what **[TO CONFIRM: legal entity name]** ("Tallyn", "we", "us") collects, why, who it goes to, and the choices you have. It applies to the Tallyn app and website.
+This policy explains what **[TO CONFIRM: legal entity name]** ("Coinroof", "we", "us") collects, why, who it goes to, and the choices you have. It applies to the Coinroof app and website.
 
 **The short version:** we collect what we need to show your family's money in one place. We don't sell your data and we never share it with advertisers. Nobody in your household sees your money until you share it.
 
@@ -27,7 +27,7 @@ This policy explains what **[TO CONFIRM: legal entity name]** ("Tallyn", "we", "
 - When you agreed to our terms and this policy, and which versions
 
 **From your banks, through Plaid**, when you link a bank
-- The bank's name, and an access token that lets Tallyn read your accounts; we store the token **encrypted**
+- The bank's name, and an access token that lets Coinroof read your accounts; we store the token **encrypted**
 - Your accounts: name, type, the last few digits of the account number (never the full number), currency and balances
 - Your transactions: amount, dates, description, merchant name and logo, category, and whether it's pending
 - When your bank provides them, **the time and place of a purchase**: time, address, city, postal code, country, map coordinates and store number
@@ -40,7 +40,7 @@ This policy explains what **[TO CONFIRM: legal entity name]** ("Tallyn", "we", "
 - To show you and the people you choose your balances, transactions, spending and totals
 - To keep your account secure (two-step sign-in, confirming important changes)
 - To keep your banks up to date in the background
-- To run, fix and improve Tallyn, and to meet our legal obligations
+- To run, fix and improve Coinroof, and to meet our legal obligations
 
 **Legal basis:** **[TO CONFIRM with a lawyer: the bases we rely on, and whether a GLBA privacy notice is also required.]**
 
@@ -53,11 +53,11 @@ This policy explains what **[TO CONFIRM: legal entity name]** ("Tallyn", "we", "
 
 ## 4. Who we share it with
 
-We **don't sell** personal data, and we **never** share it with advertisers or data brokers. We share it only with companies that help us run Tallyn:
+We **don't sell** personal data, and we **never** share it with advertisers or data brokers. We share it only with companies that help us run Coinroof:
 
 | Provider | What for |
 |---|---|
-| **Plaid Inc.** | Connecting to your banks and reading your account data. Tallyn uses Plaid; see the [Plaid End User Privacy Policy](https://plaid.com/legal/#end-user-privacy-policy). |
+| **Plaid Inc.** | Connecting to your banks and reading your account data. Coinroof uses Plaid; see the [Plaid End User Privacy Policy](https://plaid.com/legal/#end-user-privacy-policy). |
 | **Supabase** | Our database and sign-in |
 | **[TO CONFIRM: hosting provider]** | Running the app and website |
 | **Merchant logos** | Logos are loaded from Plaid's logo service without telling it which page you're on |
@@ -70,14 +70,14 @@ Two-step sign-in is required for everyone. Bank access tokens are encrypted befo
 
 ## 6. How long we keep it
 
-- While your account is open, we keep your data so Tallyn can show it to you.
-- **Unlinking a bank** removes its accounts and transactions from Tallyn.
+- While your account is open, we keep your data so Coinroof can show it to you.
+- **Unlinking a bank** removes its accounts and transactions from Coinroof.
 - **Closing your account** deletes your profile, banks and transactions **[TO CONFIRM: within how many days, and anything we must keep longer by law]**.
 - Records of what you agreed to are kept **[TO CONFIRM: how long]**.
 
 ## 7. Children
 
-Tallyn isn't for children under 13. We don't knowingly collect data from children under 13, and they can't have an account or be invited. If we learn we have, we'll delete it. Teens aged 13 to 17 can join only through a parent or guardian who is an owner of their household.
+Coinroof isn't for children under 13. We don't knowingly collect data from children under 13, and they can't have an account or be invited. If we learn we have, we'll delete it. Teens aged 13 to 17 can join only through a parent or guardian who is an owner of their household.
 
 ## 8. Your rights and choices
 

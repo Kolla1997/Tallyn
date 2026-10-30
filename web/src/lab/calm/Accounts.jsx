@@ -220,7 +220,7 @@ function Bento({ visibleBanks, showOwner }) {
           )
         })}
       </ul>
-      <Note>Tallyn reads balances and transactions. It can’t move money.</Note>
+      <Note>Coinroof reads balances and transactions. It can’t move money.</Note>
     </>
   )
 }

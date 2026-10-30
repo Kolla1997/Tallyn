@@ -110,7 +110,7 @@ function FakeQR() {
       viewBox={`0 0 ${n} ${n}`}
       className="size-36 rounded-lg bg-white p-2"
       role="img"
-      aria-label="QR code to add Tallyn to your other authenticator app (made up)"
+      aria-label="QR code to add Coinroof to your other authenticator app (made up)"
     >
       {Array.from(
         { length: n * n },
@@ -224,7 +224,7 @@ function Security() {
       )}
       {dialog?.kind === 'remove' && (
         <Dialog title={`Remove ${dialog.app.name}?`} onClose={close}>
-          <p>Its codes will stop working for Tallyn. Your other authenticators and backup codes still work.</p>
+          <p>Its codes will stop working for Coinroof. Your other authenticators and backup codes still work.</p>
           <CodeField />
           <Actions onClose={close} action="Remove" danger onAction={() => (setApps((l) => l.filter((a) => a.id !== dialog.app.id)), close())} />
         </Dialog>
@@ -363,7 +363,7 @@ function YourData() {
         <Item label="Who sees your money" note="Choose what each person sees">
           <TextLink>Family</TextLink>
         </Item>
-        <Item label="Download your data" note="Everything Tallyn holds about you">
+        <Item label="Download your data" note="Everything Coinroof holds about you">
           <Button quiet small onClick={() => setConfirming(true)}>
             Download
           </Button>
@@ -401,7 +401,7 @@ const Legal = () => (
           <a href="#" className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/60">
             <span className="grow">
               <span className="block text-sm font-semibold">{t}</span>
-              <span className="block text-[13px] text-zinc-500 dark:text-zinc-400">Version 0.1-draft</span>
+              <span className="block text-[13px] text-zinc-500 dark:text-zinc-400">Version 0.2-draft</span>
             </span>
             <ChevronRight className="size-4 text-zinc-400" aria-hidden="true" />
           </a>
@@ -420,14 +420,14 @@ function LeaveOrClose() {
         <Item label={`Leave ${HOUSEHOLD}`} note="You’ll confirm with your name and a code from your authenticator app">
           <TextLink danger>Leave</TextLink>
         </Item>
-        <Item label="Close your Tallyn account" note="Removes your banks, transactions and sign-in">
+        <Item label="Close your Coinroof account" note="Removes your banks, transactions and sign-in">
           <TextLink danger onClick={() => setClosing(true)}>
             Close account
           </TextLink>
         </Item>
       </Items>
       {closing && (
-        <Dialog title="Close your Tallyn account?" onClose={() => setClosing(false)}>
+        <Dialog title="Close your Coinroof account?" onClose={() => setClosing(false)}>
           <p>
             Your banks are disconnected, and your accounts, transactions, sharing choices and sign-in are deleted. This can’t be undone. Your household and its
             budgets stay for the others.

@@ -1,7 +1,7 @@
-// Tallyn's Home, redesigned (#182, round 3b). Same jobs as web/src/screens/HomePage.jsx (total with
+// Coinroof's Home, redesigned (#182, round 3b). Same jobs as web/src/screens/HomePage.jsx (total with
 // Yours/Everyone, accounts, credit cards, spending this month, recent transactions by kind, shared
 // with you, family, goals), rebuilt with Kokonut UI, Bklit charts and anime.js.
-// Palette: red, green, white, black, red lead (Dinesh, 2026-10-25). Fonts and logo: Tallyn's.
+// Palette: red, green, white, black, red lead (Dinesh, 2026-10-25). Fonts and logo: Coinroof's.
 // Motion follows the animate and emil-design-eng skills. All names and amounts are made up.
 //
 // Layout: four rows, each an 8 + 4 pair on a 12-column grid with one 16px gutter.
@@ -481,7 +481,7 @@ function Goals() {
     <Panel id="goals-h" title="Goals" meta={<See>All goals</See>}>
       <BoardingPass
         flight={{
-          airline: 'Tallyn Goals',
+          airline: 'Coinroof Goals',
           number: 'Beach trip',
           from: { code: 'NOW', city: `${usd(trip.saved, 0)} saved`, time: 'Oct 24' },
           to: { code: 'SUN', city: `${usd(trip.target, 0)} goal`, time: 'Jun 27' },
@@ -535,9 +535,9 @@ function Sidebar({ dark, collapsed, onToggle }) {
     >
       <div className={`mb-4 flex items-center ${collapsed ? 'flex-col gap-2' : 'justify-between pl-2'}`}>
         {collapsed ? (
-          <img src={dark ? markDark : markLight} alt="Tallyn" className="size-8" />
+          <img src={dark ? markDark : markLight} alt="Coinroof" className="size-8" />
         ) : (
-          <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-7" />
+          <img src={dark ? lockupDark : lockupLight} alt="Coinroof" className="h-7" />
         )}
         <button
           type="button"
@@ -622,7 +622,7 @@ export default function RedesignHome() {
       <Sidebar dark={dark} collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
       {/* Phones: the original header, logo and ☰ menu */}
       <header className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 lg:hidden dark:border-zinc-800">
-        <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-7" />
+        <img src={dark ? lockupDark : lockupLight} alt="Coinroof" className="h-7" />
         <button type="button" aria-label="Menu" className="flex size-10 items-center justify-center rounded-full border border-zinc-300 dark:border-zinc-700">
           <Menu className="size-5" aria-hidden="true" />
         </button>
@@ -691,7 +691,7 @@ export default function RedesignHome() {
         </div>
       </main>
 
-      {/* Phones and tablets: Tallyn's bottom tab bar (Design System) */}
+      {/* Phones and tablets: Coinroof's bottom tab bar (Design System) */}
       <nav
         aria-label="Main"
         className="fixed inset-x-0 bottom-0 z-40 flex h-16 items-center justify-around border-t border-zinc-200 bg-white/95 backdrop-blur lg:hidden dark:border-zinc-800 dark:bg-zinc-950/95"

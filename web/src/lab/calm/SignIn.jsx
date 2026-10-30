@@ -165,7 +165,7 @@ function SignInCard({ signup, go }) {
       {signup && <Rule ok={pw.length >= 8} />}
       {signup && (
         <Agree checked={agreed} onChange={setAgreed}>
-          I agree to the <A>Terms of Service</A> and <A>Privacy Policy</A>. Tallyn is for people 18 and over.
+          I agree to the <A>Terms of Service</A> and <A>Privacy Policy</A>. Coinroof is for people 18 and over.
         </Agree>
       )}
       <Primary disabled={signup && !agreed} onClick={() => go(signup ? 'setup' : 'code')}>
@@ -192,7 +192,7 @@ function CodeCard({ go }) {
   return (
     <>
       <H>Enter your code</H>
-      <Note>Open your authenticator app and enter the 6-digit code for Tallyn.</Note>
+      <Note>Open your authenticator app and enter the 6-digit code for Coinroof.</Note>
       <CodeBoxes button="Continue" onDone={() => go('household')} />
       {help && (
         <div id="code-help" className="grid gap-2">
@@ -264,7 +264,7 @@ function FakeQR() {
       viewBox={`0 0 ${n} ${n}`}
       className="size-40 rounded-xl border border-zinc-200 bg-white p-2.5 dark:border-zinc-700"
       role="img"
-      aria-label="QR code to add Tallyn to your authenticator app (made up)"
+      aria-label="QR code to add Coinroof to your authenticator app (made up)"
     >
       {Array.from(
         { length: n * n },
@@ -278,7 +278,7 @@ function SetupCard({ go }) {
   return (
     <>
       <H>Protect your account</H>
-      <Note>Tallyn asks for a code from an authenticator app each time you sign in, so your password alone can’t open your family’s money.</Note>
+      <Note>Coinroof asks for a code from an authenticator app each time you sign in, so your password alone can’t open your family’s money.</Note>
       <ol className="grid gap-1 text-sm">
         <li className="flex gap-2">
           <b className="font-display">1</b> In your authenticator app, add an account and scan this code.
@@ -330,7 +330,7 @@ function CodesCard({ go }) {
         I’ve saved these codes somewhere safe
       </Agree>
       <Primary disabled={!saved} onClick={() => go('household')}>
-        Continue to Tallyn
+        Continue to Coinroof
       </Primary>
       <div className="text-center">
         <Quiet>Remind me next time</Quiet>
@@ -343,7 +343,7 @@ function ResetCard({ go }) {
   return (
     <>
       <H>Reset your password</H>
-      <Note>Enter the email you use for Tallyn and we’ll send you a link to choose a new password.</Note>
+      <Note>Enter the email you use for Coinroof and we’ll send you a link to choose a new password.</Note>
       <Field label="Email">
         <input type="email" autoComplete="email" defaultValue={EMAIL} className={input} />
       </Field>
@@ -447,7 +447,7 @@ function JoinCard() {
   return (
     <>
       <H>You’ve been invited</H>
-      <Note>Someone invited you to their household on Tallyn. Joining doesn’t share any of your money: you choose that later in Sharing.</Note>
+      <Note>Someone invited you to their household on Coinroof. Joining doesn’t share any of your money: you choose that later in Sharing.</Note>
       <Info>Nobody sees your money until you share it.</Info>
       <Primary>Join household</Primary>
       <div className="text-center">
@@ -491,14 +491,14 @@ export default function SignIn({ dark }) {
         <Chips label="Screen" options={SCREENS} value={screen} onChange={go} />
       </div>
       <div className={`flex w-full grow flex-col items-center ${centred ? 'justify-center' : ''}`}>
-        <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="mb-6 h-8" />
+        <img src={dark ? lockupDark : lockupLight} alt="Coinroof" className="mb-6 h-8" />
         <section key={screen} className="grid w-full max-w-[360px] gap-4 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <Card go={go} />
         </section>
       </div>
       <footer className="mt-12 flex w-full max-w-3xl flex-wrap items-center justify-between gap-2 border-t border-zinc-200 pt-4 text-[13px] text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
         <span className="flex items-center gap-1.5">
-          <img src={dark ? wordDark : wordLight} alt="Tallyn" height="18" className="h-[18px]" />
+          <img src={dark ? wordDark : wordLight} alt="Coinroof" height="18" className="h-[18px]" />
           <span>· It all adds up.</span>
         </span>
         <nav aria-label="Legal" className="flex gap-3">

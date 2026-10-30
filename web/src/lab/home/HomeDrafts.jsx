@@ -64,7 +64,7 @@ function Shell({ style, children }) {
     <>
       {style.shell === 'plane' && (
         <aside className="side plane" aria-label="Main">
-          <img className="logo" src={logo} alt="Tallyn" />
+          <img className="logo" src={logo} alt="Coinroof" />
           {NAV.map((n) => (
             <a key={n} href="#" aria-current={n === 'Home' ? 'page' : undefined}>
               <Icon name={n} />
@@ -76,7 +76,7 @@ function Shell({ style, children }) {
       )}
       {style.shell === 'rail' && (
         <aside className="side rail" aria-label="Main">
-          <img className="mark" src={mark} alt="Tallyn" />
+          <img className="mark" src={mark} alt="Coinroof" />
           {NAV.map((n) => (
             <a key={n} href="#" aria-label={n} title={n} aria-current={n === 'Home' ? 'page' : undefined}>
               <Icon name={n} />
@@ -88,7 +88,7 @@ function Shell({ style, children }) {
       {style.shell === 'top' && (
         <header className="topbar">
           <div className="in">
-            <img className="logo" src={logo} alt="Tallyn" />
+            <img className="logo" src={logo} alt="Coinroof" />
             <nav style={{ display: 'flex', gap: 24 }} aria-label="Main">
               {['Home', 'Accounts', 'Transactions', 'Budgets', 'Family'].map((n) => (
                 <a key={n} href="#" aria-current={n === 'Home' ? 'page' : undefined}>
@@ -615,7 +615,7 @@ export default function HomeDrafts() {
     <div className={`home style-${DESIGNS[design][theme]} shell-${style.shell}`} style={{ ...style.vars, '--bar-h': '48px' }}>
       <div className="lab-bar">
         <span>
-          <b>Draft for #182</b> · 100% taste-skill · Tallyn fonts and logo · <b>made-up names and amounts</b>
+          <b>Draft for #182</b> · 100% taste-skill · Coinroof fonts and logo · <b>made-up names and amounts</b>
         </span>
         <span className="grp" role="group" aria-label="Design">
           {Object.entries(DESIGNS).map(([k, d]) => (

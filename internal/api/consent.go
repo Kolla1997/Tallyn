@@ -12,8 +12,8 @@ import (
 // the `version` in legal/terms.md and legal/privacy.md (a test checks it).
 // Publishing a new version here asks everyone to agree again.
 var CurrentVersions = map[string]string{
-	"terms":   "0.1-draft",
-	"privacy": "0.1-draft",
+	"terms":   "0.2-draft",
+	"privacy": "0.2-draft",
 }
 
 // consent reports the current versions and whether the caller has agreed to

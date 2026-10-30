@@ -1,5 +1,5 @@
 // taste-skill app styles dealt for #182 (library/app.json), with the face chosen for each.
-// Fonts are Tallyn's (Dinesh's rule); everything else is the style's own.
+// Fonts are Coinroof's (Dinesh's rule); everything else is the style's own.
 const base = (t) => ({
   '--ground': t.ground,
   '--surface': t.surface,
@@ -129,7 +129,7 @@ export const STYLES = {
       warnPill: ['#2a2416', '#d9a441'],
     }),
   },
-  // Dark. Face: a warm near-black for a home, Tallyn's Clay as the one data hue.
+  // Dark. Face: a warm near-black for a home, Coinroof's Clay as the one data hue.
   black: {
     id: 'true-black-flat',
     name: 'True-black flat',

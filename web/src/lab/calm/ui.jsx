@@ -1,5 +1,5 @@
 // Shared pieces for the calm drafts of every screen (#185), taken from the calm Home (#182).
-// Red, green, white, black; the original sidebar and phone tab bar; Tallyn's fonts and logo.
+// Red, green, white, black; the original sidebar and phone tab bar; Coinroof's fonts and logo.
 // Kokonut UI and Bklit components are used by the pages; anime.js only for press feedback.
 import { useLayoutEffect, useState } from 'react'
 import { animate } from 'animejs'
@@ -216,9 +216,9 @@ function Sidebar({ dark, collapsed, onToggle, page, go }) {
     >
       <div className={`mb-4 flex items-center ${collapsed ? 'flex-col gap-2' : 'justify-between pl-2'}`}>
         {collapsed ? (
-          <img src={dark ? markDark : markLight} alt="Tallyn" className="size-8" />
+          <img src={dark ? markDark : markLight} alt="Coinroof" className="size-8" />
         ) : (
-          <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-7" />
+          <img src={dark ? lockupDark : lockupLight} alt="Coinroof" className="h-7" />
         )}
         <button
           type="button"
@@ -274,7 +274,7 @@ function Sidebar({ dark, collapsed, onToggle, page, go }) {
 const GLASS = [
   ['off', 'Off'],
   ['soft', 'Soft'],
-  ['tallyn', 'Tallyn'],
+  ['tallyn', 'Coinroof'],
   ['mix', 'Mix'],
 ]
 
@@ -356,7 +356,7 @@ export function Shell({ page, pages, go, dark, setDark, children, bare = false }
         <>
           <Sidebar dark={dark} collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} page={page} go={go} />
           <header className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 lg:hidden dark:border-zinc-800">
-            <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-7" />
+            <img src={dark ? lockupDark : lockupLight} alt="Coinroof" className="h-7" />
             <button
               type="button"
               aria-label="Menu"

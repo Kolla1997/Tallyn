@@ -20,7 +20,7 @@ import lockupDark from '../../../../brand/logo/svg/tallyn-lockup-horizontal-dark
 // Palettes to test: each sets the accent the libraries use. Light and dark come from Tailwind's dark variant.
 const PALETTES = {
   ember: { name: 'Ember', accent: '#f97316', button: '#c2410c', second: '#0ea5e9', note: "Kokonut's own orange" },
-  clay: { name: 'Sage & Clay', accent: '#C8553D', button: '#B04A34', second: '#6F9575', note: "Tallyn's brand colours" },
+  clay: { name: 'Sage & Clay', accent: '#C8553D', button: '#B04A34', second: '#6F9575', note: "Coinroof's brand colours" },
   ocean: { name: 'Ocean', accent: '#2563eb', button: '#1d4ed8', second: '#14b8a6', note: 'Blue and teal' },
   orchid: { name: 'Orchid', accent: '#a21caf', button: '#a21caf', second: '#f59e0b', note: 'Violet and amber' },
   // Red, green, white and black: Light/Dark gives the white or black ground; these pick which colour leads.
@@ -87,7 +87,7 @@ const bills = D.due.map((d, i) => {
 
 const beach = D.goals[0]
 const beachPass = {
-  airline: 'Tallyn Goals',
+  airline: 'Coinroof Goals',
   number: 'TG 2027',
   from: { code: 'NOW', city: `${money(beach.saved).replace('.00', '')} saved`, time: 'Oct 24' },
   to: { code: 'SUN', city: `${money(beach.target).replace('.00', '')} beach trip`, time: 'Jun 27' },
@@ -416,7 +416,7 @@ export default function BoldHome() {
       </div>
 
       <header className="mx-auto flex max-w-[1240px] flex-wrap items-center gap-x-8 gap-y-3 px-4 pt-6 md:px-8">
-        <img src={dark ? lockupDark : lockupLight} alt="Tallyn" className="h-7" />
+        <img src={dark ? lockupDark : lockupLight} alt="Coinroof" className="h-7" />
         <nav aria-label="Main" className="flex flex-wrap gap-5 text-sm font-semibold text-zinc-500 dark:text-zinc-400">
           {['Home', 'Accounts', 'Transactions', 'Budgets', 'Goals', 'Family'].map((n) => (
             <a
