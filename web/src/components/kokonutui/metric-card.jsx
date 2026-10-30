@@ -106,6 +106,32 @@ function resample(values, count) {
   return out
 }
 
+/**
+ * Resample `values` along the same Catmull-Rom curve `toPath` draws through them, so a morph
+ * ends on exactly the line it lands on. A linear resample cuts the curve's rounded peaks, and
+ * the line jumped at the end of every morph (#221).
+ */
+export function curveResample(values, count) {
+  if (values.length < 2) {
+    return resample(values, count)
+  }
+  const out = new Array(count)
+  for (let i = 0; i < count; i++) {
+    const at = (i / (count - 1)) * (values.length - 1)
+    const lo = Math.min(Math.floor(at), values.length - 2)
+    const t = at - lo
+    const p0 = values[lo - 1] ?? values[lo]
+    const p1 = values[lo]
+    const p2 = values[lo + 1]
+    const p3 = values[lo + 2] ?? p2
+    const c1 = p1 + (p2 - p0) / 6
+    const c2 = p2 - (p3 - p1) / 6
+    const u = 1 - t
+    out[i] = u * u * u * p1 + 3 * u * u * t * c1 + 3 * u * t * t * c2 + t * t * t * p2
+  }
+  return out
+}
+
 const yOf = (height) => PAD_Y + (1 - height) * (H - PAD_Y * 2)
 
 /** Heights 0..1 to an SVG path, smoothed with a Catmull-Rom spline. */
@@ -150,8 +176,8 @@ function buildPeriod(data, days, focus) {
     before,
     // Resampled to a common length for morphing between views.
     shape: {
-      current: resample(now.map(norm), SAMPLES),
-      previous: resample(before.map(norm), SAMPLES),
+      current: curveResample(now.map(norm), SAMPLES),
+      previous: curveResample(before.map(norm), SAMPLES),
     },
     // Drawn through the real days once it lands, so the dots sit on it.
     paths: {
