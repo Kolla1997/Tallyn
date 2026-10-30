@@ -773,24 +773,6 @@ body:has(.calm-page)::before {
   border-radius: 22px;
   background: linear-gradient(135deg, var(--color-zinc-100), var(--color-zinc-200));
 }
-.launch-play {
-  display: grid;
-  place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: #fff;
-  color: var(--color-zinc-900);
-  box-shadow: 0 6px 24px rgb(0 0 0 / 0.12);
-}
-.launch-video small {
-  position: absolute;
-  bottom: 12px;
-  left: 14px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-zinc-500);
-}
 .launch-slot {
   display: grid;
   align-content: start;
@@ -1040,5 +1022,87 @@ body:has(.calm-page)::before {
   .tile-footer-copy {
     grid-column: span 2;
     grid-row: auto;
+  }
+}
+
+/* The demo video (#220, C): the four scenes cross-fade every 4s (16s loop) and each drifts slowly
+   closer while it shows. Transform and opacity only. Reduced motion: the first scene, still. */
+.launch-demo {
+  isolation: isolate;
+  background: var(--color-zinc-900);
+}
+.launch-scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.launch-scene img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+  transform-origin: 30% 20%;
+}
+.launch-caption {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgb(24 24 27 / 0.82);
+  color: #fafafa;
+  font-size: 14px;
+  font-weight: 600;
+}
+.dark .launch-caption {
+  background: rgb(250 250 250 / 0.9);
+  color: var(--color-zinc-900);
+}
+.launch-demo-tag {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.45);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+@keyframes launch-scene {
+  0% {
+    opacity: 0;
+  }
+  3%,
+  25% {
+    opacity: 1;
+  }
+  29%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes launch-drift {
+  0% {
+    transform: scale(1.04);
+  }
+  30% {
+    transform: scale(1.14);
+  }
+  100% {
+    transform: scale(1.04);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .launch-scene {
+    animation: launch-scene 16s calc(var(--i) * 4s) infinite both;
+  }
+  .launch-scene img {
+    animation: launch-drift 16s calc(var(--i) * 4s) linear infinite both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .launch-scene:first-child {
+    opacity: 1;
   }
 }
