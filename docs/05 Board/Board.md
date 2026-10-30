@@ -9,7 +9,6 @@ kanban-plugin: board
 ## Backlog
 
 - [ ] [#55 Notifications](https://github.com/Kolla1997/Tallyn/issues/55) #type/feature #area/frontend #area/backend #priority/p2
-- [ ] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
 - [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p3
 - [ ] [#153 Keyboard and screen readers: page titles, focus and ARIA fixes](https://github.com/Kolla1997/Tallyn/issues/153) #type/bug #area/frontend #priority/p1
 - [ ] [#154 Worst-case data: long text, emoji, blank names, double submits, races](https://github.com/Kolla1997/Tallyn/issues/154) #type/bug #area/frontend #priority/p1
@@ -19,6 +18,7 @@ kanban-plugin: board
 - [ ] [#158 Tap areas and control contrast](https://github.com/Kolla1997/Tallyn/issues/158) #type/design #area/design #area/frontend #priority/p2
 - [ ] [#159 Load speed: requests wait on each other](https://github.com/Kolla1997/Tallyn/issues/159) #type/tech-debt #area/frontend #area/backend #priority/p2
 - [ ] [#160 CSS cleanup and tokens](https://github.com/Kolla1997/Tallyn/issues/160) #type/tech-debt #area/design #area/frontend #priority/p3
+- [ ] [#253 Transactions: By category shows honest shares of the month](https://github.com/Kolla1997/Tallyn/issues/253) #type/feature #area/frontend #priority/p2
 
 
 ## In Progress
@@ -29,6 +29,7 @@ kanban-plugin: board
 
 ## Review
 
+- [ ] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
 - [ ] [#120 Family owner can reset a member's 2FA](https://github.com/Kolla1997/Tallyn/issues/120) #type/feature #area/backend #priority/p2
 
 
