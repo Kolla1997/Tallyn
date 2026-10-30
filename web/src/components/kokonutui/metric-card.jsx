@@ -708,14 +708,19 @@ export default function MetricCard({
         )}
 
         {/* Today, at rest. It rides the morph to the new end. */}
+        {/* The full-height layer slides with a transform, not top, so it doesn't re-lay out (#157). */}
         <div
           aria-hidden
-          className={cn(
-            'pointer-events-none absolute right-0 size-2 translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-900 ring-4 ring-white transition-[top,opacity] duration-[420ms] ease-[cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-none dark:bg-zinc-100 dark:ring-zinc-950',
-            span ? 'opacity-0' : 'opacity-100',
-          )}
-          style={{ top: `${(endY / H) * 100}%` }}
-        />
+          className="pointer-events-none absolute inset-0 transition-transform duration-[420ms] ease-[cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-none"
+          style={{ transform: `translateY(${(endY / H) * 100}%)` }}
+        >
+          <div
+            className={cn(
+              'absolute top-0 right-0 size-2 translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-900 ring-4 ring-white transition-opacity duration-[420ms] ease-[cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-none dark:bg-zinc-100 dark:ring-zinc-950',
+              span ? 'opacity-0' : 'opacity-100',
+            )}
+          />
+        </div>
       </div>
 
       <div className="mt-2 flex justify-between text-xs text-zinc-500 tabular-nums dark:text-zinc-400">

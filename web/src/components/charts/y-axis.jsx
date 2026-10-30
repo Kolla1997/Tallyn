@@ -85,9 +85,10 @@ const YAxisInner = memo(function YAxisInner({
             className="absolute flex items-center"
             key={tick.value}
             style={{
-              top: tick.y,
-              transform: 'translateY(-50%)',
-              transition: `top ${Y_AXIS_POSITION_TWEEN_MS}ms cubic-bezier(${LINE_LOADING_PULSE_EASE.join(', ')})`,
+              // Moved with a transform, not top, so it slides without re-laying out (#157).
+              top: 0,
+              transform: `translateY(calc(${tick.y}px - 50%))`,
+              transition: `transform ${Y_AXIS_POSITION_TWEEN_MS}ms cubic-bezier(${LINE_LOADING_PULSE_EASE.join(', ')})`,
               ...(isLeft ? { right: 0, justifyContent: 'flex-end', paddingRight: 8 } : { left: 0, justifyContent: 'flex-start', paddingLeft: 8 }),
             }}
           >
