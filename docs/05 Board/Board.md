@@ -18,7 +18,6 @@ kanban-plugin: board
 - [ ] [#158 Tap areas and control contrast](https://github.com/Kolla1997/Tallyn/issues/158) #type/design #area/design #area/frontend #priority/p2
 - [ ] [#159 Load speed: requests wait on each other](https://github.com/Kolla1997/Tallyn/issues/159) #type/tech-debt #area/frontend #area/backend #priority/p2
 - [ ] [#160 CSS cleanup and tokens](https://github.com/Kolla1997/Tallyn/issues/160) #type/tech-debt #area/design #area/frontend #priority/p3
-- [ ] [#253 Transactions: By category shows honest shares of the month](https://github.com/Kolla1997/Tallyn/issues/253) #type/feature #area/frontend #priority/p2
 
 
 ## In Progress
@@ -31,6 +30,7 @@ kanban-plugin: board
 
 - [ ] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
 - [ ] [#120 Family owner can reset a member's 2FA](https://github.com/Kolla1997/Tallyn/issues/120) #type/feature #area/backend #priority/p2
+- [ ] [#253 Transactions: By category shows honest shares of the month](https://github.com/Kolla1997/Tallyn/issues/253) #type/feature #area/frontend #priority/p2
 
 
 ## Blocked
