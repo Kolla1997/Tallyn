@@ -72,8 +72,8 @@ function useRise() {
 }
 
 // When the card in the slot changes height (sign in to create an account), it grows or shrinks
-// smoothly instead of jumping (#220). The card sits on its own layer on wide screens, so this
-// moves nothing else on the page. Reduced motion jumps.
+// smoothly instead of jumping (#220). On wide screens a card that fits the gap under the hero moves
+// nothing else on the page; a taller one moves About with it. Reduced motion jumps.
 function useSmoothCard() {
   const slot = useRef(null)
   useEffect(() => {

@@ -418,6 +418,46 @@ body:has(.calm-page)::before {
     border: 1px solid var(--color-zinc-200);
     border-radius: 12px;
   }
+  /* Setting up 2FA on wide screens (#220): the QR code sits beside steps 1 and 2, so the card
+     stays short. Phones keep it stacked. */
+  @media (min-width: 861px) {
+    .calm-auth .card .qr-scan {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    .calm-auth .card .qr-scan > div {
+      display: grid;
+      gap: 8px;
+    }
+    .calm-auth .card .qr-scan .qr {
+      justify-self: start;
+      width: 112px;
+      height: 112px;
+      padding: 6px;
+    }
+    .calm-auth .card .qr-scan .secret {
+      font-size: 12px;
+      text-align: left;
+    }
+  }
+  /* Phones: step 1, then the QR code, then the key, as before. */
+  @media (max-width: 860px) {
+    .calm-auth .card .qr-scan {
+      display: grid;
+      gap: inherit;
+    }
+    .calm-auth .card .qr-scan > div {
+      display: contents;
+    }
+    .calm-auth .card .qr-scan .qr {
+      order: 1;
+    }
+    .calm-auth .card .qr-scan > div > p {
+      order: 2;
+    }
+  }
   .calm-auth .card .secret {
     font-family: var(--font-heading);
     font-size: 14px;
@@ -779,16 +819,15 @@ body:has(.calm-page)::before {
   align-self: start;
 }
 /* Wide screens (#220): the row is as tall as the video; a taller card (create an account) grows
-   down into the gap under the hero instead of pushing About further down. */
+   up to 96px down into the gap under the hero instead of pushing About further down. A card taller
+   still (setting up 2FA) pushes About down rather than covering it. */
 @media (min-width: 861px) {
   .launch-slot {
     position: relative;
-    align-self: stretch;
     z-index: 1;
   }
   .launch-slot > * {
-    position: absolute;
-    inset: 0 0 auto;
+    margin-bottom: -96px;
   }
 }
 .calm-auth .launch-slot .card {
