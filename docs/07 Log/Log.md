@@ -10,6 +10,13 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-10-30
+- #1 CI minutes (PR #242): Actions ran out of free minutes (about 2,200 billed against 2,000) and every check was refused for billing. Checks now run on PRs only (not again on `main`) and skip docs-only changes; the board sync runs only on issue open, close, reopen or label, and every 6 hours; end-to-end weekly; every job has a time limit. The new "CI minutes" rule is in CLAUDE.md §5. Dinesh made the repo public to unblock it (a history scan found no secrets; his commit email is public) and plans to make it private again in November.
+- #1 Legal pages (PRs #239, #244): centred, the background blended, the draft note fixed in dark mode, the old `body::before` glow off on redesigned pages; a contents list beside the text that stays as you scroll (Dinesh picked B), folding into "Contents" on phones.
+- #220 Launch page (PRs #240, #243): the video keeps its shape and a taller card grows smoothly into the gap without moving About. The video slot plays a demo (Dinesh picked C): Home, Accounts, Budgets and Transactions from the preview's made-up family, cross-fading and drifting, with captions and a "Demo" label, until the real video exists.
+- #202 Terms and Privacy say Coinroof (PR #245): Dinesh picked a version bump to 0.2-draft, so everyone agrees again once. The dev-only lab and preview titles were renamed too. Code names, storage keys and the repo name stay for #203.
+- Open: the real product video; lawyer review and the `[TO CONFIRM]` entity details in the legal texts; #203 (repo, docs, services rename); making the repo private again in November.
+
 ## 2026-10-29
 - #220 Signed-out launch page (PR #238, merged), Dinesh picked C:
   - The headline runs across the top; the product video and the auth card share one row, and every auth screen (sign in, create, 2FA, reset) opens in that one card slot.
