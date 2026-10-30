@@ -341,7 +341,7 @@ function Person({ person, members, onSelect, me, household, sharing, setSharing,
 
   const parentView = !you && isKid(person.role) && !isKid(me.role) && me.role !== 'viewer'
   const received = sharing.received[person.user_id] ?? []
-  const given = sharing.given[person.user_id] ?? []
+  const given = useMemo(() => sharing.given[person.user_id] ?? [], [sharing.given, person.user_id])
   // Same rules as before (#28): nobody shares with teens or children, and
   // teens and children only share with viewers (parents already see theirs).
   const canShare = !you && !isKid(person.role) && (!isKid(me.role) || person.role === 'viewer')

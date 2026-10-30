@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api.js'
+import { startMe } from '../lib/me.js'
 import { currentVersions, LEGAL, takeAgreement } from '../lib/legal.js'
 import { Link } from '../lib/router.jsx'
 import AuthPage from './AuthPage.jsx'
@@ -20,6 +21,7 @@ export default function ConsentGate({ onSignOut, children }) {
 
   useEffect(() => {
     let live = true
+    startMe() // your profile loads while consent is checked (#159)
     api('/api/consent').then(
       async (d) => {
         if (!d.needed) return live && setState('ok')
