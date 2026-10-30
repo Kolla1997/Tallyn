@@ -105,10 +105,11 @@ export function Chips({ label, options, value, onChange }) {
 export const PILL = 'inline-flex h-9 items-center gap-1.5 rounded-full border-0 px-3 text-[13px] font-semibold text-white bg-[var(--color-redesign-button)]'
 
 export function Pill({ children, icon: I, quiet, onClick, type = 'button', to, disabled, label }) {
-  const cls = `inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold no-underline disabled:opacity-60 ${
+  const cls = `pill inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-semibold no-underline ${
     quiet ? 'border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white' : 'border-0 text-white'
   }`
-  const style = quiet ? undefined : { background: 'var(--color-redesign-button)' }
+  // Disabled reads as disabled by its colour, not only by fading (#158): app.css → .pill:disabled.
+  const style = quiet || disabled ? undefined : { background: 'var(--color-redesign-button)' }
   const inner = (
     <>
       {I && <I className="size-3.5" aria-hidden="true" />}

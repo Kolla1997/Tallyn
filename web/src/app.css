@@ -1445,3 +1445,72 @@ body:has(.calm-page)::before {
     padding-bottom: 3rem;
   }
 }
+
+/* Tap areas and control contrast (#158). */
+/* Phones: small text links and buttons keep their look, with an invisible tap area about 44px tall. */
+@media (max-width: 1023px) {
+  .calm-page :is(a, button)[class*='underline-offset'],
+  :is(.link-quiet, .switch-link, .password-show, .btn-small),
+  .pill {
+    position: relative;
+  }
+  .calm-page :is(a, button)[class*='underline-offset']::after,
+  :is(.link-quiet, .switch-link, .btn-small)::after {
+    content: '';
+    position: absolute;
+    inset: -12px -8px;
+  }
+  .pill::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+  }
+  .password-show::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+  }
+}
+/* Control edges reach 3:1 (WCAG 1.4.11): inputs, selects and the off state of switches use grey-3. */
+:is(.calm-page, .calm-auth, dialog) :is(input:not([type='checkbox'], [type='radio'], [type='range'], [type='hidden']), select, textarea) {
+  border-color: var(--color-redesign-grey-3);
+}
+input[role='switch']:not(:checked) + span {
+  box-shadow: inset 0 0 0 1px var(--color-redesign-grey-3);
+}
+/* Disabled buttons: a flat grey ground and grey text, so they read as disabled without relying on fading. */
+.pill:disabled,
+.btn:disabled {
+  background: var(--color-redesign-track);
+  border-color: var(--color-redesign-track);
+  color: var(--color-redesign-grey-4);
+  opacity: 1;
+  cursor: not-allowed;
+}
+.dark :is(.pill, .btn):disabled {
+  color: var(--color-redesign-grey-2);
+}
+/* Press state on touch and click; reduced motion keeps only the colour. */
+.pill:not(:disabled):active,
+.btn:not(:disabled):active {
+  transform: scale(0.97);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pill:active,
+  .btn:active {
+    transform: none;
+  }
+}
+/* Phones: the bank chips stay on one row and scroll sideways instead of wrapping to two. */
+.bank-chips {
+  flex-wrap: wrap;
+}
+@media (max-width: 639px) {
+  .bank-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: -4px;
+    padding: 2px 4px;
+  }
+}
