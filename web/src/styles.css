@@ -989,6 +989,8 @@ body::before {
 /* Terms and Privacy (#36): one readable column, links on every screen. */
 .page.page-wide {
   max-width: 760px;
+  /* Centred on wide screens (#1); it sat against the left edge. */
+  margin-inline: auto;
 }
 
 .legal {
@@ -1028,6 +1030,13 @@ body::before {
   border: 1px solid color-mix(in srgb, var(--color-warning) 50%, var(--color-white));
   border-radius: var(--radius-input);
   padding: var(--space-s3) var(--space-s4);
+}
+
+/* Dark (#1): a dim amber note on the dark card, so its light text stays readable. */
+.dark .legal-note {
+  background: color-mix(in srgb, var(--color-warning) 16%, #18181b);
+  border-color: color-mix(in srgb, var(--color-warning) 45%, #18181b);
+  color: #fafafa;
 }
 
 .legal-table {

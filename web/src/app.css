@@ -131,6 +131,11 @@ body {
 body:has(.calm-page) {
   background-color: var(--color-redesign-page);
 }
+/* The old stylesheet's strong glow on the body is for unmoved pages; the redesign has its own
+   (below), so switch the old one off here (#1). */
+body:has(.calm-page)::before {
+  display: none;
+}
 
 /* Page: the redesign's ground with a two-tone mesh behind the cards (#213): green top left,
    red bottom right, a warm amber hint between them. The mesh sits on its own fixed layer (#220),
@@ -138,7 +143,8 @@ body:has(.calm-page) {
    every frosted card re-blur it. */
 .calm-page {
   isolation: isolate;
-  background-color: var(--color-redesign-page);
+  /* No colour of its own: the body has it (above), so a narrow page (Terms, Privacy) doesn't sit
+     as a dark column over the glow (#1). */
   color: var(--color-redesign-ink);
   font-family: var(--font-body);
 }
