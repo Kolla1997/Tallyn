@@ -1147,3 +1147,107 @@ body:has(.calm-page)::before {
     opacity: 1;
   }
 }
+
+/* By category (#253): the month as one bar with 2px seams, receipt rows you tap to filter the
+   list, and a double rule above "Spent". The parts sweep in and the rows rise (calm-sweep,
+   calm-rise); with reduced motion they are simply there. */
+.cat-month {
+  display: flex;
+  gap: 2px;
+  height: 16px;
+  overflow: hidden;
+  border-radius: 999px;
+}
+.cat-month i,
+.cat-marks span {
+  flex-basis: 0;
+  min-width: 0;
+}
+.cat-month i {
+  display: block;
+  height: 100%;
+}
+.cat-marks {
+  display: flex;
+  gap: 2px;
+  margin-top: 6px;
+  white-space: nowrap;
+}
+.cat-marks span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cat-row {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  width: calc(100% + 16px);
+  margin: 0 -8px;
+  padding: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  list-style: none;
+  transition: background-color 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.cat-row:disabled {
+  cursor: default;
+}
+.cat-row-small {
+  padding: 4px 8px;
+}
+.cat-row:not(:disabled):hover,
+.cat-row[aria-pressed='true'] {
+  background: var(--color-zinc-100);
+}
+.dark .cat-row:not(:disabled):hover,
+.dark .cat-row[aria-pressed='true'] {
+  background: var(--color-zinc-800);
+}
+/* The chosen category: a 3px edge mark, like the sidebar's current page (#230) */
+.cat-row[aria-pressed='true']::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--color-redesign-spend-3);
+}
+.cat-row:active:not(:disabled) {
+  transform: scale(0.99);
+}
+.cat-row:focus-visible {
+  outline: 2px solid var(--color-redesign-focus);
+  outline-offset: 2px;
+}
+.cat-other summary::-webkit-details-marker {
+  display: none;
+}
+.cat-chev {
+  display: inline-block;
+  color: var(--color-zinc-500);
+  transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.cat-other[open] .cat-chev {
+  transform: rotate(90deg);
+}
+/* The receipt's sum line */
+.cat-sum {
+  border-top: 3px double var(--color-zinc-900);
+}
+.dark .cat-sum {
+  border-top-color: var(--color-zinc-100);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cat-row,
+  .cat-chev {
+    transition: none;
+  }
+}

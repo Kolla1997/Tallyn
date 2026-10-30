@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Search } from 'lucide-react'
 import { cleanName } from '../components/TransactionRow.jsx'
 import TxIcon from '../components/TxIcon.jsx'
-import { Head, Panel, See, Rows, Money, Pill, Chips, MUTED, IN } from '../components/calm/ui.jsx'
+import { Head, Panel, Rows, Money, Pill, Chips, MUTED, IN } from '../components/calm/ui.jsx'
 import SpendingBars from '../components/SpendingBars.jsx'
 import { TxDetails, TxSummary } from '../components/TxSummary.jsx'
 import { api } from '../lib/api.js'
@@ -412,11 +412,8 @@ export default function TransactionsPage({ me, household, refreshKey }) {
               }}
             />
           ) : (
-            <TxSummary totals={totals} scope={scope} month={day ? '' : month} day={day} />
+            <TxSummary totals={totals} scope={scope} month={day ? '' : month} day={day} category={category} onCategory={setCategory} />
           )}
-          <p className="mt-2 px-1">
-            <See to="/budgets">Budgets</See>
-          </p>
         </aside>
       </div>
     </div>
