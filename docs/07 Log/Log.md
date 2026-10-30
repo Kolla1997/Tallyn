@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-30
+- #1 Transactions summary scrolls: the right-hand summary stuck to the top and was taller than the screen, so "By category" was cut off until the list ended. Dinesh picked B: it scrolls with the page. A picked transaction's details still stay in view.
 - #1 Loading without the footer: while the app checks the sign-in and then the terms agreement, it showed the loader inside the launch page or the sign-in frame, with the logo and the whole footer. Dinesh picked B: only the mark, centred on the page ground, like the in-app loader.
 - #157 Cheaper motion (Dinesh un-paused it and asked to finish and merge): the sidebar no longer animates the page's padding; the padding changes in one step and the page slides from where it was with a transform (reversing mid-slide carries on from where it is). The goal chart's month labels, the unused y-axis labels and Home's "today" dot move with transforms instead of `left`/`top`. M14 (Debts ring replay) was already gone: the live Debts page uses the waffle and doesn't remount on a person switch. G4's `styles.css` lines no longer exist.
 - Open (#157): G15, the cost of the card blur, needs profiling on a real mid-range phone; not measured. The notification stack still animates its height (small, kept).
