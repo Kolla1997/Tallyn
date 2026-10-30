@@ -980,7 +980,9 @@ body:has(.calm-page)::before {
   gap: 10px;
   width: 100%;
   max-width: 1120px;
-  margin: 24px auto 0;
+  /* Sits at the foot of the window on short pages (sign in, Before you start), like any footer;
+     the page's gap keeps it clear of the card above (#220). */
+  margin: auto auto 0;
   padding: 0;
   border-top: 0;
   font-size: 14px;
