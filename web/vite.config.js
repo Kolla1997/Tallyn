@@ -10,7 +10,7 @@ import { fileURLToPath, URL } from 'node:url'
 // server sends (internal/api/security.go), so anything it would block shows
 // up while developing. Dev only adds what Vite needs: its inline React
 // refresh script and the live-reload socket. Keep the two in step.
-function devPolicy(supabaseURL) {
+function devPolicy(supabaseURL, mapURLs) {
   let supabase = ''
   try {
     const u = new URL(supabaseURL)
@@ -18,13 +18,25 @@ function devPolicy(supabaseURL) {
   } catch {
     // not set: leave it out, like the server
   }
+  // The map host (#60). In production the map file and its fonts share one R2 host; in dev
+  // they may be a local tile server and Protomaps' fonts.
+  const maps = mapURLs
+    .map((m) => {
+      try {
+        return ` ${new URL(m.replace(/\{[xyz]\}/g, '0')).origin}`
+      } catch {
+        return ''
+      }
+    })
+    .join('')
   return [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' https://cdn.plaid.com",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https://plaid-merchant-logos.plaid.com https://plaid-counterparty-logos.plaid.com",
     "font-src 'self'",
-    `connect-src 'self' ws://localhost:* https://*.plaid.com${supabase}`,
+    `connect-src 'self' ws://localhost:* https://*.plaid.com${supabase}${maps}`,
+    "worker-src 'self' blob:",
     'frame-src https://cdn.plaid.com',
     "frame-ancestors 'none'",
     "object-src 'none'",
@@ -48,7 +60,7 @@ export default defineConfig(({ mode }) => {
         '/api': 'http://localhost:8080',
       },
       headers: {
-        'Content-Security-Policy': devPolicy(env.VITE_SUPABASE_URL),
+        'Content-Security-Policy': devPolicy(env.VITE_SUPABASE_URL, [env.VITE_MAP_URL, env.VITE_MAP_ASSETS].filter(Boolean)),
       },
       // The app reads design-tokens.json and brand/ from the repo root.
       fs: {

@@ -76,6 +76,7 @@ type Deps struct {
 	SyncNow     func(bankID string)             // sync.Syncer.SyncNow; optional
 	Reconnected func(bankID string)             // sync.Syncer.Reconnected; optional (#51)
 	SupabaseURL string                          // allowed in the Content-Security-Policy (#24)
+	MapURL      string                          // our map file's host, allowed in the CSP (#60)
 
 	// Backup codes and recovery (#23, ADR 0013). RequireSignedIn lets a
 	// password sign-in (no 2FA yet) reach the one recovery route; the backup
@@ -173,7 +174,7 @@ func NewRouter(d Deps) http.Handler {
 	// API answers are never cached; limits count per signed-in person (#24).
 	mux.Handle("/api/", noStore(requireAuth(limited(lim.all, api))))
 	mux.Handle("/", spa(d.WebDir))
-	return securityHeaders(d.SupabaseURL, mux)
+	return securityHeaders(d.SupabaseURL, d.MapURL, mux)
 }
 
 // unavailable answers 503 with code: for routes whose setup is missing.

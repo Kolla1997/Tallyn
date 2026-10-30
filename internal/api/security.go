@@ -9,16 +9,20 @@ import (
 // Security headers (#24, ADR 0011). Every response gets them, the React app
 // and the API alike. The Content-Security-Policy allows only our own files
 // plus what the app really uses: Supabase for sign-in, Plaid Link (its
-// script, its window and its API) and Plaid's two logo hosts. The sign-in
+// script, its window and its API), Plaid's two logo hosts, and our own map
+// host (#60, ADR 0019). The sign-in
 // token lives in the browser (ADR 0003), so keeping other scripts out
 // matters.
 
 // contentSecurityPolicy builds the policy for the app. supabaseURL is the
-// project URL the browser signs in with ("" leaves it out).
-func contentSecurityPolicy(supabaseURL string) string {
+// project URL the browser signs in with, mapURL our map file's host ("" leaves
+// either out).
+func contentSecurityPolicy(supabaseURL, mapURL string) string {
 	connect := []string{"'self'", "https://*.plaid.com"}
-	if o := origin(supabaseURL); o != "" {
-		connect = append(connect, o)
+	for _, u := range []string{supabaseURL, mapURL} {
+		if o := origin(u); o != "" {
+			connect = append(connect, o)
+		}
 	}
 	return strings.Join([]string{
 		"default-src 'self'",
@@ -29,6 +33,8 @@ func contentSecurityPolicy(supabaseURL string) string {
 		"img-src 'self' data: https://plaid-merchant-logos.plaid.com https://plaid-counterparty-logos.plaid.com",
 		"font-src 'self'",
 		"connect-src " + strings.Join(connect, " "),
+		// The map library draws in web workers it starts from blob: URLs (#60).
+		"worker-src 'self' blob:",
 		"frame-src https://cdn.plaid.com",
 		"frame-ancestors 'none'",
 		"object-src 'none'",
@@ -47,8 +53,8 @@ func origin(raw string) string {
 }
 
 // securityHeaders adds the headers to every response.
-func securityHeaders(supabaseURL string, next http.Handler) http.Handler {
-	csp := contentSecurityPolicy(supabaseURL)
+func securityHeaders(supabaseURL, mapURL string, next http.Handler) http.Handler {
+	csp := contentSecurityPolicy(supabaseURL, mapURL)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h := w.Header()
 		h.Set("Content-Security-Policy", csp)

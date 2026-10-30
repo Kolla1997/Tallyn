@@ -1147,3 +1147,83 @@ body:has(.calm-page)::before {
     opacity: 1;
   }
 }
+
+/* The map in the transaction details (#60, Dinesh picked option I): the left half of the place
+   block, grey so the red pin is the only colour. A soft shimmer while it loads, then the map
+   fades in and the pin settles; with reduced motion it simply appears. */
+.tx-map {
+  position: relative;
+  height: 124px;
+  overflow: hidden;
+  border: 1px solid var(--color-zinc-200);
+  border-radius: 12px;
+  background: var(--color-zinc-100);
+}
+.dark .tx-map {
+  border-color: var(--color-zinc-800);
+  background: var(--color-zinc-800);
+}
+/* .tx-map in front: MapLibre's stylesheet makes its container position: relative. */
+.tx-map .tx-map-gl {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.tx-map.is-ready .tx-map-gl {
+  opacity: 1;
+}
+.tx-map:not(.is-ready)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.08) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: tx-map-shimmer 1.2s linear infinite;
+}
+@keyframes tx-map-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+.tx-map-credit {
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+  z-index: 1;
+  font-size: 10px;
+  color: var(--color-zinc-500);
+}
+.tx-map .maplibregl-ctrl-attrib {
+  display: none;
+}
+.tx-map-pin {
+  width: 14px;
+  height: 14px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: var(--color-redesign-button);
+  box-shadow:
+    0 0 0 6px rgb(203 9 0 / 0.35),
+    0 2px 6px rgb(0 0 0 / 0.4);
+  animation: tx-map-pin 0.4s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+@keyframes tx-map-pin {
+  from {
+    opacity: 0;
+    translate: 0 -10px;
+    scale: 0.8;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tx-map-gl {
+    transition: none;
+  }
+  .tx-map:not(.is-ready)::after,
+  .tx-map-pin {
+    animation: none;
+  }
+}

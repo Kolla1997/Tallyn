@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { Suspense, lazy, useRef } from 'react'
 import { ArrowLeft, MapPin } from 'lucide-react'
 import { useTakeover } from '../lib/takeover.js'
 import { categoryLabel, formatMoney } from '../lib/money.js'
@@ -8,6 +8,10 @@ import TxIcon from './TxIcon.jsx'
 import TallynLoader from './TallynLoader.jsx'
 import CountUp from './CountUp.jsx'
 import { Panel, Rows, NUM, MUTED, IN } from './calm/ui.jsx'
+import { MAP_URL } from '../lib/map.js'
+
+// The map library is big, so it loads only when a transaction with a place opens (#60).
+const TxMap = lazy(() => import('./TxMap.jsx'))
 
 // The Transactions page's right column (#58), in the calm redesign (#187, the #185 draft): a
 // summary of whatever is filtered (money in and spent, top merchants, spending by category as
@@ -105,6 +109,8 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
   const time = when && new Date(when).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
   const place = [w?.city, [w?.region, w?.postal_code].filter(Boolean).join(' ')].filter(Boolean).join(', ')
   const hasPlace = Boolean(w?.address || place || (w?.lat != null && w?.lon != null))
+  // The map needs the bank's coordinates and a map host (#60).
+  const hasMap = Boolean(MAP_URL) && w?.lat != null && w?.lon != null
   const owner = tx.owner_user_id === meId ? 'You' : nameOf(people[tx.owner_user_id] ?? { user_id: tx.owner_user_id })
   const name = cleanName(tx.merchant)
   // On phones the details cover the page (#153): focus moves in, and back to the row when they close.
@@ -151,24 +157,32 @@ export function TxDetails({ tx, meId, people, onBack, onMerchant }) {
         <dd>{tx.category_primary ? categoryLabel(tx.category_primary) : 'Other'}</dd>
       </dl>
       {hasPlace ? (
-        <div className="mt-4 grid gap-2">
-          <p className="flex items-start gap-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 px-3 py-2.5 text-[13px] text-zinc-700 dark:text-zinc-200">
-            <MapPin className="size-4 shrink-0" aria-hidden="true" />
-            <span>
-              {w.address && <span className="block">{w.address}</span>}
-              {place && <span className="block">{place}</span>}
-              {w.store_number && <span className={`block ${MUTED}`}>Store #{w.store_number}</span>}
-            </span>
-          </p>
+        <div className="mt-4 grid gap-3">
+          {/* The map on the left, the address on the right (#60, option I). */}
+          <div className={`grid items-center gap-4 ${hasMap ? 'grid-cols-[minmax(0,1fr)_minmax(0,1fr)]' : ''}`}>
+            {hasMap && (
+              <Suspense fallback={<div className="tx-map" />}>
+                <TxMap lat={w.lat} lon={w.lon} name={name} />
+              </Suspense>
+            )}
+            <p className={`m-0 text-[14px] ${hasMap ? 'text-right' : 'flex items-start gap-2'}`}>
+              {!hasMap && <MapPin className="size-4 shrink-0" aria-hidden="true" />}
+              <span>
+                {w.address && <span className="block">{w.address}</span>}
+                {place && <span className="block">{place}</span>}
+                {w.store_number && <span className={`block ${MUTED}`}>Store #{w.store_number}</span>}
+                {hasMap && <span className={`mt-1 block text-[11px] ${MUTED}`}>Coinroof&apos;s own map, private</span>}
+              </span>
+            </p>
+          </div>
           <a
-            className="inline-flex h-8 w-fit items-center rounded-full border border-zinc-300 dark:border-zinc-700 px-3 text-[13px] font-semibold"
+            className="w-fit text-[13px] font-semibold underline decoration-zinc-300 dark:decoration-zinc-600 underline-offset-4"
             href={mapsLink(w, name)}
             target="_blank"
             rel="noreferrer noopener"
           >
             Open in Maps
           </a>
-          <p className={`text-[13px] ${MUTED}`}>Opens your maps app. Coinroof doesn&apos;t send the location anywhere until you tap.</p>
         </div>
       ) : (
         <p className="mt-4 flex items-center gap-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 px-3 py-2.5 text-[13px] text-zinc-600 dark:text-zinc-300">

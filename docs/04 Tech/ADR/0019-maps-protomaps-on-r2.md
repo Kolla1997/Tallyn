@@ -24,7 +24,9 @@ Transactions keep where a purchase happened (latitude and longitude, #9), shown 
 ## Decision
 Option A, US only (lower 48, Alaska, Hawaii) at **zoom 13**. Measured on the 2026-10-30 build: zoom 13 ≈ 4.6 GB, zoom 14 ≈ 9.6 GB, full detail ≈ 20 GB. Zoom 13 leaves room under R2's free 10 GB; the map library enlarges the last level, which is enough to show the streets around a pin.
 
-- The map loads only after the person taps **Show map**.
+- The map loads when the transaction details open, only for people allowed to see time and location (#28). An earlier plan asked for a **Show map** tap first; Dinesh dropped it on 2026-10-30, because with our own file no map company sees anything, so the tap protected nothing.
+- Layout (Dinesh picked option I, `drafts/60-transaction-map-final.html`): the map fills the left half of the place block, the address keeps to the right with one small line under it.
+- The map library, its fonts and icons are bundled or served from the same R2 host; the app reaches no other map host.
 - The pin comes from the bank's coordinates, not the map, so an older map still places it correctly.
 - The CSP adds only the map host; no map-company scripts, fonts or images.
 - Attribution: © OpenStreetMap.

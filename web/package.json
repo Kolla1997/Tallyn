@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@number-flow/react": "^0.6.2",
+    "@protomaps/basemaps": "5.1.0",
     "@supabase/supabase-js": "^2.117.3",
     "@visx/curve": "^4.0.0",
     "@visx/event": "^4.0.0",
@@ -33,7 +34,9 @@
     "d3-sankey": "^0.12.3",
     "d3-shape": "^3.2.0",
     "lucide-react": "^1.61.0",
+    "maplibre-gl": "6.14.0",
     "motion": "^14.6.0",
+    "pmtiles": "3.2.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-plaid-link": "^5.0.0",
