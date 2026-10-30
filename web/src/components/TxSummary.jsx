@@ -7,25 +7,21 @@ import { cleanName } from './TransactionRow.jsx'
 import TxIcon from './TxIcon.jsx'
 import TallynLoader from './TallynLoader.jsx'
 import CountUp from './CountUp.jsx'
-import { Panel, Rows, NUM, MUTED, IN } from './calm/ui.jsx'
+import { Panel, Rows, See, NUM, MUTED, IN } from './calm/ui.jsx'
+import { categoryShares, finding } from '../lib/categoryShares.js'
 
 // The Transactions page's right column (#58), in the calm redesign (#187, the #185 draft): a
 // summary of whatever is filtered (money in and spent, top merchants, spending by category as
 // bars with their shares), or the details of the transaction you picked.
 
-export function TxSummary({ totals, scope }) {
+export function TxSummary({ totals, scope, category = '', onCategory }) {
   if (!totals) {
     return (
       <Panel label="Summary">{totals === null ? <TallynLoader small /> : <p className={`text-[13px] ${MUTED}`}>Nothing to add up for these filters.</p>}</Panel>
     )
   }
   const cur = totals.currency
-  const cats = totals.categories ?? []
-  const top = cats[0]?.amount_minor || 1
-  const pct = (v) => {
-    const p = (v / (totals.spent_minor || 1)) * 100
-    return p < 1 ? '<1%' : `${Math.round(p)}%`
-  }
+  const shares = categoryShares(totals.categories ?? [])
   return (
     <div className="grid gap-3">
       <Panel id="sum-h" title={scope} glass>
@@ -68,27 +64,91 @@ export function TxSummary({ totals, scope }) {
         </Panel>
       )}
 
-      {cats.length > 0 && (
-        <Panel id="cat-h" title="By category">
-          <ul aria-label="Categories" className="grid gap-2.5">
-            {cats.map((c) => (
-              <li key={c.category}>
-                <div className="flex items-baseline justify-between gap-3 text-[14px]">
-                  <span className="font-semibold">{categoryLabel(c.category)}</span>
-                  <span className="flex items-baseline gap-2">
-                    <span className={`text-[13px] ${MUTED}`}>{pct(c.amount_minor)}</span>
-                    <span className={NUM}>{formatMoney(c.amount_minor, cur)}</span>
-                  </span>
-                </div>
-                <span className="mt-1 block h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--color-redesign-track)' }} aria-hidden="true">
-                  <span className="block h-full rounded-full bg-zinc-500" style={{ width: `${(c.amount_minor / top) * 100}%` }} />
-                </span>
-              </li>
-            ))}
-          </ul>
+      {shares && (
+        <Panel id="cat-h" title="By category" meta={<See to="/budgets">See budgets</See>}>
+          <ByCategory shares={shares} cur={cur} category={category} onCategory={onCategory} />
         </Panel>
       )}
     </div>
+  )
+}
+
+// By category (#253, Dinesh picked option C): the finding first, the month as one bar split by
+// category, then receipt rows that add up to "Spent". Shares are of the whole (they add up to
+// 100%), in the spending reds. Tapping a row filters the list to it; tapping it again shows all.
+const SPEND = (n) => `var(--color-redesign-spend-${n})`
+const pctText = (p) => (p < 1 ? '<1%' : `${p}%`)
+
+function ByCategory({ shares, cur, category, onCategory }) {
+  const label = (c) => (c === 'OTHER' ? `Other, ${shares.small.length} categories` : categoryLabel(c))
+  const money = (v) => formatMoney(v, cur)
+  const f = finding(shares, categoryLabel, money)
+  const pick = (c) => onCategory?.(category === c ? '' : c)
+  const row = (c, pct, amount, small = false) => (
+    <button type="button" className={`cat-row ${small ? 'cat-row-small' : ''}`} aria-pressed={category === c} onClick={() => pick(c)} disabled={!onCategory}>
+      <span className={`grow text-left ${small ? '' : 'font-semibold'}`}>{label(c)}</span>
+      <span className={`text-[13px] tabular-nums ${MUTED}`}>{pctText(pct)}</span>
+      <span className={NUM}>{money(amount)}</span>
+    </button>
+  )
+  return (
+    <>
+      <p className="m-0 text-[14px]">
+        <strong className="font-semibold">{f.strong}</strong> {f.rest && <span className={MUTED}>{f.rest}</span>}
+      </p>
+      <div className="cat-month mt-4" role="img" aria-label={shares.parts.map((p) => `${label(p.category)} ${pctText(p.pct)}`).join(', ')}>
+        {shares.parts.map((p, i) => (
+          <i key={p.category} className="calm-sweep" style={{ flexGrow: p.amount_minor, background: SPEND(p.level), '--d': `${300 + i * 60}ms` }} />
+        ))}
+      </div>
+      <div className={`cat-marks text-[12px] ${MUTED}`} aria-hidden="true">
+        {shares.parts.map((p) => (
+          <span key={p.category} style={{ flexGrow: p.amount_minor }}>
+            {p.pct >= 8 ? label(p.category).split(' ')[0] : ''}
+          </span>
+        ))}
+      </div>
+      <ul aria-label="Categories" className="m-0 mt-3 grid list-none gap-1 p-0">
+        {shares.parts.map((p, i) =>
+          p.category === 'OTHER' ? (
+            <li key="OTHER" className="calm-rise" style={{ '--d': `${200 + i * 90}ms` }}>
+              <details className="cat-other">
+                <summary className="cat-row">
+                  <span className="grow text-left font-semibold">
+                    <span className="cat-chev" aria-hidden="true">
+                      ›
+                    </span>{' '}
+                    {label('OTHER')}
+                  </span>
+                  <span className={`text-[13px] tabular-nums ${MUTED}`}>{pctText(p.pct)}</span>
+                  <span className={NUM}>{money(p.amount_minor)}</span>
+                </summary>
+                <ul className="m-0 ml-5 grid list-none gap-0.5 p-0">
+                  {shares.small.map((c) => (
+                    <li key={c.category}>{row(c.category, c.pct, c.amount_minor, true)}</li>
+                  ))}
+                </ul>
+              </details>
+            </li>
+          ) : (
+            <li key={p.category} className="calm-rise" style={{ '--d': `${200 + i * 90}ms` }}>
+              {row(p.category, p.pct, p.amount_minor)}
+            </li>
+          ),
+        )}
+      </ul>
+      <div className="cat-sum mt-2 flex items-baseline justify-between gap-3 pt-2.5">
+        <span className="text-[14px]">Spent</span>
+        <span className={`text-[22px] ${NUM}`}>
+          <CountUp value={shares.total} start={0} format={money} />
+        </span>
+      </div>
+      {onCategory && (
+        <p className={`m-0 mt-2 text-[13px] ${MUTED}`} aria-live="polite">
+          {category ? `Showing ${categoryLabel(category)} in the list. Tap it again to show all.` : 'Tap a category to see its transactions.'}
+        </p>
+      )}
+    </>
   )
 }
 
