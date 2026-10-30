@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-24
+updated: 2026-10-30
 issues: [5, 6, 7, 8, 9, 30, 99, 113]
 tags: [tech, onboarding]
 ---
@@ -89,7 +89,7 @@ In the Supabase dashboard, for each project (dev and prod). See [[Feature - Auth
 To try the single-deployment setup: `cd web && npm run build`, then `go run ./cmd/server` serves the built app from `web/dist`.
 
 ## Browser end-to-end tests (#113)
-The P0 paths (sign-in with 2FA, Home totals, connecting a sandbox bank, inviting a member, sharing) in a real browser, against the Go API, a **Supabase project just for tests** and the Plaid sandbox. They run nightly and by hand (GitHub → Actions → **End-to-end** → Run workflow), never on pull requests. Rows in [[Test Plan]].
+The P0 paths (sign-in with 2FA, Home totals, connecting a sandbox bank, inviting a member, sharing) in a real browser, against the Go API, a **Supabase project just for tests** and the Plaid sandbox. They run weekly (Mondays) and by hand (GitHub → Actions → **End-to-end** → Run workflow), never on pull requests. Rows in [[Test Plan]].
 
 > [!warning] Test project only
 > Never point these at tallyn-dev or production. Each test makes its own people (`e2e-…@example.test`) with the project's secret key, and deletes them afterwards. Households they made stay behind, empty.
@@ -113,7 +113,7 @@ The P0 paths (sign-in with 2FA, Home totals, connecting a sandbox bank, inviting
 ## Common tasks
 | Task | Command |
 |---|---|
-| Sync board into docs | Automatic (hourly GitHub Action, `git pull` to get it). By hand: `python3 scripts/sync_board.py` |
+| Sync board into docs | Automatic (GitHub Action every 6 hours and on issue changes, `git pull` to get it). By hand: `python3 scripts/sync_board.py` |
 | Test | `go test ./...` (database tests skip unless `TALLYN_TEST_DATABASE_URL` is set) |
 | Browser end-to-end tests | `cd web && npm run test:e2e` (needs the `E2E_*` values, above) |
 | Test the schema and RLS | Start a throwaway Postgres: `docker run --rm -d -p 5433:5432 -e POSTGRES_PASSWORD=postgres postgres:16`, then `TALLYN_TEST_DATABASE_URL=postgres://postgres:postgres@localhost:5433/postgres go test ./internal/db`. Without Docker, Homebrew `postgresql@16` works too (steps in [PR #20](https://github.com/Kolla1997/Tallyn/pull/20)) |

@@ -1,14 +1,18 @@
-# Checks on every pull request and on main (#100): Go formatting, vet and
+# Checks on every pull request (#100): Go formatting, vet and
 # tests (with a throwaway Postgres for the schema and row-level security
 # tests), the web app's lint, formatting, tests and build, and layout checks
 # in a browser (#117). A PR shows a tick or a cross before it's merged. No
 # secrets and no passwords here.
+# Kept small for the free Actions minutes (#1, CLAUDE.md §5 "CI minutes"): not re-run on main after a
+# merge (the PR already passed), skipped for docs-only changes, and every job has a time limit.
 name: Checks
 
 on:
   pull_request:
-  push:
-    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+      - '.obsidian/**'
   workflow_dispatch:
 
 concurrency:
@@ -22,6 +26,7 @@ jobs:
   go:
     name: Go (format, vet, tests)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     services:
       postgres:
         image: postgres:16
@@ -55,6 +60,7 @@ jobs:
   web:
     name: Web (lint, format, tests, build)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: web
@@ -81,6 +87,7 @@ jobs:
   layout:
     name: Layout (phone, laptop, desktop)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: web
