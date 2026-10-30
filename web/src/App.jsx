@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useState } from 'react'
 import AuthPage from './components/AuthPage.jsx'
+import LaunchPage from './components/LaunchPage.jsx'
 import { configured, supabase } from './lib/supabase.js'
 import SignIn from './screens/SignIn.jsx'
 import IdleGuard from './components/IdleGuard.jsx'
@@ -140,11 +141,11 @@ function AuthFlow() {
       />
     )
   else screen = <SetUp2FA onSignOut={signOut} />
-  // The 2FA screens sit in the middle of the page (#108, Dinesh picked A).
+  // Every auth screen opens in the same card slot beside the product video (#220, Dinesh picked C).
   return (
-    <AuthPage centred={Boolean(session && aal)}>
+    <LaunchPage>
       <Suspense fallback={<TallynLoader />}>{screen}</Suspense>
-    </AuthPage>
+    </LaunchPage>
   )
 }
 

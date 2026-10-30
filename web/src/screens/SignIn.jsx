@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { SIGN_UP_EVENT } from '../components/LaunchPage.jsx'
 import { clearActive } from '../lib/idle.js'
 import { NOTES, takeSignOutNote } from '../lib/session.js'
 import { MIN_PASSWORD, resetAskedEmail } from '../lib/recovery.js'
@@ -13,6 +14,12 @@ import Heading from '../components/Heading.jsx'
 // `expired`: a password reset link had expired or was used (#22).
 export default function SignIn({ expired = false, onExpiredSeen }) {
   const [mode, setMode] = useState(expired ? 'reset' : 'signin') // 'signin' | 'signup' | 'reset'
+  // The launch page's closing call opens "create an account" here (#220).
+  useEffect(() => {
+    const open = () => setMode('signup')
+    window.addEventListener(SIGN_UP_EVENT, open)
+    return () => window.removeEventListener(SIGN_UP_EVENT, open)
+  }, [])
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
