@@ -3,7 +3,7 @@ type: spec
 status: draft
 owner: Dinesh
 updated: 2026-10-30
-issues: [111, 113, 153, 154, 155, 200, 201, 209]
+issues: [111, 113, 153, 154, 155, 159, 200, 201, 209]
 tags: [spec, tech, testing]
 ---
 
@@ -153,6 +153,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Use case | P | Unit | Integration | End-to-end | Tests today |
 |---|---|---|---|---|---|
 | SQL is always constant, never built from input | P0 | — | Yes | — | `sqlsafety_test.go` |
+| Opening the app: your profile loads beside the consent check, not after it, and is never handed to the next person after a sign-out (#159) | P2 | Yes | — | No | `me.test.js` (early request used once; dropped on sign-out). Gap: real timing on a production build is a release-checklist item |
 | Pages load on demand, and reload once after an update (#99) | P2 | No | — | No | — |
 | Phone layout: no sideways scroll, nothing hidden (#97, #94) | P1 | — | — | Yes | `web/e2e/layout.spec.js` (#117): every page at 375, 1024 and 1440 px: no sideways scroll, no error, key parts really visible (size, on screen, not hidden by display, visibility or opacity, waiting up to 3s for the load fade, #212); menus with Terms and Privacy; sign-in, 2FA, reset, legal pages. Fake data and session, every PR |
 | A page that can’t load offers Try again (glass card); a reload that fails keeps the money on screen under a banner (#151) | P1 | Yes | — | No | `HomePage.test.jsx` (`a first load that fails offers Try again`, `a reload that fails keeps the money on screen`); other pages share `LoadFailed.jsx` |
@@ -224,6 +225,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - [ ] Phone (#153): pick a person on Family and a section in Settings; the details scroll into view
 - [ ] Reduced motion and reduced transparency on (#155): cards and the tab bar are solid in light and dark; chart pieces fade, don't slide
 - [ ] iPhone (#155): the tab bar sits above the home indicator; no white flash on a dark-mode reload; brand fonts don't visibly jump on big amounts
+- [ ] Load speed (#159): on the hosted build, open Home signed in with the network panel open; `/api/consent` and `/api/me` start together
 
 ## Open questions
 None at the moment. New ones go here as `> [!todo]` callouts.

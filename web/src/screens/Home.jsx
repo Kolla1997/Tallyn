@@ -1,6 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useState } from 'react'
 import AuthPage from '../components/AuthPage.jsx'
-import { api } from '../lib/api.js'
 import { pendingInvite } from '../lib/invite.js'
 import { takePasswordChanged } from '../lib/recovery.js'
 import { Link, usePath } from '../lib/router.jsx'
@@ -10,6 +9,7 @@ import Join from './Join.jsx'
 import Shell, { PageHead } from './Shell.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
 import Heading from '../components/Heading.jsx'
+import { loadMe } from '../lib/me.js'
 
 // Faster first load (#99): Home comes with the app; the other pages load the
 // first time they're opened, with the Tallyn loader meanwhile.
@@ -55,7 +55,7 @@ export default function Home({ email, onSignOut }) {
   const [invite, setInvite] = useState(pendingInvite)
 
   const load = useCallback(() => {
-    api('/api/me').then(setMe, (e) => setError(e.message))
+    loadMe().then(setMe, (e) => setError(e.message))
   }, [])
 
   useEffect(load, [load])

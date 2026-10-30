@@ -6,6 +6,7 @@ import SignIn from './screens/SignIn.jsx'
 import IdleGuard from './components/IdleGuard.jsx'
 import SessionLimit from './components/SessionLimit.jsx'
 import { signOutEverywhere, signOutHere } from './lib/session.js'
+import { forgetMe } from './lib/me.js'
 import { endRecovery, recoveryState, startRecovery } from './lib/recovery.js'
 import { ChoosePassword } from './screens/ResetPassword.jsx'
 import { BackupCodesGate } from './screens/BackupCodes.jsx'
@@ -56,6 +57,7 @@ function AuthFlow() {
   useEffect(() => {
     // Fires INITIAL_SESSION straight away, then on every sign-in, verified code and refresh.
     const { data } = supabase.auth.onAuthStateChange((event, s) => {
+      if (event === 'SIGNED_OUT') forgetMe() // never hand one person's early profile to the next (#159)
       if (event === 'PASSWORD_RECOVERY') {
         startRecovery()
         setRecovery('pending')
