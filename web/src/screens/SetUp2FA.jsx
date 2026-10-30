@@ -57,12 +57,16 @@ export default function SetUp2FA({ onSignOut }) {
       {error && !factor && <TryAgain busy={starting} onRetry={start} />}
       {factor && (
         <>
-          <ol>
-            <li>In your authenticator app, add an account and scan this code.</li>
-          </ol>
-          <img className="qr" src={factor.qr} alt="QR code to add Coinroof to your authenticator app" />
-          <p className="muted">Can&apos;t scan it? Enter this key instead:</p>
-          <p className="secret">{factor.secret}</p>
+          <div className="qr-scan">
+            <img className="qr" src={factor.qr} alt="QR code to add Coinroof to your authenticator app" />
+            <div>
+              <ol>
+                <li>In your authenticator app, add an account and scan this code.</li>
+              </ol>
+              <p className="muted">Can&apos;t scan it? Enter this key instead:</p>
+              <p className="secret">{factor.secret}</p>
+            </div>
+          </div>
           <ol start={2}>
             <li>
               Enter the <span className="nowrap">6-digit</span> code your app shows for Coinroof.
