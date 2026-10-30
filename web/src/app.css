@@ -909,3 +909,98 @@ body:has(.calm-page) {
     transition-delay: var(--d, 0ms);
   }
 }
+
+/* The footer (#220, B, brand tile bigger): frosted tiles, 1120px wide. Brand tile spans two rows;
+   top row: the page's sections and Create an account; bottom: Terms, Privacy, the copyright. */
+.calm-auth .tile-footer {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr 1fr;
+  grid-template-rows: repeat(2, minmax(96px, auto));
+  /* Tiles fill their rows (the old footer rule centres them). */
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  max-width: 1120px;
+  margin: 24px auto 0;
+  padding: 0;
+  border-top: 0;
+  font-size: 15px;
+}
+.tile-footer > * {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  min-width: 0;
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+}
+.calm-auth .tile-footer-brand {
+  grid-row: span 2;
+  flex-direction: column;
+  gap: 12px;
+  padding: 32px 20px;
+}
+.calm-auth .tile-footer-brand img {
+  height: 34px;
+  width: auto;
+}
+.calm-auth .tile-footer .site-footer-tag {
+  font-size: 24px;
+}
+.tile-footer-links {
+  grid-column: span 2;
+  flex-wrap: wrap;
+}
+.calm-auth .tile-footer a,
+.tile-footer-cta button {
+  color: var(--color-zinc-900);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+.tile-footer-cta :is(a, button) {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 22px;
+}
+.calm-auth .tile-footer :is(a, button):hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.calm-auth .tile-footer :is(a, button):focus-visible {
+  outline: 2px solid var(--color-zinc-900);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.tile-footer-copy {
+  color: var(--color-zinc-500);
+  font-size: 13px;
+}
+.dark .calm-auth .tile-footer :is(a, button) {
+  color: #fafafa;
+}
+.dark .calm-auth .tile-footer :is(a, button):focus-visible {
+  outline-color: #fafafa;
+}
+.dark .tile-footer-copy {
+  color: #a1a1aa;
+}
+@media (max-width: 760px) {
+  .calm-auth .tile-footer {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-auto-rows: minmax(72px, auto);
+  }
+  .calm-auth .tile-footer-brand,
+  .tile-footer-links,
+  .tile-footer-cta,
+  .tile-footer-copy {
+    grid-column: span 2;
+    grid-row: auto;
+  }
+}

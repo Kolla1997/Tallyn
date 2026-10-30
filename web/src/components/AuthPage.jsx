@@ -1,7 +1,5 @@
 import logo from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-light.svg'
-import wordmark from '../../../brand/coinroof/logo/svg/coinroof-wordmark-ink.svg'
 import logoDark from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-dark.svg'
-import wordmarkDark from '../../../brand/coinroof/logo/svg/coinroof-wordmark-white.svg'
 import ThemeSwitch from './calm/ThemeSwitch.jsx'
 import { Link } from '../lib/router.jsx'
 
@@ -20,21 +18,39 @@ export default function AuthPage({ children, wide = false, centred = false }) {
   )
 }
 
-// The page footer (#25, option B): the Coinroof wordmark (#200) with the tagline under it (#220, in
-// the button font, no middle dot), then the Terms of Service and Privacy Policy (#36).
-export function SiteFooter() {
+// The page footer (#220, Dinesh picked B from the footer drafts, with the brand tile bigger):
+// frosted tiles in a grid. A tall tile with the Coinroof lockup and "It all adds up."; the launch
+// page's sections; Create an account; Terms of Service; Privacy Policy (#36); the copyright.
+// `onSignUp` opens sign-up in the card on the launch page; elsewhere the button goes home.
+export function SiteFooter({ onSignUp }) {
   return (
-    <footer className="site-footer">
-      <span className="site-footer-brand">
-        {/* The wordmark file, never retyped (Logo Guide). */}
-        <img className="dark:hidden" src={wordmark} alt="Coinroof" height="14" />
-        <img className="hidden dark:block" src={wordmarkDark} alt="Coinroof" height="14" />
+    <footer className="site-footer tile-footer">
+      <div className="tile-footer-brand calm-glass">
+        <img className="dark:hidden" src={logo} alt="Coinroof" />
+        <img className="hidden dark:block" src={logoDark} alt="Coinroof" />
         <span className="site-footer-tag">It all adds up.</span>
-      </span>
-      <nav aria-label="Legal" className="flex gap-3">
-        <Link to="/terms">Terms of Service</Link>
-        <Link to="/privacy">Privacy Policy</Link>
+      </div>
+      <nav className="calm-glass tile-footer-links" aria-label="About Coinroof">
+        <a href="/#about-h">About</a>
+        <a href="/#features-h">What it does</a>
+        <a href="/#safe-h">Your money stays yours</a>
       </nav>
+      <div className="calm-glass tile-footer-cta">
+        {onSignUp ? (
+          <button type="button" onClick={onSignUp}>
+            Create an account
+          </button>
+        ) : (
+          <Link to="/">Create an account</Link>
+        )}
+      </div>
+      <div className="calm-glass">
+        <Link to="/terms">Terms of Service</Link>
+      </div>
+      <div className="calm-glass">
+        <Link to="/privacy">Privacy Policy</Link>
+      </div>
+      <div className="calm-glass tile-footer-copy">© {new Date().getFullYear()} Coinroof</div>
     </footer>
   )
 }

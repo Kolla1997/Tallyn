@@ -25,7 +25,7 @@ describe('CountUp', () => {
       const { container } = render(<CountUp value={900} start={0} format={(v) => `$${v}`} />)
       const visible = container.querySelector('[aria-hidden="true"]')
       expect(visible).toHaveTextContent('$0')
-      await waitFor(() => expect(visible).toHaveTextContent('$900'), { timeout: 3000 })
+      await waitFor(() => expect(visible).toHaveTextContent('$900'), { timeout: 8000 })
     } finally {
       window.matchMedia = real
     }

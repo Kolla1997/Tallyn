@@ -72,6 +72,10 @@ function useRise() {
 
 export default function LaunchPage({ children }) {
   const root = useRise()
+  // Footer links from other pages land here with a #section.
+  useEffect(() => {
+    if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView()
+  }, [])
   const signUp = () => {
     window.dispatchEvent(new Event(SIGN_UP_EVENT))
     document.getElementById('auth-slot')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -108,6 +112,9 @@ export default function LaunchPage({ children }) {
           Coinroof is a family finance app. Families connect bank accounts and cards in any currency, see one total in their home currency, and keep track of
           spending and savings together, with partners, kids and parents.
         </p>
+        <h3 id="features-h" className="sr-only">
+          What it does
+        </h3>
         <div className="launch-features">
           {FEATURES.map(([title, text, icon], i) => (
             <article key={title} className="calm-glass launch-feature launch-rise" style={{ '--d': `${i * 90}ms` }}>
@@ -141,7 +148,7 @@ export default function LaunchPage({ children }) {
         </button>
       </section>
 
-      <SiteFooter />
+      <SiteFooter onSignUp={signUp} />
     </main>
   )
 }
