@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import { UserPlus, Mail, Check } from 'lucide-react'
 import { api } from '../lib/api.js'
@@ -12,6 +12,7 @@ import { Head, Panel, Rows, Row, Money, Pill, MUTED, OWE, IN } from '../componen
 import PageSkeleton from '../components/calm/PageSkeleton.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
+import { useRevealOnPhone } from '../lib/modal.js'
 
 // Family (#39 step 4, #37, #38), in the calm redesign (#187, the #185 draft): everyone in the
 // household on the left; pick a person to see their money (what you may see of it), what you
@@ -159,6 +160,8 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
   const [banks, setBanks] = useState([])
   const [invites, setInvites] = useState([])
   const [selected, setSelected] = useState(fromAddress)
+  const details = useRef(null)
+  useRevealOnPhone(details, selected)
   const [failed, setFailed] = useState(false) // the last load failed (#151)
   const isOwner = household.role === 'owner'
 
@@ -274,7 +277,7 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
             </ul>
           </section>
 
-          <div className="grid items-start gap-3 lg:col-span-8 xl:col-span-9 xl:grid-cols-[minmax(0,1fr)_320px] [&>*]:min-w-0">
+          <div ref={details} className="grid scroll-mt-4 items-start gap-3 lg:col-span-8 xl:col-span-9 xl:grid-cols-[minmax(0,1fr)_320px] [&>*]:min-w-0">
             {current?.kind === 'member' && (
               <Person
                 key={current.member.user_id}
@@ -323,7 +326,8 @@ export default function FamilyPage({ me, household, refreshKey, onChanged, onLef
 
 function Person({ person, members, onSelect, me, household, sharing, setSharing, banks, meId, onChanged, onLeft }) {
   const [error, setError] = useState('')
-  const [dialog, setDialog] = useState(null) // { kind: 'remove' | 'leave' | 'role' | 'reset', role? }
+  // Settings → Leave links here with ?leave=1, which opens the leave dialog (#154).
+  const [dialog, setDialog] = useState(() => (person.is_you && new URLSearchParams(window.location.search).get('leave') ? { kind: 'leave' } : null)) // { kind: 'remove' | 'leave' | 'role' | 'reset', role? }
   const [wasReset, setWasReset] = useState(false)
   const isOwner = household.role === 'owner'
   const name = nameOf(person)
@@ -343,30 +347,55 @@ function Person({ person, members, onSelect, me, household, sharing, setSharing,
   const canShare = !you && !isKid(person.role) && (!isKid(me.role) || person.role === 'viewer')
   const seesTransactions = parentView || received.includes('transactions')
 
-  async function toggle(category, on) {
-    let next = new Set(given)
+  // Quick toggles save one after another, each from the latest choice, and a
+  // failure goes back to what the server last saved, not to an older screen (#154).
+  const latest = useRef(given)
+  useEffect(() => {
+    latest.current = given
+  }, [given])
+  const saved = useRef(given)
+  const queue = useRef(Promise.resolve())
+  const setGiven = (list) => setSharing((s) => ({ ...s, given: { ...s.given, [person.user_id]: list } }))
+
+  function toggle(category, on) {
+    let next = new Set(latest.current)
     if (on) next.add(category)
     else next.delete(category)
     if (!next.has('transactions')) next.delete('whereabouts') // time and location only with transactions
     next = [...next]
-    const before = sharing
+    latest.current = next
     setError('')
-    setSharing({ ...sharing, given: { ...sharing.given, [person.user_id]: next } })
-    try {
-      await api('/api/sharing', {
-        method: 'PUT',
-        body: { household_id: household.id, viewer_user_id: person.user_id, categories: next },
-      })
-      onChanged()
-    } catch {
-      setSharing(before)
-      setError(`We couldn't change what you share with ${name}. Try again.`)
-    }
+    setGiven(next)
+    queue.current = queue.current.then(async () => {
+      try {
+        await api('/api/sharing', {
+          method: 'PUT',
+          body: { household_id: household.id, viewer_user_id: person.user_id, categories: next },
+        })
+        saved.current = next
+        onChanged()
+      } catch {
+        latest.current = saved.current
+        setGiven(saved.current)
+        setError(`We couldn't change what you share with ${name}. Try again.`)
+      }
+    })
   }
 
   async function setRole(role) {
     await api(`/api/households/${household.id}/members/${person.user_id}`, { method: 'PUT', body: { role } })
     onChanged()
+  }
+
+  // A role picker is one choice, read as a radio group (#153). Arrows move
+  // between roles; Space or Enter picks one, which asks first.
+  function moveRole(e) {
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key]
+    if (!step) return
+    e.preventDefault()
+    const radios = [...e.currentTarget.querySelectorAll('[role="radio"]')]
+    const i = radios.indexOf(document.activeElement)
+    radios[(i + step + radios.length) % radios.length]?.focus()
   }
 
   // Every role change asks first. Owner changes are serious, so they also
@@ -413,14 +442,21 @@ function Person({ person, members, onSelect, me, household, sharing, setSharing,
         </div>
         {isOwner && !you && person.role !== 'child' && (
           <div className="mt-3">
-            <div role="group" aria-label={`Role for ${name}`} className="inline-flex flex-wrap rounded-full bg-zinc-100 dark:bg-zinc-800 p-0.5">
+            <div
+              role="radiogroup"
+              aria-label={`Role for ${name}`}
+              onKeyDown={moveRole}
+              className="inline-flex flex-wrap rounded-full bg-zinc-100 dark:bg-zinc-800 p-0.5"
+            >
               {ROLES.map(([r, l]) => (
                 <button
                   key={r}
                   type="button"
-                  aria-pressed={person.role === r}
+                  role="radio"
+                  aria-checked={person.role === r}
+                  tabIndex={person.role === r ? 0 : -1}
                   onClick={() => chooseRole(r)}
-                  className="rounded-full px-3 py-1 text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 transition-colors duration-150 aria-pressed:bg-white dark:aria-pressed:bg-zinc-900 aria-pressed:text-zinc-900 dark:aria-pressed:text-white aria-pressed:shadow-sm"
+                  className="rounded-full px-3 py-1 text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 transition-colors duration-150 aria-checked:bg-white dark:aria-checked:bg-zinc-900 aria-checked:text-zinc-900 dark:aria-checked:text-white aria-checked:shadow-sm"
                 >
                   {l}
                 </button>
@@ -681,14 +717,18 @@ function YourSummary({ members, me, household, sharing, theirs, have, owe, meId,
 
 function PendingInvite({ invite, onCancelled }) {
   const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
   async function cancel() {
+    if (busy) return
     setError('')
+    setBusy(true)
     try {
       await api(`/api/invites/${invite.id}`, { method: 'DELETE' })
       onCancelled()
     } catch {
       setError("We couldn't cancel that invite.")
     }
+    setBusy(false)
   }
   return (
     <section className={CARD} aria-labelledby="pending-h">
@@ -716,8 +756,8 @@ function PendingInvite({ invite, onCancelled }) {
         </p>
       )}
       <div className="mt-3">
-        <Pill quiet onClick={cancel}>
-          Cancel invite
+        <Pill quiet onClick={cancel} disabled={busy}>
+          {busy ? 'Cancelling…' : 'Cancel invite'}
         </Pill>
       </div>
     </section>

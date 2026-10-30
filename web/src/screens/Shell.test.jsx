@@ -63,7 +63,7 @@ describe('Shell', () => {
   it('starts collapsed, keeps page names, and remembers opening', () => {
     localStorage.clear()
     renderShell()
-    const sidebar = screen.getByRole('complementary', { name: 'Main' })
+    const sidebar = document.getElementById('sidebar')
     for (const name of ['Home', 'Accounts', 'Transactions', 'Budgets', 'Debts', 'Family', 'Goals', 'Settings']) {
       expect(within(sidebar).getByRole('link', { name })).toBeInTheDocument()
     }

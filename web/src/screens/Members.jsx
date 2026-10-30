@@ -17,12 +17,15 @@ export function Invite({ householdId, onCreated }) {
   const [role, setRole] = useState('adult')
   const [link, setLink] = useState(null) // { url, email }
   const [error, setError] = useState('')
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState(null) // true, false (failed) or null
+  const [busy, setBusy] = useState(false)
 
   async function submit(e) {
     e.preventDefault()
+    if (busy) return // a double click makes one invite, not two (#154)
     setError('')
-    setCopied(false)
+    setCopied(null)
+    setBusy(true)
     try {
       const d = await api(`/api/households/${householdId}/invites`, { method: 'POST', body: { email, role } })
       setLink({ url: inviteLink(d.token), email: d.invite.email })
@@ -37,6 +40,7 @@ export function Invite({ householdId, onCreated }) {
             : "We couldn't create the invite.",
       )
     }
+    setBusy(false)
   }
 
   async function copy() {
@@ -44,7 +48,7 @@ export function Invite({ householdId, onCreated }) {
       await navigator.clipboard.writeText(link.url)
       setCopied(true)
     } catch {
-      setCopied(false)
+      setCopied(false) // said out loud below, not silent (#153)
     }
   }
 
@@ -71,8 +75,8 @@ export function Invite({ householdId, onCreated }) {
         </p>
       )}
       <div>
-        <Pill type="submit" icon={Mail}>
-          Create invite link
+        <Pill type="submit" icon={Mail} disabled={busy}>
+          {busy ? 'Creating…' : 'Create invite link'}
         </Pill>
       </div>
       {link && (
@@ -81,10 +85,11 @@ export function Invite({ householdId, onCreated }) {
             Send this link to <strong>{link.email}</strong>. It works once, only for that email, for 7 days. You won&apos;t see it again, so copy it now.
           </p>
           <p className="m-0 font-mono text-[13px] break-all">{link.url}</p>
-          <div>
+          <div className="flex flex-wrap items-center gap-2">
             <Pill quiet onClick={copy}>
               {copied ? 'Copied' : 'Copy link'}
             </Pill>
+            {copied === false && <span className={`text-[13px] ${MUTED}`}>We couldn&apos;t copy it. Select the link and copy it yourself.</span>}
           </div>
         </div>
       )}

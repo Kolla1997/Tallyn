@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LAST_ACTIVE_KEY, hasLastActive, idleState, lastActive, markActive } from '../lib/idle.js'
 import { rememberSignOutNote } from '../lib/session.js'
+import { returnFocus } from '../lib/modal.js'
 
 // Sign out after 30 minutes without activity (#91, Dinesh picked A): for the
 // last minute a dialog counts down ("Still there?"), with the page blurred
@@ -68,15 +69,20 @@ export default function IdleGuard({ onSignOut }) {
     }
   }, [check])
 
+  const opener = useRef(null)
   // Open or close the dialog with the warning.
   useEffect(() => {
     const d = dialog.current
     if (!d) return
     if (secondsLeft != null && !d.open) {
+      opener.current = document.activeElement
       d.showModal()
       stayButton.current?.focus() // Enter or Space keeps you signed in
     }
-    if (secondsLeft == null && d.open) d.close()
+    if (secondsLeft == null && d.open) {
+      d.close()
+      returnFocus(opener.current) // back where you were (#153)
+    }
   }, [secondsLeft])
 
   const stay = () => {

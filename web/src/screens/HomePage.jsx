@@ -29,8 +29,9 @@ import OpensOver from '../components/calm/OpensOver.jsx'
 // Everything shown is what the API returns for this person, so the sharing rules (#28) apply.
 // Yours / Everyone switches the whole page (#68).
 
-const now = new Date()
-const MONTH = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+// Read the date when it's used, not when the file loads: a tab left open into a new month
+// would otherwise show last month under this month's name (#154).
+const monthKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 const monthName = (d) => d.toLocaleDateString('en-US', { month: 'long' })
 const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 const DAY = 86400000
@@ -59,7 +60,8 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
   const load = useCallback(() => {
     const hh = encodeURIComponent(household.id)
     const owner = encodeURIComponent(me.user_id)
-    const year = now.getFullYear()
+    const month = monthKey()
+    const year = new Date().getFullYear()
     // The spending trend loads on its own, so Home never waits for it. Each half stands alone: one
     // failing never blanks the other. The last 90 days can start in last year, so that year too.
     Promise.all([
@@ -71,8 +73,8 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
       api(`/api/households/${hh}/members`),
       api(`/api/transactions?household_id=${hh}&limit=200`),
       api(`/api/transactions?household_id=${hh}&owner=${owner}&limit=100`),
-      api(`/api/transactions/summary?household_id=${hh}&month=${MONTH}&owner=${owner}`),
-      api(`/api/transactions/summary?household_id=${hh}&month=${MONTH}`),
+      api(`/api/transactions/summary?household_id=${hh}&month=${month}&owner=${owner}`),
+      api(`/api/transactions/summary?household_id=${hh}&month=${month}`),
     ]).then(
       ([b, m, t, y, sy, se]) => {
         setBanks(b.banks)
@@ -308,7 +310,7 @@ function Spending({ days, summary, home, everyone }) {
   }, [days, home, end])
   const spent = summary?.spent_minor ?? 0
   return (
-    <section aria-label={`${everyone ? 'Spending' : 'Your spending'} in ${monthName(now)}`} className="flex h-full min-w-0 flex-col">
+    <section aria-label={`${everyone ? 'Spending' : 'Your spending'} in ${monthName(new Date(end))}`} className="flex h-full min-w-0 flex-col">
       <MetricCard
         label={everyone ? 'Spending' : 'Your spending'}
         segments={['Spending']}
@@ -324,7 +326,7 @@ function Spending({ days, summary, home, everyone }) {
       <p className={`m-0 mt-1.5 px-1 text-[13px] ${MUTED}`}>
         {spent > 0 ? (
           <>
-            {monthName(now)} so far: <b className="font-semibold text-zinc-900 dark:text-white">{formatMoney(spent, home)}</b> spent.{' '}
+            {monthName(new Date(end))} so far: <b className="font-semibold text-zinc-900 dark:text-white">{formatMoney(spent, home)}</b> spent.{' '}
           </>
         ) : (
           <>No spending yet this month. </>

@@ -12,10 +12,13 @@ export default function CreateHousehold({ onCreated }) {
 
   async function submit(e) {
     e.preventDefault()
+    if (busy) return
+    // A name of only spaces passes `required` (#154).
+    if (!name.trim()) return setError('Give your household a name.')
     setError('')
     setBusy(true)
     try {
-      await api('/api/households', { method: 'POST', body: { name, home_currency: currency } })
+      await api('/api/households', { method: 'POST', body: { name: name.trim(), home_currency: currency } })
       onCreated()
     } catch {
       setError("We couldn't create your household. Check the name and try again.")
@@ -28,7 +31,15 @@ export default function CreateHousehold({ onCreated }) {
       <p className="muted">A household is where your family&apos;s money comes together. You can invite others later.</p>
       <label>
         Household name
-        <input required maxLength={80} value={name} onChange={(e) => setName(e.target.value)} placeholder="The Rivera family" />
+        <input
+          required
+          maxLength={80}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'household-error' : undefined}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="The Rivera family"
+        />
       </label>
       <label>
         Home currency
@@ -39,12 +50,12 @@ export default function CreateHousehold({ onCreated }) {
         </select>
       </label>
       {error && (
-        <p className="error" role="alert">
+        <p className="error" id="household-error" role="alert">
           {error}
         </p>
       )}
       <button className="btn" type="submit" disabled={busy}>
-        Create household
+        {busy ? 'Creating…' : 'Create household'}
       </button>
     </form>
   )

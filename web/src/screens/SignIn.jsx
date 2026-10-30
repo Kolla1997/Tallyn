@@ -126,7 +126,15 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
       <form onSubmit={submit}>
         <label>
           Email
-          <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            type="email"
+            autoComplete="username"
+            required
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? 'sign-in-error' : undefined}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </label>
         {/* "Forgot password?" sits on the label's line (#22) but outside the
             <label>, which would otherwise name the button, not the field. */}
@@ -147,7 +155,8 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
               autoComplete={signup ? 'new-password' : 'current-password'}
               required
               minLength={signup ? MIN_PASSWORD : undefined}
-              aria-describedby={signup ? 'password-rule' : undefined}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={[signup && 'password-rule', error && 'sign-in-error'].filter(Boolean).join(' ') || undefined}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -156,7 +165,7 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
         </div>
         {signup && <PasswordRule ok={password.length >= MIN_PASSWORD} />}
         {error && (
-          <p className="error" role="alert">
+          <p className="error" id="sign-in-error" role="alert">
             {error}
           </p>
         )}

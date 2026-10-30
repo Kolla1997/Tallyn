@@ -357,7 +357,7 @@ function Details({ account: a, money, onChanged, onError }) {
     return (
       <p className={`m-0 text-[13px] ${MUTED}`}>
         {join([
-          apr && `APR ${apr}%`,
+          apr != null && `APR ${apr}%`, // 0% is a real rate (#154)
           a.card.minimum_payment_minor != null && `Min ${money(a.card.minimum_payment_minor)}`,
           due(null, a.card.next_payment_due_date, a.card.is_overdue),
         ])}
@@ -366,7 +366,7 @@ function Details({ account: a, money, onChanged, onError }) {
   }
   if (a.loan) {
     const l = a.loan
-    const rate = l.rate_percent && `${l.rate_percent}%${l.rate_type ? ` ${l.rate_type}` : ''}`
+    const rate = l.rate_percent != null && `${l.rate_percent}%${l.rate_type ? ` ${l.rate_type}` : ''}`
     const end =
       l.payoff_date && (l.kind === 'mortgage' ? `${l.term ? `${l.term}, ` : ''}ends ${monthYear(l.payoff_date)}` : `Paid off by ${monthYear(l.payoff_date)}`)
     return (

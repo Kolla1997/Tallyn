@@ -73,7 +73,7 @@ export function SaveBackupCodes({ email, canDefer = false, newFeature = false, o
     a.href = url
     a.download = 'coinroof-backup-codes.txt'
     a.click()
-    URL.revokeObjectURL(url)
+    setTimeout(() => URL.revokeObjectURL(url), 1000) // at once can cancel the download in Safari and Firefox (#154)
   }
 
   return (
@@ -238,11 +238,13 @@ export function UseBackupCode({ onBack }) {
             required
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? 'backup-code-error' : undefined}
             autoFocus
           />
         </label>
         {error && (
-          <p className="error" role="alert">
+          <p className="error" id="backup-code-error" role="alert">
             {error}
           </p>
         )}

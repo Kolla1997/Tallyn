@@ -14,9 +14,28 @@
    and the libraries') apply under it. */
 @custom-variant dark (&:is(.dark *));
 
+/* Metric-matched stand-ins while the brand fonts load (#155): a local Arial sized to each font's
+   width and line metrics, so big amounts don't jump when the real font swaps in. */
+@font-face {
+  font-family: 'Space Grotesk Fallback';
+  src: local('Arial');
+  size-adjust: 102.98%;
+  ascent-override: 89.69%;
+  descent-override: 26.47%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Montserrat Fallback';
+  src: local('Arial');
+  size-adjust: 112.83%;
+  ascent-override: 85.79%;
+  descent-override: 22.25%;
+  line-gap-override: 0%;
+}
+
 @theme inline {
-  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
-  --font-body: Montserrat, ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Space Grotesk', 'Space Grotesk Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-body: Montserrat, 'Montserrat Fallback', ui-sans-serif, system-ui, sans-serif;
   /* The tagline "It all adds up." (#220): the button face from design-tokens.json. */
   --font-tagline: 'Bricolage Grotesque', var(--font-body);
 }
@@ -202,7 +221,8 @@ body:has(.calm-page)::before {
 
 /* A focus ring on every control in the redesign, shown at once. Not on headings and other parts the app focuses
    with tabindex="-1" for screen readers (#209): they aren't controls, and a ring made them look clickable. */
-.calm-page :is(a, button, input, select, textarea, [tabindex]:not([tabindex='-1'])):focus-visible {
+/* One default for the whole app (#153, G13): sign-in pages and dialogs too, so new controls get it. */
+:is(a, button, input, select, textarea, summary, [tabindex]:not([tabindex='-1'])):focus-visible {
   outline: 2px solid var(--color-redesign-focus);
   outline-offset: 2px;
 }
@@ -1329,5 +1349,99 @@ body:has(.calm-page)::before {
   .cat-row,
   .cat-chev {
     transition: none;
+  }
+}
+
+/* The skip link sits above the sidebar and the tab bar (z-40) and menus (z-50) (#153, G10). */
+.skip-link {
+  z-index: 60;
+}
+
+/* Worst-case data (#154). */
+/* "Forgot password?" grows its tap area up and sideways, not down into the password field. */
+@media (max-width: 1023px) {
+  button.link.label-link::after {
+    inset: -16px -8px 0;
+  }
+}
+/* A long email with no break points wraps inside its card instead of running out of it. */
+.card,
+.calm-auth .card {
+  overflow-wrap: anywhere;
+}
+/* On a short window the sidebar scrolls, so the profile and Sign out stay reachable. Only there:
+   scrolling clips the collapsed rail's name labels, which sit outside it. */
+@media (max-height: 600px) {
+  #sidebar {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Glass fallbacks and reduced motion, completed (#155). */
+/* Safari before 18 blurs only with the prefixed property. */
+.calm-glass {
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tabbar {
+    background-color: #fff;
+  }
+  .dark .tabbar,
+  .dark :is(.panel, .card, .chip, .sidebar, .budget-tile) {
+    background-color: #18181b;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .calm-glass,
+  .tabbar,
+  .idle-dialog::backdrop {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .tabbar {
+    background-color: #fff;
+  }
+  /* The old fallbacks use --color-white, which stays white in dark mode. */
+  .dark .tabbar,
+  .dark :is(.panel, .card, .chip, .sidebar, .budget-tile) {
+    background-color: #18181b;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Page basics (#155). The browser draws form controls and scrollbars for the theme, and phones
+   don't auto-darken the glass (lib/theme.js sets it per theme once the app starts). */
+:root {
+  color-scheme: light;
+}
+.dark {
+  color-scheme: dark;
+}
+/* 100vh is taller than the visible screen on mobile Safari; dvh follows the toolbar. */
+@supports (height: 100dvh) {
+  body,
+  .page {
+    min-height: 100dvh;
+  }
+  .sidebar {
+    height: 100dvh;
+  }
+}
+/* The phone tab bar clears the home indicator. */
+.tabbar {
+  height: calc(4rem + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.calm-page main {
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+}
+@media (min-width: 1024px) {
+  .calm-page main {
+    padding-bottom: 3rem;
   }
 }

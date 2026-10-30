@@ -11,6 +11,7 @@ describe('formatMoney', () => {
     expect(formatMoney(null, 'USD')).toBe('—')
     expect(formatMoney(undefined, 'USD')).toBe('—')
     expect(formatMoney(5, 'NOT-A-CODE')).toBe('5 NOT-A-CODE')
+    expect(formatMoney(150000, 'BTCX')).toBe('150,000 BTCX') // grouped, not a bare run of digits (#154)
   })
 })
 

@@ -88,10 +88,18 @@ export function ResetRequest({ initialEmail = '', expired = false, onBack }) {
       <form onSubmit={send}>
         <label>
           Email
-          <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            type="email"
+            autoComplete="username"
+            required
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? 'reset-error' : undefined}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </label>
         {error && (
-          <p className="error" role="alert">
+          <p className="error" id="reset-error" role="alert">
             {error}
           </p>
         )}
@@ -142,6 +150,8 @@ export function ChoosePassword({ email, onDone }) {
       <Heading>Choose a new password</Heading>
       {email && <p className="muted">For {email}.</p>}
       <form onSubmit={save}>
+        {/* Which account this password is for, so password managers save it to the right one (#153). */}
+        {email && <input type="email" name="username" autoComplete="username" value={email} readOnly hidden />}
         <div className="field">
           <label htmlFor="new-password">New password</label>
           <span className="password-field">
@@ -152,7 +162,8 @@ export function ChoosePassword({ email, onDone }) {
               autoComplete="new-password"
               required
               minLength={MIN_PASSWORD}
-              aria-describedby="password-rule"
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? 'password-rule choose-error' : 'password-rule'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -161,12 +172,12 @@ export function ChoosePassword({ email, onDone }) {
         </div>
         <PasswordRule ok={long} />
         {error && (
-          <p className="error" role="alert">
+          <p className="error" id="choose-error" role="alert">
             {error}
           </p>
         )}
         <button className="btn" type="submit" disabled={busy || !long}>
-          Save and sign in
+          {busy ? 'Saving…' : 'Save and sign in'}
         </button>
         <p className="muted small">You&apos;ll be signed out on your other devices.</p>
       </form>

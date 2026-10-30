@@ -14,9 +14,19 @@ export function nameOf(member) {
   return member.display_name || `Your ${member.role}`
 }
 
+// The first whole character, so an emoji or accented name isn't cut in half (#154).
+export function firstChar(text) {
+  const t = (text || '').trim()
+  if (!t) return ''
+  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+    const [first] = new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(t)
+    return first.segment
+  }
+  return Array.from(t)[0]
+}
+
 export function initialOf(member) {
-  const n = member?.display_name?.trim()
-  return (n ? n.charAt(0) : member?.role?.charAt(0) || '·').toUpperCase()
+  return (firstChar(member?.display_name) || firstChar(member?.role) || '·').toUpperCase()
 }
 
 // Avatar is a coloured circle with the person's initial; decorative next to

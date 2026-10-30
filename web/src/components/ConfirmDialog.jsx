@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { verifiedAuthenticators, verifyCode } from '../lib/mfa.js'
 import { Pill, OWE } from './calm/ui.jsx'
+import { useModal } from '../lib/modal.js'
 
 const FIELD = 'h-10 w-full rounded-xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 text-[14px]'
 
@@ -17,14 +18,16 @@ export default function ConfirmDialog({ title, children, action, typeToConfirm, 
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const titleId = useId()
 
-  useEffect(() => {
-    const d = ref.current
-    if (!d.open) d.showModal()
-    return () => d.open && d.close()
-  }, [])
+  useModal(ref)
 
-  const nameOk = !typeToConfirm || typed.trim().toLowerCase() === typeToConfirm.trim().toLowerCase()
+  // Compared as plain text: same letters however they were typed (accents, emoji, case, spaces).
+  // A blank name can't be confirmed by typing nothing (#154).
+  const plain = (t) => (t || '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase()
+  // A name that is only spaces falls back to the action's word ("Remove").
+  const target = typeToConfirm && (plain(typeToConfirm) ? typeToConfirm.trim() : action)
+  const nameOk = !target || (plain(typed) !== '' && plain(typed) === plain(target))
   const ready = nameOk && (!needsCode || code.length === 6) && !busy
 
   async function submit(e) {
@@ -53,18 +56,18 @@ export default function ConfirmDialog({ title, children, action, typeToConfirm, 
     <dialog
       ref={ref}
       className="calm m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border-0 bg-white dark:bg-zinc-900 p-5 text-zinc-900 dark:text-white shadow-2xl backdrop:bg-black/40"
-      aria-labelledby="dialog-title"
+      aria-labelledby={titleId}
       onCancel={(e) => (busy ? e.preventDefault() : onClose())}
     >
       <form onSubmit={submit} className="grid gap-3 text-[14px]">
-        <h2 id="dialog-title" className="m-0 font-[family-name:var(--font-heading)] text-[18px] font-semibold">
+        <h2 id={titleId} className="m-0 font-[family-name:var(--font-heading)] text-[18px] font-semibold">
           {title}
         </h2>
         <div className="grid gap-2 text-zinc-600 dark:text-zinc-300 [&_p]:m-0">{children}</div>
         {typeToConfirm && (
           <label className="grid gap-1">
             <span>
-              Type <strong>{typeToConfirm}</strong> to confirm
+              Type <strong>{target}</strong> to confirm
             </span>
             <input className={FIELD} value={typed} onChange={(e) => setTyped(e.target.value)} autoComplete="off" spellCheck={false} autoFocus />
           </label>

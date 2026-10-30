@@ -8,7 +8,9 @@ export function formatMoney(minor, currency) {
     const digits = f.resolvedOptions().maximumFractionDigits
     return f.format(minor / 10 ** digits)
   } catch {
-    return `${minor} ${currency}` // a code Intl doesn't know (e.g. crypto)
+    // A code Intl doesn't know (e.g. crypto): we can't know its decimals, so
+    // show the stored number plainly rather than guess (#154).
+    return `${Number(minor).toLocaleString('en-US')} ${currency || ''}`.trim()
   }
 }
 

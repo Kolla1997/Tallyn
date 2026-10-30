@@ -15,6 +15,7 @@ import CountUp from '../components/CountUp.jsx'
 import { nameOf } from '../lib/people.jsx'
 import { useRetry } from '../lib/retry.js'
 import { Head, Panel, Chips, Pill, NUM, MUTED, OWE } from '../components/calm/ui.jsx'
+import { useModal as openModal } from '../lib/modal.js'
 
 // Savings goals (#14), in the calm redesign (#187, the #185 draft): "This month" on top (what
 // to put aside, ticked as money lands, the answer first), every goal as a pot that fills, and
@@ -373,11 +374,7 @@ function Forecast({ goal, f, now }) {
 
 function useModal() {
   const ref = useRef(null)
-  useEffect(() => {
-    const d = ref.current
-    if (!d.open) d.showModal()
-    return () => d.open && d.close()
-  }, [])
+  openModal(ref)
   return ref
 }
 
