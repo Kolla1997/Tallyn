@@ -1,17 +1,19 @@
 # Mirrors Tallyn Board and Tallyn Ideas into docs/ (scripts/sync_board.py) and commits the result.
-# Card moves on user-level Projects send no events, so the hourly run catches those (#16).
+# Card moves on user-level Projects send no events, so a run every 6 hours catches those (#16).
+# Kept small for the free Actions minutes (#1): only the issue events that change the boards, a
+# burst of them collapses into one run, and /i and /promote still sync straight away.
 name: Sync board mirrors
 
 on:
   issues:
-    types: [opened, edited, closed, reopened, labeled, unlabeled]
+    types: [opened, closed, reopened, labeled]
   schedule:
-    - cron: "17 * * * *"
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 concurrency:
   group: sync-board
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -19,6 +21,7 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
         with:

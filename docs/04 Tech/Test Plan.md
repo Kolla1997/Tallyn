@@ -2,7 +2,7 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-29
+updated: 2026-10-30
 issues: [111, 113, 200, 201, 209]
 tags: [spec, tech, testing]
 ---
@@ -40,7 +40,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | **Integration** | The API with a real Postgres: RLS, roles, SQL, handlers end to end with a test token | Go tests with `TALLYN_TEST_DATABASE_URL` (Postgres 16 in CI) | Every PR |
 | **Layout** | Every page at phone, laptop and desktop width: no sideways scroll, no error, key parts really visible (#117) | Playwright (Chromium) against the production build, with fake data and a fake session (`web/e2e`) | Every PR |
 | **Contract** | Our Plaid and Supabase code against recorded responses | Go `httptest` fakes (Plaid today) | Every PR |
-| **Browser end-to-end** | A person's path through the real app: sign-in, 2FA, a page, a change | **Playwright** with a separate Supabase test project and the Plaid sandbox (#113) | Nightly, and before each release |
+| **Browser end-to-end** | A person's path through the real app: sign-in, 2FA, a page, a change | **Playwright** with a separate Supabase test project and the Plaid sandbox (#113) | Weekly, and before each release |
 | **Manual** | What can't be automated safely: real email, a real authenticator app, a real bank, how it looks | Release checklist (below) | Before a release |
 
 **Priority:**
@@ -214,6 +214,7 @@ None at the moment. New ones go here as `> [!todo]` callouts.
 | Date | Decision | Why |
 |---|---|---|
 | 2026-10-12 | Browser end-to-end tests run nightly and before each release, not on every PR | Dinesh: cheaper and faster PRs; unit and integration tests still run on every PR (#111) |
+| 2026-10-30 | Browser end-to-end tests run weekly (Mondays), checks run on PRs only and skip docs-only changes | Actions minutes ran out in October 2026 and stopped every check (#1); a PR is checked before it merges, so main didn't need a second run |
 | 2026-10-12 | A separate Supabase project for automated tests | Dinesh: tests never touch tallyn-dev's real sign-ins or data (#111, #113) |
 | 2026-10-23 | End-to-end tests make fresh test people each run (with 2FA set up then) and delete them after, instead of one seeded user with a stored TOTP secret | No authenticator secret kept anywhere, and no test depends on another (#113) |
 | 2026-10-23 | Connecting a bank goes through the real Plaid Link sandbox screen; other tests link a bank through Plaid's sandbox API to save time | Dinesh picked A: test what people do; fall back to the API if Link proves flaky (#113) |

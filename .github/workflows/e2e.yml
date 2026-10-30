@@ -1,5 +1,5 @@
 # Browser end-to-end tests (#113): the P0 paths through the real app, Go API,
-# the Supabase project just for tests and the Plaid sandbox. Nightly, and by
+# the Supabase project just for tests and the Plaid sandbox. Weekly (#1, to save Actions minutes), and by
 # hand before each release (Actions → "End-to-end" → Run workflow). Never on
 # pull requests, so the test keys can't reach code from a fork.
 # Keys come from repository secrets (E2E_*), listed in docs/04 Tech/Dev Setup.md.
@@ -7,7 +7,7 @@ name: End-to-end
 
 on:
   schedule:
-    - cron: '0 6 * * *' # every day, 06:00 UTC
+    - cron: '0 6 * * 1' # Mondays, 06:00 UTC
   workflow_dispatch:
 
 concurrency:
