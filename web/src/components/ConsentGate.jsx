@@ -62,9 +62,16 @@ export default function ConsentGate({ onSignOut, children }) {
   }
 
   if (state === 'ok') return children
+  // While checking, only the mark on the page's own ground, like the in-app loader: no logo, card or
+  // footer flashing up before Home (#1, Dinesh picked B).
+  if (state === 'checking')
+    return (
+      <main className="calm-page grid min-h-svh place-items-center">
+        <TallynLoader />
+      </main>
+    )
   return (
     <AuthPage>
-      {state === 'checking' && <TallynLoader />}
       {state === 'error' && (
         <section className="card">
           <Heading>Something went wrong</Heading>

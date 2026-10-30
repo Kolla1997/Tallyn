@@ -25,6 +25,19 @@ describe('ConsentGate', () => {
     localStorage.clear()
   })
 
+  // While checking, only the loader: no logo or footer (#1, Dinesh picked B).
+  it('checking: only the loader, no footer', () => {
+    api.mockReturnValue(new Promise(() => {}))
+    const { container } = render(
+      <ConsentGate onSignOut={() => {}}>
+        <p>Home</p>
+      </ConsentGate>,
+    )
+    expect(screen.getByRole('status')).toHaveTextContent('Adding it all up')
+    expect(container.querySelector('footer')).toBeNull()
+    expect(screen.queryByRole('img', { name: 'Coinroof' })).toBeNull()
+  })
+
   it('already agreed: straight in', async () => {
     await open(false)
     expect(screen.getByText('Home')).toBeInTheDocument()

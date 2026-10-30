@@ -128,9 +128,16 @@ function AuthFlow() {
       </>
     )
   }
+  // While the sign-in is checked, only the mark on the page's own ground (#1, Dinesh picked B), the same
+  // as the terms check after it (`ConsentGate`), so no launch page or footer flashes up before Home.
+  if (session === undefined || (session && !aal))
+    return (
+      <main className="calm-page grid min-h-svh place-items-center">
+        <TallynLoader />
+      </main>
+    )
   let screen
-  if (session === undefined || (session && !aal)) screen = <TallynLoader />
-  else if (!session) screen = <SignIn expired={recovery === 'expired'} onExpiredSeen={finishReset} />
+  if (!session) screen = <SignIn expired={recovery === 'expired'} onExpiredSeen={finishReset} />
   else if (aal.nextLevel === 'aal2')
     screen = (
       <Verify2FA
