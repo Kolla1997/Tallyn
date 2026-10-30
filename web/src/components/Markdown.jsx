@@ -38,6 +38,14 @@ function inline(text, key = 'i') {
   return out
 }
 
+// A heading's id, so a contents list can link to it (#1): "2. Who can use Tallyn" → "who-can-use-tallyn".
+export const slug = (text) =>
+  text
+    .toLowerCase()
+    .replace(/^\d+\.\s*/, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+
 export default function Markdown({ text }) {
   const lines = text.replace(/\r/g, '').split('\n')
   const blocks = []
@@ -51,7 +59,11 @@ export default function Markdown({ text }) {
     const h = line.match(/^(#{1,3})\s+(.*)$/)
     if (h) {
       const Tag = `h${Math.max(2, h[1].length)}` // the page has its own h1, so ## is h2
-      blocks.push(<Tag key={i}>{inline(h[2], `h${i}`)}</Tag>)
+      blocks.push(
+        <Tag key={i} id={Tag === 'h2' ? slug(h[2]) : undefined}>
+          {inline(h[2], `h${i}`)}
+        </Tag>,
+      )
       i++
       continue
     }
