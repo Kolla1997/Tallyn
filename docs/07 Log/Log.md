@@ -11,6 +11,18 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-29
+- #220 Signed-out launch page (PR #238, merged), Dinesh picked C:
+  - The headline runs across the top; the product video and the auth card share one row, and every auth screen (sign in, create, 2FA, reset) opens in that one card slot.
+  - Below: About, three features, "Your money stays yours" and a closing call.
+  - Footer: frosted tiles (B from the footer drafts), with only the brand tile (lockup and "It all adds up.") bigger. Dinesh turned down the grid, glass, calm and outlined-frame versions before that.
+  - Also fixed: the stretched theme button; footer section links glide instead of reloading; the page mesh moved to its own fixed layer instead of `background-attachment: fixed`.
+- #221 Loader (PR #235, merged): pages load with only the Coinroof mark, built again every 2.6s while "Adding it all up…" types out; the grey card shapes are gone.
+- #1 Legal pages (PR #239, open): Terms and Privacy centred; the draft note fixed in dark mode; the dark column gone (`.calm-page` is transparent); the old `body::before` glow off on redesigned pages.
+- #220 follow-up (PR #240, open): the video keeps its shape; a taller card grows smoothly into the gap below without moving About.
+- Open:
+  - The draft product video (`drafts/220-video.html`, A slideshow / B guided pan / C mix) is waiting for a pick.
+  - The legal pages' empty space on wide screens: draft A (a wider card) or build B (a contents list beside the text)?
+  - The 2FA set-up card might be tall enough to reach About; check on the real flow.
 - #228 Accounts on load (C, PR #229): the rings sweep; net worth, have and owe count up from $0 (`CountUp start`); the tiles arrive left to right; each limit bar fills after its tile.
 - #228 Loading-effect rule: every new screen, card, chart or figure gets a planned loading effect in its draft, with a reduced-motion version. Added to CLAUDE.md §6 and Design System → Loading motion, which lists the patterns to reuse.
 - #230 Sidebar and Transactions (C for both, PR #231): in dark mode the active page is green with a 3px edge bar. On Transactions, Spending by day's bars grow left to right once the days arrive (they used to grow on the empty month), the figures count up, and the capped label lands last.
