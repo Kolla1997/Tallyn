@@ -19,6 +19,7 @@ const NOTCH_MS = 14
 const ROWS_FROM = 800
 const ROW_GAP = 150
 import IncomePlan from './IncomePlan.jsx'
+import { useModal } from '../lib/modal.js'
 
 // Budgets (#13, ADR 0014), in the calm redesign (#187, the #185 draft): the plan from your
 // income, who counts and your own switch, household budgets as cards with a pace line (spent so
@@ -176,7 +177,12 @@ function PersonBudget({ b, name, today, money, onChange, start }) {
         </span>
         <PacePill b={b} today={today} late={done} />
         {b.can_manage && (
-          <button type="button" className={CHANGE} onClick={onChange} aria-label={`Change ${name}'s ${what(b)} budget`}>
+          <button
+            type="button"
+            className={CHANGE}
+            onClick={onChange}
+            aria-label={name === 'You' ? `Change your ${what(b)} budget` : `Change ${name}'s ${what(b)} budget`}
+          >
             Change
           </button>
         )}
@@ -399,11 +405,7 @@ function BudgetDialog({ budget, choices, people, me, household, onClose, onSaved
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  useEffect(() => {
-    const d = ref.current
-    if (!d.open) d.showModal()
-    return () => d.open && d.close()
-  }, [])
+  useModal(ref)
 
   const coverName = (id) => (id === '' ? 'The household' : id === me.user_id ? 'You' : nameOf(people[id] ?? { user_id: id }))
   const minor = toMinor(amount, cur)

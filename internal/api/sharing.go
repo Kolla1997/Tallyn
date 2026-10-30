@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/Kolla1997/Tallyn/internal/db"
 )
@@ -73,6 +74,11 @@ func setMe(store Store) http.HandlerFunc {
 			DisplayName string `json:"display_name"`
 		}
 		if !readJSON(w, r, &in) {
+			return
+		}
+		// A name of only spaces would leave people with no name to tell them apart (#154).
+		if strings.TrimSpace(in.DisplayName) == "" {
+			writeError(w, http.StatusBadRequest, "invalid_name")
 			return
 		}
 		err := store.SetDisplayName(r.Context(), uid, in.DisplayName)

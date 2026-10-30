@@ -7,6 +7,7 @@ import { AccountsIcon, BudgetsIcon, DebtsIcon, FamilyIcon, GoalsIcon, HomeIcon, 
 import { Link } from '../lib/router.jsx'
 import Heading from '../components/Heading.jsx'
 import ThemeSwitch from '../components/calm/ThemeSwitch.jsx'
+import { firstChar } from '../lib/people.jsx'
 
 // App layout (#39), in the calm redesign (#187): a floating frosted rail on web (1024px and up),
 // collapsed by default; opening and closing glide (#221, the sidebar's width and the page's left padding); header and bottom tab bar on phones. One 1280px content width. Built from
@@ -72,7 +73,7 @@ function isTyping(el) {
 
 export default function Shell({ me, household, households, onChooseHousehold, onSignOut, children }) {
   const name = me?.display_name || 'You'
-  const initial = name.trim().charAt(0).toUpperCase() || '·'
+  const initial = firstChar(name).toUpperCase() || '·'
   const [collapsed, setCollapsed] = useState(initialCollapsed)
 
   const toggle = (next = !collapsed) => {
@@ -84,10 +85,12 @@ export default function Shell({ me, household, households, onChooseHousehold, on
     }
   }
 
-  // "[" toggles the sidebar, unless you're typing.
+  // "[" toggles the sidebar, unless you're typing, a dialog is open, or the
+  // sidebar isn't shown (phones) (#153).
   useEffect(() => {
     const onKey = (e) => {
       if (e.key !== '[' || e.metaKey || e.ctrlKey || e.altKey || isTyping(document.activeElement)) return
+      if (document.querySelector('dialog[open]') || !window.matchMedia?.('(min-width: 1024px)').matches) return
       e.preventDefault()
       setCollapsed((c) => {
         try {
@@ -109,7 +112,6 @@ export default function Shell({ me, household, households, onChooseHousehold, on
       </a>
       <aside
         id="sidebar"
-        aria-label="Main"
         className={`calm-glass fixed top-3 bottom-3 left-3 z-40 hidden flex-col rounded-3xl p-3 lg:flex transition-[width] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${collapsed ? 'w-[60px] items-center' : 'w-[208px]'}`}
       >
         {/* Logo, with Collapse beside it (#72). */}
@@ -140,7 +142,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
             </svg>
           </button>
         </div>
-        <nav className="flex flex-col gap-0.5">
+        <nav aria-label="Main" className="flex flex-col gap-0.5">
           {SIDEBAR.map(([to, label, Icon]) => (
             <Link key={to} to={to} className={`${NAV_LINK} ${collapsed ? 'w-[42px] justify-center' : 'px-3'}`}>
               <Icon width={18} height={18} />
@@ -247,7 +249,7 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
   }
 
   return (
-    <div className="relative" ref={box}>
+    <div className="relative" ref={box} onBlur={(e) => open && !box.current.contains(e.relatedTarget) && close(false)}>
       <button
         ref={button}
         className={`profile-card flex h-12 items-center gap-2.5 rounded-2xl border-0 bg-transparent p-0 text-left text-zinc-900 dark:text-white transition-colors duration-150 hover:bg-zinc-100 dark:hover:bg-zinc-800 ${collapsed ? 'w-[42px] justify-center' : 'w-full px-2'}`}
@@ -285,7 +287,7 @@ function ProfileMenu({ name, initial, household, households, onChooseHousehold, 
         <div className={`${MENU} bottom-full left-0 mb-2`} role="menu" aria-label="Your account" onKeyDown={onMenuKey}>
           {households?.length > 1 && (
             <>
-              <p className="px-2.5 pt-1 text-[12px] text-zinc-500 dark:text-zinc-400" aria-hidden="true">
+              <p role="none" className="px-2.5 pt-1 text-[12px] text-zinc-500 dark:text-zinc-400" aria-hidden="true">
                 Household
               </p>
               {households.map((h) => (
@@ -365,7 +367,7 @@ function MobileMenu({ name, initial, household, onSignOut }) {
   }
 
   return (
-    <div className="relative" ref={box}>
+    <div className="relative" ref={box} onBlur={(e) => open && !box.current.contains(e.relatedTarget) && close(false)}>
       <button
         ref={button}
         className="flex size-10 items-center justify-center rounded-full border border-zinc-300 dark:border-zinc-700 bg-transparent p-0 text-zinc-900 dark:text-white"
@@ -391,7 +393,7 @@ function MobileMenu({ name, initial, household, onSignOut }) {
             Settings
           </Link>
           <hr className="my-1 border-zinc-100 dark:border-zinc-800" />
-          <p className="flex items-center gap-2.5 px-2.5 py-2">
+          <p role="none" className="flex items-center gap-2.5 px-2.5 py-2">
             <Avatar initial={initial} />
             <span className="min-w-0 grow leading-tight">
               <strong className="block truncate text-[13px]">{name}</strong>
@@ -444,7 +446,7 @@ export function PageHead({ title, tab, sub, children }) {
 // lib/legal.js, so the documents' text stays out of the first download (#99).
 function LegalLinks() {
   return (
-    <p className="px-2.5 py-1.5 text-[12px] text-zinc-500 dark:text-zinc-400 [&_a]:text-zinc-600 [&_a]:underline [&_a]:underline-offset-2">
+    <p role="none" className="px-2.5 py-1.5 text-[12px] text-zinc-500 dark:text-zinc-400 [&_a]:text-zinc-600 [&_a]:underline [&_a]:underline-offset-2">
       <a role="menuitem" href="/terms" target="_blank" rel="noopener">
         Terms of Service
       </a>

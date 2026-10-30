@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase.js'
 import { SaveBackupCodes } from './BackupCodes.jsx'
 import CodeForm from './CodeForm.jsx'
 import { Head, Panel, Pill, MUTED, OWE, IN } from '../components/calm/ui.jsx'
+import { useModal, useRevealOnPhone } from '../lib/modal.js'
 
 // Settings (#39 step 5), in the calm redesign (#187, the #185 draft): sections on the left, the
 // chosen one on the right, like Family. Everything here works today; what doesn't yet says so and
@@ -38,6 +39,8 @@ const fromAddress = () => {
 
 export default function Settings({ me, household, email, onSaved, onSignOut }) {
   const [section, setSection] = useState(fromAddress)
+  const details = useRef(null)
+  useRevealOnPhone(details, section)
 
   // Keep the section in the address, so a link can open it and Back works.
   useEffect(() => {
@@ -67,7 +70,7 @@ export default function Settings({ me, household, email, onSaved, onSignOut }) {
             ))}
           </ul>
         </nav>
-        <div className="lg:col-span-8 xl:col-span-9">
+        <div ref={details} className="scroll-mt-4 lg:col-span-8 xl:col-span-9">
           {section === 'profile' && <Profile me={me} email={email} onSaved={onSaved} />}
           {section === 'security' && <Security email={email} onSignOut={onSignOut} />}
           {section === 'household' && <Household household={household} onSaved={onSaved} />}
@@ -115,18 +118,24 @@ function Profile({ me, email, onSaved }) {
   const [name, setName] = useState(me?.display_name ?? '')
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
 
   async function save(e) {
     e.preventDefault()
-    setError('')
+    if (busy) return
     setSaved(false)
+    // A name of only spaces leaves your family nothing to know you by (#154).
+    if (!name.trim()) return setError('Enter a name your family will know you by.')
+    setError('')
+    setBusy(true)
     try {
-      await api('/api/me', { method: 'PUT', body: { display_name: name } })
+      await api('/api/me', { method: 'PUT', body: { display_name: name.trim() } })
       setSaved(true)
       onSaved()
     } catch {
       setError("We couldn't save your name.")
     }
+    setBusy(false)
   }
 
   return (
@@ -147,13 +156,15 @@ function Profile({ me, email, onSaved }) {
         </label>
         <Rows>
           <Row label="Email" note={email}>
-            <Pill type="submit">Save</Pill>
+            <Pill type="submit" disabled={busy}>
+              {busy ? 'Saving…' : 'Save'}
+            </Pill>
           </Row>
         </Rows>
         {saved && (
           <p className="m-0 mt-1 flex items-center gap-1.5 text-[13px] font-semibold" style={IN} role="status">
             <Check className="size-4" aria-hidden="true" />
-            Saved. Your family now sees you as {name.trim() || 'your role'}.
+            Saved. Your family now sees you as {name.trim()}.
           </p>
         )}
         {error && (
@@ -351,11 +362,7 @@ function BackupCodesRow({ email }) {
 
 function CodesDialog({ email, onClose }) {
   const ref = useRef(null)
-  useEffect(() => {
-    const d = ref.current
-    if (!d.open) d.showModal()
-    return () => d.open && d.close()
-  }, [])
+  useModal(ref)
   return (
     <dialog ref={ref} className={`${DIALOG} calm-auth max-w-lg`} aria-label="Your backup codes" onCancel={(e) => e.preventDefault()}>
       <SaveBackupCodes email={email} done="Done" onDone={onClose} />
@@ -373,11 +380,7 @@ function AddAuthenticator({ names, onAdded, onClose }) {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  useEffect(() => {
-    const d = ref.current
-    if (!d.open) d.showModal()
-    return () => d.open && d.close()
-  }, [])
+  useModal(ref)
 
   async function start(e) {
     e.preventDefault()
@@ -404,7 +407,7 @@ function AddAuthenticator({ names, onAdded, onClose }) {
   }
 
   return (
-    <dialog ref={ref} className={DIALOG} aria-labelledby="add-auth-title" onCancel={(e) => (e.preventDefault(), cancel())}>
+    <dialog ref={ref} className={DIALOG} aria-labelledby="add-auth-title" onCancel={(e) => (e.preventDefault(), !busy && cancel())}>
       <h2 id="add-auth-title" className="m-0 mb-3 font-[family-name:var(--font-heading)] text-[18px] font-semibold">
         Add another authenticator
       </h2>
@@ -674,7 +677,7 @@ function LeaveOrClose({ me, household, email }) {
       <Rows>
         {household && (
           <Row label={`Leave ${household.name}`} note="You'll confirm with your name and a code from your authenticator app">
-            <Link to={`/family?member=${me.user_id}`} className={TEXT_LINK} style={OWE}>
+            <Link to={`/family?member=${me.user_id}&leave=1`} className={TEXT_LINK} style={OWE}>
               Leave
             </Link>
           </Row>

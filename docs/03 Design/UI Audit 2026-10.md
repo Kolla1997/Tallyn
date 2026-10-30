@@ -2,7 +2,7 @@
 type: guide
 status: active
 owner: Dinesh
-updated: 2026-10-23
+updated: 2026-10-30
 issue: 145
 tags: [audit, accessibility, motion, design]
 ---
@@ -29,6 +29,7 @@ A one-off audit of every screen and component in `web/` using the outside skills
 About 110 findings. Most are invisible. Glass and contrast hold up well: every main text colour passes AA on glass, dialogs, inputs and buttons stay solid, and both fallbacks exist for the main surfaces.
 
 **Fixed already**
+- #153, #154, #155 (2026-10-30, one PR): the keyboard, worst-case data and glass/motion findings below. M8 and M9 went with the redesign (those chart files no longer exist); M10 was fixed in #253; A10 was gone already.
 - [#146](https://github.com/Kolla1997/Tallyn/issues/146): budget amounts with a comma decimal saved 100× too big ("12,50" → 1,250.00). PR #148.
 - [#147](https://github.com/Kolla1997/Tallyn/issues/147): Home's this-month figure only counted recent transactions. Now "spent this month" from the month summary. PR #149.
 

@@ -57,7 +57,7 @@ describe('FamilyPage', () => {
     const list = screen.getByRole('region', { name: 'People in your household' })
     expect(within(list).getByText('Sam')).toBeInTheDocument()
     expect(within(list).getByText('Robin')).toBeInTheDocument()
-    expect(within(person()).getByRole('button', { name: 'Adult' })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(person()).getByRole('radio', { name: 'Adult' })).toHaveAttribute('aria-checked', 'true')
   })
 
   it('what Pat shares with you, and the switches for what you share', async () => {
@@ -98,7 +98,7 @@ describe('FamilyPage', () => {
     answers()
     await open()
     expect(screen.getByRole('button', { name: 'Invite someone' })).toBeInTheDocument()
-    expect(within(person()).getByRole('group', { name: 'Role for Pat' })).toBeInTheDocument()
+    expect(within(person()).getByRole('radiogroup', { name: 'Role for Pat' })).toBeInTheDocument()
     fireEvent.click(within(person()).getByRole('button', { name: 'Remove from household' }))
     const dialog = screen.getByRole('dialog', { name: 'Remove Pat?' })
     expect(within(dialog).getByText(/Type/)).toBeInTheDocument()
@@ -110,7 +110,7 @@ describe('FamilyPage', () => {
     answers({ role: 'adult' })
     await open({ ...owner, role: 'adult' })
     expect(screen.queryByRole('button', { name: 'Invite someone' })).toBeNull()
-    expect(within(person()).queryByRole('group', { name: 'Role for Pat' })).toBeNull()
+    expect(within(person()).queryByRole('radiogroup', { name: 'Role for Pat' })).toBeNull()
     expect(within(person()).queryByRole('button', { name: 'Remove from household' })).toBeNull()
   })
 

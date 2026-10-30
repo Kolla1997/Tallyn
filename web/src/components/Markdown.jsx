@@ -122,7 +122,8 @@ export default function Markdown({ text }) {
       )
       continue
     }
-    const para = []
+    // The first line always joins, so a stray "#12" or "####" line can't stall the loop (#154).
+    const para = [lines[i++]]
     while (i < lines.length && lines[i].trim() && !/^(#|>|\||\s*-\s)/.test(lines[i])) para.push(lines[i++])
     blocks.push(<p key={i}>{inline(para.join(' '), `p${i}`)}</p>)
   }

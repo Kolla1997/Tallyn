@@ -85,6 +85,10 @@ func TestSetMe(t *testing.T) {
 	if rec := send(h, "PUT", "/api/me", `not json`); rec.Code != http.StatusBadRequest {
 		t.Fatalf("bad JSON: %d", rec.Code)
 	}
+	s.gotName = "unchanged"
+	if rec := send(h, "PUT", "/api/me", `{"display_name":"   "}`); rec.Code != http.StatusBadRequest || s.gotName != "unchanged" {
+		t.Fatalf("a blank name must be refused before saving (#154): %d, saved %q", rec.Code, s.gotName)
+	}
 	s.err = db.ErrInvalid // e.g. longer than 80 characters
 	if rec := send(h, "PUT", "/api/me", `{"display_name":"x"}`); rec.Code != http.StatusBadRequest || !strings.Contains(rec.Body.String(), "invalid_name") {
 		t.Fatalf("invalid: %d %s", rec.Code, rec.Body)
