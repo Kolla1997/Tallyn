@@ -910,30 +910,30 @@ body:has(.calm-page) {
   }
 }
 
-/* The footer (#220, B, brand tile bigger): frosted tiles, 1120px wide. Brand tile spans two rows;
+/* The footer (#220, B; only the brand tile bigger, the rest at draft size): frosted tiles, 1120px wide. Brand tile spans two rows;
    top row: the page's sections and Create an account; bottom: Terms, Privacy, the copyright. */
 .calm-auth .tile-footer {
   display: grid;
   grid-template-columns: 1.1fr 1fr 1fr 1fr;
-  grid-template-rows: repeat(2, minmax(96px, auto));
+  grid-template-rows: auto auto;
   /* Tiles fill their rows (the old footer rule centres them). */
   align-items: stretch;
-  gap: 12px;
+  gap: 10px;
   width: 100%;
   max-width: 1120px;
   margin: 24px auto 0;
   padding: 0;
   border-top: 0;
-  font-size: 15px;
+  font-size: 14px;
 }
 .tile-footer > * {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 18px;
   min-width: 0;
-  padding: 20px;
-  border-radius: 20px;
+  padding: 22px 18px;
+  border-radius: 18px;
   text-align: center;
 }
 .calm-auth .tile-footer-brand {
@@ -966,7 +966,7 @@ body:has(.calm-page) {
   padding: 0;
   cursor: pointer;
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 20px;
 }
 .calm-auth .tile-footer :is(a, button):hover {
   text-decoration: underline;
