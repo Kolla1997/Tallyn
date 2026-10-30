@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import logo from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-light.svg'
 import logoDark from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-dark.svg'
 import ThemeSwitch from './calm/ThemeSwitch.jsx'
+import LaunchVideo from './LaunchVideo.jsx'
 import { SiteFooter } from './AuthPage.jsx'
 
 // The signed-out page (#220, Dinesh picked C): the headline across the top, then the product video
@@ -133,15 +134,8 @@ export default function LaunchPage({ children }) {
           <h1>All your family&apos;s money, in every currency.</h1>
           <p>Link your banks and cards, see one total in your home currency, and share what you choose with the people you love.</p>
         </div>
-        {/* TODO(#220): the product video goes here once it exists. */}
-        <div className="launch-video launch-rise" style={{ '--d': '240ms' }} role="img" aria-label="Product video, coming soon">
-          <span className="launch-play" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" fill="currentColor" />
-            </svg>
-          </span>
-          <small>Product video coming soon</small>
-        </div>
+        {/* TODO(#220): swap the demo for the real product video once it exists. */}
+        <LaunchVideo />
         <div ref={slot} id="auth-slot" className="launch-slot launch-rise" style={{ '--d': '60ms' }}>
           {children}
         </div>
