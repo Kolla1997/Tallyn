@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import logo from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-light.svg'
 import mark from '../../../brand/coinroof/logo/svg/coinroof-mark-outline.svg'
 import logoDark from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-dark.svg'
@@ -10,7 +10,8 @@ import ThemeSwitch from '../components/calm/ThemeSwitch.jsx'
 import { firstChar } from '../lib/people.jsx'
 
 // App layout (#39), in the calm redesign (#187): a floating frosted rail on web (1024px and up),
-// collapsed by default; opening and closing glide (#221, the sidebar's width and the page's left padding); header and bottom tab bar on phones. One 1280px content width. Built from
+// collapsed by default; opening and closing glide (#221: the sidebar's width; the page jumps to its new padding
+// and slides there with a transform, #157); header and bottom tab bar on phones. One 1280px content width. Built from
 // the #185 drafts (web/src/lab/calm/ui.jsx).
 // The phone tab bar keeps these five; Debts (#27) and Goals are in the
 // sidebar on web and in the ☰ menu on phones (Dinesh's choice). Budgets (#13)
@@ -75,6 +76,22 @@ export default function Shell({ me, household, households, onChooseHousehold, on
   const name = me?.display_name || 'You'
   const initial = firstChar(name).toUpperCase() || '·'
   const [collapsed, setCollapsed] = useState(initialCollapsed)
+  const page = useRef(null)
+  const pageLeft = useRef(null)
+  // The page's left padding changes in one step, then the page slides from where it was with a
+  // transform (#157), so the browser doesn't lay the whole page out again on every frame.
+  useLayoutEffect(() => {
+    const el = page.current
+    if (!el) return
+    // If it's still sliding from the last toggle, start from where it is now, not where it was headed.
+    const seen = el.getBoundingClientRect().left
+    el.getAnimations?.().forEach((a) => a.cancel())
+    const left = el.getBoundingClientRect().left
+    const from = pageLeft.current === null ? null : pageLeft.current + seen - 2 * left
+    pageLeft.current = left
+    if (!from || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    el.animate?.([{ transform: `translateX(${from}px)` }, { transform: 'none' }], { duration: 300, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' })
+  }, [collapsed])
 
   const toggle = (next = !collapsed) => {
     setCollapsed(next)
@@ -182,11 +199,10 @@ export default function Shell({ me, household, households, onChooseHousehold, on
       </header>
       {/* No footer in the signed-in app (#122): Terms and Privacy are in
           the profile menu, the ☰ menu on phones, and Settings → Legal. */}
-      <main
-        id="main"
-        className={`px-4 pt-5 pb-24 md:px-6 lg:pr-6 lg:pb-12 transition-[padding] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none ${collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}
-      >
-        <div className="mx-auto max-w-[1280px]">{children}</div>
+      <main id="main" className={`px-4 pt-5 pb-24 md:px-6 lg:pr-6 lg:pb-12 ${collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}>
+        <div ref={page} className="mx-auto max-w-[1280px]">
+          {children}
+        </div>
       </main>
 
       <nav

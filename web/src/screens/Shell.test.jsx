@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import Shell from './Shell.jsx'
 
 // The tidier sidebar (#122, Dinesh picked P, A and M2): no footer in the
@@ -70,5 +70,42 @@ describe('Shell', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Expand sidebar' }))
     expect(screen.getByRole('button', { name: 'Collapse sidebar' })).toBeInTheDocument()
     expect(localStorage.getItem('tallyn.sidebar')).toBe('expanded')
+  })
+
+  // Cheaper motion (#157): the page's padding changes in one step and the page slides from where it
+  // was with a transform, never animating padding. jsdom has no layout, so the page's left is faked
+  // from the main padding class.
+  describe('page slide', () => {
+    afterEach(() => vi.restoreAllMocks())
+
+    function fakeLayout({ reduced }) {
+      vi.spyOn(window, 'matchMedia').mockImplementation((q) => ({ matches: reduced && q.includes('reduce'), addEventListener() {}, removeEventListener() {} }))
+      const animate = vi.fn()
+      HTMLElement.prototype.animate = animate
+      HTMLElement.prototype.getAnimations = () => []
+      vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+        const wide = document.getElementById('main').className.includes('lg:pl-[240px]')
+        return { left: wide ? 240 : 114, top: 0, width: 0, height: 0, right: 0, bottom: 0 }
+      })
+      return animate
+    }
+
+    it('slides the page with a transform, not padding', () => {
+      localStorage.clear()
+      const animate = fakeLayout({ reduced: false })
+      renderShell()
+      expect(document.getElementById('main').className).not.toMatch(/transition-\[padding\]/)
+      fireEvent.click(screen.getByRole('button', { name: 'Expand sidebar' }))
+      expect(animate).toHaveBeenCalledTimes(1)
+      expect(animate.mock.calls[0][0]).toEqual([{ transform: 'translateX(-126px)' }, { transform: 'none' }])
+    })
+
+    it('snaps with reduced motion', () => {
+      localStorage.clear()
+      const animate = fakeLayout({ reduced: true })
+      renderShell()
+      fireEvent.click(screen.getByRole('button', { name: 'Expand sidebar' }))
+      expect(animate).not.toHaveBeenCalled()
+    })
   })
 })

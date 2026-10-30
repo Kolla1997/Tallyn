@@ -30,12 +30,14 @@ function XAxisLabel({ label, x, crosshairX, hoveredLabel, isHovering, tickerHalf
     <div
       className="absolute"
       style={{
-        left: x,
+        left: 0,
+        // Moved with a transform, not left, so it slides without re-laying out (#157).
+        transform: `translateX(${x}px)`,
         bottom: 12,
         width: 0,
         display: 'flex',
         justifyContent: 'center',
-        transition: animatePosition ? `left ${X_AXIS_POSITION_TWEEN_MS}ms cubic-bezier(${LINE_LOADING_PULSE_EASE.join(', ')})` : undefined,
+        transition: animatePosition ? `transform ${X_AXIS_POSITION_TWEEN_MS}ms cubic-bezier(${LINE_LOADING_PULSE_EASE.join(', ')})` : undefined,
       }}
     >
       <span
