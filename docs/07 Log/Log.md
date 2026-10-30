@@ -11,6 +11,12 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-30
+- #120 Family owner can reset a teen's 2FA (PR #250): Dinesh picked B, its own card on the member's page. The owner confirms with their own code; migration `0019_twofa_resets.sql` adds the reset record. Run on tallyn-dev and tallyn-e2e.
+- #220 Footer (PR #251): the tile footer stays at the foot of short pages.
+- #60 Transaction map (PR #252, ADR 0019): Protomaps' US map at zoom 13 (4.65 GB) as one `.pmtiles` file on Cloudflare R2, read by MapLibre 6.14 in grey, with the red pin as the only colour. Shown only where location is visible (#28). No map company sees where anyone shops. Label fonts are on R2 too; CORS allows localhost only. Dinesh picked I with changes: the map fills the panel, address to the right, a small credit.
+- #253 By category (PR #254): Dinesh picked C (taste-skill redesign). Shares are of the month and add up to 100%, under 5% folds into Other, it leads with a finding, rows filter the list, and "See budgets" is in the card.
+- #255 created (Backlog, p2): turn the map on where the app is hosted, once the domain is bought.
+- Open: delete the R2 API token whose secret showed in the terminal (Dinesh); hosting and domain for #255.
 - #1 CI minutes (PR #242): Actions ran out of free minutes (about 2,200 billed against 2,000) and every check was refused for billing. Checks now run on PRs only (not again on `main`) and skip docs-only changes; the board sync runs only on issue open, close, reopen or label, and every 6 hours; end-to-end weekly; every job has a time limit. The new "CI minutes" rule is in CLAUDE.md §5. Dinesh made the repo public to unblock it (a history scan found no secrets; his commit email is public) and plans to make it private again in November.
 - #1 Legal pages (PRs #239, #244): centred, the background blended, the draft note fixed in dark mode, the old `body::before` glow off on redesigned pages; a contents list beside the text that stays as you scroll (Dinesh picked B), folding into "Contents" on phones.
 - #220 Launch page (PRs #240, #243): the video keeps its shape and a taller card grows smoothly into the gap without moving About. The video slot plays a demo (Dinesh picked C): Home, Accounts, Budgets and Transactions from the preview's made-up family, cross-fading and drifting, with captions and a "Demo" label, until the real video exists.
