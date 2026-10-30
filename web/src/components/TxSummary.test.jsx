@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { TxDetails, TxSummary } from './TxSummary.jsx'
 
@@ -82,6 +82,48 @@ describe('TxSummary', () => {
       open({ ...tx, whereabouts: null })
       expect(screen.queryByRole('img', { name: /Map of where/ })).toBeNull()
       expect(screen.getByText('No location for this one.')).toBeInTheDocument()
+    })
+  })
+
+  describe('By category (#253)', () => {
+    const month = {
+      currency: 'USD',
+      money_in_minor: 0,
+      spent_minor: 2587193,
+      transfers_minor: 0,
+      categories: [
+        { category: 'FOOD_AND_DRINK', amount_minor: 614697, count: 9 },
+        { category: 'TRANSPORTATION', amount_minor: 613536, count: 7 },
+        { category: 'RENT_AND_UTILITIES', amount_minor: 600000, count: 1 },
+        { category: 'TRAVEL', amount_minor: 600000, count: 1 },
+        { category: 'GENERAL_MERCHANDISE', amount_minor: 80460, count: 9 },
+        { category: 'PERSONAL_CARE', amount_minor: 78500, count: 2 },
+      ],
+      merchants: [],
+    }
+
+    it('leads with the finding, folds the small ones, and adds up to Spent', () => {
+      render(<TxSummary totals={month} scope="October · yours" category="" onCategory={() => {}} />)
+      expect(screen.getByText('Four categories took 94% of it.')).toBeInTheDocument()
+      expect(screen.getByText(/Food and drink led, \$11\.61 ahead of Transportation/)).toBeInTheDocument()
+      expect(screen.getByRole('img', { name: /Food and drink 24%.*Other, 2 categories 6%/ })).toBeInTheDocument()
+      const list = screen.getByRole('list', { name: 'Categories' })
+      expect(within(list).getByText('Other, 2 categories')).toBeInTheDocument()
+      expect(within(list).getByText('General merchandise')).toBeInTheDocument() // inside Other, still there
+      expect(screen.getByRole('link', { name: 'See budgets' })).toHaveAttribute('href', '/budgets')
+    })
+
+    it('tapping a category filters the list to it; tapping it again shows all', () => {
+      const onCategory = vi.fn()
+      const { rerender } = render(<TxSummary totals={month} scope="" category="" onCategory={onCategory} />)
+      fireEvent.click(screen.getByRole('button', { name: /^Food and drink/ }))
+      expect(onCategory).toHaveBeenLastCalledWith('FOOD_AND_DRINK')
+      rerender(<TxSummary totals={month} scope="" category="FOOD_AND_DRINK" onCategory={onCategory} />)
+      const food = screen.getByRole('button', { name: /^Food and drink/ })
+      expect(food).toHaveAttribute('aria-pressed', 'true')
+      expect(screen.getByText(/Showing Food and drink in the list/)).toBeInTheDocument()
+      fireEvent.click(food)
+      expect(onCategory).toHaveBeenLastCalledWith('')
     })
   })
 })
