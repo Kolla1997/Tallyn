@@ -2,7 +2,7 @@
 type: log
 status: active
 owner: Dinesh
-updated: 2026-10-29
+updated: 2026-10-30
 tags: [log]
 ---
 
@@ -15,6 +15,9 @@ Newest first. One entry per working session or decision.
 - #1 Legal pages (PRs #239, #244): centred, the background blended, the draft note fixed in dark mode, the old `body::before` glow off on redesigned pages; a contents list beside the text that stays as you scroll (Dinesh picked B), folding into "Contents" on phones.
 - #220 Launch page (PRs #240, #243): the video keeps its shape and a taller card grows smoothly into the gap without moving About. The video slot plays a demo (Dinesh picked C): Home, Accounts, Budgets and Transactions from the preview's made-up family, cross-fading and drifting, with captions and a "Demo" label, until the real video exists.
 - #202 Terms and Privacy say Coinroof (PR #245): Dinesh picked a version bump to 0.2-draft, so everyone agrees again once. The dev-only lab and preview titles were renamed too. Code names, storage keys and the repo name stay for #203.
+- #203 moved to Blocked: the Coinroof rename waits for the trademark and domain checks, then Dinesh's dashboard changes (Supabase, Plaid, domain, hosting). Agreed plan once cleared: three PRs (docs and boards; code identifiers with a `tallyn.*` → `coinroof.*` storage key copy; repo and Go module last). Database logins and the two salts keep their names.
+- #220 2FA set-up card (PR #247): it covered About by about 270px at 1440px. Dinesh picked C from drafts: on wide screens the QR code sits beside steps 1 and 2, and a card taller than the gap under the hero pushes About down instead of covering it. Phones unchanged.
+- #221 Spending line (PR #248): the morph resampled the days with straight lines, then landed on the smoothed curve, so the peak jumped about 14px. It now samples the same curve it lands on (`metric-card.test.jsx`).
 - Open: the real product video; lawyer review and the `[TO CONFIRM]` entity details in the legal texts; #203 (repo, docs, services rename); making the repo private again in November.
 
 ## 2026-10-29
