@@ -8,17 +8,9 @@ kanban-plugin: board
 
 ## Backlog
 
-- [ ] [#14 Savings goals](https://github.com/Kolla1997/Tallyn/issues/14) #type/feature #area/frontend #priority/p2
-- [ ] [#53 Rename a household](https://github.com/Kolla1997/Tallyn/issues/53) #type/feature #area/frontend #area/backend #priority/p2
-- [ ] [#54 Download your data](https://github.com/Kolla1997/Tallyn/issues/54) #type/feature #area/frontend #area/backend #priority/p1
 - [ ] [#55 Notifications](https://github.com/Kolla1997/Tallyn/issues/55) #type/feature #area/frontend #area/backend #priority/p2
-- [ ] [#56 Close your Tallyn account](https://github.com/Kolla1997/Tallyn/issues/56) #type/feature #area/frontend #area/backend #priority/p1
 - [ ] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
-- [ ] [#113 Browser end-to-end tests for the P0 paths](https://github.com/Kolla1997/Tallyn/issues/113) #type/tech-debt #area/infra #priority/p1
-- [ ] [#120 Family owner can reset a member's 2FA](https://github.com/Kolla1997/Tallyn/issues/120) #type/feature #area/backend #priority/p2
 - [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p3
-- [ ] [#133 Plan from your income with templates (e.g. 55/5/10/15/15)](https://github.com/Kolla1997/Tallyn/issues/133) #type/feature #area/frontend #area/backend #priority/p1
-- [ ] [#152 Calm error messages instead of raw Supabase and network text](https://github.com/Kolla1997/Tallyn/issues/152) #type/bug #area/frontend #priority/p1
 - [ ] [#153 Keyboard and screen readers: page titles, focus and ARIA fixes](https://github.com/Kolla1997/Tallyn/issues/153) #type/bug #area/frontend #priority/p1
 - [ ] [#154 Worst-case data: long text, emoji, blank names, double submits, races](https://github.com/Kolla1997/Tallyn/issues/154) #type/bug #area/frontend #priority/p1
 - [ ] [#155 Glass fallbacks, reduced motion gaps and page basics](https://github.com/Kolla1997/Tallyn/issues/155) #type/bug #area/frontend #priority/p1
@@ -27,27 +19,17 @@ kanban-plugin: board
 - [ ] [#158 Tap areas and control contrast](https://github.com/Kolla1997/Tallyn/issues/158) #type/design #area/design #area/frontend #priority/p2
 - [ ] [#159 Load speed: requests wait on each other](https://github.com/Kolla1997/Tallyn/issues/159) #type/tech-debt #area/frontend #area/backend #priority/p2
 - [ ] [#160 CSS cleanup and tokens](https://github.com/Kolla1997/Tallyn/issues/160) #type/tech-debt #area/design #area/frontend #priority/p3
-- [ ] [#200 Rename the app people see to Coinroof](https://github.com/Kolla1997/Tallyn/issues/200) #type/feature #area/brand #area/frontend #priority/p1
-- [ ] [#201 Coinroof colours in the app](https://github.com/Kolla1997/Tallyn/issues/201) #type/design #area/design #priority/p1
-- [ ] [#202 Rename Terms and Privacy to Coinroof](https://github.com/Kolla1997/Tallyn/issues/202) #type/docs #area/backend #priority/p1
-- [ ] [#209 Focus ring shows around page headings after a keyboard sign-in](https://github.com/Kolla1997/Tallyn/issues/209) #type/bug #area/frontend #priority/p2
 
 
 ## In Progress
 
 - [ ] [#1 Housekeeping: small docs and config fixes](https://github.com/Kolla1997/Tallyn/issues/1) #type/docs
 - [ ] [#182 Home: explore bolder directions with taste-skill](https://github.com/Kolla1997/Tallyn/issues/182) #type/design #area/design #priority/p2
-- [ ] [#185 Calm redesign drafts for all screens](https://github.com/Kolla1997/Tallyn/issues/185) #type/design #area/design #priority/p2
 
 
 ## Review
 
-- [ ] [#145 Full UI audit with the outside skills](https://github.com/Kolla1997/Tallyn/issues/145) #type/design #area/design #area/frontend #priority/p1
-- [ ] [#146 Budget amounts with a comma decimal save 100x too big](https://github.com/Kolla1997/Tallyn/issues/146) #type/bug #area/frontend #priority/p1
-- [ ] [#147 Home's this-month figure only counts recent transactions](https://github.com/Kolla1997/Tallyn/issues/147) #type/bug #area/frontend #priority/p1
-- [ ] [#151 Stuck and failed states: Try again instead of endless loaders](https://github.com/Kolla1997/Tallyn/issues/151) #type/bug #area/design #area/frontend #priority/p1
-- [ ] [#180 Tallyn design skill: Tallyn rules plus taste-skill's app-screen method](https://github.com/Kolla1997/Tallyn/issues/180) #type/docs #area/design #priority/p2
-- [ ] [#183 Add shadcn, Bklit charts, Kokonut UI (free) and anime.js to web/ for drafts](https://github.com/Kolla1997/Tallyn/issues/183) #type/tech-debt #area/frontend #priority/p2
+- [ ] [#120 Family owner can reset a member's 2FA](https://github.com/Kolla1997/Tallyn/issues/120) #type/feature #area/backend #priority/p2
 
 
 ## Blocked
@@ -67,6 +49,7 @@ kanban-plugin: board
 - [x] [#10 Brand: logo and design tokens](https://github.com/Kolla1997/Tallyn/issues/10) #type/design #area/brand #priority/p0
 - [x] [#12 Household members: invitations and roles](https://github.com/Kolla1997/Tallyn/issues/12) #type/feature #area/backend #priority/p1
 - [x] [#13 Budgets: for the household or one person](https://github.com/Kolla1997/Tallyn/issues/13) #type/feature #area/frontend #priority/p1
+- [x] [#14 Savings goals](https://github.com/Kolla1997/Tallyn/issues/14) #type/feature #area/frontend #priority/p2
 - [x] [#16 Automate board sync with a GitHub Action](https://github.com/Kolla1997/Tallyn/issues/16) #type/feature #area/infra #priority/p2
 - [x] [#22 Password reset](https://github.com/Kolla1997/Tallyn/issues/22) #type/feature #area/frontend #priority/p1
 - [x] [#23 Recovery when someone loses their authenticator app](https://github.com/Kolla1997/Tallyn/issues/23) #type/feature #area/frontend #priority/p1
@@ -82,6 +65,9 @@ kanban-plugin: board
 - [x] [#39 Build the app screens from the comps, for phone and web](https://github.com/Kolla1997/Tallyn/issues/39) #type/design #area/frontend #priority/p1
 - [x] [#42 Transactions page with person switcher, search and merchant logos](https://github.com/Kolla1997/Tallyn/issues/42) #type/feature #area/frontend #priority/p1
 - [x] [#51 Reconnect a bank that needs sign-in (Plaid update mode)](https://github.com/Kolla1997/Tallyn/issues/51) #type/feature #area/frontend #area/backend #priority/p1
+- [x] [#53 Rename a household](https://github.com/Kolla1997/Tallyn/issues/53) #type/feature #area/frontend #area/backend #priority/p2
+- [x] [#54 Download your data](https://github.com/Kolla1997/Tallyn/issues/54) #type/feature #area/frontend #area/backend #priority/p1
+- [x] [#56 Close your Tallyn account](https://github.com/Kolla1997/Tallyn/issues/56) #type/feature #area/frontend #area/backend #priority/p1
 - [x] [#58 Transactions: summary and details panel](https://github.com/Kolla1997/Tallyn/issues/58) #type/feature #area/frontend #area/backend #priority/p1
 - [x] [#61 Frosted glass finish on every card](https://github.com/Kolla1997/Tallyn/issues/61) #type/design #area/design #area/frontend #priority/p2
 - [x] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
@@ -105,11 +91,25 @@ kanban-plugin: board
 - [x] [#100 Lint, web tests and checks on every PR](https://github.com/Kolla1997/Tallyn/issues/100) #type/tech-debt #area/infra #priority/p2
 - [x] [#108 Make the 2FA code screen clearer](https://github.com/Kolla1997/Tallyn/issues/108) #type/design #area/frontend
 - [x] [#111 Detailed test plan for unit and integration testing](https://github.com/Kolla1997/Tallyn/issues/111) #type/docs #area/infra
+- [x] [#113 Browser end-to-end tests for the P0 paths](https://github.com/Kolla1997/Tallyn/issues/113) #type/tech-debt #area/infra #priority/p1
 - [x] [#114 Tests for the untested screens and PUT /api/me](https://github.com/Kolla1997/Tallyn/issues/114) #type/tech-debt #area/frontend #priority/p2
 - [x] [#115 Connect a bank can hit the Plaid rate limit](https://github.com/Kolla1997/Tallyn/issues/115) #type/bug #area/frontend #priority/p1
 - [x] [#116 Test that automatic sign-outs end only this device](https://github.com/Kolla1997/Tallyn/issues/116) #type/tech-debt #area/frontend #priority/p2
 - [x] [#117 Layout checks in the browser at phone and desktop width](https://github.com/Kolla1997/Tallyn/issues/117) #type/tech-debt #area/frontend #priority/p2
 - [x] [#122 Tidy the sidebar: new collapse icon, smaller menu and profile card, legal links in the profile menu](https://github.com/Kolla1997/Tallyn/issues/122) #type/design #area/frontend
+- [x] [#133 Plan from your income with templates (e.g. 55/5/10/15/15)](https://github.com/Kolla1997/Tallyn/issues/133) #type/feature #area/frontend #area/backend #priority/p1
+- [x] [#145 Full UI audit with the outside skills](https://github.com/Kolla1997/Tallyn/issues/145) #type/design #area/design #area/frontend #priority/p1
+- [x] [#146 Budget amounts with a comma decimal save 100x too big](https://github.com/Kolla1997/Tallyn/issues/146) #type/bug #area/frontend #priority/p1
+- [x] [#147 Home's this-month figure only counts recent transactions](https://github.com/Kolla1997/Tallyn/issues/147) #type/bug #area/frontend #priority/p1
+- [x] [#151 Stuck and failed states: Try again instead of endless loaders](https://github.com/Kolla1997/Tallyn/issues/151) #type/bug #area/design #area/frontend #priority/p1
+- [x] [#152 Calm error messages instead of raw Supabase and network text](https://github.com/Kolla1997/Tallyn/issues/152) #type/bug #area/frontend #priority/p1
+- [x] [#180 Tallyn design skill: Tallyn rules plus taste-skill's app-screen method](https://github.com/Kolla1997/Tallyn/issues/180) #type/docs #area/design #priority/p2
+- [x] [#183 Add shadcn, Bklit charts, Kokonut UI (free) and anime.js to web/ for drafts](https://github.com/Kolla1997/Tallyn/issues/183) #type/tech-debt #area/frontend #priority/p2
+- [x] [#185 Calm redesign drafts for all screens](https://github.com/Kolla1997/Tallyn/issues/185) #type/design #area/design #priority/p2
+- [x] [#200 Rename the app people see to Coinroof](https://github.com/Kolla1997/Tallyn/issues/200) #type/feature #area/brand #area/frontend #priority/p1
+- [x] [#201 Coinroof colours in the app](https://github.com/Kolla1997/Tallyn/issues/201) #type/design #area/design #priority/p1
+- [x] [#202 Rename Terms and Privacy to Coinroof](https://github.com/Kolla1997/Tallyn/issues/202) #type/docs #area/backend #priority/p1
+- [x] [#209 Focus ring shows around page headings after a keyboard sign-in](https://github.com/Kolla1997/Tallyn/issues/209) #type/bug #area/frontend #priority/p2
 
 
 %% kanban:settings
