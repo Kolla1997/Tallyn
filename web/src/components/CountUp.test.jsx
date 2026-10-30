@@ -1,5 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import CountUp from './CountUp.jsx'
 
 // Counting numbers use tabular figures, so digits don't move the layout as they
@@ -18,18 +18,20 @@ describe('CountUp', () => {
   })
 
   // #228: on a page load, figures count up from 0; with reduced motion they show the value at once.
-  it('counts up from start on the first show', async () => {
-    const real = window.matchMedia
-    window.matchMedia = (query) => ({ ...real(query), matches: false })
-    try {
-      const { container } = render(<CountUp value={900} start={0} format={(v) => `$${v}`} />)
-      const visible = container.querySelector('[aria-hidden="true"]')
-      expect(visible).toHaveTextContent('$0')
-      await waitFor(() => expect(visible).toHaveTextContent('$900'), { timeout: 8000 })
-    } finally {
-      window.matchMedia = real
-    }
+  // Tests run with reduced motion (test-setup.js); this one turns it off, so put it back after.
+  const real = window.matchMedia
+  afterEach(() => {
+    window.matchMedia = real
   })
+
+  it('counts up from start on the first show', async () => {
+    window.matchMedia = (query) => ({ ...real(query), matches: false })
+    const { container } = render(<CountUp value={900} start={0} format={(v) => `$${v}`} />)
+    const visible = container.querySelector('[aria-hidden="true"]')
+    expect(visible).toHaveTextContent('$0')
+    // A busy test run slows animation frames down, so allow time beyond the 600ms count.
+    await waitFor(() => expect(visible).toHaveTextContent('$900'), { timeout: 8000 })
+  }, 10000)
 
   it('skips the count with reduced motion', () => {
     const { container } = render(<CountUp value={900} start={0} format={(v) => `$${v}`} />)

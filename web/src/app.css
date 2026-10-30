@@ -133,16 +133,25 @@ body:has(.calm-page) {
 }
 
 /* Page: the redesign's ground with a two-tone mesh behind the cards (#213): green top left,
-   red bottom right, a warm amber hint between them. */
+   red bottom right, a warm amber hint between them. The mesh sits on its own fixed layer (#220),
+   not background-attachment: fixed, which repaints the whole page on every scroll frame and makes
+   every frosted card re-blur it. */
 .calm-page {
+  isolation: isolate;
   background-color: var(--color-redesign-page);
+  color: var(--color-redesign-ink);
+  font-family: var(--font-body);
+}
+.calm-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background-image:
     radial-gradient(60% 70% at 0% 0%, var(--redesign-glow-green), transparent 60%),
     radial-gradient(55% 65% at 100% 100%, var(--redesign-glow-red), transparent 60%),
     radial-gradient(40% 40% at 70% 20%, var(--redesign-glow-amber), transparent 60%);
-  background-attachment: fixed;
-  color: var(--color-redesign-ink);
-  font-family: var(--font-body);
 }
 
 /* Frosted: the sidebar and summary cards. Lists and tables stay on solid cards (.calm-solid). */
@@ -162,7 +171,7 @@ body:has(.calm-page) {
   border-color: #27272a;
 }
 @supports not (backdrop-filter: blur(1px)) {
-  .calm-page {
+  .calm-page::before {
     background-image: none;
   }
   .calm-glass {
@@ -173,7 +182,7 @@ body:has(.calm-page) {
   }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .calm-page {
+  .calm-page::before {
     background-image: none;
   }
   .calm-glass {
@@ -794,6 +803,12 @@ body:has(.calm-page) {
   max-width: 62ch;
   font-size: 17px;
   color: var(--color-zinc-600);
+}
+/* Footer links scroll to these with a little air above (#220). */
+#about-h,
+#features-h,
+#safe-h {
+  scroll-margin-top: 32px;
 }
 .launch-features {
   display: grid;

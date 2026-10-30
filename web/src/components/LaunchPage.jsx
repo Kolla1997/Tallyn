@@ -112,10 +112,7 @@ export default function LaunchPage({ children }) {
           Coinroof is a family finance app. Families connect bank accounts and cards in any currency, see one total in their home currency, and keep track of
           spending and savings together, with partners, kids and parents.
         </p>
-        <h3 id="features-h" className="sr-only">
-          What it does
-        </h3>
-        <div className="launch-features">
+        <div id="features-h" className="launch-features">
           {FEATURES.map(([title, text, icon], i) => (
             <article key={title} className="calm-glass launch-feature launch-rise" style={{ '--d': `${i * 90}ms` }}>
               <span className="launch-icon">
