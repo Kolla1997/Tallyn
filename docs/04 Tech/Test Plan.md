@@ -187,7 +187,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - [ ] Home totals match the bank sandbox's balances in the home currency.
 - [ ] Wait 30 minutes idle: the warning, then the sign-out note.
 - [ ] Phone (375px) and desktop: every page, no sideways scroll.
-- [ ] Spending chart on load (#221): when Home loads, the spending line rises from flat over about 1s and the total rolls up from $0; switching 7D/30D/90D still morphs quickly; with Reduce motion on, it appears already drawn.
+- [ ] Spending chart on load (#221): when Home loads, the spending line rises from flat over about 1s and the total rolls up from $0; switching 7D/30D/90D still morphs quickly; neither the rise nor a morph jumps at the end (the peak stays put, `metric-card.test.jsx`); with Reduce motion on, it appears already drawn.
 - [ ] Balance on load (#221): when Home loads, the balance tiles start at $0 and each digit flips up to its number, left to right, in under 1s; switching Yours/Everyone still flips from the current figure; with Reduce motion on, the figure appears at once.
 - [ ] Dotted bars on load (#221): on Home, once the rows have faded up, the credit card bars fill square by square, one bar after another top to bottom (goals the same); with Reduce motion on, the bars appear full.
 - [ ] Sidebar glide (#221): at laptop width, « and » (and the [ key) glide the sidebar between narrow and wide in about 0.3s with the page sliding in step; names fade in after it widens; the icon names still show on hover when narrow; with Reduce motion on, it snaps.
