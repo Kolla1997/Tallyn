@@ -158,12 +158,12 @@ export default function AccountsPage({ me, household, refreshKey, onChanged }) {
           <NetWorth have={have} owe={owe} home={home} accounts={counted} />
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             {shown.length > 1 ? (
-              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Which bank">
+              <div className="bank-chips flex gap-1.5" role="group" aria-label="Which bank">
                 {[['', 'All', accounts.length], ...shown.map((b) => [b.id, b.institution_name || 'Bank', b.accounts.length])].map(([id, label, n]) => (
                   <button
                     key={id || 'all'}
                     type="button"
-                    className="inline-flex h-8 items-center gap-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 transition-[border-color,color] duration-150 aria-pressed:border-zinc-900 dark:aria-pressed:border-white aria-pressed:text-zinc-900 dark:aria-pressed:text-white"
+                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full whitespace-nowrap border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 text-[13px] font-semibold text-zinc-600 dark:text-zinc-300 transition-[border-color,color] duration-150 aria-pressed:border-zinc-900 dark:aria-pressed:border-white aria-pressed:text-zinc-900 dark:aria-pressed:text-white"
                     aria-pressed={(picked?.id ?? '') === id}
                     onClick={() => setBank(id)}
                   >
