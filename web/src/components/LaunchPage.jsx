@@ -70,8 +70,51 @@ function useRise() {
   return root
 }
 
+// When the card in the slot changes height (sign in to create an account), it grows or shrinks
+// smoothly instead of jumping (#220). The card sits on its own layer on wide screens, so this
+// moves nothing else on the page. Reduced motion jumps.
+function useSmoothCard() {
+  const slot = useRef(null)
+  useEffect(() => {
+    const el = slot.current
+    if (!el || typeof MutationObserver === 'undefined') return
+    const card = () => el.querySelector('.card')
+    let prev = card()?.getBoundingClientRect().height ?? 0 // the card's settled height
+    let frame = 0
+    // After the card's content changes, measure its new natural height and ease from where it was.
+    const settle = () => {
+      frame = 0
+      const c = card()
+      if (!c) return
+      const shown = c.getAnimations().length ? c.getBoundingClientRect().height : prev
+      c.getAnimations().forEach((a) => a.cancel())
+      const next = c.getBoundingClientRect().height
+      const still = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      if (shown && Math.abs(next - shown) > 2 && !still && c.animate) {
+        c.style.overflow = 'hidden'
+        const run = c.animate([{ height: `${shown}px` }, { height: `${next}px` }], {
+          duration: 320,
+          easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
+        })
+        run.onfinish = () => (c.style.overflow = '')
+      }
+      prev = next
+    }
+    const mo = new MutationObserver(() => {
+      if (!frame) frame = requestAnimationFrame(settle)
+    })
+    mo.observe(el, { childList: true, subtree: true, characterData: true })
+    return () => {
+      mo.disconnect()
+      cancelAnimationFrame(frame)
+    }
+  }, [])
+  return slot
+}
+
 export default function LaunchPage({ children }) {
   const root = useRise()
+  const slot = useSmoothCard()
   // Footer links from other pages land here with a #section.
   useEffect(() => {
     if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView()
@@ -99,7 +142,7 @@ export default function LaunchPage({ children }) {
           </span>
           <small>Product video coming soon</small>
         </div>
-        <div id="auth-slot" className="launch-slot launch-rise" style={{ '--d': '60ms' }}>
+        <div ref={slot} id="auth-slot" className="launch-slot launch-rise" style={{ '--d': '60ms' }}>
           {children}
         </div>
       </div>
