@@ -150,11 +150,14 @@ func NewRouter(d Deps) http.Handler {
 		writeError(w, http.StatusNotFound, "not_found")
 	})
 	recovery := http.Handler(unavailable("recovery_unavailable"))
+	resetNote := http.Handler(unavailable("recovery_unavailable"))
 	if d.BackupCodes != nil && len(d.CodeKey) == 32 {
 		api.HandleFunc("GET /api/backup-codes", backupCodeStatus(d.BackupCodes))
 		api.HandleFunc("POST /api/backup-codes", newBackupCodeSet(d.BackupCodes, d.CodeKey))
 		if d.Factors != nil && d.RequireSignedIn != nil {
 			recovery = d.RequireSignedIn(limited(lim.recovery, recoverWithBackupCode(d.BackupCodes, d.Factors, d.CodeKey)))
+			resetNote = d.RequireSignedIn(limited(lim.recovery, my2FAReset(d.BackupCodes)))
+			api.HandleFunc("POST /api/households/{id}/members/{user}/reset-2fa", resetMember2FA(d.BackupCodes, d.Factors)) // #120
 		}
 	} else {
 		api.Handle("/api/backup-codes", unavailable("backup_codes_unavailable"))
@@ -164,6 +167,9 @@ func NewRouter(d Deps) http.Handler {
 	mux.Handle("GET /api/health", noStore(http.HandlerFunc(health)))
 	// Outside the 2FA-only /api/ below: a password sign-in plus a backup code (#23).
 	mux.Handle("POST /api/recovery/backup-code", noStore(recovery))
+	// Also outside: after an owner reset their 2FA (#120), a teen signs in with
+	// only a password and is told who reset it.
+	mux.Handle("GET /api/recovery/2fa-reset", noStore(resetNote))
 	// API answers are never cached; limits count per signed-in person (#24).
 	mux.Handle("/api/", noStore(requireAuth(limited(lim.all, api))))
 	mux.Handle("/", spa(d.WebDir))

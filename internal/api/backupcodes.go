@@ -22,6 +22,9 @@ type BackupCodeStore interface {
 	BackupCodeStatus(ctx context.Context, userID string) (db.BackupCodeStatus, error)
 	ReplaceBackupCodes(ctx context.Context, userID string, hashes [][]byte) error
 	UseBackupCode(ctx context.Context, userID string, hash []byte) (bool, error)
+	// An owner resetting a teen's 2FA (#120).
+	ResetMember2FA(ctx context.Context, userID, householdID, memberID string, removeFactors func(context.Context) error) error
+	My2FAReset(ctx context.Context, userID string) (*db.TwoFAReset, error)
 }
 
 // FactorRemover removes a person's authenticators. *supabaseadmin.Client

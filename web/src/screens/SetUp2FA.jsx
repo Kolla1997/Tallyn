@@ -5,13 +5,15 @@ import { supabase } from '../lib/supabase.js'
 import CodeForm from './CodeForm.jsx'
 import { TryAgain } from '../components/LoadFailed.jsx'
 import Heading from '../components/Heading.jsx'
+import { api } from '../lib/api.js'
 
 // First sign-in: add Tallyn to an authenticator app (TOTP) and confirm a code.
 // Also after recovering with a backup code (#23): set up again, then save a
-// new set of backup codes.
+// new set of backup codes. And after an owner reset it (#120): who, and when.
 export default function SetUp2FA({ onSignOut }) {
   const [factor, setFactor] = useState(null) // { id, qr, secret }
   const [recovered] = useState(takeRecovered)
+  const [reset, setReset] = useState(null) // { reset_by_name, reset_at }
   const [error, setError] = useState('')
   const [starting, setStarting] = useState(false)
   const started = useRef(false)
@@ -22,6 +24,10 @@ export default function SetUp2FA({ onSignOut }) {
     started.current = true
     markJustSetUp() // backup codes come next (#23)
     start()
+    // Only a note: if it can't load, setting up goes on as usual.
+    api('/api/recovery/2fa-reset')
+      .then((r) => setReset(r?.reset ?? null))
+      .catch(() => {})
   }, [])
 
   // Can fail to start (#152): calm words and Try again, never Supabase's text.
@@ -44,7 +50,16 @@ export default function SetUp2FA({ onSignOut }) {
           <span>You&apos;re in with a backup code. Your old authenticator has been removed.</span>
         </p>
       )}
-      <Heading>{recovered ? 'Set up your authenticator' : 'Protect your account'}</Heading>
+      {reset && !recovered && (
+        <p className="info-note">
+          <LockIcon />
+          <span>
+            {reset.reset_by_name || 'A household owner'} reset your two-step sign-in on{' '}
+            {new Date(reset.reset_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}. Set up your authenticator again to carry on.
+          </span>
+        </p>
+      )}
+      <Heading>{recovered || reset ? 'Set up your authenticator' : 'Protect your account'}</Heading>
       <p className="muted">
         Coinroof asks for a code from an authenticator app each time you sign in, so your password alone isn&apos;t enough. Microsoft Authenticator, Google
         Authenticator and 1Password all work.
