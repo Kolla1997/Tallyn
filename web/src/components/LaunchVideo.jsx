@@ -13,7 +13,7 @@ import transactionsDark from '../assets/launch/transactions-dark.jpg'
 // it later. Dark mode shows the dark screens (the light set never loads there: lazy and hidden).
 // Reduced motion: the first screen, still. Screen readers get one description.
 const SCENES = [
-  [homeLight, homeDark, 'One total, in every currency'],
+  [homeLight, homeDark, 'Every account, one total'],
   [accountsLight, accountsDark, 'Every account, side by side'],
   [budgetsLight, budgetsDark, 'Budgets that keep pace'],
   [transactionsLight, transactionsDark, 'Every transaction, in one place'],
@@ -21,7 +21,7 @@ const SCENES = [
 
 export default function LaunchVideo() {
   return (
-    <div className="launch-video launch-demo" role="img" aria-label="A short demo of Coinroof: one total in every currency, accounts, budgets and transactions">
+    <div className="launch-video launch-demo" role="img" aria-label="A short demo of Coinroof: one total of every account, accounts, budgets and transactions">
       {SCENES.map(([light, dark, caption], i) => (
         <div key={caption} className="launch-scene" style={{ '--i': i }} aria-hidden="true">
           <img className="dark:hidden" src={light} alt="" loading="lazy" decoding="async" />
