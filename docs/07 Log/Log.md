@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-10-30
+- #1 Launch page gap: About sat 112px under the hero, a space held so the taller create-account card could grow into it (#220). Dinesh picked A: one 56px section gap; a taller card now pushes About down.
 - #1 Launch page says US first: Dinesh picked C from the copy draft (`drafts/1-us-first-copy.html`). Hero "All your family's money, in one place." with "Link your US banks and cards"; the first tile is "It all adds up"; About ends "More countries come later."; the demo caption is "Every account, one total". Layout, icons and motion unchanged.
 - #1 US first: Dinesh decided Coinroof is US only for now (US banks, USD). Vision updated; multi-currency moves to Future (#11, on hold). #156 parked for the same reason. Launch-page copy ("One total, in every currency") not changed yet; it needs a draft.
 - #1 Transactions summary scrolls: the right-hand summary stuck to the top and was taller than the screen, so "By category" was cut off until the list ended. Dinesh picked B: it scrolls with the page. A picked transaction's details still stay in view.
