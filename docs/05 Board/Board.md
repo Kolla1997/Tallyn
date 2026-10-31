@@ -30,9 +30,6 @@ kanban-plugin: board
 
 ## Review
 
-- [ ] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
-- [ ] [#120 Family owner can reset a member's 2FA](https://github.com/Kolla1997/Tallyn/issues/120) #type/feature #area/backend #priority/p2
-- [ ] [#253 Transactions: By category shows honest shares of the month](https://github.com/Kolla1997/Tallyn/issues/253) #type/feature #area/frontend #priority/p2
 
 
 ## Blocked
@@ -72,6 +69,7 @@ kanban-plugin: board
 - [x] [#54 Download your data](https://github.com/Kolla1997/Tallyn/issues/54) #type/feature #area/frontend #area/backend #priority/p1
 - [x] [#56 Close your Tallyn account](https://github.com/Kolla1997/Tallyn/issues/56) #type/feature #area/frontend #area/backend #priority/p1
 - [x] [#58 Transactions: summary and details panel](https://github.com/Kolla1997/Tallyn/issues/58) #type/feature #area/frontend #area/backend #priority/p1
+- [x] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
 - [x] [#61 Frosted glass finish on every card](https://github.com/Kolla1997/Tallyn/issues/61) #type/design #area/design #area/frontend #priority/p2
 - [x] [#63 Floating rounded sidebar, darker secondary text, soft card shade](https://github.com/Kolla1997/Tallyn/issues/63) #type/design #area/design #area/frontend #priority/p2
 - [x] [#64 Floating rounded sidebar, darker secondary text and a soft shade under cards](https://github.com/Kolla1997/Tallyn/issues/64) #type/design #area/design #area/frontend #priority/p2
@@ -99,6 +97,7 @@ kanban-plugin: board
 - [x] [#115 Connect a bank can hit the Plaid rate limit](https://github.com/Kolla1997/Tallyn/issues/115) #type/bug #area/frontend #priority/p1
 - [x] [#116 Test that automatic sign-outs end only this device](https://github.com/Kolla1997/Tallyn/issues/116) #type/tech-debt #area/frontend #priority/p2
 - [x] [#117 Layout checks in the browser at phone and desktop width](https://github.com/Kolla1997/Tallyn/issues/117) #type/tech-debt #area/frontend #priority/p2
+- [x] [#120 Family owner can reset a member's 2FA](https://github.com/Kolla1997/Tallyn/issues/120) #type/feature #area/backend #priority/p2
 - [x] [#122 Tidy the sidebar: new collapse icon, smaller menu and profile card, legal links in the profile menu](https://github.com/Kolla1997/Tallyn/issues/122) #type/design #area/frontend
 - [x] [#133 Plan from your income with templates (e.g. 55/5/10/15/15)](https://github.com/Kolla1997/Tallyn/issues/133) #type/feature #area/frontend #area/backend #priority/p1
 - [x] [#145 Full UI audit with the outside skills](https://github.com/Kolla1997/Tallyn/issues/145) #type/design #area/design #area/frontend #priority/p1
@@ -113,6 +112,7 @@ kanban-plugin: board
 - [x] [#201 Coinroof colours in the app](https://github.com/Kolla1997/Tallyn/issues/201) #type/design #area/design #priority/p1
 - [x] [#202 Rename Terms and Privacy to Coinroof](https://github.com/Kolla1997/Tallyn/issues/202) #type/docs #area/backend #priority/p1
 - [x] [#209 Focus ring shows around page headings after a keyboard sign-in](https://github.com/Kolla1997/Tallyn/issues/209) #type/bug #area/frontend #priority/p2
+- [x] [#253 Transactions: By category shows honest shares of the month](https://github.com/Kolla1997/Tallyn/issues/253) #type/feature #area/frontend #priority/p2
 
 
 %% kanban:settings
