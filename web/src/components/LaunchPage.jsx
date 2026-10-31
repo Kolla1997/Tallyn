@@ -15,7 +15,7 @@ import { SiteFooter } from './AuthPage.jsx'
 export const SIGN_UP_EVENT = 'coinroof:sign-up'
 
 const FEATURES = [
-  ['One total, any currency', 'Every account, converted to your home currency, added up in one place.', 'globe'],
+  ['It all adds up', 'Checking, savings, cards and loans, in one number that stays current.', 'globe'],
   ['Spending and savings', 'Budgets and goals that update as your bank does, so you see how the month is going.', 'bars'],
   ['Shared, on your terms', 'Partners, kids and parents see only what you choose to share.', 'people'],
 ]
@@ -131,8 +131,8 @@ export default function LaunchPage({ children }) {
         <img className="logo launch-logo dark:hidden" src={logo} alt="Coinroof" />
         <img className="logo launch-logo hidden dark:block" src={logoDark} alt="Coinroof" />
         <div className="launch-pitch launch-rise" style={{ '--d': '120ms' }}>
-          <h1>All your family&apos;s money, in every currency.</h1>
-          <p>Link your banks and cards, see one total in your home currency, and share what you choose with the people you love.</p>
+          <h1>All your family&apos;s money, in one place.</h1>
+          <p>Link your US banks and cards, see one total, and share what you choose with the people you love.</p>
         </div>
         {/* TODO(#220): swap the demo for the real product video once it exists. */}
         <LaunchVideo />
@@ -146,8 +146,8 @@ export default function LaunchPage({ children }) {
           About Coinroof
         </h2>
         <p className="launch-lead launch-rise" style={{ '--d': '90ms' }}>
-          Coinroof is a family finance app. Families connect bank accounts and cards in any currency, see one total in their home currency, and keep track of
-          spending and savings together, with partners, kids and parents.
+          Coinroof is a family finance app. Families connect their US bank accounts and cards, see one total, and keep track of spending and savings together,
+          with partners, kids and parents. More countries come later.
         </p>
         <div id="features-h" className="launch-features">
           {FEATURES.map(([title, text, icon], i) => (

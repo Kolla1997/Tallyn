@@ -795,7 +795,6 @@ body:has(.calm-page)::before {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
   gap: 22px 28px;
-  padding-bottom: 56px;
 }
 .launch-hero .launch-logo {
   grid-column: 1 / -1;
@@ -838,18 +837,9 @@ body:has(.calm-page)::before {
   align-content: start;
   align-self: start;
 }
-/* Wide screens (#220): the row is as tall as the video; a taller card (create an account) grows
-   up to 96px down into the gap under the hero instead of pushing About further down. A card taller
-   still (setting up 2FA) pushes About down rather than covering it. */
-@media (min-width: 861px) {
-  .launch-slot {
-    position: relative;
-    z-index: 1;
-  }
-  .launch-slot > * {
-    margin-bottom: -96px;
-  }
-}
+/* Wide screens: the row is as tall as the video. About sits one section gap (56px) below it; a taller
+   card (create an account, setting up 2FA) pushes About down rather than leaving a gap held for it
+   on every visit (#1, Dinesh picked A; replaces the 96px overlap from #220). */
 .calm-auth .launch-slot .card {
   max-width: none;
 }
