@@ -10,6 +10,9 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-11-01
+- #1 Demo caption: the first scene says "It all adds up" (Dinesh), instead of "Every account, one total" right before "Every account, side by side".
+
 ## 2026-10-30
 - #1 Launch page gap: About sat 112px under the hero, a space held so the taller create-account card could grow into it (#220). Dinesh picked A: one 56px section gap; a taller card now pushes About down.
 - #1 Launch page says US first: Dinesh picked C from the copy draft (`drafts/1-us-first-copy.html`). Hero "All your family's money, in one place." with "Link your US banks and cards"; the first tile is "It all adds up"; About ends "More countries come later."; the demo caption is "Every account, one total". Layout, icons and motion unchanged.
