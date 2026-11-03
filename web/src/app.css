@@ -1528,21 +1528,55 @@ input[role='switch']:not(:checked) + span {
   }
 }
 
-/* The notification list's clear glass (#267): solid where blur isn't available or less transparency is asked for,
-   since clear glass without blur can't be read. */
+/* The notification list's glass (#267, Dinesh picked F): a sheen and bright rim over a light frost
+   (22% tint, 10px blur), and frosted chips under each alert, the title and the day. Solid where blur
+   isn't available or less transparency is asked for. */
+.notif-glass {
+  --notif-sheen: rgb(255 255 255 / 0.55);
+  --notif-tint: rgb(255 255 255 / 0.22);
+  --notif-edge: rgb(255 255 255 / 0.7);
+  --notif-chip: rgb(255 255 255 / 0.55);
+  background: linear-gradient(160deg, var(--notif-sheen), transparent 40%), var(--notif-tint);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  border: 1px solid var(--notif-edge);
+  box-shadow:
+    inset 0 1px 1px var(--notif-edge),
+    0 12px 32px rgb(24 24 27 / 0.14);
+}
+.dark .notif-glass {
+  --notif-sheen: rgb(255 255 255 / 0.14);
+  --notif-tint: rgb(24 24 27 / 0.22);
+  --notif-edge: rgb(255 255 255 / 0.22);
+  --notif-chip: rgb(24 24 27 / 0.5);
+  box-shadow:
+    inset 0 1px 1px var(--notif-edge),
+    0 12px 32px rgb(0 0 0 / 0.4);
+}
+.notif-chip {
+  background: var(--notif-chip);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 12px;
+}
 @supports not (backdrop-filter: blur(1px)) {
-  .notif-glass {
-    background-color: #fff;
+  .notif-glass,
+  .notif-chip {
+    background: #fff;
   }
-  .dark .notif-glass {
-    background-color: var(--color-zinc-900);
+  .dark .notif-glass,
+  .dark .notif-chip {
+    background: var(--color-zinc-900);
   }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .notif-glass {
-    background-color: #fff;
+  .notif-glass,
+  .notif-chip {
+    background: #fff;
+    backdrop-filter: none;
   }
-  .dark .notif-glass {
-    background-color: var(--color-zinc-900);
+  .dark .notif-glass,
+  .dark .notif-chip {
+    background: var(--color-zinc-900);
   }
 }
