@@ -115,10 +115,10 @@ export function NotificationBell({ className = '' }) {
               ))}
             </div>
           )}
-          {/* From the tally tape: a double rule that adds it up, so you know you're done reading. */}
+          {/* The counts under a soft hairline (Dinesh swapped out the tally tape's double rule). */}
           {list?.length > 0 && (
             <div className="notif-chip mt-1 px-2 pb-2">
-              <p className="flex justify-between pt-2 text-[13px] tabular-nums" style={{ borderTop: '3px double currentColor' }}>
+              <p className="flex justify-between border-0 border-t border-solid border-zinc-900/10 pt-2 text-[13px] tabular-nums dark:border-white/10">
                 <span>{unread} new</span>
                 <span>{needs} needs you</span>
               </p>
