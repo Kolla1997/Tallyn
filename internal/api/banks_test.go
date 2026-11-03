@@ -65,6 +65,12 @@ func (stubStore) SetGoalSaved(context.Context, string, string, int64, time.Time)
 	return errors.New("stub")
 }
 func (stubStore) DeleteGoal(context.Context, string, string) error { return errors.New("stub") }
+func (stubStore) Notifications(context.Context, string) ([]db.Notification, error) {
+	return nil, errors.New("stub")
+}
+func (stubStore) MarkNotificationsRead(context.Context, string, string) error {
+	return errors.New("stub")
+}
 func (stubStore) CreateHousehold(context.Context, string, string, string) (db.MyHousehold, error) {
 	return db.MyHousehold{}, errors.New("stub")
 }

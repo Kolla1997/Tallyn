@@ -1504,3 +1504,26 @@ input[role='switch']:not(:checked) + span {
     padding: 2px 4px;
   }
 }
+
+/* Notifications (#267): the list drops from the bell (250ms, ease-out) and its rows rise in
+   (.calm-row); the unread count pops in once. Reduced motion: shown at once. */
+@keyframes notif-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+@keyframes notif-pop {
+  from {
+    transform: scale(0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .notif-panel {
+    animation: notif-drop 250ms cubic-bezier(0.23, 1, 0.32, 1) both;
+    transform-origin: top right;
+  }
+  .notif-badge {
+    animation: notif-pop 300ms cubic-bezier(0.23, 1, 0.32, 1) 400ms both;
+  }
+}

@@ -261,6 +261,66 @@ const PLAN = {
   can_manage: true,
 }
 
+// In-app notifications (#267): made-up, as in the picked draft.
+const ago = (h) => new Date(Date.now() - h * 3600000).toISOString()
+const NOTIFICATIONS = [
+  {
+    id: 'n1',
+    household_id: 'hh-1',
+    kind: 'reconnect',
+    ref_id: 'b-chase',
+    data: { bank: 'Harbor Bank' },
+    needs_action: true,
+    created_at: ago(0.5),
+    read: false,
+    resolved: false,
+  },
+  {
+    id: 'n2',
+    household_id: 'hh-1',
+    kind: 'big_purchase',
+    ref_id: 't9',
+    data: { merchant: 'Best Buy', amount_minor: 64218, currency: 'USD', account: 'Everyday Checking' },
+    needs_action: false,
+    created_at: ago(1),
+    read: false,
+    resolved: false,
+  },
+  {
+    id: 'n3',
+    household_id: 'hh-1',
+    kind: 'low_balance',
+    ref_id: 'a1',
+    data: { account: 'Everyday Checking', balance_minor: 8430, threshold_minor: 10000, currency: 'USD' },
+    needs_action: false,
+    created_at: ago(2),
+    read: false,
+    resolved: false,
+  },
+  {
+    id: 'n4',
+    household_id: 'hh-1',
+    kind: 'joined',
+    ref_id: 'u-rosa',
+    data: { name: 'Rosa', household: 'The Rivera family' },
+    needs_action: false,
+    created_at: ago(30),
+    read: false,
+    resolved: false,
+  },
+  {
+    id: 'n5',
+    household_id: 'hh-1',
+    kind: 'big_purchase',
+    ref_id: 't8',
+    data: { merchant: 'Delta', amount_minor: 51800, currency: 'USD', account: 'Travel Card' },
+    needs_action: false,
+    created_at: ago(80),
+    read: true,
+    resolved: false,
+  },
+]
+
 const ROUTES = [
   ['/api/me', { user_id: ME, display_name: 'Maya', households: [{ id: 'hh-1', name: 'The Rivera family', role: 'owner', home_currency: 'USD' }] }],
   ['/api/banks', { banks: BANKS }],
@@ -273,6 +333,7 @@ const ROUTES = [
   ['/api/transactions/daily', DAILY],
   ['/api/transactions', { transactions: TXS }],
   ['/api/goals', { goals: GOALS }],
+  ['/api/notifications', { notifications: NOTIFICATIONS }],
   [
     '/api/budgets',
     {

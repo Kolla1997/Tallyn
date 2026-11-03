@@ -8,6 +8,7 @@ import { categoryLabel, formatMoney } from '../lib/money.js'
 import { Avatar, nameOf } from '../lib/people.jsx'
 import { currencies, isOwed, summarize } from '../lib/summary.js'
 import { LinkBank } from './Banks.jsx'
+import { NeedsYou } from '../components/Notifications.jsx'
 import PageSkeleton from '../components/calm/PageSkeleton.jsx'
 import LoadFailed, { StaleBanner } from '../components/LoadFailed.jsx'
 import { useRetry } from '../lib/retry.js'
@@ -111,6 +112,7 @@ export default function HomePage({ me, household, refreshKey, onChanged }) {
           Family and sharing
         </Pill>
       </Head>
+      <NeedsYou householdId={household.id} />
       {error && (
         <p className="error" role="alert">
           {error}

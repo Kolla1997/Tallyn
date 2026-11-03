@@ -8,6 +8,7 @@ import { Link } from '../lib/router.jsx'
 import Heading from '../components/Heading.jsx'
 import ThemeSwitch from '../components/calm/ThemeSwitch.jsx'
 import { firstChar } from '../lib/people.jsx'
+import { NotificationBell } from '../components/Notifications.jsx'
 
 // App layout (#39), in the calm redesign (#187): a floating frosted rail on web (1024px and up),
 // collapsed by default; opening and closing glide (#221: the sidebar's width; the page jumps to its new padding
@@ -193,6 +194,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
       <header className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 lg:hidden">
         <Logo light={logo} dark={logoDark} className="h-7" />
         <div className="flex items-center gap-2">
+          <NotificationBell />
           <ThemeSwitch size="size-10" />
           <MobileMenu name={name} initial={initial} household={household} onSignOut={onSignOut} />
         </div>
@@ -201,6 +203,9 @@ export default function Shell({ me, household, households, onChooseHousehold, on
           the profile menu, the ☰ menu on phones, and Settings → Legal. */}
       <main id="main" className={`px-4 pt-5 pb-24 md:px-6 lg:pr-6 lg:pb-12 ${collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}>
         <div ref={page} className="mx-auto max-w-[1280px]">
+          {/* The bell sits top right of every page (#267). Floated, so each page's heading row
+              (a new block context) makes room beside it instead of running under it. */}
+          <NotificationBell className="float-right ml-3 hidden lg:block" />
           {children}
         </div>
       </main>
