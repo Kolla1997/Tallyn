@@ -2,13 +2,18 @@
 type: log
 status: active
 owner: Dinesh
-updated: 2026-10-30
+updated: 2026-11-03
 tags: [log]
 ---
 
 # Log
 
 Newest first. One entry per working session or decision.
+
+## 2026-11-03
+- #55 Notifications split (agreed with Dinesh): in-app #267, Settings → Notifications #268, emails #269 (blocked on #131, #255); push on phones is idea #270.
+- #267 In-app notifications: Dinesh picked draft C (`drafts/267-notifications.html`) with the bell moved to the top right of the page. Triggers write alerts (`0020_notifications.sql`): big purchase over $500, low balance under $100, a bank to reconnect (action alert, also a strip on Home), someone joined. The list is solid like the app's menus, not glass, so it reads over the page.
+- Decision (#267): alerts about an account go to its owner only for now; telling others needs the sharing rules applied when the alert is written. Open question for Dinesh.
 
 ## 2026-11-01
 - #1 Demo caption: the first scene says "It all adds up" (Dinesh), instead of "Every account, one total" right before "Every account, side by side".

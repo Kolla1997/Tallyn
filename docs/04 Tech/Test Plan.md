@@ -2,8 +2,8 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-30
-issues: [111, 113, 153, 154, 155, 158, 159, 200, 201, 209]
+updated: 2026-11-03
+issues: [111, 113, 153, 154, 155, 158, 159, 200, 201, 209, 267]
 tags: [spec, tech, testing]
 ---
 
@@ -153,6 +153,9 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Use case | P | Unit | Integration | End-to-end | Tests today |
 |---|---|---|---|---|---|
 | SQL is always constant, never built from input | P0 | — | Yes | — | `sqlsafety_test.go` |
+| Notifications reach only their person: each alert goes to one member, nobody else reads or marks it, nobody writes alerts or changes anything but read (#267) | P0 | — | Yes | — | `db/notifications_test.go` (`TestNotifyBigPurchase`, `TestNotifyJoinedAndMarkRead`), `TestEveryTableHasRLS` |
+| Alert rules: big purchase over $500 (settled, recent, once); low balance under $100 on a drop from a known balance, cleared when it climbs back; a bank needing sign-in is an action alert cleared when it's active again or unlinked; someone joining tells the others (#267) | P1 | — | Yes | — | `db/notifications_test.go` (`TestNotifyBigPurchase`, `TestNotifyLowBalanceAndReconnect`, `TestNotifyJoinedAndMarkRead`) |
+| Bell and list (draft C): unread count, Today and Earlier, mark one or all read, the counts under a soft hairline ("4 new", "1 needs you"), Escape closes; Home's strip shows only open action alerts for this household with Reconnect; money in tabular figures; routes pass through (#267) | P1 | Yes | Yes | No | `Notifications.test.jsx`, `api/notifications_test.go`. Gap: layout at phone and laptop width is a release-checklist item |
 | Opening the app: your profile loads beside the consent check, not after it, and is never handed to the next person after a sign-out (#159) | P2 | Yes | — | No | `me.test.js` (early request used once; dropped on sign-out). Gap: real timing on a production build is a release-checklist item |
 | Pages load on demand, and reload once after an update (#99) | P2 | No | — | No | — |
 | Phone layout: no sideways scroll, nothing hidden (#97, #94) | P1 | — | — | Yes | `web/e2e/layout.spec.js` (#117): every page at 375, 1024 and 1440 px: no sideways scroll, no error, key parts really visible (size, on screen, not hidden by display, visibility or opacity, waiting up to 3s for the load fade, #212); menus with Terms and Privacy; sign-in, 2FA, reset, legal pages. Fake data and session, every PR |
@@ -212,6 +215,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 - [ ] Budgets on load (#232): the income split fills left to right with its amounts counting up; job cards arrive left to right and each bar fills after its card; one-person budget rows fill notch by notch, one row after another, then today's outline and the Over budget / On pace tag land; with Reduce motion on, all appear drawn.
 - [ ] Active page edge bar (#232): the current page in the sidebar has a small bar on its left, red in light mode and green in dark.
 - [ ] Debts, Family and Goals on load (#234): Debts' waffle fills square by square, its figures count up from $0, the rows arrive and each bar fills after its row, and Overdue lands last; Family's Has and Owes count up and the cards-and-debts rows arrive in order; a goal's bar fills after its card, what's left counts up, and the forecast lines arrive one by one; with Reduce motion on, all appear drawn.
+- [ ] Notifications (#267): at laptop width the bell sits top right of every page beside the heading, never over a button; on a phone it's in the header. The list drops from the bell and rows rise in; the count pops in once; with Reduce motion on, all appear at once. A bank that needs signing in shows on Home's strip, and Reconnect there clears it.
 - [ ] Launch demo video (#220): the video slot plays Home, Accounts, Budgets and Transactions (the preview's made-up family) on a 16s loop, each drifting closer with its caption and a "Demo" label; dark screens in dark mode; with Reduce motion on, only Home, still.
 - [ ] Transaction map (#60): on the deployed app, opening a transaction loads the US map from the R2 host (browser network tab: no other map hosts), the pin sits on the shop, zooming in stays readable, and light and dark both look right.
 - [ ] Owner resets a teen's 2FA (#120): on a real account, the teen gets Supabase's "MFA method removed" email, signs in with their password, sees who reset it, and sets up a new authenticator with a real app.

@@ -8,6 +8,18 @@ import { Link } from '../lib/router.jsx'
 import Heading from '../components/Heading.jsx'
 import ThemeSwitch from '../components/calm/ThemeSwitch.jsx'
 import { firstChar } from '../lib/people.jsx'
+import { NotificationBell } from '../components/Notifications.jsx'
+import { TopActions } from '../lib/topActions.js'
+import { HeadActions } from '../components/calm/ui.jsx'
+
+// On web, the bell and then the light/dark switch end each page's heading row (#267, Dinesh's diagram).
+// Phones keep them in the header.
+const TOP = (
+  <span className="hidden items-center gap-2 lg:flex">
+    <NotificationBell />
+    <ThemeSwitch size="size-10" />
+  </span>
+)
 
 // App layout (#39), in the calm redesign (#187): a floating frosted rail on web (1024px and up),
 // collapsed by default; opening and closing glide (#221: the sidebar's width; the page jumps to its new padding
@@ -175,9 +187,6 @@ export default function Shell({ me, household, households, onChooseHousehold, on
           ))}
         </nav>
         <div className={`mt-auto flex flex-col gap-2 ${collapsed ? 'items-center' : ''}`}>
-          <div className={collapsed ? '' : 'px-1.5'}>
-            <ThemeSwitch />
-          </div>
           <ProfileMenu
             name={name}
             initial={initial}
@@ -193,6 +202,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
       <header className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 lg:hidden">
         <Logo light={logo} dark={logoDark} className="h-7" />
         <div className="flex items-center gap-2">
+          <NotificationBell />
           <ThemeSwitch size="size-10" />
           <MobileMenu name={name} initial={initial} household={household} onSignOut={onSignOut} />
         </div>
@@ -201,7 +211,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
           the profile menu, the ☰ menu on phones, and Settings → Legal. */}
       <main id="main" className={`px-4 pt-5 pb-24 md:px-6 lg:pr-6 lg:pb-12 ${collapsed ? 'lg:pl-[92px]' : 'lg:pl-[240px]'}`}>
         <div ref={page} className="mx-auto max-w-[1280px]">
-          {children}
+          <TopActions.Provider value={TOP}>{children}</TopActions.Provider>
         </div>
       </main>
 
@@ -452,7 +462,9 @@ export function PageHead({ title, tab, sub, children }) {
         <Heading title={tab ?? title}>{title}</Heading>
         {sub && <p className="muted">{sub}</p>}
       </div>
-      {children && <div className="page-actions">{children}</div>}
+      <div className="page-actions">
+        <HeadActions>{children}</HeadActions>
+      </div>
     </div>
   )
 }

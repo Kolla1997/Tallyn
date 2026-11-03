@@ -1,0 +1,113 @@
+import { useEffect, useSyncExternalStore } from 'react'
+import { api } from './api.js'
+import { formatMoney } from './money.js'
+
+// In-app notifications (#267, Dinesh picked draft C with the bell top right):
+// one shared list for the bell and Home's strip, so marking one read shows in
+// both. The database writes the alerts (0020_notifications.sql); each person
+// sees only their own.
+
+let state = { list: null, failed: false }
+const listeners = new Set()
+let timer = null
+let users = 0
+
+const REFRESH_MS = 5 * 60 * 1000 // the bank sync runs every few hours; five minutes is plenty
+
+function set(next) {
+  state = { ...state, ...next }
+  listeners.forEach((l) => l())
+}
+
+export async function refresh() {
+  try {
+    const d = await api('/api/notifications')
+    set({ list: d?.notifications ?? [], failed: false })
+  } catch {
+    set({ failed: true }) // keep what we had; the bell just stays as it was
+  }
+}
+
+// Marks one alert read, or all of them without an id. Shown at once; the
+// server catches up.
+export async function markRead(id) {
+  if (state.list) set({ list: state.list.map((n) => (!id || n.id === id ? { ...n, read: true } : n)) })
+  try {
+    await api('/api/notifications/read', { method: 'POST', body: id ? { id } : {} })
+  } catch {
+    refresh()
+  }
+}
+
+function onFocus() {
+  if (document.visibilityState === 'visible') refresh()
+}
+
+// The list, loaded once and refreshed every five minutes and when the tab
+// comes back, for as long as something on screen uses it.
+export function useNotifications() {
+  useEffect(() => {
+    if (users++ === 0) {
+      refresh()
+      timer = setInterval(refresh, REFRESH_MS)
+      document.addEventListener('visibilitychange', onFocus)
+    }
+    return () => {
+      if (--users === 0) {
+        clearInterval(timer)
+        document.removeEventListener('visibilitychange', onFocus)
+      }
+    }
+  }, [])
+  return useSyncExternalStore(
+    (l) => (listeners.add(l), () => listeners.delete(l)),
+    () => state,
+  )
+}
+
+// What each alert says, as parts ({ b } is bold), and where it leads. Never
+// an account number: the server sends names only.
+export function describe(n) {
+  const d = n.data ?? {}
+  const m = (minor) => ({ b: formatMoney(minor, d.currency), money: true })
+  switch (n.kind) {
+    case 'big_purchase':
+      return { parts: ['You spent ', m(d.amount_minor), ` at ${d.merchant ?? 'a store'} from ${d.account ?? 'your account'}.`], to: '/transactions' }
+    case 'low_balance':
+      return {
+        parts: [`${d.account ?? 'Your account'} is down to `, m(d.balance_minor), `, under your ${formatMoney(d.threshold_minor, d.currency)} alert.`],
+        to: '/accounts',
+      }
+    case 'reconnect':
+      return { parts: [{ b: `${d.bank ?? 'Your bank'} needs you to sign in again.` }, " We can't update it until then."], to: '/accounts' }
+    case 'joined':
+      return { parts: [{ b: d.name ?? 'Someone' }, ` joined ${d.household ?? 'your household'}.`], to: '/family' }
+    default:
+      return { parts: ['Something changed.'], to: '/' }
+  }
+}
+
+// "Today, 8:02", "Yesterday", "Mon", "Oct 12", in the viewer's time zone.
+export function when(iso, now = new Date()) {
+  const t = new Date(iso)
+  const day = (x) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime()
+  const days = Math.round((day(now) - day(t)) / 86400000)
+  if (days <= 0) return `Today, ${t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`
+  if (days === 1) return 'Yesterday'
+  if (days < 7) return t.toLocaleDateString('en-US', { weekday: 'short' })
+  return t.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+// Today and Earlier, newest first.
+export function groups(list, now = new Date()) {
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
+  const today = list.filter((n) => new Date(n.created_at).getTime() >= start)
+  const earlier = list.filter((n) => new Date(n.created_at).getTime() < start)
+  return [
+    ['Today', today],
+    ['Earlier', earlier],
+  ].filter(([, l]) => l.length)
+}
+
+// Open alerts that need you (a bank to reconnect), for Home's strip.
+export const needsYou = (list) => (list ?? []).filter((n) => n.needs_action && !n.resolved)
