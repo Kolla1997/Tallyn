@@ -7,7 +7,8 @@ import { ReconnectBank } from '../screens/Banks.jsx'
 // In-app notifications (#267, Dinesh picked draft C, with the bell top right
 // of the page): the bell holds every alert; alerts that need you (a bank to
 // reconnect) also show on Home as a strip until they're done (NeedsYou).
-// The list is solid, like the app's other menus, so it reads clearly over the page.
+// The list is solid, like the app's other menus, so it reads clearly over the page. On phones it
+// spans the screen under the header; from 1024px it drops from the bell.
 
 function Words({ parts }) {
   return parts.map((p, i) =>
@@ -69,7 +70,7 @@ export function NotificationBell({ className = '' }) {
         <section
           id={panelId}
           aria-label="Notifications"
-          className="notif-panel absolute right-0 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl top-[calc(100%+8px)] z-50 flex max-h-[min(560px,75vh)] w-[min(380px,calc(100vw-32px))] flex-col rounded-3xl p-4"
+          className="notif-panel fixed inset-x-4 top-16 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-xl z-50 flex max-h-[min(560px,75vh)] lg:absolute lg:inset-x-auto lg:right-0 lg:top-[calc(100%+8px)] lg:w-[380px] flex-col rounded-3xl p-4"
         >
           <div className="flex items-baseline justify-between">
             <h2 className="text-[16px] font-semibold">Notifications</h2>
