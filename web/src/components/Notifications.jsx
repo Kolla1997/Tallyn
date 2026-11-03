@@ -53,13 +53,13 @@ export function NotificationBell({ className = '' }) {
     <div ref={box} className={`relative ${className}`}>
       <button
         type="button"
-        className="calm-glass relative flex size-[42px] items-center justify-center rounded-xl border-0 p-0 text-zinc-600 dark:text-zinc-300 transition-colors duration-150 hover:text-zinc-900 dark:hover:text-white"
+        className="relative flex size-10 shrink-0 items-center justify-center rounded-full border border-zinc-300 bg-white p-0 text-zinc-700 transition-colors duration-150 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:text-white"
         aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'}
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((o) => !o)}
       >
-        <BellIcon />
+        <BellIcon width={16} height={16} />
         {unread > 0 && (
           <span className="notif-badge absolute -top-1 -right-1 min-w-[18px] rounded-full bg-[var(--color-redesign-accent)] px-[5px] text-center text-[11px] leading-[18px] font-semibold tabular-nums text-white">
             {unread > 9 ? '9+' : unread}

@@ -1,4 +1,5 @@
 import { animate } from 'animejs'
+import { useTopActions } from '../../lib/topActions.js'
 import { Link } from '../../lib/router.jsx'
 import Heading from '../Heading.jsx'
 
@@ -137,6 +138,18 @@ export const Head = ({ title, tab, sub, children }) => (
       </Heading>
       {sub && <p className={`m-0 mt-0.5 text-[15px] ${MUTED}`}>{sub}</p>}
     </div>
-    {children && <div className="flex flex-wrap gap-2">{children}</div>}
+    <HeadActions>{children}</HeadActions>
   </div>
 )
+
+// The page's own actions, then the shell's bell and theme switch on the same line (#267).
+export function HeadActions({ children }) {
+  const top = useTopActions()
+  if (!children && !top) return null
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {children}
+      {top}
+    </div>
+  )
+}
