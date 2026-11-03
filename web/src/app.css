@@ -1528,20 +1528,21 @@ input[role='switch']:not(:checked) + span {
   }
 }
 
-/* The notification list's inverted glass (#267): solid where blur isn't available or less transparency is asked for. */
+/* The notification list's clear glass (#267): solid where blur isn't available or less transparency is asked for,
+   since clear glass without blur can't be read. */
 @supports not (backdrop-filter: blur(1px)) {
   .notif-glass {
-    background-color: var(--color-zinc-950);
+    background-color: #fff;
   }
   .dark .notif-glass {
-    background-color: #fff;
+    background-color: var(--color-zinc-900);
   }
 }
 @media (prefers-reduced-transparency: reduce) {
   .notif-glass {
-    background-color: var(--color-zinc-950);
+    background-color: #fff;
   }
   .dark .notif-glass {
-    background-color: #fff;
+    background-color: var(--color-zinc-900);
   }
 }
