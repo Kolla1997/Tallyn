@@ -204,7 +204,7 @@ func emailJob(system *db.System, linkKey []byte) *email.Job {
 			sender = email.Logger{}
 		}
 	}
-	return &email.Job{Outbox: system, Sender: sender, LinkKey: linkKey, AppURL: strings.TrimRight(getenv("APP_URL", "http://localhost:8080"), "/"), Every: 5 * time.Minute}
+	return &email.Job{Outbox: system, Sender: sender, LinkKey: linkKey, AppURL: strings.TrimRight(getenv("APP_URL", "http://localhost:8080"), "/"), LogoURL: os.Getenv("EMAIL_LOGO_URL"), Every: 5 * time.Minute}
 }
 
 func getenv(key, fallback string) string {

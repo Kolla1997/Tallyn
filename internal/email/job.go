@@ -23,6 +23,7 @@ type Job struct {
 	Sender  Sender
 	LinkKey []byte
 	AppURL  string // e.g. https://coinroof.us
+	LogoURL string // public PNG of the lockup (EMAIL_LOGO_URL); defaults to AppURL's
 	Every   time.Duration
 }
 
@@ -85,7 +86,7 @@ func (j *Job) compose(e db.OutboxEmail) (Message, error) {
 	if e.UserID != e.OwnerID {
 		l.Kind, l.Kid = db.EmailKidReconnect, e.OwnerID
 	}
-	m, err := Compose(Alert{Kind: e.Kind, Data: e.Data}, j.AppURL, Sign(j.LinkKey, l), e.Household)
+	m, err := Compose(Alert{Kind: e.Kind, Data: e.Data}, Links{App: j.AppURL, Logo: j.LogoURL}, Sign(j.LinkKey, l), e.Household)
 	if err != nil {
 		return Message{}, err
 	}

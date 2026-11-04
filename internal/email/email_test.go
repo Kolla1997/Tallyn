@@ -45,7 +45,7 @@ func TestLinkSignAndVerify(t *testing.T) {
 
 func compose(t *testing.T, kind, data string) Message {
 	t.Helper()
-	m, err := Compose(Alert{Kind: kind, Data: json.RawMessage(data)}, "https://coinroof.us", "tok.en", "Trail House")
+	m, err := Compose(Alert{Kind: kind, Data: json.RawMessage(data)}, Links{App: "https://coinroof.us"}, "tok.en", "Trail House")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -57,7 +57,7 @@ func TestComposePaymentDue(t *testing.T) {
 	if m.Subject != "Payment due Saturday: Plaid Credit Card" {
 		t.Errorf("subject = %q", m.Subject)
 	}
-	for _, want := range []string{"$20.00", "$410.00", "Due Nov 7", "https://coinroof.us/unsubscribe?t=tok.en", "Stop payment-due emails", "coinroof-logo.png", "Trail House"} {
+	for _, want := range []string{"$20.00", "<b style=\"font-weight:700;color:#18181b\">$410.00</b>", "Due Nov 7", "https://coinroof.us/unsubscribe?t=tok.en", "Stop payment-due emails", "coinroof-logo.png", "Trail House"} {
 		if !strings.Contains(m.HTML, want) {
 			t.Errorf("HTML is missing %q", want)
 		}
@@ -84,7 +84,7 @@ func TestComposeReconnect(t *testing.T) {
 	if k.Subject != "Mia's bank needs reconnecting" || !strings.Contains(k.HTML, "Stop Mia&#39;s emails") {
 		t.Errorf("child's: %q", k.Subject)
 	}
-	if _, err := Compose(Alert{Kind: "big_purchase", Data: json.RawMessage(`{}`)}, "", "", ""); err == nil {
+	if _, err := Compose(Alert{Kind: "big_purchase", Data: json.RawMessage(`{}`)}, Links{}, "", ""); err == nil {
 		t.Error("composed an email for a big purchase")
 	}
 }

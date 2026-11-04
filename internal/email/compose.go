@@ -35,21 +35,32 @@ type alertData struct {
 
 // view is what the template shows.
 type view struct {
-	Heading, Label, Figure, Chip, Body, Note, Button, ButtonURL, Why, StopText, StopURL, SettingsURL, LogoURL string
-	Red, Kid                                                                                                  bool
-	Tile                                                                                                      string // bank name, for reconnect
+	Heading, Label, Figure, Chip, Body, Statement, Note, Button, ButtonURL, Why, StopText, StopURL, SettingsURL, LogoURL string
+	Red, Kid                                                                                                             bool
+	Tile                                                                                                                 string // bank name, for reconnect
 }
 
-// Compose builds the email for an alert. appURL is the app's address, token
+// Links are where an email's links and logo point.
+type Links struct {
+	App  string // the app's address, e.g. https://coinroof.us
+	Logo string // a public PNG of the Coinroof lockup; mail apps can't load localhost
+}
+
+// Compose builds the email for an alert. links.App is the app's address, token
 // the signed unsubscribe link (Sign): the footer opens the page that asks
 // first (mail scanners open links), mail apps' own button posts to the API.
-func Compose(a Alert, appURL, token, household string) (Message, error) {
+func Compose(a Alert, links Links, token, household string) (Message, error) {
+	appURL := links.App
 	unsubscribe := appURL + "/api/email/unsubscribe?t=" + url.QueryEscape(token)
 	var d alertData
 	if err := json.Unmarshal(a.Data, &d); err != nil {
 		return Message{}, fmt.Errorf("email: alert data: %w", err)
 	}
-	v := view{LogoURL: appURL + "/email/coinroof-logo.png", SettingsURL: appURL + "/settings", StopURL: appURL + "/unsubscribe?t=" + url.QueryEscape(token)}
+	logo := links.Logo
+	if logo == "" {
+		logo = appURL + "/email/coinroof-logo.png"
+	}
+	v := view{LogoURL: logo, SettingsURL: appURL + "/settings", StopURL: appURL + "/unsubscribe?t=" + url.QueryEscape(token)}
 	var subject string
 	switch a.Kind {
 	case "reconnect":
@@ -86,7 +97,7 @@ func Compose(a Alert, appURL, token, household string) (Message, error) {
 			v.Heading = "Your " + account + " payment is due " + day
 			v.Label, v.Chip = "Minimum payment", "Due "+shortDate(d.DueDate)
 			if d.StatementMinor != nil && *d.StatementMinor > 0 {
-				v.Body = "Your statement balance is " + formatMoney(*d.StatementMinor, d.Currency) + ". Paying it in full avoids interest."
+				v.Statement = formatMoney(*d.StatementMinor, d.Currency) // bold in the HTML
 			}
 		}
 	default:
@@ -107,6 +118,9 @@ func text(v view) string {
 	}
 	if v.Tile != "" {
 		b.WriteString(v.Tile + ": " + v.Chip + "\n")
+	}
+	if v.Statement != "" {
+		b.WriteString("\nYour statement balance is " + v.Statement + ". Paying it in full avoids interest.\n")
 	}
 	if v.Body != "" {
 		b.WriteString("\n" + v.Body + "\n")
@@ -182,18 +196,19 @@ func formatMoney(minor int64, currency string) string {
 
 // page is the email, with inline styles: many mail apps drop <style>.
 var page = template.Must(template.New("email").Parse(`<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><title>{{.Heading}}</title></head>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet"><title>{{.Heading}}</title></head>
 <body style="margin:0;padding:0;background:#f6f1ea;font-family:Montserrat,Helvetica,Arial,sans-serif;color:#18181b">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea"><tr><td style="padding:24px 16px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid #ece6dd;border-radius:22px"><tr><td style="padding:24px">
-<img src="{{.LogoURL}}" alt="Coinroof" height="28" style="display:block;height:28px;width:auto;border:0;margin-bottom:20px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid #ece6dd;border-radius:22px"><tr><td align="center" style="padding:28px 24px;text-align:center">
+<img src="{{.LogoURL}}" alt="Coinroof" width="138" height="28" style="display:block;height:28px;width:138px;border:0;margin:0 auto 20px;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;font-weight:700;font-size:18px;color:#18181b">
 <h1 style="margin:0 0 8px;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;font-size:22px;line-height:1.25;color:#18181b">{{.Heading}}</h1>
 {{if .Figure}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea;border-radius:16px;margin-top:16px"><tr>
-<td style="padding:14px 16px"><div style="font-size:13px;color:#52525b">{{.Label}}</div><div style="font-family:'Space Grotesk',Helvetica,Arial,sans-serif;font-weight:700;font-size:28px;line-height:1.1;font-variant-numeric:tabular-nums;color:{{if .Red}}#cb0900{{else}}#18181b{{end}}">{{.Figure}}</div></td>
-<td align="right" style="padding:14px 16px"><span style="display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 8px;{{if .Red}}background:#fde8e7;color:#a30700{{else}}background:#e4e4e7;color:#3f3f46{{end}}">{{.Chip}}</span></td></tr></table>{{end}}
+<td align="center" style="padding:16px;text-align:center"><div style="font-size:13px;color:#52525b">{{.Label}}</div><div style="font-family:'Space Grotesk',Helvetica,Arial,sans-serif;font-weight:700;font-size:30px;line-height:1.2;font-variant-numeric:tabular-nums;color:{{if .Red}}#cb0900{{else}}#18181b{{end}}">{{.Figure}}</div>
+<span style="display:inline-block;margin-top:6px;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;{{if .Red}}background:#fde8e7;color:#a30700{{else}}background:#e4e4e7;color:#3f3f46{{end}}">{{.Chip}}</span></td></tr></table>{{end}}
 {{if .Tile}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea;border-radius:16px;margin-top:16px"><tr>
-<td style="padding:14px 16px;font-weight:600">{{.Tile}}</td>
-<td align="right" style="padding:14px 16px"><span style="display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 8px;background:#fde8e7;color:#a30700">{{.Chip}}</span></td></tr></table>{{end}}
+<td align="center" style="padding:16px;text-align:center"><div style="font-weight:700;font-size:16px;color:#18181b">{{.Tile}}</div>
+<span style="display:inline-block;margin-top:6px;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;background:#fde8e7;color:#a30700">{{.Chip}}</span></td></tr></table>{{end}}
+{{if .Statement}}<p style="margin:16px 0 0;font-size:15px;line-height:1.5;color:#3f3f46">Your statement balance is <b style="font-weight:700;color:#18181b">{{.Statement}}</b>. Paying it in full avoids interest.</p>{{end}}
 {{if .Body}}<p style="margin:16px 0 0;font-size:15px;line-height:1.5;color:#3f3f46">{{.Body}}</p>{{end}}
 <a href="{{.ButtonURL}}" style="display:inline-block;margin-top:20px;background:#18181b;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;border-radius:999px;padding:12px 22px">{{.Button}}</a>
 </td></tr></table>
