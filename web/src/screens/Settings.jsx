@@ -9,6 +9,7 @@ import { rememberSignOutNote, signOutHere } from '../lib/session.js'
 import { supabase } from '../lib/supabase.js'
 import { SaveBackupCodes } from './BackupCodes.jsx'
 import CodeForm from './CodeForm.jsx'
+import NotificationSettings from './NotificationSettings.jsx'
 import { Head, Panel, Pill, MUTED, OWE, IN } from '../components/calm/ui.jsx'
 import { useModal, useRevealOnPhone } from '../lib/modal.js'
 
@@ -75,7 +76,7 @@ export default function Settings({ me, household, email, onSaved, onSignOut }) {
           {section === 'security' && <Security email={email} onSignOut={onSignOut} />}
           {section === 'household' && <Household household={household} onSaved={onSaved} />}
           {section === 'data' && <YourData />}
-          {section === 'notifications' && <Notifications />}
+          {section === 'notifications' && <NotificationSettings me={me} household={household} />}
           {section === 'legal' && <Legal />}
           {section === 'leave' && <LeaveOrClose me={me} household={household} email={email} />}
         </div>
@@ -613,18 +614,6 @@ function YourData() {
           </p>
         </ConfirmDialog>
       )}
-    </Section>
-  )
-}
-
-function Notifications() {
-  return (
-    <Section id="notifications-h" title="Notifications">
-      <Rows>
-        <Row label="Alerts" note="For example a big purchase, a low balance, or a bank that needs you to sign in again">
-          <Soon ticket={55} />
-        </Row>
-      </Rows>
     </Section>
   )
 }

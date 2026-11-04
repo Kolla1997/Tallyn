@@ -39,6 +39,20 @@ export async function markRead(id) {
   }
 }
 
+// Closes alerts in the list (#267: the × on one, "Close all" for a day), and marks them read.
+// A bank still to reconnect stays on Home's strip until it's done.
+export async function dismiss(ids) {
+  if (state.list) set({ list: state.list.map((n) => (ids.includes(n.id) ? { ...n, dismissed: true, read: true } : n)) })
+  try {
+    await api('/api/notifications/dismiss', { method: 'POST', body: { ids } })
+  } catch {
+    refresh()
+  }
+}
+
+// What the bell's list shows: everything not closed.
+export const shown = (list) => (list ?? []).filter((n) => !n.dismissed)
+
 function onFocus() {
   if (document.visibilityState === 'visible') refresh()
 }
@@ -72,14 +86,26 @@ export function describe(n) {
   const m = (minor) => ({ b: formatMoney(minor, d.currency), money: true })
   switch (n.kind) {
     case 'big_purchase':
-      return { parts: ['You spent ', m(d.amount_minor), ` at ${d.merchant ?? 'a store'} from ${d.account ?? 'your account'}.`], to: '/transactions' }
+      // d.person: someone else's purchase, shared with you (a child's, or a partner's, #268).
+      return d.person
+        ? {
+            parts: [{ b: d.person }, ' spent ', m(d.amount_minor), ` at ${d.merchant ?? 'a store'} from ${d.account ?? 'their account'}.`],
+            to: '/transactions',
+          }
+        : { parts: ['You spent ', m(d.amount_minor), ` at ${d.merchant ?? 'a store'} from ${d.account ?? 'your account'}.`], to: '/transactions' }
     case 'low_balance':
       return {
-        parts: [`${d.account ?? 'Your account'} is down to `, m(d.balance_minor), `, under your ${formatMoney(d.threshold_minor, d.currency)} alert.`],
+        parts: [
+          d.person ? `${d.person}'s ${d.account ?? 'account'} is down to ` : `${d.account ?? 'Your account'} is down to `,
+          m(d.balance_minor),
+          `, under your ${formatMoney(d.threshold_minor, d.currency)} alert.`,
+        ],
         to: '/accounts',
       }
     case 'reconnect':
-      return { parts: [{ b: `${d.bank ?? 'Your bank'} needs you to sign in again.` }, " We can't update it until then."], to: '/accounts' }
+      return d.person
+        ? { parts: [{ b: `${d.person}'s ${d.bank ?? 'bank'} needs signing in again.` }, ` Only ${d.person} can do it.`], to: '/accounts' }
+        : { parts: [{ b: `${d.bank ?? 'Your bank'} needs you to sign in again.` }, " We can't update it until then."], to: '/accounts' }
     case 'joined':
       return { parts: [{ b: d.name ?? 'Someone' }, ` joined ${d.household ?? 'your household'}.`], to: '/family' }
     default:

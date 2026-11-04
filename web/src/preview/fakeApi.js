@@ -333,6 +333,10 @@ const ROUTES = [
   ['/api/transactions/daily', DAILY],
   ['/api/transactions', { transactions: TXS }],
   ['/api/goals', { goals: GOALS }],
+  [
+    '/api/notifications/settings',
+    { big_purchase: true, big_purchase_minor: 50000, low_balance: true, low_balance_minor: 10000, joined: true, share_with: null },
+  ],
   ['/api/notifications', { notifications: NOTIFICATIONS }],
   [
     '/api/budgets',

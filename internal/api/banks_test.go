@@ -71,6 +71,15 @@ func (stubStore) Notifications(context.Context, string) ([]db.Notification, erro
 func (stubStore) MarkNotificationsRead(context.Context, string, string) error {
 	return errors.New("stub")
 }
+func (stubStore) DismissNotifications(context.Context, string, []string) error {
+	return errors.New("stub")
+}
+func (stubStore) NotificationSettingsFor(context.Context, string, string) (db.NotificationSettings, error) {
+	return db.NotificationSettings{}, errors.New("stub")
+}
+func (stubStore) SaveNotificationSettings(context.Context, string, string, db.NotificationSettings) error {
+	return errors.New("stub")
+}
 func (stubStore) CreateHousehold(context.Context, string, string, string) (db.MyHousehold, error) {
 	return db.MyHousehold{}, errors.New("stub")
 }

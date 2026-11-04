@@ -59,6 +59,11 @@ describe('notification words', () => {
       ', under your $100.00 alert.',
     )
     expect(words(LIST[0]).parts[0]).toEqual({ b: 'Fake Bank needs you to sign in again.' })
+    // Someone else's alert names them (#268): a child's, or a partner's shared with you.
+    expect(
+      words({ kind: 'big_purchase', data: { person: 'Mia', merchant: 'Fake Store', amount_minor: 60000, currency: 'USD', account: 'Savings' } }).parts[0],
+    ).toEqual({ b: 'Mia' })
+    expect(words({ kind: 'reconnect', data: { person: 'Mia', bank: 'Fake Bank' } }).parts[1]).toBe(' Only Mia can do it.')
   })
 
   it('groups Today and Earlier, and picks out what needs you', () => {
@@ -92,6 +97,26 @@ describe('NotificationBell', () => {
     await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Mark all read' })))
     expect(api).toHaveBeenCalledWith('/api/notifications/read', { method: 'POST', body: {} })
     expect(screen.getByRole('button', { name: 'Notifications' })).toBeInTheDocument()
+  })
+})
+
+describe('closing alerts', () => {
+  it('the × closes one; Close all closes a day; both tell the server', async () => {
+    render(<NotificationBell />)
+    fireEvent.click(await screen.findByRole('button', { name: /^Notifications/ }))
+    const panel = screen.getByRole('region', { name: 'Notifications' })
+    await act(async () => fireEvent.click(within(panel).getAllByRole('button', { name: 'Close this alert' })[1]))
+    expect(api).toHaveBeenCalledWith('/api/notifications/dismiss', { method: 'POST', body: { ids: ['n2'] } })
+    expect(within(panel).queryByText(/Fake Store/)).toBeNull()
+    await act(async () => fireEvent.click(within(panel).getAllByRole('button', { name: 'Close all' })[0]))
+    expect(api).toHaveBeenLastCalledWith('/api/notifications/dismiss', { method: 'POST', body: { ids: ['n1'] } })
+    expect(within(panel).queryByText('Today')).toBeNull()
+  })
+
+  it('a closed bank to reconnect stays on Home until it is fixed', async () => {
+    api.mockImplementation((path) => Promise.resolve(path === '/api/notifications' ? { notifications: [{ ...LIST[0], dismissed: true, read: true }] } : null))
+    render(<NeedsYou householdId="hh-1" />)
+    expect(await screen.findByRole('status')).toHaveTextContent('Fake Bank needs you to sign in again.')
   })
 })
 
