@@ -83,9 +83,9 @@ export function NotificationBell({ className = '' }) {
             )}
           </div>
           {!list ? (
-            <p className="mt-4 text-[14px] text-[var(--ni-muted)]">Adding it all up…</p>
+            <p className="mt-4 text-[14px] text-zinc-600 dark:text-zinc-300">Adding it all up…</p>
           ) : list.length === 0 ? (
-            <p className="mt-4 text-[14px] text-[var(--ni-muted)]">Nothing new. We&apos;ll tell you here when something changes.</p>
+            <p className="mt-4 text-[14px] text-zinc-600 dark:text-zinc-300">Nothing new. We&apos;ll tell you here when something changes.</p>
           ) : (
             <div className="-mx-2 mt-1 overflow-y-auto px-2">
               {groups(list).map(([label, items]) => (

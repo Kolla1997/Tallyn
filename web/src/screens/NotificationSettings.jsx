@@ -171,7 +171,7 @@ export default function NotificationSettings({ me, household }) {
 
           {/* The alert as it would land, in the list's glass F (#267), changing as you type. */}
           <div className="notif-glass mt-3 rounded-[20px] p-2" aria-live="polite">
-            <p className="m-0 px-2 pb-1 text-[12px] text-[var(--ni-muted)]">How it will look</p>
+            <p className={`m-0 px-2 pb-1 text-[12px] ${MUTED}`}>How it will look</p>
             <p className="notif-chip m-0 p-2 text-[14px] text-[var(--ni-text)]">
               You spent <b className="font-semibold tabular-nums text-[var(--ni-ink)]">{formatMoney(big + 14218, CUR)}</b> at a store from your checking
               account.

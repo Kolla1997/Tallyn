@@ -1528,15 +1528,15 @@ input[role='switch']:not(:checked) + span {
   }
 }
 
-/* The notification list's glass (#267, Dinesh picked F, then turned it round): dark glass in light
-   mode, light glass in dark mode, with a sheen and bright rim, and frosted chips under each alert,
-   the title, the day and the counts. --ni-* are its text colours. Solid where blur isn't available
+/* The notification list's glass (#267, Dinesh picked F): light glass with a sheen and bright rim in
+   light mode, and dark chips under each alert, the title, the day and the counts, with light text.
+   Dark mode turns both round. --ni-* are the chips' text colours. Solid where blur isn't available
    or less transparency is asked for. */
 .notif-glass {
-  --notif-sheen: rgb(255 255 255 / 0.12);
-  --notif-tint: rgb(24 24 27 / 0.55);
-  --notif-edge: rgb(255 255 255 / 0.18);
-  --notif-chip: rgb(24 24 27 / 0.5);
+  --notif-sheen: rgb(255 255 255 / 0.55);
+  --notif-tint: rgb(255 255 255 / 0.22);
+  --notif-edge: rgb(255 255 255 / 0.7);
+  --notif-chip: rgb(24 24 27 / 0.8);
   --ni-ink: #fff;
   --ni-text: var(--color-zinc-200);
   --ni-muted: var(--color-zinc-300);
@@ -1546,13 +1546,13 @@ input[role='switch']:not(:checked) + span {
   border: 1px solid var(--notif-edge);
   box-shadow:
     inset 0 1px 1px var(--notif-edge),
-    0 12px 32px rgb(24 24 27 / 0.22);
+    0 12px 32px rgb(24 24 27 / 0.14);
 }
 .dark .notif-glass {
-  --notif-sheen: rgb(255 255 255 / 0.55);
-  --notif-tint: rgb(255 255 255 / 0.3);
-  --notif-edge: rgb(255 255 255 / 0.7);
-  --notif-chip: rgb(255 255 255 / 0.6);
+  --notif-sheen: rgb(255 255 255 / 0.14);
+  --notif-tint: rgb(24 24 27 / 0.22);
+  --notif-edge: rgb(255 255 255 / 0.22);
+  --notif-chip: rgb(255 255 255 / 0.85);
   --ni-ink: var(--color-zinc-950);
   --ni-text: var(--color-zinc-800);
   --ni-muted: var(--color-zinc-600);
@@ -1567,11 +1567,15 @@ input[role='switch']:not(:checked) + span {
   border-radius: 12px;
 }
 @supports not (backdrop-filter: blur(1px)) {
-  .notif-glass,
+  .notif-glass {
+    background: #fff;
+  }
   .notif-chip {
     background: var(--color-zinc-900);
   }
-  .dark .notif-glass,
+  .dark .notif-glass {
+    background: var(--color-zinc-900);
+  }
   .dark .notif-chip {
     background: #fff;
   }
@@ -1579,10 +1583,17 @@ input[role='switch']:not(:checked) + span {
 @media (prefers-reduced-transparency: reduce) {
   .notif-glass,
   .notif-chip {
-    background: var(--color-zinc-900);
     backdrop-filter: none;
   }
-  .dark .notif-glass,
+  .notif-glass {
+    background: #fff;
+  }
+  .notif-chip {
+    background: var(--color-zinc-900);
+  }
+  .dark .notif-glass {
+    background: var(--color-zinc-900);
+  }
   .dark .notif-chip {
     background: #fff;
   }
