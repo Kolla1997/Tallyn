@@ -24,6 +24,7 @@ type Notification struct {
 	CreatedAt   time.Time       `json:"created_at"`
 	Read        bool            `json:"read"`
 	Resolved    bool            `json:"resolved"`
+	Dismissed   bool            `json:"dismissed"` // closed in the list, still on Home until resolved
 }
 
 // notificationsShown is how many alerts the list keeps: the newest 50.
@@ -34,8 +35,9 @@ func (d *DB) Notifications(ctx context.Context, userID string) ([]Notification, 
 	list := []Notification{}
 	err := d.AsUser(ctx, userID, func(tx pgx.Tx) error {
 		rows, err := tx.Query(ctx, `
-			select id, household_id, kind, ref_id, data, needs_action, created_at, read_at is not null, resolved_at is not null
+			select id, household_id, kind, ref_id, data, needs_action, created_at, read_at is not null, resolved_at is not null, dismissed_at is not null
 			from public.notifications
+			where dismissed_at is null or (needs_action and resolved_at is null)
 			order by created_at desc
 			limit $1`, notificationsShown)
 		if err != nil {
@@ -43,7 +45,7 @@ func (d *DB) Notifications(ctx context.Context, userID string) ([]Notification, 
 		}
 		for rows.Next() {
 			var n Notification
-			if err := rows.Scan(&n.ID, &n.HouseholdID, &n.Kind, &n.RefID, &n.Data, &n.NeedsAction, &n.CreatedAt, &n.Read, &n.Resolved); err != nil {
+			if err := rows.Scan(&n.ID, &n.HouseholdID, &n.Kind, &n.RefID, &n.Data, &n.NeedsAction, &n.CreatedAt, &n.Read, &n.Resolved, &n.Dismissed); err != nil {
 				return err
 			}
 			list = append(list, n)
@@ -136,5 +138,27 @@ func (d *DB) SaveNotificationSettings(ctx context.Context, userID, householdID s
 			return ErrForbidden
 		}
 		return nil
+	}))
+}
+
+// maxDismiss is how many alerts one "Close all" can close: the whole list.
+const maxDismiss = notificationsShown
+
+// DismissNotifications closes userID's alerts in the list (#267), and marks
+// them read. Someone else's IDs change nothing.
+func (d *DB) DismissNotifications(ctx context.Context, userID string, ids []string) error {
+	if len(ids) == 0 || len(ids) > maxDismiss {
+		return ErrInvalid
+	}
+	for _, id := range ids {
+		if !uuidRE.MatchString(id) {
+			return ErrInvalid
+		}
+	}
+	return mapErr(d.AsUser(ctx, userID, func(tx pgx.Tx) error {
+		_, err := tx.Exec(ctx, `
+			update public.notifications set dismissed_at = now(), read_at = coalesce(read_at, now())
+			where id = any($1::uuid[]) and dismissed_at is null`, ids)
+		return err
 	}))
 }

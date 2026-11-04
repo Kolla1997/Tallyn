@@ -1,7 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { X } from 'lucide-react'
 import { BellIcon } from './Icons.jsx'
 import { navigate } from '../lib/router.jsx'
-import { describe, groups, markRead, needsYou, refresh, useNotifications, when } from '../lib/notifications.js'
+import { describe, dismiss, groups, markRead, needsYou, refresh, shown, useNotifications, when } from '../lib/notifications.js'
 import { ReconnectBank } from '../screens/Banks.jsx'
 
 // In-app notifications (#267, Dinesh picked draft C, with the bell top right
@@ -29,7 +30,8 @@ export function NotificationBell({ className = '' }) {
   const [open, setOpen] = useState(false)
   const box = useRef(null)
   const panelId = useId()
-  const unread = (list ?? []).filter((n) => !n.read).length
+  const visible = list && shown(list)
+  const unread = (visible ?? []).filter((n) => !n.read).length
   const needs = needsYou(list).length
 
   // Close on Escape or a click outside.
@@ -84,21 +86,30 @@ export function NotificationBell({ className = '' }) {
           </div>
           {!list ? (
             <p className="mt-4 text-[14px] text-zinc-600 dark:text-zinc-300">Adding it all up…</p>
-          ) : list.length === 0 ? (
+          ) : visible.length === 0 ? (
             <p className="mt-4 text-[14px] text-zinc-600 dark:text-zinc-300">Nothing new. We&apos;ll tell you here when something changes.</p>
           ) : (
             <div className="-mx-2 mt-1 overflow-y-auto px-2">
-              {groups(list).map(([label, items]) => (
+              {groups(visible).map(([label, items]) => (
                 <div key={label}>
-                  <h3 className="notif-chip mt-3 mb-1 inline-block px-2 py-0.5 text-[12px] font-medium text-[var(--ni-muted)]">{label}</h3>
+                  <div className="mt-3 mb-1 flex items-center justify-between gap-2">
+                    <h3 className="notif-chip m-0 inline-block px-2 py-0.5 text-[12px] font-medium text-[var(--ni-muted)]">{label}</h3>
+                    <button
+                      type="button"
+                      className="notif-chip border-0 px-2 py-0.5 text-[12px] font-semibold text-[var(--ni-text)] hover:brightness-[1.04]"
+                      onClick={() => dismiss(items.map((n) => n.id))}
+                    >
+                      Close all
+                    </button>
+                  </div>
                   <ul className="m-0 list-none p-0">
                     {items.map((n) => {
                       const { parts, to } = describe(n)
                       return (
-                        <li key={n.id} className="calm-row">
+                        <li key={n.id} className="calm-row relative">
                           <button
                             type="button"
-                            className="notif-chip relative mb-2 block w-full border-0 px-2 py-2 pr-6 text-left text-[14px] text-[var(--ni-text)] hover:brightness-[1.04]"
+                            className="notif-chip relative mb-2 block w-full border-0 px-2 py-2 pr-9 text-left text-[14px] text-[var(--ni-text)] hover:brightness-[1.04]"
                             onClick={() => go(n, to)}
                           >
                             <Words parts={parts} inverse />
@@ -106,7 +117,16 @@ export function NotificationBell({ className = '' }) {
                               {when(n.created_at)}
                               {n.needs_action && !n.resolved && ' · Needs you'}
                             </span>
-                            {!n.read && <span className="absolute top-3.5 right-2 size-2 rounded-full bg-[var(--color-redesign-accent)]" aria-label="Unread" />}
+                            {!n.read && <span className="absolute top-10 right-3 size-2 rounded-full bg-[var(--color-redesign-accent)]" aria-label="Unread" />}
+                          </button>
+                          {/* Close this one (Dinesh's sketch: the × above the unread dot). */}
+                          <button
+                            type="button"
+                            className="absolute top-1 right-1 flex size-8 items-center justify-center rounded-full border-0 bg-transparent p-0 text-[var(--ni-muted)] hover:text-[var(--ni-ink)]"
+                            aria-label="Close this alert"
+                            onClick={() => dismiss([n.id])}
+                          >
+                            <X className="size-4" aria-hidden="true" />
                           </button>
                         </li>
                       )
@@ -117,7 +137,7 @@ export function NotificationBell({ className = '' }) {
             </div>
           )}
           {/* The counts under a soft hairline (Dinesh swapped out the tally tape's double rule). */}
-          {list?.length > 0 && (
+          {visible?.length > 0 && (
             <div className="notif-chip mt-1 px-2 pb-2">
               <p className="flex justify-between border-0 border-t border-solid border-zinc-900/10 pt-2 text-[13px] tabular-nums dark:border-white/10">
                 <span>{unread} new</span>

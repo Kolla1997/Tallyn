@@ -82,3 +82,25 @@ func saveNotificationSettings(store Store) http.HandlerFunc {
 		w.WriteHeader(http.StatusNoContent)
 	}
 }
+
+// POST /api/notifications/dismiss {"ids": [...]}: close alerts in the list,
+// one (its ×) or a day's ("Close all").
+func dismissNotifications(store Store) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		uid, ok := userID(w, r)
+		if !ok {
+			return
+		}
+		var in struct {
+			IDs []string `json:"ids"`
+		}
+		if !readJSON(w, r, &in) {
+			return
+		}
+		if err := store.DismissNotifications(r.Context(), uid, in.IDs); err != nil {
+			memberError(w, "dismiss notifications", err)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	}
+}

@@ -39,6 +39,20 @@ export async function markRead(id) {
   }
 }
 
+// Closes alerts in the list (#267: the × on one, "Close all" for a day), and marks them read.
+// A bank still to reconnect stays on Home's strip until it's done.
+export async function dismiss(ids) {
+  if (state.list) set({ list: state.list.map((n) => (ids.includes(n.id) ? { ...n, dismissed: true, read: true } : n)) })
+  try {
+    await api('/api/notifications/dismiss', { method: 'POST', body: { ids } })
+  } catch {
+    refresh()
+  }
+}
+
+// What the bell's list shows: everything not closed.
+export const shown = (list) => (list ?? []).filter((n) => !n.dismissed)
+
 function onFocus() {
   if (document.visibilityState === 'visible') refresh()
 }

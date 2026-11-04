@@ -16,9 +16,14 @@ type notifStore struct {
 	stubStore
 	readID *string
 	saved  db.NotificationSettings
+	closed []string
 	err    error
 }
 
+func (s *notifStore) DismissNotifications(_ context.Context, _ string, ids []string) error {
+	s.closed = ids
+	return s.err
+}
 func (s *notifStore) NotificationSettingsFor(context.Context, string, string) (db.NotificationSettings, error) {
 	return db.NotificationSettings{BigPurchase: true, BigPurchaseMinor: 50000}, s.err
 }
@@ -66,5 +71,17 @@ func TestNotificationSettingsRoutes(t *testing.T) {
 	s.err = db.ErrForbidden
 	if rec := send(h, "PUT", "/api/notifications/settings?household_id="+testHH, `{}`); rec.Code != http.StatusForbidden {
 		t.Errorf("not allowed: %d, want 403", rec.Code)
+	}
+}
+
+func TestDismissRoute(t *testing.T) {
+	s := &notifStore{}
+	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s})
+	if rec := send(h, "POST", "/api/notifications/dismiss", `{"ids":["n1","n2"]}`); rec.Code != http.StatusNoContent || len(s.closed) != 2 {
+		t.Fatalf("dismiss: %d %v", rec.Code, s.closed)
+	}
+	s.err = db.ErrInvalid
+	if rec := send(h, "POST", "/api/notifications/dismiss", `{"ids":[]}`); rec.Code != http.StatusBadRequest {
+		t.Errorf("no ids: %d, want 400", rec.Code)
 	}
 }

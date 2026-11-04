@@ -128,3 +128,40 @@ func TestNotifyJoinedAndMarkRead(t *testing.T) {
 		t.Errorf("alice changed resolved_at")
 	}
 }
+
+// Closing alerts (#267): gone from the list, read, and only your own. A bank
+// still to reconnect stays (marked closed) so Home's strip keeps it.
+func TestDismissNotifications(t *testing.T) {
+	f := setup(t)
+	f.addDana(t)
+	ctx := context.Background()
+	mustExec(t, f.admin, `update plaid_items set status = 'needs_reauth' where id = $1`, f.aliceItem)
+	list, _ := f.db.Notifications(ctx, alice) // reconnect, Dana joined, Carl joined
+	ids := []string{}
+	for _, n := range list {
+		ids = append(ids, n.ID)
+	}
+	if err := f.db.DismissNotifications(ctx, bob, ids); err != nil {
+		t.Fatal(err)
+	}
+	if after, _ := f.db.Notifications(ctx, alice); len(after) != len(list) {
+		t.Fatalf("Bob closed Alice's alerts")
+	}
+	if err := f.db.DismissNotifications(ctx, alice, ids); err != nil {
+		t.Fatal(err)
+	}
+	after, _ := f.db.Notifications(ctx, alice)
+	if len(after) != 1 || after[0].Kind != "reconnect" || !after[0].Dismissed || !after[0].Read {
+		t.Fatalf("after closing all: %+v", after)
+	}
+	mustExec(t, f.admin, `update plaid_items set status = 'active' where id = $1`, f.aliceItem)
+	if after, _ := f.db.Notifications(ctx, alice); len(after) != 0 {
+		t.Errorf("a fixed, closed reconnect still listed")
+	}
+	if err := f.db.DismissNotifications(ctx, alice, []string{"x"}); err != ErrInvalid {
+		t.Errorf("bad id: err = %v", err)
+	}
+	if _, err := f.execAs(alice, `update notifications set kind = 'joined'`); err == nil {
+		t.Errorf("alice changed an alert's kind")
+	}
+}

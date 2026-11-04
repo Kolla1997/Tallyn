@@ -25,6 +25,7 @@ Rules (see `CLAUDE.md` §7):
 | `0015_budgets.sql` | budgets for the household or one person, the count-my-spending choice, and `budget_spending()` (totals only) (#13, ADR 0014) |
 | `0020_notifications.sql` | in-app notifications: one person per alert, written by triggers (big purchase, low balance, bank to reconnect, someone joined) (#267) |
 | `0021_notification_settings.sql` | each person's alert switches and amounts; parents hear their kids' big purchases and reconnects; one partner by choice, only for what is already shared (#268) |
+| `0022_notification_dismiss.sql` | close an alert in the bell's list (`dismissed_at`); a bank to reconnect stays on Home until fixed (#267) |
 
 Apply them in order on the Supabase project (SQL editor, or `psql "$ADMIN_DATABASE_URL" -f <file>`). Migrations run as `postgres`; the app itself never does (ADR 0006).
 Tests apply them to a throwaway Postgres: see `internal/db/db_test.go`. `TestEveryTableHasRLS` fails if a table is missing RLS.
