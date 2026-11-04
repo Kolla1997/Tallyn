@@ -26,6 +26,7 @@ Rules (see `CLAUDE.md` §7):
 | `0020_notifications.sql` | in-app notifications: one person per alert, written by triggers (big purchase, low balance, bank to reconnect, someone joined) (#267) |
 | `0021_notification_settings.sql` | each person's alert switches and amounts; parents hear their kids' big purchases and reconnects; one partner by choice, only for what is already shared (#268) |
 | `0022_notification_dismiss.sql` | close an alert in the bell's list (`dismissed_at`); a bank to reconnect stays on Home until fixed (#267) |
+| `0023_notification_emails.sql` | payment-due alerts, the email outbox (`emailed_at`) and a parent's opt-in for a child's reconnect emails (#269) |
 
 Apply them in order on the Supabase project (SQL editor, or `psql "$ADMIN_DATABASE_URL" -f <file>`). Migrations run as `postgres`; the app itself never does (ADR 0006).
 Tests apply them to a throwaway Postgres: see `internal/db/db_test.go`. `TestEveryTableHasRLS` fails if a table is missing RLS.

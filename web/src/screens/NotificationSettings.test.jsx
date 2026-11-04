@@ -14,7 +14,17 @@ const MEMBERS = [
   { user_id: 'u-sam', display_name: 'Sam', role: 'adult' },
   { user_id: 'u-mia', display_name: 'Mia', role: 'child' },
 ]
-const SETTINGS = { big_purchase: true, big_purchase_minor: 50000, low_balance: true, low_balance_minor: 10000, joined: true, share_with: null }
+const SETTINGS = {
+  big_purchase: true,
+  big_purchase_minor: 50000,
+  low_balance: true,
+  low_balance_minor: 10000,
+  joined: true,
+  share_with: null,
+  email_reconnect: false,
+  email_payment_due: false,
+  email_kid_reconnect: [],
+}
 
 beforeEach(() => {
   api.mockReset()
@@ -28,12 +38,26 @@ beforeEach(() => {
 const lastPut = () => api.mock.calls.filter(([, o]) => o?.method === 'PUT').pop()?.[1].body
 
 describe('NotificationSettings', () => {
-  it('shows each alert with its switch and amount, and email as coming soon', async () => {
+  it('shows each alert with its switch and amount, and email off by default', async () => {
     render(<NotificationSettings me={me} household={household} />)
     expect(await screen.findByRole('switch', { name: 'Big purchase alerts' })).toBeChecked()
     expect(screen.getByRole('textbox', { name: 'Big purchase amount' })).toHaveValue('500')
     expect(screen.getByRole('textbox', { name: 'Low balance amount' })).toHaveValue('100')
-    expect(screen.getByRole('switch', { name: /Email when a bank needs reconnecting/ })).toBeDisabled()
+    expect(screen.getByRole('switch', { name: 'Email when a bank needs reconnecting' })).not.toBeChecked()
+    expect(screen.getByRole('switch', { name: "Email me when Mia's bank needs reconnecting" })).not.toBeChecked()
+  })
+
+  it("turns on emails, and a child's reconnect emails (#269)", async () => {
+    render(<NotificationSettings me={me} household={household} />)
+    fireEvent.click(await screen.findByRole('switch', { name: 'Email when a payment is due' }))
+    await act(async () => {})
+    expect(lastPut()).toMatchObject({ email_payment_due: true })
+    fireEvent.click(screen.getByRole('switch', { name: "Email me when Mia's bank needs reconnecting" }))
+    await act(async () => {})
+    expect(lastPut()).toMatchObject({ email_kid_reconnect: ['u-mia'] })
+    fireEvent.click(screen.getByRole('switch', { name: "Email me when Mia's bank needs reconnecting" }))
+    await act(async () => {})
+    expect(lastPut()).toMatchObject({ email_kid_reconnect: [] })
   })
 
   it('saves a switch and a new amount, and the sample follows the typing', async () => {
@@ -64,7 +88,8 @@ describe('NotificationSettings', () => {
     await act(async () => {})
     expect(lastPut()).toMatchObject({ share_with: 'u-sam' })
     expect(screen.getByText(/Mia never gets yours/)).toBeInTheDocument()
-    expect(screen.queryByRole('switch', { name: /Mia/ })).toBeNull()
+    // Mia's alerts in the app can't be turned off; only her reconnect emails can be asked for (#269).
+    expect(screen.getAllByRole('switch', { name: /Mia/ }).map((s) => s.getAttribute('aria-label'))).toEqual(["Email me when Mia's bank needs reconnecting"])
   })
 
   it('shows no who-else section to a child', async () => {

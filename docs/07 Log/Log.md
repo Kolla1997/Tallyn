@@ -2,13 +2,20 @@
 type: log
 status: active
 owner: Dinesh
-updated: 2026-11-03
+updated: 2026-11-04
 tags: [log]
 ---
 
 # Log
 
 Newest first. One entry per working session or decision.
+
+## 2026-11-04
+- #269 Notification emails: scope agreed with Dinesh (Brevo from day one, test sends to him only until coinroof.us is verified; owners only; a parent can opt in to a child's reconnect emails). Weekly summary is #273, monthly highlights #274.
+- #269 Payment due is a new alert (in the app always, email by choice): three days before a card or loan is due, and again when overdue, checked by the server every 5 minutes with the sync's login (`0023_notification_emails.sql`).
+- #269 Dinesh picked emails C, Settings B, unsubscribe page A (`drafts/269-notification-emails.html`), with the Coinroof lockup in emails (PNG, `web/public/email/coinroof-logo.png`). Emails are solid, not glass: mail apps can't blur.
+- #269 Unsubscribe links are signed (key derived from `TOKEN_ENCRYPTION_KEY`), turn one email off by a button press (opening changes nothing), have a one-click mail-app header, and change settings as the person through RLS. No expiry; changing the key cancels them all.
+- #269 Sending needs `BREVO_API_KEY`; every email goes to `EMAIL_TEST_TO` until `EMAIL_LIVE=true`, so a half-ready setup never reaches a family.
 
 ## 2026-11-03
 - #267 Notification list, Dinesh's changes: light glass with dark tiles (the reverse in dark mode); an × on each alert and "Close all" per day (`0022_notification_dismiss.sql`). Closing a bank to reconnect keeps it on Home's strip until fixed.

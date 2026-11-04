@@ -10,6 +10,8 @@ import { Panel, MUTED } from '../components/calm/ui.jsx'
 // (#269), a sample alert that changes as you type, then who else hears. Agreed 2026-11-03: parents
 // hear their kids' big purchases and banks to reconnect, never the other way; one switch shares all
 // your alerts with one owner or adult, only for what you already share with them (0021).
+// Email (#269, Dinesh picked Settings B in drafts/269-notification-emails.html): the reconnect and
+// payment-due switches, and a dashed line under each child to get their reconnect emails too.
 
 const NOTE = `m-0 text-[13px] ${MUTED}`
 const CUR = 'USD' // US only for now (Vision)
@@ -82,10 +84,10 @@ function Row({ i, label, note, children }) {
 const Rows = ({ children }) => <ul className="m-0 list-none divide-y divide-zinc-100 dark:divide-zinc-800 p-0">{children}</ul>
 const Sub = ({ children }) => <h4 className={`mt-4 mb-1 text-[13px] font-medium ${MUTED}`}>{children}</h4>
 
-function EmailSoon({ label }) {
+function Email({ label, checked, onChange }) {
   return (
     <span className={`inline-flex items-center gap-2 text-[13px] ${MUTED}`}>
-      Email <Toggle label={`${label} (coming soon)`} checked={false} disabled onChange={() => {}} />
+      Email <Toggle label={label} checked={checked} onChange={onChange} />
     </span>
   )
 }
@@ -130,6 +132,7 @@ export default function NotificationSettings({ me, household }) {
   const kids = members.filter((m) => m.role === 'teen' || m.role === 'child')
   const partner = partners.find((m) => m.user_id === (s?.share_with ?? pick)) ?? partners[0]
   const big = sample ?? s?.big_purchase_minor ?? 50000
+  const kidEmails = s?.email_kid_reconnect ?? []
 
   return (
     <Panel id="notifications-h" title="Notifications">
@@ -159,10 +162,10 @@ export default function NotificationSettings({ me, household }) {
               <Amount key={s.low_balance_minor} label="Low balance amount" minor={s.low_balance_minor} onSave={(m) => save({ low_balance_minor: m })} />
             </Row>
             <Row i={2} label="A bank needs reconnecting" note="Always on in the app: we can't update it until you sign in.">
-              <EmailSoon label="Email when a bank needs reconnecting" />
+              <Email label="Email when a bank needs reconnecting" checked={s.email_reconnect} onChange={(v) => save({ email_reconnect: v })} />
             </Row>
-            <Row i={3} label="Payment due soon" note="Three days before a card or loan is due.">
-              <EmailSoon label="Email when a payment is due" />
+            <Row i={3} label="Payment due soon" note="Always on in the app. Three days before a card or loan is due, and if it's overdue.">
+              <Email label="Email when a payment is due" checked={s.email_payment_due} onChange={(v) => save({ email_payment_due: v })} />
             </Row>
             <Row i={4} label="Someone joins" note={`When someone joins ${household.name}.`}>
               <Toggle label="Someone joins alerts" checked={s.joined} onChange={(v) => save({ joined: v })} />
@@ -235,13 +238,22 @@ export default function NotificationSettings({ me, household }) {
                     note={`Big purchases and banks to reconnect come to you and the other adults. ${nameOf(k)} never gets yours.`}
                   >
                     <span className="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[12px] font-semibold">Always on</span>
+                    {/* Dashed: someone else's money, as in Family. Off until you ask (#269). */}
+                    <span className="flex basis-full items-center gap-3 rounded-[16px] border border-dashed border-zinc-400 dark:border-zinc-600 px-3 py-2">
+                      <span className="min-w-0 grow text-[14px] font-medium">Email me when {nameOf(k)}&apos;s bank needs reconnecting</span>
+                      <Toggle
+                        label={`Email me when ${nameOf(k)}'s bank needs reconnecting`}
+                        checked={kidEmails.includes(k.user_id)}
+                        onChange={(v) => save({ email_kid_reconnect: v ? [...kidEmails, k.user_id] : kidEmails.filter((id) => id !== k.user_id) })}
+                      />
+                    </span>
                   </Row>
                 ))}
               </Rows>
             </>
           )}
           <p className={`${NOTE} mt-3`} role="status" aria-live="polite">
-            {status || 'Email for payments due and banks to reconnect comes later, with a weekly summary.'}
+            {status || 'Every email has a link to stop it. Weekly and monthly summaries come later.'}
           </p>
         </>
       )}

@@ -106,11 +106,28 @@ export function describe(n) {
       return d.person
         ? { parts: [{ b: `${d.person}'s ${d.bank ?? 'bank'} needs signing in again.` }, ` Only ${d.person} can do it.`], to: '/accounts' }
         : { parts: [{ b: `${d.bank ?? 'Your bank'} needs you to sign in again.` }, " We can't update it until then."], to: '/accounts' }
+    case 'payment_due': {
+      // #269: three days before a card or loan is due, or once it's overdue.
+      const whose = d.person ? `${d.person}'s ${d.account ?? 'card'}` : (d.account ?? 'Your card')
+      const amount = d.amount_minor != null ? [m(d.amount_minor), ' '] : []
+      return d.overdue
+        ? { parts: [{ b: `${whose} payment is overdue.` }, ' ', ...amount, 'past due.'], to: '/debts' }
+        : { parts: [`${whose}: `, ...amount, `due ${dueDay(d.due_date)}.`], to: '/debts' }
+    }
     case 'joined':
       return { parts: [{ b: d.name ?? 'Someone' }, ` joined ${d.household ?? 'your household'}.`], to: '/family' }
     default:
       return { parts: ['Something changed.'], to: '/' }
   }
+}
+
+// "Friday, Nov 7" from a date like 2026-11-07 (a calendar day, no time zone).
+export function dueDay(iso) {
+  const [y, mo, da] = String(iso ?? '')
+    .split('-')
+    .map(Number)
+  if (!y || !mo || !da) return 'soon'
+  return new Date(y, mo - 1, da).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
 }
 
 // "Today, 8:02", "Yesterday", "Mon", "Oct 12", in the viewer's time zone.

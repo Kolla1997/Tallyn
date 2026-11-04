@@ -66,6 +66,14 @@ describe('notification words', () => {
     expect(words({ kind: 'reconnect', data: { person: 'Mia', bank: 'Fake Bank' } }).parts[1]).toBe(' Only Mia can do it.')
   })
 
+  it('says when a payment is due, and when it is overdue (#269)', () => {
+    const due = words({ kind: 'payment_due', data: { account: 'Fake Card', due_date: '2026-11-07', amount_minor: 2000, currency: 'USD' } })
+    expect(due.to).toBe('/debts')
+    expect(due.parts).toEqual(['Fake Card: ', { b: '$20.00', money: true }, ' ', 'due Saturday, Nov 7.'])
+    const late = words({ kind: 'payment_due', data: { account: 'Fake Card', due_date: '2026-11-07', amount_minor: 2000, currency: 'USD', overdue: true } })
+    expect(late.parts[0]).toEqual({ b: 'Fake Card payment is overdue.' })
+  })
+
   it('groups Today and Earlier, and picks out what needs you', () => {
     expect(groups(LIST, now).map(([g, l]) => [g, l.length])).toEqual([
       ['Today', 2],
