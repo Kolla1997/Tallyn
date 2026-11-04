@@ -59,6 +59,11 @@ describe('notification words', () => {
       ', under your $100.00 alert.',
     )
     expect(words(LIST[0]).parts[0]).toEqual({ b: 'Fake Bank needs you to sign in again.' })
+    // Someone else's alert names them (#268): a child's, or a partner's shared with you.
+    expect(
+      words({ kind: 'big_purchase', data: { person: 'Mia', merchant: 'Fake Store', amount_minor: 60000, currency: 'USD', account: 'Savings' } }).parts[0],
+    ).toEqual({ b: 'Mia' })
+    expect(words({ kind: 'reconnect', data: { person: 'Mia', bank: 'Fake Bank' } }).parts[1]).toBe(' Only Mia can do it.')
   })
 
   it('groups Today and Earlier, and picks out what needs you', () => {

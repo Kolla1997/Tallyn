@@ -15,7 +15,16 @@ import (
 type notifStore struct {
 	stubStore
 	readID *string
+	saved  db.NotificationSettings
 	err    error
+}
+
+func (s *notifStore) NotificationSettingsFor(context.Context, string, string) (db.NotificationSettings, error) {
+	return db.NotificationSettings{BigPurchase: true, BigPurchaseMinor: 50000}, s.err
+}
+func (s *notifStore) SaveNotificationSettings(_ context.Context, _, _ string, in db.NotificationSettings) error {
+	s.saved = in
+	return s.err
 }
 
 func (s *notifStore) Notifications(context.Context, string) ([]db.Notification, error) {
@@ -41,5 +50,21 @@ func TestNotificationRoutes(t *testing.T) {
 	s.err = db.ErrInvalid
 	if rec := send(h, "POST", "/api/notifications/read", `{"id":"x"}`); rec.Code != http.StatusBadRequest {
 		t.Errorf("bad id: %d, want 400", rec.Code)
+	}
+}
+
+func TestNotificationSettingsRoutes(t *testing.T) {
+	s := &notifStore{}
+	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s})
+	if rec := send(h, "GET", "/api/notifications/settings?household_id="+testHH, ""); rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"big_purchase_minor":50000`) {
+		t.Fatalf("GET: %d %s", rec.Code, rec.Body)
+	}
+	rec := send(h, "PUT", "/api/notifications/settings?household_id="+testHH, `{"big_purchase":true,"big_purchase_minor":75000,"low_balance":false,"low_balance_minor":10000,"joined":true,"share_with":null}`)
+	if rec.Code != http.StatusNoContent || s.saved.BigPurchaseMinor != 75000 || s.saved.LowBalance {
+		t.Fatalf("PUT: %d %+v", rec.Code, s.saved)
+	}
+	s.err = db.ErrForbidden
+	if rec := send(h, "PUT", "/api/notifications/settings?household_id="+testHH, `{}`); rec.Code != http.StatusForbidden {
+		t.Errorf("not allowed: %d, want 403", rec.Code)
 	}
 }

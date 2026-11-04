@@ -272,6 +272,11 @@ const ROUTES = [
   [/^\/api\/budgets$/, () => BUDGETS],
   [/^\/api\/plans$/, () => PLANS],
   [/^\/api\/goals$/, () => GOALS],
+  // Settings → Notifications (#268): the defaults.
+  [
+    /^\/api\/notifications\/settings$/,
+    () => ({ big_purchase: true, big_purchase_minor: 50000, low_balance: true, low_balance_minor: 10000, joined: true, share_with: null }),
+  ],
 ]
 
 // A fake session, unsigned: the app reads it from storage and never checks

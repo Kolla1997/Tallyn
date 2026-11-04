@@ -154,8 +154,16 @@ describe('Settings: profile, legal and coming soon (#114)', () => {
   })
 
   it('what isn’t built yet says so, without links to tickets', async () => {
+    // Notifications is built (#268); its email switches wait for #269 and say so.
+    api.mockImplementation((path) =>
+      Promise.resolve(
+        path.startsWith('/api/notifications/settings')
+          ? { big_purchase: true, big_purchase_minor: 50000, low_balance: true, low_balance_minor: 10000, joined: true, share_with: null }
+          : { members: [] },
+      ),
+    )
     await openSection('notifications')
-    expect(screen.getAllByText('Coming soon').length).toBeGreaterThan(0)
+    expect((await screen.findAllByRole('switch', { name: /coming soon/ })).length).toBeGreaterThan(0)
     expect(document.querySelector('a[href*="github.com"]')).toBeNull()
   })
 

@@ -66,6 +66,8 @@ type Store interface {
 	// In-app notifications (#267).
 	Notifications(ctx context.Context, userID string) ([]db.Notification, error)
 	MarkNotificationsRead(ctx context.Context, userID, id string) error
+	NotificationSettingsFor(ctx context.Context, userID, householdID string) (db.NotificationSettings, error) // #268
+	SaveNotificationSettings(ctx context.Context, userID, householdID string, s db.NotificationSettings) error
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -152,6 +154,8 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("DELETE /api/goals/{id}", deleteGoal(d.Store))
 	api.HandleFunc("GET /api/notifications", notifications(d.Store)) // #267
 	api.HandleFunc("POST /api/notifications/read", markNotificationsRead(d.Store))
+	api.HandleFunc("GET /api/notifications/settings", notificationSettings(d.Store)) // #268
+	api.HandleFunc("PUT /api/notifications/settings", saveNotificationSettings(d.Store))
 	api.HandleFunc("/api/", func(w http.ResponseWriter, _ *http.Request) {
 		writeError(w, http.StatusNotFound, "not_found")
 	})

@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-11-03
+- #268 Settings → Notifications: Dinesh picked draft C (`drafts/268-notification-settings.html`). Each person's own switches and amounts; parents (owners, adults) hear their kids' big purchases and banks to reconnect, never low balance, and never the other way; one switch shares all your alerts with one owner or adult, only for what you already share with them. A partner is never asked to reconnect your bank. Email switches wait for #269 (`0021_notification_settings.sql`).
 - #55 Notifications split (agreed with Dinesh): in-app #267, Settings → Notifications #268, emails #269 (blocked on #131, #255); push on phones is idea #270.
 - #267 In-app notifications: Dinesh picked draft C (`drafts/267-notifications.html`) with the bell moved to the top right of the page. Triggers write alerts (`0020_notifications.sql`): big purchase over $500, low balance under $100, a bank to reconnect (action alert, also a strip on Home), someone joined. The list is solid like the app's menus, not glass, so it reads over the page.
 - Decision (#267): alerts about an account go to its owner only for now; telling others needs the sharing rules applied when the alert is written. Open question for Dinesh.

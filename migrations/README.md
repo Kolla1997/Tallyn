@@ -24,6 +24,7 @@ Rules (see `CLAUDE.md` §7):
 | `0014_backup_codes.sql` | one-time backup codes, keyed hashes only, used and replaced through two functions (#23, ADR 0013) |
 | `0015_budgets.sql` | budgets for the household or one person, the count-my-spending choice, and `budget_spending()` (totals only) (#13, ADR 0014) |
 | `0020_notifications.sql` | in-app notifications: one person per alert, written by triggers (big purchase, low balance, bank to reconnect, someone joined) (#267) |
+| `0021_notification_settings.sql` | each person's alert switches and amounts; parents hear their kids' big purchases and reconnects; one partner by choice, only for what is already shared (#268) |
 
 Apply them in order on the Supabase project (SQL editor, or `psql "$ADMIN_DATABASE_URL" -f <file>`). Migrations run as `postgres`; the app itself never does (ADR 0006).
 Tests apply them to a throwaway Postgres: see `internal/db/db_test.go`. `TestEveryTableHasRLS` fails if a table is missing RLS.
