@@ -16,8 +16,8 @@ import (
 // green for low (Dinesh, 2026-11-05), in the calendar, the split bar and the
 // weekly email's day bars.
 
-// Spending colours, highest first: spend-3, spend-2, spend-1 from
-// design-tokens.json, a light green (proposed) and money-in green.
+// Spending colours, highest first: spend-3, spend-2, spend-1, spend-low and
+// money-in green from design-tokens.json.
 var heat = []string{"#cb0900", "#e06b66", "#f7c6c2", "#8cc785", "#067b00"}
 
 // heatText is readable text on each heat colour.
