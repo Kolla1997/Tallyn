@@ -27,6 +27,10 @@ type Export struct {
 	Sharing      []ExportShare       `json:"sharing"`
 	Agreements   []ExportAgreement   `json:"agreements"`
 	BackupCodes  ExportBackupCodes   `json:"backup_codes"`
+	// Every product news choice (#290, #281) and the notification settings
+	// saved in each household (#268).
+	ProductNews   []ExportNewsChoice   `json:"product_news"`
+	Notifications []ExportNotification `json:"notification_settings"`
 }
 
 type ExportProfile struct {
@@ -162,6 +166,32 @@ type ExportAgreement struct {
 	AcceptedAt time.Time `json:"accepted_at"`
 }
 
+type ExportNewsChoice struct {
+	Subscribed     bool      `json:"subscribed"`
+	Where          string    `json:"where"` // signup, settings or stop_link
+	PrivacyVersion string    `json:"privacy_version"`
+	At             time.Time `json:"at"`
+}
+
+// ExportNotification is one household's saved settings. People are named,
+// never shown as IDs.
+type ExportNotification struct {
+	Household          string   `json:"household"`
+	BigPurchase        bool     `json:"big_purchase_alerts"`
+	BigPurchaseMinor   int64    `json:"big_purchase_amount_minor"`
+	LowBalance         bool     `json:"low_balance_alerts"`
+	LowBalanceMinor    int64    `json:"low_balance_amount_minor"`
+	Joined             bool     `json:"someone_joined_alerts"`
+	SharedWith         *string  `json:"alerts_shared_with"`
+	EmailReconnect     bool     `json:"email_reconnect"`
+	EmailPaymentDue    bool     `json:"email_payment_due"`
+	EmailKidReconnect  []string `json:"email_kid_reconnect"`
+	EmailWeekly        bool     `json:"email_weekly"`
+	EmailIncludeShared bool     `json:"email_include_shared"`
+	EmailMonthly       bool     `json:"email_monthly"`
+	TimeZone           *string  `json:"time_zone"`
+}
+
 type ExportBackupCodes struct {
 	Left   int        `json:"left"`
 	MadeAt *time.Time `json:"made_at"`
@@ -256,6 +286,23 @@ func (d *DB) Export(ctx context.Context, userID string) (Export, error) {
 		if e.Agreements, err = collect[ExportAgreement](tx.Query(ctx, `
 			select document, version, accepted_at from public.consents
 			where user_id = $1 order by accepted_at`, userID)); err != nil {
+			return err
+		}
+		if e.ProductNews, err = collect[ExportNewsChoice](tx.Query(ctx, `
+			select subscribed, source, privacy_version, created_at from public.news_choices
+			where user_id = $1 order by created_at, id`, userID)); err != nil {
+			return err
+		}
+		if e.Notifications, err = collect[ExportNotification](tx.Query(ctx, `
+			select h.name, n.big_purchase, n.big_purchase_minor, n.low_balance, n.low_balance_minor, n.joined,
+			       (select nullif(p.display_name, '') from public.profiles p where p.id = n.share_with),
+			       n.email_reconnect, n.email_payment_due,
+			       array(select coalesce(nullif(p.display_name, ''), 'A child') from unnest(n.email_kid_reconnect) k
+			             left join public.profiles p on p.id = k order by 1),
+			       n.email_weekly, n.email_include_shared, n.email_monthly, n.time_zone
+			from public.notification_settings n
+			join public.households h on h.id = n.household_id
+			where n.user_id = $1 order by h.name`, userID)); err != nil {
 			return err
 		}
 		return tx.QueryRow(ctx, `
