@@ -11,6 +11,9 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-11-05
+- #153 Rechecked; fixed faint focus rings on newer components, the bell's focus, and goal/budget/alert-amount errors tied to fields (PR #297).
+- #160 Fixed grey tokens replace ~100 hand-written greys; one duplicate rule removed (PR #298). G9 sizes wait for a draft. Also a #154 follow-up (long words wrap in panels) and a flaky Settings test fixed.
+- #55 Checked: only the spending-limit alert is left (needs a draft).
 - #294 Privacy Policy draft lists Brevo and Resend, the emails we send and how to stop them (PR #295); marked for the lawyer, version unchanged.
 - #292 Newsletter idea parked at lowest priority (p3); never scrape news, use public government data and links if it returns.
 - #287 US only: `home_currency` kept for #11.
