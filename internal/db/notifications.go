@@ -87,6 +87,7 @@ type NotificationSettings struct {
 	// and the time zone it's sent in (from the browser; nil = Chicago).
 	EmailWeekly        bool    `json:"email_weekly"`
 	EmailIncludeShared bool    `json:"email_include_shared"`
+	EmailMonthly       bool    `json:"email_monthly"` // monthly highlights (#274)
 	TimeZone           *string `json:"time_zone"`
 }
 
@@ -112,10 +113,10 @@ func (d *DB) NotificationSettingsFor(ctx context.Context, userID, householdID st
 		}
 		err := tx.QueryRow(ctx, `
 			select big_purchase, big_purchase_minor, low_balance, low_balance_minor, joined, share_with, email_reconnect, email_payment_due,
-			       email_kid_reconnect::text[], email_weekly, email_include_shared, time_zone
+			       email_kid_reconnect::text[], email_weekly, email_include_shared, time_zone, email_monthly
 			from public.notification_settings where household_id = $1 and user_id = $2`, householdID, userID).
 			Scan(&s.BigPurchase, &s.BigPurchaseMinor, &s.LowBalance, &s.LowBalanceMinor, &s.Joined, &s.ShareWith, &s.EmailReconnect, &s.EmailPaymentDue,
-				&s.EmailKidReconnect, &s.EmailWeekly, &s.EmailIncludeShared, &s.TimeZone)
+				&s.EmailKidReconnect, &s.EmailWeekly, &s.EmailIncludeShared, &s.TimeZone, &s.EmailMonthly)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil
 		}
@@ -145,8 +146,8 @@ func (d *DB) SaveNotificationSettings(ctx context.Context, userID, householdID s
 		tag, err := tx.Exec(ctx, `
 			insert into public.notification_settings
 			  (household_id, user_id, big_purchase, big_purchase_minor, low_balance, low_balance_minor, joined, share_with, email_reconnect, email_payment_due,
-			   email_kid_reconnect, email_weekly, email_include_shared, time_zone)
-			values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::uuid[], $12, $13, coalesce($14, (select time_zone from public.notification_settings
+			   email_kid_reconnect, email_weekly, email_include_shared, email_monthly, time_zone)
+			values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::uuid[], $12, $13, $15, coalesce($14, (select time_zone from public.notification_settings
 			  where household_id = $1 and user_id = $2)))
 			on conflict (household_id, user_id) do update set
 			  big_purchase = excluded.big_purchase, big_purchase_minor = excluded.big_purchase_minor,
@@ -155,9 +156,9 @@ func (d *DB) SaveNotificationSettings(ctx context.Context, userID, householdID s
 			  email_reconnect = excluded.email_reconnect, email_payment_due = excluded.email_payment_due,
 			  email_kid_reconnect = excluded.email_kid_reconnect,
 			  email_weekly = excluded.email_weekly, email_include_shared = excluded.email_include_shared,
-			  time_zone = excluded.time_zone`,
+			  email_monthly = excluded.email_monthly, time_zone = excluded.time_zone`,
 			householdID, userID, s.BigPurchase, s.BigPurchaseMinor, s.LowBalance, s.LowBalanceMinor, s.Joined, s.ShareWith, s.EmailReconnect, s.EmailPaymentDue,
-			s.EmailKidReconnect, s.EmailWeekly, s.EmailIncludeShared, s.TimeZone)
+			s.EmailKidReconnect, s.EmailWeekly, s.EmailIncludeShared, s.TimeZone, s.EmailMonthly)
 		if err != nil {
 			return err
 		}

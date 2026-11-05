@@ -154,7 +154,7 @@ describe('Settings: profile, legal and coming soon (#114)', () => {
   })
 
   it('what isn’t built yet says so, without links to tickets', async () => {
-    // Notifications is built (#268), with email (#269) and the weekly summary (#273); the monthly one comes later and says so.
+    // Notifications is built (#268), with email (#269) and both summaries (#273, #274).
     api.mockImplementation((path) =>
       Promise.resolve(
         path.startsWith('/api/notifications/settings')
@@ -163,7 +163,7 @@ describe('Settings: profile, legal and coming soon (#114)', () => {
       ),
     )
     await openSection('notifications')
-    expect(await screen.findByText(/monthly summary comes later/)).toBeInTheDocument()
+    expect(await screen.findByText(/Every email has a link to stop it/)).toBeInTheDocument()
     expect(document.querySelector('a[href*="github.com"]')).toBeNull()
   })
 

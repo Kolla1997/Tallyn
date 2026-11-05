@@ -17,6 +17,9 @@ type Outbox interface {
 	WeeklyDue(ctx context.Context, now time.Time) ([]db.WeeklyDue, error)
 	WeeklySummary(ctx context.Context, householdID, userID string, weekStart time.Time) (json.RawMessage, error)
 	MarkWeekly(ctx context.Context, householdID, userID string, weekStart time.Time, sent bool) error
+	MonthlyDue(ctx context.Context, now time.Time) ([]db.WeeklyDue, error)
+	MonthlySummary(ctx context.Context, householdID, userID string, monthStart time.Time) (json.RawMessage, error)
+	MarkMonthly(ctx context.Context, householdID, userID string, monthStart time.Time, sent bool) error
 }
 
 // Job checks payments due and sends the emails alerts call for, every few
@@ -84,6 +87,53 @@ func (j *Job) Once(ctx context.Context, now time.Time) {
 		log.Printf("email: sent %d", sent)
 	}
 	j.weekly(ctx, now)
+	j.monthly(ctx, now)
+}
+
+// monthly sends the monthly highlights due now (#274), as weekly does.
+func (j *Job) monthly(ctx context.Context, now time.Time) {
+	due, err := j.Outbox.MonthlyDue(ctx, now)
+	if err != nil {
+		log.Printf("email: monthly due: %v", err)
+		return
+	}
+	sent := 0
+	for _, d := range due {
+		raw, err := j.Outbox.MonthlySummary(ctx, d.HouseholdID, d.UserID, d.WeekStart)
+		var mo Monthly
+		if err == nil {
+			err = json.Unmarshal(raw, &mo)
+		}
+		if err != nil {
+			log.Printf("email: monthly summary: %v", err)
+			continue
+		}
+		if mo.Quiet() {
+			if err := j.Outbox.MarkMonthly(ctx, d.HouseholdID, d.UserID, d.WeekStart, false); err != nil {
+				log.Printf("email: mark monthly: %v", err)
+			}
+			continue
+		}
+		token := Sign(j.LinkKey, Link{UserID: d.UserID, HouseholdID: d.HouseholdID, Kind: db.EmailMonthly})
+		m, err := ComposeMonthly(mo, Links{App: j.AppURL, Logo: j.LogoURL}, token, d.Household)
+		if err != nil {
+			log.Printf("email: monthly compose: %v", err)
+			_ = j.Outbox.MarkMonthly(ctx, d.HouseholdID, d.UserID, d.WeekStart, false) // can't be built: don't retry forever
+			continue
+		}
+		m.To = d.Email
+		if err := j.Sender.Send(ctx, m); err != nil {
+			log.Printf("email: send monthly: %v", err)
+			continue
+		}
+		if err := j.Outbox.MarkMonthly(ctx, d.HouseholdID, d.UserID, d.WeekStart, true); err != nil {
+			log.Printf("email: mark monthly: %v", err)
+		}
+		sent++
+	}
+	if sent > 0 {
+		log.Printf("email: sent %d monthly highlights", sent)
+	}
 }
 
 // weekly sends the weekly summaries due now (#273). A quiet week is marked

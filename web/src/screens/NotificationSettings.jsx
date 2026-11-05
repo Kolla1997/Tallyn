@@ -178,12 +178,15 @@ export default function NotificationSettings({ me, household }) {
             <Row i={5} label="Weekly summary" note="Every Monday at 9am: last week's spending, what's coming up, and this month so far.">
               <Email label="Weekly summary email" checked={s.email_weekly ?? false} onChange={(v) => save({ email_weekly: v })} />
             </Row>
+            <Row i={6} label="Monthly highlights" note="On the 1st at 9am: last month's highlights, day by day, and where it went.">
+              <Email label="Monthly highlights email" checked={s.email_monthly ?? false} onChange={(v) => save({ email_monthly: v })} />
+            </Row>
             {adult && (
-              <Row i={6} label="Include what's shared with me" note="Spending others share with you in Family, and your children's totals.">
+              <Row i={7} label="Include what's shared with me" note="Spending others share with you in Family, and your children's totals.">
                 <Toggle
-                  label="Include what's shared with me in the weekly summary"
+                  label="Include what's shared with me in the summaries"
                   checked={s.email_include_shared ?? false}
-                  disabled={!s.email_weekly}
+                  disabled={!s.email_weekly && !s.email_monthly}
                   onChange={(v) => save({ email_include_shared: v })}
                 />
               </Row>
@@ -208,7 +211,7 @@ export default function NotificationSettings({ me, household }) {
               <Rows>
                 {partner && (
                   <Row
-                    i={7}
+                    i={8}
                     label={
                       <span className="inline-flex flex-wrap items-center gap-2">
                         <Avatar member={partner} small />
@@ -246,7 +249,7 @@ export default function NotificationSettings({ me, household }) {
                 {kids.map((k, i) => (
                   <Row
                     key={k.user_id}
-                    i={8 + i}
+                    i={9 + i}
                     label={
                       <span className="inline-flex items-center gap-2">
                         <Avatar member={k} small />
@@ -271,7 +274,7 @@ export default function NotificationSettings({ me, household }) {
             </>
           )}
           <p className={`${NOTE} mt-3`} role="status" aria-live="polite">
-            {status || 'Every email has a link to stop it. A monthly summary comes later.'}
+            {status || 'Every email has a link to stop it.'}
           </p>
         </>
       )}
