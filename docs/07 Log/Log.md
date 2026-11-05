@@ -11,6 +11,8 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-11-05
+- #290 Data export adds product news choices and notification settings (PR #291).
+- #292 Idea logged: weekly AI-written money and markets newsletter; weekly, Dinesh approves each issue at first, product news covers it (one switch).
 - #287 US only for now (PR #288): Dinesh chose to hide multi-currency and keep #11 for later; picked C (`drafts/287-usd-only.html`). No currency choice when making a household (always USD); Settings says "US dollars. Coinroof is US only for now." CLAUDE.md and Vision updated (#1, PR #286); #156 parked.
 - #281 Product news (PR #284): Dinesh picked A (`drafts/281-product-news.html`). Box at sign-up and on Before you start, ticked except for browsers in Europe; Settings switch; stop link for news only; every choice kept with source and Privacy Policy version (0027, applied to the sandbox); Resend sender, no campaigns yet. Open: Privacy Policy line (lawyer), choices in the data export (#54).
 - #280 Welcome and invite emails (PR #282): Dinesh picked F, the short letter, after two rounds of drafts (`drafts/280-welcome-emails.html`). Welcome sent once after agreeing to the terms (last 7 days only); invite sent by the API when made, with the join link. Brevo, no stop link. 0026 applied to the sandbox; both tested to the test address.
