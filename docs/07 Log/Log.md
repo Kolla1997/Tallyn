@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-11-04
+- #273 Emails edge to edge on a computer (Dinesh picked D in `drafts/273-email-edge-to-edge.html`): full-width band and footer, weekly in two columns; phones keep the card. Applies to the alert emails too. Checked with real sends to Gmail (sandbox, test address only).
 - #269 Removed the `List-Unsubscribe` header (Dinesh): Gmail's own Unsubscribe button made Brevo block every email to that address, not just one kind. Each email's "Stop … emails" link stays; the API still accepts one-click posts.
 - #273 Weekly summary email: Dinesh picked D (`drafts/273-weekly-summary.html`): the week as one big number, a bar per day, tiles for month so far / last month / cash, where it went, coming up, and a shared section. Sent Monday 9am in each person's own time zone (saved from the browser; Central until then); quiet weeks skipped (`0024_weekly_summary.sql`).
 - #269 Notification emails: scope agreed with Dinesh (Brevo from day one, test sends to him only until coinroof.us is verified; owners only; a parent can opt in to a child's reconnect emails). Weekly summary is #273, monthly highlights #274.
