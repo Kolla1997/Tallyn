@@ -11,6 +11,9 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-11-05
+- #294 Privacy Policy draft lists Brevo and Resend, the emails we send and how to stop them (PR #295); marked for the lawyer, version unchanged.
+- #292 Newsletter idea parked at lowest priority (p3); never scrape news, use public government data and links if it returns.
+- #287 US only: `home_currency` kept for #11.
 - #290 Data export adds product news choices and notification settings (PR #291).
 - #292 Idea logged: weekly AI-written money and markets newsletter; weekly, Dinesh approves each issue at first, product news covers it (one switch).
 - #287 US only for now (PR #288): Dinesh chose to hide multi-currency and keep #11 for later; picked C (`drafts/287-usd-only.html`). No currency choice when making a household (always USD); Settings says "US dollars. Coinroof is US only for now." CLAUDE.md and Vision updated (#1, PR #286); #156 parked.
