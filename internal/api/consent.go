@@ -51,6 +51,7 @@ func acceptConsent(store Store) http.HandlerFunc {
 		var in struct {
 			Terms   string `json:"terms"`
 			Privacy string `json:"privacy"`
+			News    *bool  `json:"news"` // the product news box, when shown (#281)
 		}
 		if !readJSON(w, r, &in) {
 			return
@@ -63,6 +64,12 @@ func acceptConsent(store Store) http.HandlerFunc {
 			log.Printf("api: accept consent: %v", err)
 			writeError(w, http.StatusInternalServerError, "internal")
 			return
+		}
+		if in.News != nil {
+			if err := store.SetNews(r.Context(), uid, *in.News, db.NewsSignup, in.Privacy); err != nil {
+				// The agreement is saved; the choice can still be made in Settings.
+				log.Printf("api: product news at sign-up: %v", err)
+			}
 		}
 		w.WriteHeader(http.StatusNoContent)
 	}

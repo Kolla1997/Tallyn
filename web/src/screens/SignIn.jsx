@@ -5,6 +5,7 @@ import { NOTES, takeSignOutNote } from '../lib/session.js'
 import { MIN_PASSWORD, resetAskedEmail } from '../lib/recovery.js'
 import { PasswordRule, ResetRequest, ShowPassword, useShowPassword } from './ResetPassword.jsx'
 import { LEGAL, rememberAgreement } from '../lib/legal.js'
+import { NEWS_LABEL, NEWS_NOTE, newsDefault } from '../lib/news.js'
 import { Link } from '../lib/router.jsx'
 import { supabase } from '../lib/supabase.js'
 import { authMessage, isExistingAccount } from '../lib/authErrors.js'
@@ -26,6 +27,7 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
   const [busy, setBusy] = useState(false)
   const [sentTo, setSentTo] = useState('')
   const [agreed, setAgreed] = useState(false) // sign-up only (#36)
+  const [news, setNews] = useState(newsDefault) // product news (#281, Dinesh picked A)
   const [show, toggleShow, hide] = useShowPassword()
   // Signed out automatically, after 30 minutes idle (#91, Dinesh picked note 1)
   // or 12 hours (#92): say why, once. Being here also ends the old activity
@@ -59,7 +61,7 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
     }
     // With email confirmation on, sign-up returns no session until the link is opened.
     // Recorded with the versions at the first sign-in (components/ConsentGate.jsx).
-    if (mode === 'signup') rememberAgreement()
+    if (mode === 'signup') rememberAgreement(news)
     if (mode === 'signup' && !data.session) {
       setSentTo(email)
     }
@@ -182,6 +184,15 @@ export default function SignIn({ expired = false, onExpiredSeen }) {
                 Privacy Policy
               </Link>
               . Coinroof is for people 18 and over.
+            </span>
+          </label>
+        )}
+        {signup && (
+          <label className="agree">
+            <input type="checkbox" checked={news} onChange={(e) => setNews(e.target.checked)} />
+            <span>
+              {NEWS_LABEL}
+              <span className="agree-note">{NEWS_NOTE}</span>
             </span>
           </label>
         )}

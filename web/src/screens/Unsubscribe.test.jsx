@@ -32,6 +32,13 @@ describe('Unsubscribe', () => {
     expect(await screen.findByRole('heading', { name: 'Stop weekly summaries?' })).toBeInTheDocument()
   })
 
+  it('product news: says alerts and account emails still come (#281)', async () => {
+    globalThis.fetch = vi.fn(() => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ kind: 'news' }) }))
+    render(<Unsubscribe />)
+    expect(await screen.findByRole('heading', { name: 'Stop product news?' })).toBeInTheDocument()
+    expect(screen.getByText('You’ll still get alerts, summaries and account emails.')).toBeInTheDocument()
+  })
+
   it('says when a link does not work', async () => {
     globalThis.fetch = vi.fn(() => Promise.resolve({ ok: false, status: 400, json: () => Promise.resolve({ error: 'bad_link' }) }))
     render(<Unsubscribe />)

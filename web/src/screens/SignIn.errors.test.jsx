@@ -36,7 +36,7 @@ describe('SignIn errors', () => {
     render(<SignIn />)
     fireEvent.click(screen.getByRole('button', { name: /Create a new account/ }))
     fill()
-    fireEvent.click(screen.getByRole('checkbox'))
+    fireEvent.click(screen.getByRole('checkbox', { name: /I agree/ }))
     await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Create account' })))
     expect(screen.getByText(/We sent a link to/)).toBeInTheDocument()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()

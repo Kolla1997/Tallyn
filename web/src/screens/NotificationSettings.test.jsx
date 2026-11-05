@@ -35,6 +35,7 @@ beforeEach(() => {
   api.mockImplementation((path, opts) => {
     if (opts?.method === 'PUT') return Promise.resolve(null)
     if (path.startsWith('/api/notifications/settings')) return Promise.resolve({ ...SETTINGS })
+    if (path === '/api/me/news') return Promise.resolve({ on: true, set: true })
     return Promise.resolve({ members: MEMBERS })
   })
 })
@@ -42,6 +43,16 @@ beforeEach(() => {
 const lastPut = () => api.mock.calls.filter(([, o]) => o?.method === 'PUT').pop()?.[1].body
 
 describe('NotificationSettings', () => {
+  it('product news: its own switch, saved for you, not the household (#281)', async () => {
+    render(<NotificationSettings me={me} household={household} />)
+    const sw = await screen.findByRole('switch', { name: 'Product news email' })
+    expect(sw).toBeChecked()
+    await act(async () => fireEvent.click(sw))
+    const put = api.mock.calls.filter(([p, o]) => p === '/api/me/news' && o?.method === 'PUT').pop()
+    expect(put[1].body).toEqual({ on: false })
+    expect(sw).not.toBeChecked()
+  })
+
   it('shows each alert with its switch and amount, and email off by default', async () => {
     render(<NotificationSettings me={me} household={household} />)
     expect(await screen.findByRole('switch', { name: 'Big purchase alerts' })).toBeChecked()

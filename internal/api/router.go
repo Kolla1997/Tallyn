@@ -71,6 +71,8 @@ type Store interface {
 	NotificationSettingsFor(ctx context.Context, userID, householdID string) (db.NotificationSettings, error) // #268
 	SaveNotificationSettings(ctx context.Context, userID, householdID string, s db.NotificationSettings) error
 	SetEmail(ctx context.Context, userID, householdID, kind, kid string, on bool) error // #269
+	News(ctx context.Context, userID string) (db.News, error)                           // #281
+	SetNews(ctx context.Context, userID string, on bool, source, privacyVersion string) error
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -126,6 +128,8 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("POST /api/me/close", c.close) // #56
 	api.HandleFunc("GET /api/consent", consent(d.Store))
 	api.HandleFunc("POST /api/consent", acceptConsent(d.Store))
+	api.HandleFunc("GET /api/me/news", news(d.Store)) // #281
+	api.HandleFunc("PUT /api/me/news", setNews(d.Store))
 	api.HandleFunc("GET /api/sharing", sharing(d.Store))
 	api.HandleFunc("PUT /api/sharing", setSharing(d.Store))
 	api.HandleFunc("GET /api/households/{id}/members", members(d.Store))
