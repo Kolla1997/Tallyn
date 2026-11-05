@@ -117,9 +117,8 @@ func TestBrevo(t *testing.T) {
 		t.Fatal(err)
 	}
 	to := got["to"].([]any)[0].(map[string]any)["email"]
-	h := got["headers"].(map[string]any)
-	if apiKey != "test-only-key" || to != "me@example.com" || got["subject"] != "[test] Hi" ||
-		h["List-Unsubscribe-Post"] != "List-Unsubscribe=One-Click" || h["List-Unsubscribe"] != "<https://coinroof.us/api/email/unsubscribe?t=a>" {
+	// No List-Unsubscribe: a mail app's button would make Brevo block every email.
+	if apiKey != "test-only-key" || to != "me@example.com" || got["subject"] != "[test] Hi" || got["headers"] != nil {
 		t.Errorf("sent %v with key %q", got, apiKey)
 	}
 
@@ -132,8 +131,11 @@ func TestBrevo(t *testing.T) {
 }
 
 type fakeOutbox struct {
-	list   []db.OutboxEmail
-	marked []string
+	list         []db.OutboxEmail
+	marked       []string
+	weeklyDue    []db.WeeklyDue
+	summaries    map[string]json.RawMessage
+	weeklyMarked []string
 }
 
 func (f *fakeOutbox) NotifyPaymentsDue(context.Context, time.Time) (int, error) { return 0, nil }
@@ -179,5 +181,86 @@ func TestJobOnce(t *testing.T) {
 	tok := s.sent[1].Unsubscribe[strings.Index(s.sent[1].Unsubscribe, "t=")+2:]
 	if l, err := Verify(key, strings.ReplaceAll(tok, "%2E", ".")); err != nil || l.Kind != db.EmailKidReconnect || l.Kid != kid || l.UserID != ann {
 		t.Errorf("child's link = %+v, %v", l, err)
+	}
+}
+
+func (f *fakeOutbox) WeeklyDue(context.Context, time.Time) ([]db.WeeklyDue, error) {
+	return f.weeklyDue, nil
+}
+func (f *fakeOutbox) WeeklySummary(_ context.Context, _, user string, _ time.Time) (json.RawMessage, error) {
+	return f.summaries[user], nil
+}
+func (f *fakeOutbox) MarkWeekly(_ context.Context, _, user string, _ time.Time, sent bool) error {
+	f.weeklyMarked = append(f.weeklyMarked, user+":"+map[bool]string{true: "sent", false: "skipped"}[sent])
+	return nil
+}
+
+// A week from the sandbox, Oct 19–25: spending on Tue, Wed and Sat.
+const sampleWeek = `{"week_start":"2026-10-19","week_end":"2026-10-25","currency":"USD","spent":150633,"came_in":0,
+ "days":[0,100000,50000,0,0,633,0],
+ "purchases":[{"name":"Madison Bicycle Center","date":"2026-10-20","amount_minor":50000,"category":"TRANSPORTATION"},
+  {"name":"KFC <Fried>","date":"2026-10-20","amount_minor":50000,"category":"FOOD_AND_DRINK"}],"more":2,
+ "month":{"from":"2026-10-01","to":"2026-10-25","spent":169596,"last_from":"2026-09-01","last_to":"2026-09-25","last":169596,"avg3":165861},
+ "cash_minor":6258900,
+ "due":[{"account":"Plaid Mortgage","due_date":"2019-11-15","amount_minor":230400,"overdue":true}],
+ "shared":[{"name":"Dana","kid":false,"month":{"from":"2026-10-01","to":"2026-10-25","spent":169596,"last_from":"2026-09-01","last_to":"2026-09-25","last":150000,"avg3":163244},
+   "biggest":{"name":"KFC","date":"2026-10-20","amount_minor":50000}},
+  {"name":"Mia","kid":true,"month":{"from":"2026-10-01","to":"2026-10-25","spent":3000,"last_from":"2026-09-01","last_to":"2026-09-25","last":0,"avg3":null},"biggest":null}]}`
+
+func TestComposeWeekly(t *testing.T) {
+	var w Weekly
+	if err := json.Unmarshal([]byte(sampleWeek), &w); err != nil {
+		t.Fatal(err)
+	}
+	m, err := ComposeWeekly(w, Links{App: "https://coinroof.us"}, "tok.en", "Trail House")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m.Subject != "Your week: $1,506.33 spent (Oct 19 – 25)" {
+		t.Errorf("subject = %q", m.Subject)
+	}
+	for _, want := range []string{"Your week, Oct 19 – 25", ">$1,506.33<", "spent, and nothing came in", ">Tue<", "height:64px", "height:32px",
+		">Month so far<", ">$1,695.96<", ">vs Sep 1–25<", ">Same<", ">$62,589.00<", "Where it went", "Tuesday, transportation", "KFC &lt;Fried&gt;", "And 2 more",
+		"Coming up", "$2,304.00 overdue", "#cb0900", "Shared with you", "Dana, Oct 1–25", "$195.96 more than last month so far", "Biggest this month",
+		"Mia, Oct 1–25", "Stop weekly summaries", "https://coinroof.us/unsubscribe?t=tok.en", "Trail House"} {
+		if !strings.Contains(m.HTML, want) {
+			t.Errorf("HTML is missing %q", want)
+		}
+	}
+	// A child's part has totals only.
+	if strings.Count(m.HTML, "Biggest this month") != 1 {
+		t.Error("a child's biggest purchase is shown")
+	}
+	if !strings.Contains(m.Text, "$1,506.33 spent") || m.Unsubscribe != "https://coinroof.us/api/email/unsubscribe?t=tok.en" {
+		t.Errorf("text %q", m.Text)
+	}
+	if _, err := ComposeWeekly(Weekly{}, Links{}, "", ""); err == nil {
+		t.Error("composed a week without dates")
+	}
+}
+
+func TestJobWeekly(t *testing.T) {
+	quiet := `{"week_start":"2026-10-19","week_end":"2026-10-25","currency":"USD","spent":0,"came_in":0,"days":[0,0,0,0,0,0,0],"month":{}}`
+	wk := time.Date(2026, 10, 19, 0, 0, 0, 0, time.UTC)
+	out := &fakeOutbox{
+		weeklyDue: []db.WeeklyDue{
+			{UserID: ann, HouseholdID: home, Household: "Trail House", Email: "ann@example.com", WeekStart: wk},
+			{UserID: kid, HouseholdID: home, Household: "Trail House", Email: "down@example.com", WeekStart: wk},
+			{UserID: "quiet", HouseholdID: home, Household: "Trail House", Email: "q@example.com", WeekStart: wk},
+		},
+		summaries: map[string]json.RawMessage{ann: json.RawMessage(sampleWeek), kid: json.RawMessage(sampleWeek), "quiet": json.RawMessage(quiet)},
+	}
+	s := &fakeSender{fail: "down@example.com"}
+	j := Job{Outbox: out, Sender: s, LinkKey: key, AppURL: "https://coinroof.us"}
+	j.Once(context.Background(), time.Now())
+	if len(s.sent) != 1 || s.sent[0].To != "ann@example.com" {
+		t.Fatalf("sent %+v", s.sent)
+	}
+	if strings.Join(out.weeklyMarked, ",") != ann+":sent,quiet:skipped" {
+		t.Errorf("marked %v: a failed send must be tried again", out.weeklyMarked)
+	}
+	tok := s.sent[0].Unsubscribe[strings.Index(s.sent[0].Unsubscribe, "t=")+2:]
+	if l, err := Verify(key, strings.ReplaceAll(tok, "%2E", ".")); err != nil || l.Kind != db.EmailWeekly {
+		t.Errorf("weekly link = %+v, %v", l, err)
 	}
 }

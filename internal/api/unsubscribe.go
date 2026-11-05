@@ -25,7 +25,7 @@ type unsubscriber struct {
 
 func (u unsubscriber) link(w http.ResponseWriter, r *http.Request) (email.Link, bool) {
 	l, err := email.Verify(u.key, r.URL.Query().Get("t"))
-	if err != nil || (l.Kind != db.EmailReconnect && l.Kind != db.EmailPaymentDue && l.Kind != db.EmailKidReconnect) {
+	if err != nil || (l.Kind != db.EmailReconnect && l.Kind != db.EmailPaymentDue && l.Kind != db.EmailKidReconnect && l.Kind != db.EmailWeekly) {
 		writeError(w, http.StatusBadRequest, "bad_link")
 		return email.Link{}, false
 	}

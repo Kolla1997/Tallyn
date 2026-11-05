@@ -24,6 +24,9 @@ const SETTINGS = {
   email_reconnect: false,
   email_payment_due: false,
   email_kid_reconnect: [],
+  email_weekly: false,
+  email_include_shared: false,
+  time_zone: null,
 }
 
 beforeEach(() => {
@@ -70,6 +73,19 @@ describe('NotificationSettings', () => {
     expect(screen.getByText('$750.00')).toBeInTheDocument()
     await act(async () => fireEvent.blur(amt))
     expect(lastPut()).toMatchObject({ big_purchase_minor: 75000 })
+  })
+
+  it('turns on the weekly summary, then what is shared, and saves the time zone (#273)', async () => {
+    render(<NotificationSettings me={me} household={household} />)
+    const shared = await screen.findByRole('switch', { name: "Include what's shared with me in the weekly summary" })
+    expect(shared).toBeDisabled()
+    fireEvent.click(screen.getByRole('switch', { name: 'Weekly summary email' }))
+    await act(async () => {})
+    expect(lastPut()).toMatchObject({ email_weekly: true, time_zone: Intl.DateTimeFormat().resolvedOptions().timeZone })
+    expect(shared).not.toBeDisabled()
+    fireEvent.click(shared)
+    await act(async () => {})
+    expect(lastPut()).toMatchObject({ email_include_shared: true })
   })
 
   it('turns down an amount that is not a positive number', async () => {
