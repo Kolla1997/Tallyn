@@ -2,7 +2,7 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-10-30
+updated: 2026-11-05
 issue: 36
 tags: [legal]
 document: privacy
@@ -25,6 +25,7 @@ This policy explains what **[TO CONFIRM: legal entity name]** ("Coinroof", "we",
 - Your sign-in details: your password and your authenticator app are handled by our sign-in provider; we never see your password
 - Households you create or join, your role in each, the people you invite (their email address), and what you choose to share with whom
 - When you agreed to our terms and this policy, and which versions
+- Your notification and email settings, and whether you want product news, with when and where you said so (at sign-up, in Settings or through a stop link in an email) **[TO CONFIRM with a lawyer]**
 
 **From your banks, through Plaid**, when you link a bank
 - The bank's name, and an access token that lets Coinroof read your accounts; we store the token **encrypted**
@@ -40,6 +41,7 @@ This policy explains what **[TO CONFIRM: legal entity name]** ("Coinroof", "we",
 - To show you and the people you choose your balances, transactions, spending and totals
 - To keep your account secure (two-step sign-in, confirming important changes)
 - To keep your banks up to date in the background
+- To email you about your account (such as a welcome, an invite or a bank to reconnect), the alerts and summaries you turn on, and, **only if you say yes**, product news about Coinroof and money **[TO CONFIRM with a lawyer]**
 - To run, fix and improve Coinroof, and to meet our legal obligations
 
 **Legal basis:** **[TO CONFIRM with a lawyer: the bases we rely on, and whether a GLBA privacy notice is also required.]**
@@ -59,6 +61,8 @@ We **don't sell** personal data, and we **never** share it with advertisers or d
 |---|---|
 | **Plaid Inc.** | Connecting to your banks and reading your account data. Coinroof uses Plaid; see the [Plaid End User Privacy Policy](https://plaid.com/legal/#end-user-privacy-policy). |
 | **Supabase** | Our database and sign-in |
+| **Brevo** | Sending account emails, and the alerts and summaries you turn on. Gets your email address and what the email says **[TO CONFIRM with a lawyer]** |
+| **Resend** | Sending product news, only if you said yes. Gets your email address and name **[TO CONFIRM with a lawyer]** |
 | **[TO CONFIRM: hosting provider]** | Running the app and website |
 | **Merchant logos** | Logos are loaded from Plaid's logo service without telling it which page you're on |
 
@@ -81,7 +85,7 @@ Coinroof isn't for children under 13. We don't knowingly collect data from child
 
 ## 8. Your rights and choices
 
-You can see and correct your name in Settings, choose what you share, unlink banks, leave a household and ask us to delete your account. You can also ask us for a copy of your data or to correct or delete it by writing to **[TO CONFIRM: contact email]**.
+You can see and correct your name in Settings, choose what you share, unlink banks, leave a household and ask us to delete your account. You can turn product news and other emails off in **Settings → Notifications**, or with the stop link at the bottom of any of those emails; account emails needed to use Coinroof safely (such as a password reset) still come. **[TO CONFIRM with a lawyer]** You can also ask us for a copy of your data or to correct or delete it by writing to **[TO CONFIRM: contact email]**.
 
 Depending on where you live (for example **California**, under the CCPA as amended by the CPRA, and other US states with privacy laws), you may have rights to know, access, correct and delete your personal data, and to opt out of its sale or sharing for advertising. **We don't sell or share personal data for advertising.** We won't treat you differently for using your rights. **[TO CONFIRM with a lawyer: state-specific wording and how we verify requests.]**
 
