@@ -43,6 +43,16 @@ beforeEach(() => {
 const lastPut = () => api.mock.calls.filter(([, o]) => o?.method === 'PUT').pop()?.[1].body
 
 describe('NotificationSettings', () => {
+  it('spending limits: on in the app by default, email off, both saved (#55)', async () => {
+    render(<NotificationSettings me={me} household={household} />)
+    const app = await screen.findByRole('switch', { name: 'Spending limit alerts' })
+    expect(app).toBeChecked()
+    const mail = screen.getByRole('switch', { name: 'Email for spending limits' })
+    expect(mail).not.toBeChecked()
+    await act(async () => fireEvent.click(mail))
+    expect(lastPut()).toMatchObject({ email_budget: true })
+  })
+
   it('product news: its own switch, saved for you, not the household (#281)', async () => {
     render(<NotificationSettings me={me} household={household} />)
     const sw = await screen.findByRole('switch', { name: 'Product news email' })

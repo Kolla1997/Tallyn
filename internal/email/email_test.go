@@ -166,6 +166,7 @@ func (f *fakeOutbox) MarkMonthly(_ context.Context, _, user string, _ time.Time,
 }
 
 func (f *fakeOutbox) NotifyPaymentsDue(context.Context, time.Time) (int, error) { return 0, nil }
+func (f *fakeOutbox) NotifyBudgets(context.Context, time.Time) (int, error)     { return 0, nil }
 func (f *fakeOutbox) EmailOutbox(context.Context, int) ([]db.OutboxEmail, error) {
 	return f.list, nil
 }
@@ -372,5 +373,25 @@ func TestWeeklyBarColours(t *testing.T) {
 		if !strings.Contains(m.HTML, want) {
 			t.Errorf("weekly bars missing %q", want)
 		}
+	}
+}
+
+// Spending-limit emails (#55).
+func TestComposeBudget(t *testing.T) {
+	near := json.RawMessage(`{"category":"FOOD_AND_DRINK","limit_minor":50000,"spent_minor":41200,"currency":"USD","days_left":9}`)
+	m, err := Compose(Alert{Kind: "budget_near", Data: near}, Links{App: "https://coinroof.us"}, "tok", "Kolla family")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m.Subject != "Food and drink: $88.00 left" || !strings.Contains(m.HTML, "9 days to go") || !strings.Contains(m.HTML, "Stop spending-limit emails") {
+		t.Errorf("near: %q", m.Subject)
+	}
+	over := json.RawMessage(`{"limit_minor":20000,"spent_minor":23100,"currency":"USD","days_left":1,"person":"Mia"}`)
+	m, err = Compose(Alert{Kind: "budget_over", Data: over}, Links{App: "https://coinroof.us"}, "tok", "Kolla family")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m.Subject != "Mia's everything: $31.00 over" || !strings.Contains(m.HTML, "1 day to go") {
+		t.Errorf("over: %q", m.Subject)
 	}
 }

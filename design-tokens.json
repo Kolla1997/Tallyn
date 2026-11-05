@@ -155,7 +155,10 @@
     },
     "input": {
       "value": "14px"
-    }
+    },
+    "tiny": { "value": "4px", "$description": "Bars, notches and small marks (#160)" },
+    "small": { "value": "12px", "$description": "Small cards and tiles (#160)" },
+    "medium": { "value": "16px", "$description": "Panels inside a card (#160)" }
   },
   "spacing": {
     "s1": {
@@ -181,7 +184,15 @@
     },
     "s8": {
       "value": 64
-    }
+    },
+    "x2": { "value": 2, "$description": "In-between step the app uses on purpose (#160)" },
+    "x6": { "value": 6, "$description": "In-between step the app uses on purpose (#160)" },
+    "x10": { "value": 10, "$description": "In-between step the app uses on purpose (#160)" },
+    "x14": { "value": 14, "$description": "In-between step the app uses on purpose (#160)" },
+    "x18": { "value": 18, "$description": "In-between step the app uses on purpose (#160)" },
+    "x20": { "value": 20, "$description": "In-between step the app uses on purpose (#160)" },
+    "x22": { "value": 22, "$description": "In-between step the app uses on purpose (#160)" },
+    "x28": { "value": 28, "$description": "In-between step the app uses on purpose (#160)" }
   },
   "motion": {
     "logo-intro": {

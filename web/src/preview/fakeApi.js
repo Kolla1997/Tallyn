@@ -265,6 +265,28 @@ const PLAN = {
 const ago = (h) => new Date(Date.now() - h * 3600000).toISOString()
 const NOTIFICATIONS = [
   {
+    id: 'n-budget-near',
+    household_id: 'hh-1',
+    kind: 'budget_near',
+    ref_id: 'bud-food',
+    data: { category: 'FOOD_AND_DRINK', limit_minor: 50000, spent_minor: 41200, currency: 'USD', period_to: '2026-12-01' },
+    needs_action: false,
+    created_at: ago(0.2),
+    read: false,
+    resolved: false,
+  },
+  {
+    id: 'n-budget-over',
+    household_id: 'hh-1',
+    kind: 'budget_over',
+    ref_id: 'bud-fun',
+    data: { category: 'ENTERTAINMENT', limit_minor: 20000, spent_minor: 23100, currency: 'USD', period_to: '2026-12-01' },
+    needs_action: false,
+    created_at: ago(0.3),
+    read: false,
+    resolved: false,
+  },
+  {
     id: 'n1',
     household_id: 'hh-1',
     kind: 'reconnect',

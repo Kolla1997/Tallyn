@@ -21,6 +21,16 @@ func (s *System) NotifyPaymentsDue(ctx context.Context, today time.Time) (int, e
 	return n, err
 }
 
+// NotifyBudgets opens spending-limit alerts (#55, 0028): a heads-up at 80% of
+// a budget and another when it goes over, once each per period.
+func (s *System) NotifyBudgets(ctx context.Context, today time.Time) (int, error) {
+	var n int
+	err := s.as(ctx, func(tx pgx.Tx) error {
+		return tx.QueryRow(ctx, `select public.notify_budgets($1)`, today).Scan(&n)
+	})
+	return n, err
+}
+
 // OutboxEmail is an alert the server hasn't looked at yet. Send says whether
 // it should be emailed (the person's switches, a confirmed email address).
 type OutboxEmail struct {
@@ -74,6 +84,7 @@ const (
 	EmailKidReconnect = "kid_reconnect" // with the child's user ID
 	EmailWeekly       = "weekly"        // the weekly summary (#273)
 	EmailMonthly      = "monthly"       // the monthly highlights (#274)
+	EmailBudget       = "budget"        // spending-limit alerts (#55)
 	EmailNews         = "news"          // product news, per person (#281; no household)
 )
 
@@ -85,7 +96,7 @@ func (d *DB) SetEmail(ctx context.Context, userID, householdID, kind, kid string
 		return ErrInvalid
 	}
 	switch kind {
-	case EmailReconnect, EmailPaymentDue, EmailWeekly, EmailMonthly:
+	case EmailReconnect, EmailPaymentDue, EmailWeekly, EmailMonthly, EmailBudget:
 		kid = ""
 	case EmailKidReconnect:
 	default:
@@ -103,6 +114,7 @@ func (d *DB) SetEmail(ctx context.Context, userID, householdID, kind, kid string
 			  email_payment_due = case when $3 = 'payment_due' then $4 else email_payment_due end,
 			  email_weekly = case when $3 = 'weekly' then $4 else email_weekly end,
 			  email_monthly = case when $3 = 'monthly' then $4 else email_monthly end,
+			  email_budget = case when $3 = 'budget' then $4 else email_budget end,
 			  email_kid_reconnect = case when $3 <> 'kid_reconnect' then email_kid_reconnect
 			                             when $4 then array(select distinct unnest(email_kid_reconnect || nullif($5, '')::uuid))
 			                             else array_remove(email_kid_reconnect, nullif($5, '')::uuid) end

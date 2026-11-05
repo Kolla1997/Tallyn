@@ -1,6 +1,6 @@
 import { useEffect, useSyncExternalStore } from 'react'
 import { api } from './api.js'
-import { formatMoney } from './money.js'
+import { categoryLabel, formatMoney } from './money.js'
 
 // In-app notifications (#267, Dinesh picked draft C with the bell top right):
 // one shared list for the bell and Home's strip, so marking one read shows in
@@ -116,8 +116,39 @@ export function describe(n) {
     }
     case 'joined':
       return { parts: [{ b: d.name ?? 'Someone' }, ` joined ${d.household ?? 'your household'}.`], to: '/family' }
+    case 'budget_near':
+    case 'budget_over': {
+      // #55: a heads-up at 80% of a budget, and when it goes over.
+      const b = budgetAlert(n)
+      return b.over
+        ? { parts: [{ b: `${b.name}: ` }, m(b.amountMinor), ` over ${formatMoney(d.limit_minor, d.currency)}.`], to: '/budgets' }
+        : { parts: [{ b: `${b.name}: ` }, m(b.amountMinor), ` left of ${formatMoney(d.limit_minor, d.currency)}.`], to: '/budgets' }
+    }
     default:
       return { parts: ['Something changed.'], to: '/' }
+  }
+}
+
+// What a spending-limit alert shows (#55): whose budget, how much is left (or
+// over) and the days to go, counted from today so an older alert stays right.
+export function budgetAlert(n, today = new Date()) {
+  const d = n.data ?? {}
+  const over = n.kind === 'budget_over'
+  const cat = d.category ? categoryLabel(d.category) : 'Everything'
+  const name = d.person ? `${d.person}'s ${cat.charAt(0).toLowerCase()}${cat.slice(1)}` : cat
+  const [y, mo, da] = String(d.period_to ?? '')
+    .split('-')
+    .map(Number)
+  const end = y ? new Date(y, mo - 1, da) : null
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  const days = end ? Math.max(0, Math.round((end - start) / 86400000)) : null
+  return {
+    over,
+    name,
+    category: d.category ?? null,
+    amountMinor: Math.abs((d.limit_minor ?? 0) - (d.spent_minor ?? 0)),
+    share: d.limit_minor ? Math.min(1, (d.spent_minor ?? 0) / d.limit_minor) : 1,
+    days: days == null ? '' : days === 1 ? '1 day to go' : days === 0 ? 'Ends today' : `${days} days to go`,
   }
 }
 

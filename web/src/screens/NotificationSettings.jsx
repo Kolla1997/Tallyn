@@ -213,6 +213,10 @@ export default function NotificationSettings({ me, household }) {
             <Row i={3} label="Payment due soon" note="Always on in the app. Three days before a card or loan is due, and if it's overdue.">
               <Email label="Email when a payment is due" checked={s.email_payment_due} onChange={(v) => save({ email_payment_due: v })} />
             </Row>
+            <Row i={4} label="Spending limits" note="A heads-up when a budget reaches 80%, and when it goes over.">
+              <Toggle label="Spending limit alerts" checked={s.budget ?? true} onChange={(v) => save({ budget: v })} />
+              <Email label="Email for spending limits" checked={s.email_budget ?? false} onChange={(v) => save({ email_budget: v })} />
+            </Row>
             <Row i={4} label="Someone joins" note={`When someone joins ${household.name}.`}>
               <Toggle label="Someone joins alerts" checked={s.joined} onChange={(v) => save({ joined: v })} />
             </Row>
