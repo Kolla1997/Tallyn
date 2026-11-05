@@ -92,6 +92,43 @@ function Email({ label, checked, onChange }) {
   )
 }
 
+// Product news (#281, Dinesh picked A in drafts/281-product-news.html): one switch per person, not
+// per household, saved as a new record each time. It comes from its own address, so it never touches
+// the alerts above.
+function ProductNews() {
+  const [on, setOn] = useState(null)
+  const [err, setErr] = useState('')
+  useEffect(() => {
+    let live = true
+    api('/api/me/news').then(
+      (n) => live && setOn(!!n?.on),
+      () => live && setErr("We couldn't load this. Try again in a moment."),
+    )
+    return () => {
+      live = false
+    }
+  }, [])
+  async function change(v) {
+    setOn(v)
+    setErr('')
+    try {
+      await api('/api/me/news', { method: 'PUT', body: { on: v } })
+    } catch {
+      setOn(!v)
+      setErr("We couldn't save that. Try again in a moment.")
+    }
+  }
+  return (
+    <Row i={8} label="Product news" note={err || 'New features and tips, about once a month.'}>
+      {on === null ? (
+        !err && <span className="block h-6 w-24 animate-pulse rounded-full bg-zinc-100 motion-reduce:animate-none dark:bg-zinc-800" aria-hidden="true" />
+      ) : (
+        <Email label="Product news email" checked={on} onChange={change} />
+      )}
+    </Row>
+  )
+}
+
 export default function NotificationSettings({ me, household }) {
   const [s, setS] = useState(null)
   const [members, setMembers] = useState([])
@@ -191,6 +228,11 @@ export default function NotificationSettings({ me, household }) {
                 />
               </Row>
             )}
+          </Rows>
+
+          <Sub>Coinroof news</Sub>
+          <Rows>
+            <ProductNews />
           </Rows>
 
           {/* The alert as it would land, in the list's glass F (#267), changing as you type. */}

@@ -25,9 +25,10 @@ export const currentVersions = () => ({ terms: LEGAL.terms.version, privacy: LEG
 // Remembered when someone ticks "I agree" at sign-up, so their first sign-in
 // can record it without asking twice.
 const PENDING = 'tallyn.agreed'
-export function rememberAgreement() {
+// news is the product news box (#281), sent with the agreement.
+export function rememberAgreement(news) {
   try {
-    localStorage.setItem(PENDING, JSON.stringify(currentVersions()))
+    localStorage.setItem(PENDING, JSON.stringify({ ...currentVersions(), news: !!news }))
   } catch {
     // they'll be asked again after sign-in
   }

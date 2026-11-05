@@ -25,7 +25,7 @@ type unsubscriber struct {
 
 func (u unsubscriber) link(w http.ResponseWriter, r *http.Request) (email.Link, bool) {
 	l, err := email.Verify(u.key, r.URL.Query().Get("t"))
-	if err != nil || (l.Kind != db.EmailReconnect && l.Kind != db.EmailPaymentDue && l.Kind != db.EmailKidReconnect && l.Kind != db.EmailWeekly && l.Kind != db.EmailMonthly) {
+	if err != nil || (l.Kind != db.EmailReconnect && l.Kind != db.EmailPaymentDue && l.Kind != db.EmailKidReconnect && l.Kind != db.EmailWeekly && l.Kind != db.EmailMonthly && l.Kind != db.EmailNews) {
 		writeError(w, http.StatusBadRequest, "bad_link")
 		return email.Link{}, false
 	}
@@ -65,7 +65,13 @@ func (u unsubscriber) set(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	err := u.store.SetEmail(r.Context(), l.UserID, l.HouseholdID, l.Kind, l.Kid, on)
+	var err error
+	if l.Kind == db.EmailNews {
+		// Product news (#281) is per person, kept as a record of each change.
+		err = u.store.SetNews(r.Context(), l.UserID, on, db.NewsStopLink, CurrentVersions["privacy"])
+	} else {
+		err = u.store.SetEmail(r.Context(), l.UserID, l.HouseholdID, l.Kind, l.Kid, on)
+	}
 	switch {
 	case errors.Is(err, db.ErrForbidden), errors.Is(err, db.ErrInvalid):
 		// Left the household, or the account is closed: nothing to change.

@@ -53,14 +53,26 @@ describe('ConsentGate', () => {
     expect(go).toBeDisabled()
     fireEvent.click(screen.getByRole('checkbox', { name: /I agree/ }))
     await act(async () => fireEvent.click(go))
-    expect(callsTo(api, '/api/consent', 'POST')[0][1].body).toEqual(currentVersions())
+    expect(callsTo(api, '/api/consent', 'POST')[0][1].body).toEqual({ ...currentVersions(), news: true })
     expect(screen.getByText('Home')).toBeInTheDocument()
   })
 
+  // Product news (#281, option A): ticked by default, and the choice goes with the agreement.
+  it('product news: a second box, ticked, can be unticked', async () => {
+    await open(true)
+    const box = screen.getByRole('checkbox', { name: /Send me product news/ })
+    expect(box).toBeChecked()
+    fireEvent.click(box)
+    fireEvent.click(screen.getByRole('checkbox', { name: /I agree/ }))
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: 'Continue' })))
+    expect(callsTo(api, '/api/consent', 'POST')[0][1].body.news).toBe(false)
+  })
+
   it('ticked "I agree" at sign-up on this device: recorded without asking twice', async () => {
-    rememberAgreement()
+    rememberAgreement(false)
     await open(true)
     expect(callsTo(api, '/api/consent', 'POST')).toHaveLength(1)
+    expect(callsTo(api, '/api/consent', 'POST')[0][1].body.news).toBe(false) // the sign-up box (#281)
     expect(screen.getByText('Home')).toBeInTheDocument()
   })
 

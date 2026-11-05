@@ -78,6 +78,8 @@ func (stubStore) NotificationSettingsFor(context.Context, string, string) (db.No
 	return db.NotificationSettings{}, errors.New("stub")
 }
 func (stubStore) SetEmail(context.Context, string, string, string, string, bool) error { return nil }
+func (stubStore) News(context.Context, string) (db.News, error)                        { return db.News{}, nil }
+func (stubStore) SetNews(context.Context, string, bool, string, string) error          { return nil }
 func (stubStore) SaveNotificationSettings(context.Context, string, string, db.NotificationSettings) error {
 	return errors.New("stub")
 }

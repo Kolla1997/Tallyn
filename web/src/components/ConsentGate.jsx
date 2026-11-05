@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../lib/api.js'
 import { startMe } from '../lib/me.js'
 import { currentVersions, LEGAL, takeAgreement } from '../lib/legal.js'
+import { NEWS_LABEL, NEWS_NOTE, newsDefault } from '../lib/news.js'
 import { Link } from '../lib/router.jsx'
 import AuthPage from './AuthPage.jsx'
 import TallynLoader from './TallynLoader.jsx'
@@ -14,10 +15,11 @@ import Heading from './Heading.jsx'
 export default function ConsentGate({ onSignOut, children }) {
   const [state, setState] = useState('checking') // checking | needed | ok | error
   const [agreed, setAgreed] = useState(false)
+  const [news, setNews] = useState(newsDefault) // product news (#281, Dinesh picked A)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
-  const accept = () => api('/api/consent', { method: 'POST', body: currentVersions() })
+  const accept = (newsChoice) => api('/api/consent', { method: 'POST', body: { ...currentVersions(), news: newsChoice } })
 
   useEffect(() => {
     let live = true
@@ -29,7 +31,7 @@ export default function ConsentGate({ onSignOut, children }) {
         const now = currentVersions()
         if (pending?.terms === now.terms && pending?.privacy === now.privacy) {
           try {
-            await accept()
+            await accept(typeof pending.news === 'boolean' ? pending.news : undefined)
             return live && setState('ok')
           } catch {
             // fall through to asking
@@ -49,7 +51,7 @@ export default function ConsentGate({ onSignOut, children }) {
     setError('')
     setBusy(true)
     try {
-      await accept()
+      await accept(news)
       setState('ok')
     } catch (err) {
       setError(
@@ -102,6 +104,13 @@ export default function ConsentGate({ onSignOut, children }) {
             <label className="agree">
               <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
               <span>I agree to the Terms of Service and Privacy Policy</span>
+            </label>
+            <label className="agree">
+              <input type="checkbox" checked={news} onChange={(e) => setNews(e.target.checked)} />
+              <span>
+                {NEWS_LABEL}
+                <span className="agree-note">{NEWS_NOTE}</span>
+              </span>
             </label>
             {error && (
               <p className="error" role="alert">

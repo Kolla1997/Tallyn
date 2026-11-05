@@ -74,6 +74,7 @@ const (
 	EmailKidReconnect = "kid_reconnect" // with the child's user ID
 	EmailWeekly       = "weekly"        // the weekly summary (#273)
 	EmailMonthly      = "monthly"       // the monthly highlights (#274)
+	EmailNews         = "news"          // product news, per person (#281; no household)
 )
 
 // SetEmail turns one of userID's emails on or off, from a signed

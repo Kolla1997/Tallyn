@@ -50,6 +50,15 @@ describe('SignIn after an idle sign-out', () => {
     expect(screen.getByText(/At least 8 characters/)).toBeInTheDocument()
     expect(screen.getByLabelText('Password')).toHaveAttribute('minlength', '8')
   })
+
+  it('sign-up shows the product news box, ticked, not required (#281)', () => {
+    render(<SignIn />)
+    expect(screen.queryByRole('checkbox', { name: /product news/ })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /Create a new account/ }))
+    const box = screen.getByRole('checkbox', { name: /Send me product news/ })
+    expect(box).toBeChecked()
+    expect(box).not.toBeRequired()
+  })
 })
 
 // The eye shows the typed password, and it hides itself again after 10 seconds.
