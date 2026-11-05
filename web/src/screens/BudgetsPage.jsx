@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { curveLinear } from '@visx/curve'
 import { LineChart } from '@/components/charts/line-chart'
@@ -401,6 +401,7 @@ function BudgetDialog({ budget, choices, people, me, household, onClose, onSaved
   const [category, setCategory] = useState(budget?.category ?? '')
   const [period, setPeriod] = useState(budget?.period ?? 'month')
   const [amount, setAmount] = useState(budget ? fromMinor(budget.amount_minor, cur) : '')
+  const amountErr = useId() // the amount's error, tied to the field (#153)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -488,9 +489,11 @@ function BudgetDialog({ budget, choices, people, me, household, onClose, onSaved
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
             required
+            aria-invalid={(amount && !minor) || undefined}
+            aria-describedby={amount && !minor ? amountErr : undefined}
           />
           {amount && !minor && (
-            <span className="text-[13px] font-semibold" style={OWE}>
+            <span id={amountErr} className="text-[13px] font-semibold" style={OWE}>
               Enter an amount above zero, like 250 or 250.50.
             </span>
           )}

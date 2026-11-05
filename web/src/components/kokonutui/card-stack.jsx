@@ -557,7 +557,7 @@ export default function CardStack({ cards = DEFAULT_CARDS, accent = '#f97316', a
                   'group/deck-card absolute inset-0 origin-bottom touch-pan-y select-none rounded-2xl text-left outline-none will-change-transform',
                   'shadow-[0_1px_2px_rgb(0_0_0/0.05),0_4px_12px_-4px_rgb(0_0_0/0.12)] transition-shadow duration-200 ease-out dark:shadow-[0_1px_2px_rgb(0_0_0/0.4),0_6px_16px_-6px_rgb(0_0_0/0.7)]',
                   'data-[state=drag]:shadow-[0_2px_4px_rgb(0_0_0/0.05),0_28px_48px_-16px_rgb(0_0_0/0.3)] data-[state=fly]:shadow-[0_2px_4px_rgb(0_0_0/0.05),0_28px_48px_-16px_rgb(0_0_0/0.3)]',
-                  'focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-4 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950',
+                  'focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] focus-visible:ring-offset-4 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950',
                   isTop && 'cursor-grab data-[state=drag]:cursor-grabbing',
                   isOpen && 'shadow-none dark:shadow-none',
                 )}
@@ -696,7 +696,7 @@ function DeckDetails({ card, openId, actionLabel, onAction, onClose, closeRef })
             ))}
           </dl>
           <button
-            className="mt-3 h-9 w-full rounded-lg bg-[var(--deck-accent)] font-medium text-sm text-white transition-[filter] duration-150 ease-out hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 active:brightness-95 dark:focus-visible:ring-offset-zinc-900"
+            className="mt-3 h-9 w-full rounded-lg bg-[var(--deck-accent)] font-medium text-sm text-white transition-[filter] duration-150 ease-out hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] focus-visible:ring-offset-2 active:brightness-95 dark:focus-visible:ring-offset-zinc-900"
             onClick={() => onAction?.(card)}
             type="button"
           >
@@ -705,7 +705,7 @@ function DeckDetails({ card, openId, actionLabel, onAction, onClose, closeRef })
         </motion.div>
         <button
           aria-label="Close details"
-          className="absolute top-4 right-4 flex size-7 items-center justify-center rounded-full bg-white text-zinc-600 transition-colors duration-150 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
+          className="absolute top-4 right-4 flex size-7 items-center justify-center rounded-full bg-white text-zinc-600 transition-colors duration-150 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] dark:bg-zinc-900 dark:text-zinc-300 dark:hover:text-zinc-100"
           onClick={onClose}
           ref={closeRef}
           type="button"
@@ -724,7 +724,7 @@ const LAYOUT_SPRING = {
   bounce: 0,
 }
 const NAV_BUTTON =
-  'flex size-8 shrink-0 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 active:translate-y-px dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100'
+  'flex size-8 shrink-0 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] active:translate-y-px dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100'
 
 // ---------------------------------------------------------------------------
 // Demo artwork: flat zinc compositions with one accent, drawn inline so the

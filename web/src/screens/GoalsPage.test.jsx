@@ -141,6 +141,20 @@ describe('GoalsPage', () => {
     })
   })
 
+  it('a goal form error is tied to its field (#153)', async () => {
+    answers([])
+    await open()
+    fireEvent.click(screen.getByRole('button', { name: 'New goal' }))
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Beach trip' } })
+    fireEvent.click(screen.getByRole('radio', { name: /^I'll update it myself/ }))
+    fireEvent.change(screen.getByLabelText('Target (USD)'), { target: { value: '0' } })
+    fireEvent.submit(screen.getByLabelText('Name').closest('form'))
+    const target = screen.getByLabelText('Target (USD)')
+    expect(target).toHaveAttribute('aria-invalid', 'true')
+    expect(target).toHaveAccessibleDescription('Enter a target above zero, like 5000.')
+    expect(screen.getByLabelText('Name')).not.toHaveAttribute('aria-invalid')
+  })
+
   it('a child sees goals but sets none up', async () => {
     answers()
     await open({ ...owner, role: 'child' })

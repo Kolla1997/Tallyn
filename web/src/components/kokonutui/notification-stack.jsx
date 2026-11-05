@@ -486,7 +486,7 @@ export default function NotificationStack({ notifications = DEFAULT_NOTIFICATION
         {laidOut.length > 1 && (
           <button
             aria-expanded={expanded}
-            className="rounded-md px-2 py-1 text-sm text-zinc-500 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+            className="rounded-md px-2 py-1 text-sm text-zinc-500 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
             onClick={() => setPinned((prev) => !prev)}
             type="button"
           >
@@ -557,7 +557,7 @@ export default function NotificationStack({ notifications = DEFAULT_NOTIFICATION
                   aria-label={`${item.app}: ${item.title}. ${item.body}`}
                   className={cn(
                     'group/card relative flex select-none gap-3 rounded-2xl border border-zinc-200 bg-white p-3.5 shadow-sm outline-none dark:border-zinc-800 dark:bg-zinc-900',
-                    'focus-visible:ring-2 focus-visible:ring-zinc-400',
+                    'focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)]',
                     !expanded && depth === 0 && laidOut.length > 1 && 'cursor-pointer',
                   )}
                   onClick={() => {
@@ -601,7 +601,7 @@ function NotificationContent({ item, muted, tabbable, onDismiss }) {
       <button
         aria-label={`Dismiss ${item.title}`}
         className={cn(
-          'absolute -top-2 -left-2 flex size-6 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-500 opacity-0 transition-opacity duration-150 hover:text-zinc-900 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 group-hover/card:opacity-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100',
+          'absolute -top-2 -left-2 flex size-6 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-500 opacity-0 transition-opacity duration-150 hover:text-zinc-900 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] group-hover/card:opacity-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100',
           muted && 'hidden',
         )}
         onClick={(event) => {

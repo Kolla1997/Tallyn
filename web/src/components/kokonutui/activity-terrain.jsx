@@ -734,7 +734,7 @@ export default function ActivityTerrain({
             <button
               aria-pressed={flat === value}
               className={cn(
-                'rounded-full px-3 py-1 font-medium outline-none transition-colors duration-200 ease-out focus-visible:ring-2 focus-visible:ring-zinc-400',
+                'rounded-full px-3 py-1 font-medium outline-none transition-colors duration-200 ease-out focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)]',
                 flat === value
                   ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-50'
                   : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100',
@@ -752,7 +752,7 @@ export default function ActivityTerrain({
       <canvas
         aria-label={`${title}: ${caption ?? `${total.toLocaleString('en-US')} contributions over ${weeks} weeks`}. Use the arrow keys to read each day.`}
         className={cn(
-          'block h-72 w-full touch-pan-y rounded-b-3xl outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-inset',
+          'block h-72 w-full touch-pan-y rounded-b-3xl outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] focus-visible:ring-inset',
           dragging ? 'cursor-grabbing' : 'cursor-grab',
           canvasClassName,
         )}

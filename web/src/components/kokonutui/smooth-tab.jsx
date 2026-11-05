@@ -443,7 +443,7 @@ export default function SmoothTab({
                 className={cn(
                   'relative flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 font-medium text-sm',
                   'text-zinc-600 transition-colors duration-150 ease-out hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100',
-                  'outline-none focus-visible:outline-2 focus-visible:outline-zinc-400 focus-visible:outline-offset-2',
+                  'outline-none focus-visible:outline-2 focus-visible:outline-[var(--color-redesign-focus)] focus-visible:outline-offset-2',
                 )}
                 id={tabId(i)}
                 key={item.id}
@@ -509,7 +509,7 @@ export default function SmoothTab({
           {items.map((item, i) => (
             <div
               aria-labelledby={tabId(i)}
-              className="min-h-[220px] p-5 outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-inset"
+              className="min-h-[220px] p-5 outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] focus-visible:ring-inset"
               id={panelId(i)}
               inert={i !== selected}
               key={item.id}
