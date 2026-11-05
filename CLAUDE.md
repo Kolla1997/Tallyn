@@ -28,7 +28,7 @@ Then stop and wait. Don't start until Dinesh approves (a plan he has already app
 ## 1. What Tallyn is
 
 **Tallyn is a family finance app. Tagline: "It all adds up."**
-People connect bank accounts in any currency, see one total in their home currency, track spending and savings in real time, and open joint accounts for partners, kids and parents. Status: early development, not public.
+People connect their US bank accounts, see one total in US dollars, track spending and savings in real time, and open joint accounts for partners, kids and parents. For now Coinroof is US only; more currencies may come later (#11), so the code keeps a household's currency but every screen shows USD. Status: early development, not public.
 
 Full context: `docs/01 Product/Vision.md`.
 
