@@ -115,7 +115,8 @@ export default function NotificationSettings({ me, household }) {
   }, [household.id])
 
   async function save(change) {
-    const next = { ...s, ...change }
+    // The weekly summary goes out at 9am in this time zone (#273).
+    const next = { ...s, ...change, time_zone: Intl.DateTimeFormat().resolvedOptions().timeZone || null }
     const before = s
     setS(next)
     setStatus('Saving…')
@@ -172,6 +173,23 @@ export default function NotificationSettings({ me, household }) {
             </Row>
           </Rows>
 
+          <Sub>Summaries by email</Sub>
+          <Rows>
+            <Row i={5} label="Weekly summary" note="Every Monday at 9am: last week's spending, what's coming up, and this month so far.">
+              <Email label="Weekly summary email" checked={s.email_weekly ?? false} onChange={(v) => save({ email_weekly: v })} />
+            </Row>
+            {adult && (
+              <Row i={6} label="Include what's shared with me" note="Spending others share with you in Family, and your children's totals.">
+                <Toggle
+                  label="Include what's shared with me in the weekly summary"
+                  checked={s.email_include_shared ?? false}
+                  disabled={!s.email_weekly}
+                  onChange={(v) => save({ email_include_shared: v })}
+                />
+              </Row>
+            )}
+          </Rows>
+
           {/* The alert as it would land, in the list's glass F (#267), changing as you type. */}
           <div className="notif-glass mt-3 rounded-[20px] p-2" aria-live="polite">
             <p className={`m-0 px-2 pb-1 text-[12px] ${MUTED}`}>How it will look</p>
@@ -190,7 +208,7 @@ export default function NotificationSettings({ me, household }) {
               <Rows>
                 {partner && (
                   <Row
-                    i={5}
+                    i={7}
                     label={
                       <span className="inline-flex flex-wrap items-center gap-2">
                         <Avatar member={partner} small />
@@ -228,7 +246,7 @@ export default function NotificationSettings({ me, household }) {
                 {kids.map((k, i) => (
                   <Row
                     key={k.user_id}
-                    i={6 + i}
+                    i={8 + i}
                     label={
                       <span className="inline-flex items-center gap-2">
                         <Avatar member={k} small />
@@ -253,7 +271,7 @@ export default function NotificationSettings({ me, household }) {
             </>
           )}
           <p className={`${NOTE} mt-3`} role="status" aria-live="polite">
-            {status || 'Every email has a link to stop it. Weekly and monthly summaries come later.'}
+            {status || 'Every email has a link to stop it. A monthly summary comes later.'}
           </p>
         </>
       )}

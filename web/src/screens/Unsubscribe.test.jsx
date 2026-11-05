@@ -26,6 +26,12 @@ describe('Unsubscribe', () => {
     expect(calls[2][2]).toBe('{"on":true}')
   })
 
+  it('names the weekly summary (#273)', async () => {
+    globalThis.fetch = vi.fn(() => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({ kind: 'weekly' }) }))
+    render(<Unsubscribe />)
+    expect(await screen.findByRole('heading', { name: 'Stop weekly summaries?' })).toBeInTheDocument()
+  })
+
   it('says when a link does not work', async () => {
     globalThis.fetch = vi.fn(() => Promise.resolve({ ok: false, status: 400, json: () => Promise.resolve({ error: 'bad_link' }) }))
     render(<Unsubscribe />)

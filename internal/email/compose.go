@@ -50,8 +50,8 @@ type leaf struct{ Month, Day, Weekday string }
 // slipRow is one line on the slip. Total is the last, biggest figure; Chip
 // shows the value as a red chip ("Needs sign-in"); Red marks what's overdue.
 type slipRow struct {
-	Label, Value     string
-	Total, Chip, Red bool
+	Label, Meta, Value string // Meta: a smaller line under the label
+	Total, Chip, Red   bool
 }
 
 // Links are where an email's links and logo point.

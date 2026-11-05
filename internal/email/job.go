@@ -2,6 +2,7 @@ package email
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"time"
 
@@ -13,6 +14,9 @@ type Outbox interface {
 	NotifyPaymentsDue(ctx context.Context, today time.Time) (int, error)
 	EmailOutbox(ctx context.Context, max int) ([]db.OutboxEmail, error)
 	MarkEmailed(ctx context.Context, ids []string) error
+	WeeklyDue(ctx context.Context, now time.Time) ([]db.WeeklyDue, error)
+	WeeklySummary(ctx context.Context, householdID, userID string, weekStart time.Time) (json.RawMessage, error)
+	MarkWeekly(ctx context.Context, householdID, userID string, weekStart time.Time, sent bool) error
 }
 
 // Job checks payments due and sends the emails alerts call for, every few
@@ -78,6 +82,54 @@ func (j *Job) Once(ctx context.Context, now time.Time) {
 	}
 	if sent > 0 {
 		log.Printf("email: sent %d", sent)
+	}
+	j.weekly(ctx, now)
+}
+
+// weekly sends the weekly summaries due now (#273). A quiet week is marked
+// and skipped; a failed send is tried again next round.
+func (j *Job) weekly(ctx context.Context, now time.Time) {
+	due, err := j.Outbox.WeeklyDue(ctx, now)
+	if err != nil {
+		log.Printf("email: weekly due: %v", err)
+		return
+	}
+	sent := 0
+	for _, d := range due {
+		raw, err := j.Outbox.WeeklySummary(ctx, d.HouseholdID, d.UserID, d.WeekStart)
+		var w Weekly
+		if err == nil {
+			err = json.Unmarshal(raw, &w)
+		}
+		if err != nil {
+			log.Printf("email: weekly summary: %v", err)
+			continue
+		}
+		if w.Quiet() {
+			if err := j.Outbox.MarkWeekly(ctx, d.HouseholdID, d.UserID, d.WeekStart, false); err != nil {
+				log.Printf("email: mark weekly: %v", err)
+			}
+			continue
+		}
+		token := Sign(j.LinkKey, Link{UserID: d.UserID, HouseholdID: d.HouseholdID, Kind: db.EmailWeekly})
+		m, err := ComposeWeekly(w, Links{App: j.AppURL, Logo: j.LogoURL}, token, d.Household)
+		if err != nil {
+			log.Printf("email: weekly compose: %v", err)
+			_ = j.Outbox.MarkWeekly(ctx, d.HouseholdID, d.UserID, d.WeekStart, false) // can't be built: don't retry forever
+			continue
+		}
+		m.To = d.Email
+		if err := j.Sender.Send(ctx, m); err != nil {
+			log.Printf("email: send weekly: %v", err)
+			continue
+		}
+		if err := j.Outbox.MarkWeekly(ctx, d.HouseholdID, d.UserID, d.WeekStart, true); err != nil {
+			log.Printf("email: mark weekly: %v", err)
+		}
+		sent++
+	}
+	if sent > 0 {
+		log.Printf("email: sent %d weekly summaries", sent)
 	}
 }
 

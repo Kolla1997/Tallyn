@@ -72,6 +72,7 @@ const (
 	EmailReconnect    = "reconnect"
 	EmailPaymentDue   = "payment_due"
 	EmailKidReconnect = "kid_reconnect" // with the child's user ID
+	EmailWeekly       = "weekly"        // the weekly summary (#273)
 )
 
 // SetEmail turns one of userID's emails on or off, from a signed
@@ -82,7 +83,7 @@ func (d *DB) SetEmail(ctx context.Context, userID, householdID, kind, kid string
 		return ErrInvalid
 	}
 	switch kind {
-	case EmailReconnect, EmailPaymentDue:
+	case EmailReconnect, EmailPaymentDue, EmailWeekly:
 		kid = ""
 	case EmailKidReconnect:
 	default:
@@ -98,6 +99,7 @@ func (d *DB) SetEmail(ctx context.Context, userID, householdID, kind, kid string
 			update public.notification_settings set
 			  email_reconnect = case when $3 = 'reconnect' then $4 else email_reconnect end,
 			  email_payment_due = case when $3 = 'payment_due' then $4 else email_payment_due end,
+			  email_weekly = case when $3 = 'weekly' then $4 else email_weekly end,
 			  email_kid_reconnect = case when $3 <> 'kid_reconnect' then email_kid_reconnect
 			                             when $4 then array(select distinct unnest(email_kid_reconnect || nullif($5, '')::uuid))
 			                             else array_remove(email_kid_reconnect, nullif($5, '')::uuid) end
