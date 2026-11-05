@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-30
+updated: 2026-11-05
 tags: [product]
 ---
 
@@ -33,7 +33,7 @@ Families connect their bank accounts and cards, see one total balance, track spe
 5. Savings goals
 
 ## Future
-- Multi-currency: accounts in any currency, one total in the home currency (#11)
+- Multi-currency, later: accounts in any currency, one total in the home currency (#11). Not now: Coinroof is US only, in USD
 - AI assistant over the family's financial data (RAG with pgvector)
 
 ## What Tallyn is not
