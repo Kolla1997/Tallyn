@@ -40,7 +40,7 @@ export default function App() {
   // So is stopping an email: the signed link is the proof (#269).
   if (path === '/unsubscribe') {
     return (
-      <AuthPage centred>
+      <AuthPage centred bare>
         <Suspense fallback={<TallynLoader />}>
           <Unsubscribe />
         </Suspense>
