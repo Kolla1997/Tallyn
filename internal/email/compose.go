@@ -14,7 +14,9 @@ import (
 
 // The emails Dinesh picked (option C in drafts/269-notification-emails.html):
 // a plain heading that says what to do, the amount in a tile, one button.
-// Solid colours only: mail apps don't blur. Red only for overdue.
+// Solid colours only: mail apps don't blur. Red only for overdue. Gmail
+// doesn't load web fonts, so each face falls back to a close one already on
+// the device (Avenir Next on Apple, Segoe UI on Windows).
 
 // Alert is what an email is about, from the alert's data (0023).
 type Alert struct {
@@ -197,13 +199,13 @@ func formatMoney(minor int64, currency string) string {
 // page is the email, with inline styles: many mail apps drop <style>.
 var page = template.Must(template.New("email").Parse(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet"><title>{{.Heading}}</title></head>
-<body style="margin:0;padding:0;background:#f6f1ea;font-family:Montserrat,Helvetica,Arial,sans-serif;color:#18181b">
+<body style="margin:0;padding:0;background:#f6f1ea;font-family:Montserrat,'Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif;color:#18181b">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea"><tr><td style="padding:24px 16px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid #ece6dd;border-radius:22px"><tr><td align="center" style="padding:28px 24px;text-align:center">
-<img src="{{.LogoURL}}" alt="Coinroof" width="138" height="28" style="display:block;height:28px;width:138px;border:0;margin:0 auto 20px;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;font-weight:700;font-size:18px;color:#18181b">
-<h1 style="margin:0 0 8px;font-family:'Space Grotesk',Helvetica,Arial,sans-serif;font-size:22px;line-height:1.25;color:#18181b">{{.Heading}}</h1>
+<img src="{{.LogoURL}}" alt="Coinroof" width="138" height="28" style="display:block;height:28px;width:138px;border:0;margin:0 auto 20px;font-family:'Space Grotesk','Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif;font-weight:700;font-size:18px;color:#18181b">
+<h1 style="margin:0 0 8px;font-family:'Space Grotesk','Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif;font-size:22px;line-height:1.25;color:#18181b">{{.Heading}}</h1>
 {{if .Figure}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea;border-radius:16px;margin-top:16px"><tr>
-<td align="center" style="padding:16px;text-align:center"><div style="font-size:13px;color:#52525b">{{.Label}}</div><div style="font-family:'Space Grotesk',Helvetica,Arial,sans-serif;font-weight:700;font-size:30px;line-height:1.2;font-variant-numeric:tabular-nums;color:{{if .Red}}#cb0900{{else}}#18181b{{end}}">{{.Figure}}</div>
+<td align="center" style="padding:16px;text-align:center"><div style="font-size:13px;color:#52525b">{{.Label}}</div><div style="font-family:'Space Grotesk','Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif;font-weight:700;font-size:30px;line-height:1.2;font-variant-numeric:tabular-nums;color:{{if .Red}}#cb0900{{else}}#18181b{{end}}">{{.Figure}}</div>
 <span style="display:inline-block;margin-top:6px;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;{{if .Red}}background:#fde8e7;color:#a30700{{else}}background:#e4e4e7;color:#3f3f46{{end}}">{{.Chip}}</span></td></tr></table>{{end}}
 {{if .Tile}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea;border-radius:16px;margin-top:16px"><tr>
 <td align="center" style="padding:16px;text-align:center"><div style="font-weight:700;font-size:16px;color:#18181b">{{.Tile}}</div>
