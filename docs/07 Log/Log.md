@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-11-05
+- #281 Product news (PR #284): Dinesh picked A (`drafts/281-product-news.html`). Box at sign-up and on Before you start, ticked except for browsers in Europe; Settings switch; stop link for news only; every choice kept with source and Privacy Policy version (0027, applied to the sandbox); Resend sender, no campaigns yet. Open: Privacy Policy line (lawyer), choices in the data export (#54).
 - #280 Welcome and invite emails (PR #282): Dinesh picked F, the short letter, after two rounds of drafts (`drafts/280-welcome-emails.html`). Welcome sent once after agreeing to the terms (last 7 days only); invite sent by the API when made, with the join link. Brevo, no stop link. 0026 applied to the sandbox; both tested to the test address.
 - #281 Newsletter through Resend created: switch shown on at sign-up, off for EU/UK; Dinesh to make the Resend account. Waits for coinroof.us.
 - Decision: Dinesh said Coinroof is US only, in USD. Emails drop currency wording. Open: update Vision and CLAUDE.md, and what happens to multi-currency (#11).
