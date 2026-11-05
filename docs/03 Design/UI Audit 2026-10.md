@@ -29,6 +29,8 @@ A one-off audit of every screen and component in `web/` using the outside skills
 About 110 findings. Most are invisible. Glass and contrast hold up well: every main text colour passes AA on glass, dialogs, inputs and buttons stay solid, and both fallbacks exist for the main surfaces.
 
 **Fixed already**
+- #160 (2026-11-05): G5 about 100 written-out greys now use fixed grey tokens (three odd colours stay: the dark sage tint and the two warning ambers, which need their own tokens); G8 the one exact duplicate rule removed and the header comment updated (the other repeats are the same fallback in its two blocks, on purpose). G9 off-scale sizes are visible, so they wait for a draft.
+- #154 (2026-11-05): long words in the redesign's panels and the bell's list break instead of running out.
 - #153 rechecked 2026-11-05: every finding still holds. New since the audit and fixed: faint grey focus rings on the newer components, the notification bell's focus (Escape, Tab out, closing an alert), and goal, budget and alert-amount errors not tied to their fields.
 - #153, #154, #155 (2026-10-30, one PR): the keyboard, worst-case data and glass/motion findings below. M8 and M9 went with the redesign (those chart files no longer exist); M10 was fixed in #253; A10 was gone already.
 - [#146](https://github.com/Kolla1997/Tallyn/issues/146): budget amounts with a comma decimal saved 100× too big ("12,50" → 1,250.00). PR #148.

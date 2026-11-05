@@ -112,12 +112,13 @@ describe('NotificationSettings', () => {
   it('turns down an amount that is not a positive number', async () => {
     render(<NotificationSettings me={me} household={household} />)
     const amt = await screen.findByRole('textbox', { name: 'Low balance amount' })
-    const before = api.mock.calls.length
+    const puts = () => api.mock.calls.filter(([, o]) => o?.method === 'PUT').length // saves only: other panels may still be loading
+    const before = puts()
     fireEvent.change(amt, { target: { value: 'abc' } })
     fireEvent.blur(amt)
     expect(amt).toHaveAttribute('aria-invalid', 'true')
     expect(amt).toHaveAccessibleDescription('Enter an amount over $0.') // said, not only red (#153)
-    expect(api.mock.calls.length).toBe(before)
+    expect(puts()).toBe(before)
   })
 
   it('shares with a partner, and says kids alerts always come to the adults', async () => {
