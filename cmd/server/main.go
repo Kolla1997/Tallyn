@@ -16,6 +16,7 @@ import (
 	"github.com/Kolla1997/Tallyn/internal/api"
 	"github.com/Kolla1997/Tallyn/internal/auth"
 	"github.com/Kolla1997/Tallyn/internal/db"
+	"github.com/Kolla1997/Tallyn/internal/email"
 	"github.com/Kolla1997/Tallyn/internal/plaid"
 	"github.com/Kolla1997/Tallyn/internal/supabaseadmin"
 	banksync "github.com/Kolla1997/Tallyn/internal/sync"
@@ -66,7 +67,7 @@ func main() {
 	// A malformed key stops the server: better than failing on the first link.
 	var box *tokencrypt.Box
 	var plaidClient *plaid.Client
-	var codeKey, closingKey []byte
+	var codeKey, closingKey, linkKey []byte
 	if key := os.Getenv("TOKEN_ENCRYPTION_KEY"); key != "" && key != "replace-me" {
 		b, err := tokencrypt.New(key)
 		if err != nil {
@@ -76,6 +77,7 @@ func main() {
 		raw, _ := base64.StdEncoding.DecodeString(strings.TrimSpace(key)) // checked by tokencrypt.New
 		codeKey = api.DeriveBackupCodeKey(raw)                            // backup codes (#23)
 		closingKey = api.DeriveClosingKey(raw)                            // closing records (#56)
+		linkKey = email.DeriveLinkKey(raw)                                // unsubscribe links (#269)
 	}
 	// Recovering a lost authenticator (#23, ADR 0013) removes it through
 	// Supabase's admin API, with the server-only key. Without it, backup codes
@@ -133,6 +135,7 @@ func main() {
 		reconnected = syncer.Reconnected
 		go syncer.Run(ctx)
 		go purgeClosingRecords(ctx, system)
+		go emailJob(system, linkKey).Run(ctx)
 		log.Printf("tallyn: bank sync every %s", every)
 	}
 
@@ -155,6 +158,7 @@ func main() {
 			CodeKey:         codeKey,
 			Accounts:        accounts,
 			ClosingKey:      closingKey,
+			LinkKey:         linkKey,
 		}),
 		ReadHeaderTimeout: 10 * time.Second,
 		// #24: slow or stuck clients can't hold connections open.
@@ -180,6 +184,27 @@ func main() {
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		log.Printf("tallyn: shutdown: %v", err)
 	}
+}
+
+// emailJob checks payments due and sends notification emails (#269), every
+// 5 minutes, with the sync's login. Without BREVO_API_KEY it only logs.
+// With a key, every email goes to EMAIL_TEST_TO until EMAIL_LIVE=true, set
+// once coinroof.us is verified in Brevo: a half-ready setup never reaches a
+// family.
+func emailJob(system *db.System, linkKey []byte) *email.Job {
+	var sender email.Sender = email.Logger{}
+	if k := os.Getenv("BREVO_API_KEY"); k != "" && k != "replace-me" {
+		sender = email.Brevo{Key: k, FromEmail: getenv("EMAIL_FROM", "alerts@coinroof.us"), FromName: "Coinroof"}
+		switch to := os.Getenv("EMAIL_TEST_TO"); {
+		case to != "":
+			sender = email.TestOnly{To: to, Next: sender}
+			log.Printf("tallyn: emails go to EMAIL_TEST_TO only")
+		case os.Getenv("EMAIL_LIVE") != "true":
+			log.Printf("tallyn: BREVO_API_KEY set without EMAIL_TEST_TO or EMAIL_LIVE=true, emails are only logged")
+			sender = email.Logger{}
+		}
+	}
+	return &email.Job{Outbox: system, Sender: sender, LinkKey: linkKey, AppURL: strings.TrimRight(getenv("APP_URL", "http://localhost:8080"), "/"), LogoURL: os.Getenv("EMAIL_LOGO_URL"), Every: 5 * time.Minute}
 }
 
 func getenv(key, fallback string) string {

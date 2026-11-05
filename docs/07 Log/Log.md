@@ -2,13 +2,21 @@
 type: log
 status: active
 owner: Dinesh
-updated: 2026-11-03
+updated: 2026-11-04
 tags: [log]
 ---
 
 # Log
 
 Newest first. One entry per working session or decision.
+
+## 2026-11-04
+- #269 Notification emails: scope agreed with Dinesh (Brevo from day one, test sends to him only until coinroof.us is verified; owners only; a parent can opt in to a child's reconnect emails). Weekly summary is #273, monthly highlights #274.
+- #269 Payment due is a new alert (in the app always, email by choice): three days before a card or loan is due, and again when overdue, checked by the server every 5 minutes with the sync's login (`0023_notification_emails.sql`).
+- #269 Dinesh picked Settings B and unsubscribe page A (`drafts/269-notification-emails.html`). Emails went through C, then round 2 (`drafts/269-email-designs-2.html`) and backgrounds (`drafts/269-email-backgrounds.html`): he picked D1, a white card with a black band and the red-fade logo, a calendar leaf and a figures slip. No clay or glass in email; the unsubscribe page has no site footer.
+- #269 Checked with real email on the sandbox (Brevo, test address only): payment due and reconnect arrived in Gmail (Mac and iPhone); the footer link, the page's button and Gmail's own Unsubscribe each turned the switch off. Gmail's iPhone dark mode recolours emails on its own. The logo needs a public link (`EMAIL_LOGO_URL`, hosted on Brevo) until the app is online. The sandbox's Plaid Mortgage is really overdue, so it shows an overdue alert.
+- #269 Unsubscribe links are signed (key derived from `TOKEN_ENCRYPTION_KEY`), turn one email off by a button press (opening changes nothing), have a one-click mail-app header, and change settings as the person through RLS. No expiry; changing the key cancels them all.
+- #269 Sending needs `BREVO_API_KEY`; every email goes to `EMAIL_TEST_TO` until `EMAIL_LIVE=true`, so a half-ready setup never reaches a family.
 
 ## 2026-11-03
 - #267 Notification list, Dinesh's changes: light glass with dark tiles (the reverse in dark mode); an × on each alert and "Close all" per day (`0022_notification_dismiss.sql`). Closing a bank to reconnect keeps it on Home's strip until fixed.

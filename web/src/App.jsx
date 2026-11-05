@@ -20,6 +20,7 @@ import Heading from './components/Heading.jsx'
 // Loaded only when needed (#99): the legal pages and first-time 2FA setup.
 const LegalPage = lazy(() => import('./screens/LegalPage.jsx'))
 const SetUp2FA = lazy(() => import('./screens/SetUp2FA.jsx'))
+const Unsubscribe = lazy(() => import('./screens/Unsubscribe.jsx'))
 
 // Sign-in flow (#7, ADR 0003): email + password, then 2FA with an
 // authenticator app. Only a 2FA-completed (aal2) session reaches Home, and the
@@ -32,6 +33,16 @@ export default function App() {
       <AuthPage wide>
         <Suspense fallback={<TallynLoader />}>
           <LegalPage doc={path.slice(1)} />
+        </Suspense>
+      </AuthPage>
+    )
+  }
+  // So is stopping an email: the signed link is the proof (#269).
+  if (path === '/unsubscribe') {
+    return (
+      <AuthPage centred bare>
+        <Suspense fallback={<TallynLoader />}>
+          <Unsubscribe />
         </Suspense>
       </AuthPage>
     )

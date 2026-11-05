@@ -81,14 +81,19 @@ type NotificationSettings struct {
 	ShareWith        *string `json:"share_with"`
 	EmailReconnect   bool    `json:"email_reconnect"`
 	EmailPaymentDue  bool    `json:"email_payment_due"`
+	// Children whose reconnect emails this parent wants (#269).
+	EmailKidReconnect []string `json:"email_kid_reconnect"`
 }
 
-const maxAlertMinor = 100_000_000_000
+const (
+	maxAlertMinor = 100_000_000_000
+	maxKidEmails  = 20 // as 0023's check
+)
 
 // NotificationSettingsFor returns userID's settings in the household, or the
 // defaults when they haven't saved any. ErrForbidden if they aren't in it.
 func (d *DB) NotificationSettingsFor(ctx context.Context, userID, householdID string) (NotificationSettings, error) {
-	s := NotificationSettings{BigPurchase: true, BigPurchaseMinor: 50000, LowBalance: true, LowBalanceMinor: 10000, Joined: true}
+	s := NotificationSettings{BigPurchase: true, BigPurchaseMinor: 50000, LowBalance: true, LowBalanceMinor: 10000, Joined: true, EmailKidReconnect: []string{}}
 	if !uuidRE.MatchString(householdID) {
 		return s, ErrInvalid
 	}
@@ -101,9 +106,11 @@ func (d *DB) NotificationSettingsFor(ctx context.Context, userID, householdID st
 			return ErrForbidden
 		}
 		err := tx.QueryRow(ctx, `
-			select big_purchase, big_purchase_minor, low_balance, low_balance_minor, joined, share_with, email_reconnect, email_payment_due
+			select big_purchase, big_purchase_minor, low_balance, low_balance_minor, joined, share_with, email_reconnect, email_payment_due,
+			       email_kid_reconnect::text[]
 			from public.notification_settings where household_id = $1 and user_id = $2`, householdID, userID).
-			Scan(&s.BigPurchase, &s.BigPurchaseMinor, &s.LowBalance, &s.LowBalanceMinor, &s.Joined, &s.ShareWith, &s.EmailReconnect, &s.EmailPaymentDue)
+			Scan(&s.BigPurchase, &s.BigPurchaseMinor, &s.LowBalance, &s.LowBalanceMinor, &s.Joined, &s.ShareWith, &s.EmailReconnect, &s.EmailPaymentDue,
+				&s.EmailKidReconnect)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil
 		}
@@ -117,20 +124,32 @@ func (d *DB) NotificationSettingsFor(ctx context.Context, userID, householdID st
 func (d *DB) SaveNotificationSettings(ctx context.Context, userID, householdID string, s NotificationSettings) error {
 	if !uuidRE.MatchString(householdID) ||
 		s.BigPurchaseMinor <= 0 || s.BigPurchaseMinor > maxAlertMinor || s.LowBalanceMinor <= 0 || s.LowBalanceMinor > maxAlertMinor ||
-		(s.ShareWith != nil && (!uuidRE.MatchString(*s.ShareWith) || *s.ShareWith == userID)) {
+		(s.ShareWith != nil && (!uuidRE.MatchString(*s.ShareWith) || *s.ShareWith == userID)) ||
+		len(s.EmailKidReconnect) > maxKidEmails {
 		return ErrInvalid
+	}
+	if s.EmailKidReconnect == nil {
+		s.EmailKidReconnect = []string{}
+	}
+	for _, k := range s.EmailKidReconnect {
+		if !uuidRE.MatchString(k) {
+			return ErrInvalid
+		}
 	}
 	return mapErr(d.AsUser(ctx, userID, func(tx pgx.Tx) error {
 		tag, err := tx.Exec(ctx, `
 			insert into public.notification_settings
-			  (household_id, user_id, big_purchase, big_purchase_minor, low_balance, low_balance_minor, joined, share_with, email_reconnect, email_payment_due)
-			values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+			  (household_id, user_id, big_purchase, big_purchase_minor, low_balance, low_balance_minor, joined, share_with, email_reconnect, email_payment_due,
+			   email_kid_reconnect)
+			values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::uuid[])
 			on conflict (household_id, user_id) do update set
 			  big_purchase = excluded.big_purchase, big_purchase_minor = excluded.big_purchase_minor,
 			  low_balance = excluded.low_balance, low_balance_minor = excluded.low_balance_minor,
 			  joined = excluded.joined, share_with = excluded.share_with,
-			  email_reconnect = excluded.email_reconnect, email_payment_due = excluded.email_payment_due`,
-			householdID, userID, s.BigPurchase, s.BigPurchaseMinor, s.LowBalance, s.LowBalanceMinor, s.Joined, s.ShareWith, s.EmailReconnect, s.EmailPaymentDue)
+			  email_reconnect = excluded.email_reconnect, email_payment_due = excluded.email_payment_due,
+			  email_kid_reconnect = excluded.email_kid_reconnect`,
+			householdID, userID, s.BigPurchase, s.BigPurchaseMinor, s.LowBalance, s.LowBalanceMinor, s.Joined, s.ShareWith, s.EmailReconnect, s.EmailPaymentDue,
+			s.EmailKidReconnect)
 		if err != nil {
 			return err
 		}

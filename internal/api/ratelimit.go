@@ -87,15 +87,18 @@ type limits struct {
 	accepts  *limiter // accepting an invite link
 	recovery *limiter // backup-code tries (#23): each one guesses a code
 	exports  *limiter // data downloads (#54): each one is a full copy
+	// Unsubscribe links (#269), per person the link is for.
+	unsubscribe *limiter
 }
 
 func newLimits() limits {
 	return limits{
-		all:      newLimiter(600, time.Minute),
-		plaid:    newLimiter(30, time.Hour),
-		invites:  newLimiter(20, time.Hour),
-		accepts:  newLimiter(10, 10*time.Minute),
-		recovery: newLimiter(5, 15*time.Minute),
-		exports:  newLimiter(3, time.Hour),
+		all:         newLimiter(600, time.Minute),
+		plaid:       newLimiter(30, time.Hour),
+		invites:     newLimiter(20, time.Hour),
+		accepts:     newLimiter(10, 10*time.Minute),
+		recovery:    newLimiter(5, 15*time.Minute),
+		exports:     newLimiter(3, time.Hour),
+		unsubscribe: newLimiter(30, time.Hour),
 	}
 }

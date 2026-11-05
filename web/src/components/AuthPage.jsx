@@ -6,14 +6,15 @@ import { Link } from '../lib/router.jsx'
 // Centered single-card layout with the logo (the calm look, #187, from app.css .calm-auth): sign-in, 2FA, joining a
 // household, creating your first household, and full-page errors.
 // `centred` puts the card in the middle of the page (the 2FA screens, #108).
-export default function AuthPage({ children, wide = false, centred = false }) {
+// `bare` leaves out the site footer: one-task pages reached from an email, like unsubscribe (#269).
+export default function AuthPage({ children, wide = false, centred = false, bare = false }) {
   return (
     <main className={`page calm-page calm-auth${wide ? ' page-wide' : ''}${centred ? ' page-centred' : ''}`}>
       <ThemeSwitch className="fixed top-4 right-4 z-10" />
       <img className="logo dark:hidden" src={logo} alt="Coinroof" />
       <img className="logo hidden dark:block" src={logoDark} alt="Coinroof" />
       {children}
-      <SiteFooter />
+      {!bare && <SiteFooter />}
     </main>
   )
 }

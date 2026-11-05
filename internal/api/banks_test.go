@@ -77,6 +77,7 @@ func (stubStore) DismissNotifications(context.Context, string, []string) error {
 func (stubStore) NotificationSettingsFor(context.Context, string, string) (db.NotificationSettings, error) {
 	return db.NotificationSettings{}, errors.New("stub")
 }
+func (stubStore) SetEmail(context.Context, string, string, string, string, bool) error { return nil }
 func (stubStore) SaveNotificationSettings(context.Context, string, string, db.NotificationSettings) error {
 	return errors.New("stub")
 }

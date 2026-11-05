@@ -69,6 +69,7 @@ type Store interface {
 	DismissNotifications(ctx context.Context, userID string, ids []string) error
 	NotificationSettingsFor(ctx context.Context, userID, householdID string) (db.NotificationSettings, error) // #268
 	SaveNotificationSettings(ctx context.Context, userID, householdID string, s db.NotificationSettings) error
+	SetEmail(ctx context.Context, userID, householdID, kind, kid string, on bool) error // #269
 }
 
 // Deps is what the router needs. Nil fields switch off the routes that need
@@ -95,6 +96,7 @@ type Deps struct {
 	// Closing an account (#56, ADR 0015). Without both, closing answers 503.
 	Accounts   AccountDeleter // *supabaseadmin.Client
 	ClosingKey []byte         // DeriveClosingKey(token key)
+	LinkKey    []byte         // email.DeriveLinkKey(token key): unsubscribe links (#269)
 }
 
 // NewRouter returns the server's handler: JSON API under /api/ and the
@@ -182,6 +184,14 @@ func NewRouter(d Deps) http.Handler {
 	// Also outside: after an owner reset their 2FA (#120), a teen signs in with
 	// only a password and is told who reset it.
 	mux.Handle("GET /api/recovery/2fa-reset", noStore(resetNote))
+	// Also outside: unsubscribe links from emails, signed instead of signed in (#269).
+	if d.Store != nil && len(d.LinkKey) == 32 {
+		u := unsubscriber{store: d.Store, key: d.LinkKey, lim: lim.unsubscribe}
+		mux.Handle("GET /api/email/unsubscribe", noStore(http.HandlerFunc(u.which)))
+		mux.Handle("POST /api/email/unsubscribe", noStore(http.HandlerFunc(u.set)))
+	} else {
+		mux.Handle("/api/email/unsubscribe", noStore(unavailable("unsubscribe_unavailable")))
+	}
 	// API answers are never cached; limits count per signed-in person (#24).
 	mux.Handle("/api/", noStore(requireAuth(limited(lim.all, api))))
 	mux.Handle("/", spa(d.WebDir))
