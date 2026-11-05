@@ -2,7 +2,9 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { BellIcon } from './Icons.jsx'
 import { navigate } from '../lib/router.jsx'
-import { describe, dismiss, groups, markRead, needsYou, refresh, shown, useNotifications, when } from '../lib/notifications.js'
+import { budgetAlert, describe, dismiss, groups, markRead, needsYou, refresh, shown, useNotifications, when } from '../lib/notifications.js'
+import { formatMoney } from '../lib/money.js'
+import { categoryPath } from './TxIcon.jsx'
 import { ReconnectBank } from '../screens/Banks.jsx'
 
 // In-app notifications (#267, Dinesh picked draft C, with the bell top right
@@ -22,6 +24,56 @@ function Words({ parts, inverse }) {
         {p.b}
       </b>
     ),
+  )
+}
+
+// A spending-limit alert (#55, Dinesh picked the small F1 card in drafts/55-spending-limits.html):
+// a ring with the category's icon, the category and days to go on the left, the amount on the right.
+function BudgetAlert({ n }) {
+  const b = budgetAlert(n)
+  const r = 18
+  const c = 2 * Math.PI * r
+  const tone = b.over ? 'var(--color-redesign-accent)' : 'var(--color-warning)'
+  return (
+    <span className="flex items-center gap-3">
+      <svg viewBox="0 0 44 44" className="size-11 shrink-0" aria-hidden="true">
+        <circle cx="22" cy="22" r={r} fill="none" stroke="var(--ni-track)" strokeWidth="5" />
+        <circle
+          cx="22"
+          cy="22"
+          r={r}
+          fill="none"
+          stroke={tone}
+          strokeWidth="5"
+          strokeLinecap="round"
+          strokeDasharray={`${(b.share * c).toFixed(1)} ${c.toFixed(1)}`}
+          transform="rotate(-90 22 22)"
+        />
+        <path
+          d={categoryPath(b.category)}
+          transform="translate(13 13) scale(0.75)"
+          fill="none"
+          stroke="var(--ni-ink)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <span className="min-w-0 grow">
+        <span className="block font-semibold text-[var(--ni-ink)]">{b.name}</span>
+        <span className="block text-[12px] text-[var(--ni-muted)]">{b.days}</span>
+      </span>
+      <span className="shrink-0 text-right">
+        <b
+          className={`block font-[family-name:var(--font-heading)] text-[20px] leading-tight font-bold tabular-nums ${b.over ? 'text-[var(--ni-owe)]' : 'text-[var(--ni-ink)]'}`}
+        >
+          {formatMoney(b.amountMinor, n.data?.currency)}
+        </b>
+        <span className="block text-[12px] text-[var(--ni-muted)] tabular-nums">
+          {b.over ? 'over' : 'left of'} {formatMoney(n.data?.limit_minor ?? 0, n.data?.currency)}
+        </span>
+      </span>
+    </span>
   )
 }
 
@@ -132,7 +184,18 @@ export function NotificationBell({ className = '' }) {
                             className="notif-chip relative mb-2 block w-full border-0 px-2 py-2 pr-9 text-left text-[14px] text-[var(--ni-text)] hover:brightness-[1.04]"
                             onClick={() => go(n, to)}
                           >
-                            <Words parts={parts} inverse />
+                            {n.kind === 'budget_near' || n.kind === 'budget_over' ? (
+                              <>
+                                <span className="sr-only">
+                                  <Words parts={parts} inverse />
+                                </span>
+                                <span aria-hidden="true">
+                                  <BudgetAlert n={n} />
+                                </span>
+                              </>
+                            ) : (
+                              <Words parts={parts} inverse />
+                            )}
                             <span className="mt-0.5 block text-[12px] text-[var(--ni-muted)]">
                               {when(n.created_at)}
                               {n.needs_action && !n.resolved && ' · Needs you'}

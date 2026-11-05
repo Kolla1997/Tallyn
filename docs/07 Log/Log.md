@@ -11,6 +11,9 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-11-05
+- #55 Spending-limit alerts: a heads-up at 80% of a budget and another when it goes over, once per period, to whoever can see the budget; own switch (on) and email switch (off); 0028. Dinesh picked the small F1 card (ring left, amount right).
+- #160 G9 sizes, option C: in-between steps became spacing and corner tokens, one-offs snapped.
+- #263 Blur measured on a 4× slowed phone-sized Chrome: 60 fps, 0 dropped frames, change nothing; a real-phone check is on the release checklist. #255 launch-day steps in Dev Setup.
 - #153 Rechecked; fixed faint focus rings on newer components, the bell's focus, and goal/budget/alert-amount errors tied to fields (PR #297).
 - #160 Fixed grey tokens replace ~100 hand-written greys; one duplicate rule removed (PR #298). G9 sizes wait for a draft. Also a #154 follow-up (long words wrap in panels) and a flaky Settings test fixed.
 - #55 Checked: only the spending-limit alert is left (needs a draft).

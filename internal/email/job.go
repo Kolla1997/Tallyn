@@ -12,6 +12,7 @@ import (
 // Outbox is the database side of the job: db.System.
 type Outbox interface {
 	NotifyPaymentsDue(ctx context.Context, today time.Time) (int, error)
+	NotifyBudgets(ctx context.Context, today time.Time) (int, error)
 	EmailOutbox(ctx context.Context, max int) ([]db.OutboxEmail, error)
 	MarkEmailed(ctx context.Context, ids []string) error
 	WeeklyDue(ctx context.Context, now time.Time) ([]db.WeeklyDue, error)
@@ -56,6 +57,9 @@ func (j *Job) Run(ctx context.Context) {
 func (j *Job) Once(ctx context.Context, now time.Time) {
 	if _, err := j.Outbox.NotifyPaymentsDue(ctx, now); err != nil {
 		log.Printf("email: payments due: %v", err)
+	}
+	if _, err := j.Outbox.NotifyBudgets(ctx, now); err != nil {
+		log.Printf("email: spending limits: %v", err)
 	}
 	list, err := j.Outbox.EmailOutbox(ctx, batch)
 	if err != nil {
@@ -219,6 +223,9 @@ func (j *Job) weekly(ctx context.Context, now time.Time) {
 
 func (j *Job) compose(e db.OutboxEmail) (Message, error) {
 	l := Link{UserID: e.UserID, HouseholdID: e.HouseholdID, Kind: e.Kind}
+	if e.Kind == "budget_near" || e.Kind == "budget_over" {
+		l.Kind = db.EmailBudget // one stop link for both
+	}
 	if e.UserID != e.OwnerID {
 		l.Kind, l.Kid = db.EmailKidReconnect, e.OwnerID
 	}

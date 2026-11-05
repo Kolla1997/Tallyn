@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { describe as words, groups, needsYou, when } from '../lib/notifications.js'
+import { budgetAlert, describe as words, groups, needsYou, when } from '../lib/notifications.js'
 
 // In-app notifications (#267, draft C): the bell, its list and Home's strip.
 // All data is made up.
@@ -156,5 +156,34 @@ describe('NeedsYou', () => {
     const { container } = render(<NeedsYou householdId="hh-2" />)
     await act(async () => {})
     expect(container).toBeEmptyDOMElement()
+  })
+})
+
+// Spending-limit alerts (#55, the small F1 card).
+describe('spending-limit alerts', () => {
+  const near = {
+    id: 'b1',
+    kind: 'budget_near',
+    read: false,
+    created_at: new Date().toISOString(),
+    data: { category: 'FOOD_AND_DRINK', limit_minor: 50000, spent_minor: 41200, currency: 'USD', period_to: '2026-12-01' },
+  }
+  const over = { ...near, id: 'b2', kind: 'budget_over', data: { ...near.data, category: null, spent_minor: 53100, person: 'Mia' } }
+
+  it('says what is left, or how much over, and counts the days from today', () => {
+    expect(words(near).parts).toEqual([{ b: 'Food and drink: ' }, { b: '$88.00', money: true }, ' left of $500.00.'])
+    expect(words(over).parts).toEqual([{ b: "Mia's everything: " }, { b: '$31.00', money: true }, ' over $500.00.'])
+    expect(budgetAlert(near, new Date(2026, 10, 22)).days).toBe('9 days to go')
+    expect(budgetAlert(near, new Date(2026, 10, 30)).days).toBe('1 day to go')
+  })
+
+  it('shows the card in the bell: the category on the left, the amount on the right', async () => {
+    api.mockImplementation((path) => Promise.resolve(path === '/api/notifications' ? { notifications: [structuredClone(near)] } : null))
+    render(<NotificationBell />)
+    fireEvent.click(await screen.findByRole('button', { name: /^Notifications/ }))
+    const panel = screen.getByRole('region', { name: 'Notifications' })
+    expect(within(panel).getAllByText('$88.00')).toHaveLength(2) // the card, and the sentence screen readers hear
+    expect(within(panel).getByText('Food and drink')).toBeInTheDocument()
+    expect(within(panel).getByText(/left of \$500\.00/, { selector: 'span.tabular-nums' })).toBeInTheDocument()
   })
 })

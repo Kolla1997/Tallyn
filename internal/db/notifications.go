@@ -89,6 +89,9 @@ type NotificationSettings struct {
 	EmailIncludeShared bool    `json:"email_include_shared"`
 	EmailMonthly       bool    `json:"email_monthly"` // monthly highlights (#274)
 	TimeZone           *string `json:"time_zone"`
+	// Spending-limit alerts (#55): in the app, and by email.
+	Budget      bool `json:"budget"`
+	EmailBudget bool `json:"email_budget"`
 }
 
 const (
@@ -99,7 +102,7 @@ const (
 // NotificationSettingsFor returns userID's settings in the household, or the
 // defaults when they haven't saved any. ErrForbidden if they aren't in it.
 func (d *DB) NotificationSettingsFor(ctx context.Context, userID, householdID string) (NotificationSettings, error) {
-	s := NotificationSettings{BigPurchase: true, BigPurchaseMinor: 50000, LowBalance: true, LowBalanceMinor: 10000, Joined: true, EmailKidReconnect: []string{}}
+	s := NotificationSettings{BigPurchase: true, BigPurchaseMinor: 50000, LowBalance: true, LowBalanceMinor: 10000, Joined: true, Budget: true, EmailKidReconnect: []string{}}
 	if !uuidRE.MatchString(householdID) {
 		return s, ErrInvalid
 	}
@@ -113,10 +116,10 @@ func (d *DB) NotificationSettingsFor(ctx context.Context, userID, householdID st
 		}
 		err := tx.QueryRow(ctx, `
 			select big_purchase, big_purchase_minor, low_balance, low_balance_minor, joined, share_with, email_reconnect, email_payment_due,
-			       email_kid_reconnect::text[], email_weekly, email_include_shared, time_zone, email_monthly
+			       email_kid_reconnect::text[], email_weekly, email_include_shared, time_zone, email_monthly, budget, email_budget
 			from public.notification_settings where household_id = $1 and user_id = $2`, householdID, userID).
 			Scan(&s.BigPurchase, &s.BigPurchaseMinor, &s.LowBalance, &s.LowBalanceMinor, &s.Joined, &s.ShareWith, &s.EmailReconnect, &s.EmailPaymentDue,
-				&s.EmailKidReconnect, &s.EmailWeekly, &s.EmailIncludeShared, &s.TimeZone, &s.EmailMonthly)
+				&s.EmailKidReconnect, &s.EmailWeekly, &s.EmailIncludeShared, &s.TimeZone, &s.EmailMonthly, &s.Budget, &s.EmailBudget)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil
 		}
@@ -146,9 +149,9 @@ func (d *DB) SaveNotificationSettings(ctx context.Context, userID, householdID s
 		tag, err := tx.Exec(ctx, `
 			insert into public.notification_settings
 			  (household_id, user_id, big_purchase, big_purchase_minor, low_balance, low_balance_minor, joined, share_with, email_reconnect, email_payment_due,
-			   email_kid_reconnect, email_weekly, email_include_shared, email_monthly, time_zone)
+			   email_kid_reconnect, email_weekly, email_include_shared, email_monthly, time_zone, budget, email_budget)
 			values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::uuid[], $12, $13, $15, coalesce($14, (select time_zone from public.notification_settings
-			  where household_id = $1 and user_id = $2)))
+			  where household_id = $1 and user_id = $2)), $16, $17)
 			on conflict (household_id, user_id) do update set
 			  big_purchase = excluded.big_purchase, big_purchase_minor = excluded.big_purchase_minor,
 			  low_balance = excluded.low_balance, low_balance_minor = excluded.low_balance_minor,
@@ -156,9 +159,10 @@ func (d *DB) SaveNotificationSettings(ctx context.Context, userID, householdID s
 			  email_reconnect = excluded.email_reconnect, email_payment_due = excluded.email_payment_due,
 			  email_kid_reconnect = excluded.email_kid_reconnect,
 			  email_weekly = excluded.email_weekly, email_include_shared = excluded.email_include_shared,
-			  email_monthly = excluded.email_monthly, time_zone = excluded.time_zone`,
+			  email_monthly = excluded.email_monthly, time_zone = excluded.time_zone,
+			  budget = excluded.budget, email_budget = excluded.email_budget`,
 			householdID, userID, s.BigPurchase, s.BigPurchaseMinor, s.LowBalance, s.LowBalanceMinor, s.Joined, s.ShareWith, s.EmailReconnect, s.EmailPaymentDue,
-			s.EmailKidReconnect, s.EmailWeekly, s.EmailIncludeShared, s.TimeZone, s.EmailMonthly)
+			s.EmailKidReconnect, s.EmailWeekly, s.EmailIncludeShared, s.TimeZone, s.EmailMonthly, s.Budget, s.EmailBudget)
 		if err != nil {
 			return err
 		}

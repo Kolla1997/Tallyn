@@ -37,6 +37,20 @@ type alertData struct {
 	Currency       string `json:"currency"`
 	Overdue        bool   `json:"overdue"`
 	Person         string `json:"person"` // set when it's someone else's (a child's)
+	// Spending limits (#55, 0028).
+	Category   *string `json:"category"`
+	LimitMinor int64   `json:"limit_minor"`
+	SpentMinor int64   `json:"spent_minor"`
+	DaysLeft   int     `json:"days_left"`
+	Period     string  `json:"period"`
+}
+
+// budgetName is a budget's category in words, or the whole budget (#55).
+func budgetName(c *string) string {
+	if c == nil || *c == "" {
+		return "Everything"
+	}
+	return categoryName(*c)
 }
 
 // view is what the template shows.
@@ -122,6 +136,30 @@ func Compose(a Alert, links Links, token, household string) (Message, error) {
 			if len(v.Rows) > 1 {
 				v.Body = "Paying the full statement balance avoids interest."
 			}
+		}
+	case "budget_near", "budget_over":
+		name := budgetName(d.Category)
+		if d.Person != "" {
+			name = d.Person + "'s " + strings.ToLower(name[:1]) + name[1:]
+		}
+		limit := formatMoney(d.LimitMinor, d.Currency)
+		days := fmt.Sprintf("%d days to go", d.DaysLeft)
+		if d.DaysLeft == 1 {
+			days = "1 day to go"
+		}
+		v.Button, v.ButtonURL = "See budgets", appURL+"/budgets"
+		v.Why, v.StopText = "You're getting this because spending-limit emails are on for "+household+".", "Stop spending-limit emails"
+		v.Rows = []slipRow{{Label: "Limit", Value: limit}, {Label: "Spent", Value: formatMoney(d.SpentMinor, d.Currency)}}
+		if a.Kind == "budget_over" {
+			over := formatMoney(d.SpentMinor-d.LimitMinor, d.Currency)
+			subject = name + ": " + over + " over"
+			v.Heading = name + " is " + over + " over its " + limit + " limit"
+			v.Rows = append(v.Rows, slipRow{Label: "Over", Meta: days, Value: over, Total: true, Red: true})
+		} else {
+			left := formatMoney(d.LimitMinor-d.SpentMinor, d.Currency)
+			subject = name + ": " + left + " left"
+			v.Heading = name + " has " + left + " left of " + limit
+			v.Rows = append(v.Rows, slipRow{Label: "Left", Meta: days, Value: left, Total: true})
 		}
 	default:
 		return Message{}, fmt.Errorf("email: no email for %q alerts", a.Kind)

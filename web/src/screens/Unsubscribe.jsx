@@ -11,6 +11,7 @@ const WHAT = {
   kid_reconnect: { name: 'emails about your child’s bank', still: 'You’ll still see them in the app.' },
   weekly: { name: 'weekly summaries', still: 'Your week is still on Home and in Transactions.' },
   monthly: { name: 'monthly highlights', still: 'Your month is still on Home and in Transactions.' },
+  budget: { name: 'spending-limit emails', still: 'You’ll still see them in the app and on Budgets.' }, // #55
   news: { name: 'product news', still: 'You’ll still get alerts, summaries and account emails.' }, // #281
 }
 

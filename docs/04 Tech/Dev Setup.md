@@ -2,8 +2,8 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-30
-issues: [5, 6, 7, 8, 9, 30, 99, 113]
+updated: 2026-11-05
+issues: [5, 6, 7, 8, 9, 30, 99, 113, 255]
 tags: [tech, onboarding]
 ---
 
@@ -87,6 +87,28 @@ In the Supabase dashboard, for each project (dev and prod). See [[Feature - Auth
 - API → Data API: turn it off, or remove `public` from exposed schemas. Only the backend talks to the database
 
 To try the single-deployment setup: `cd web && npm run build`, then `go run ./cmd/server` serves the built app from `web/dist`.
+
+## Map on the hosted app (#255)
+The transaction map (ADR 0019) works locally from R2. On launch day, once the app has its address (`APP_URL`, for example `https://coinroof.us`):
+
+1. **Cloudflare → R2 → `coinroof-maps` → Settings → CORS policy**, replace it with this (change the first origin to the real address; keep localhost for development):
+   ```json
+   [
+     {
+       "AllowedOrigins": ["https://coinroof.us", "http://localhost:5173"],
+       "AllowedMethods": ["GET", "HEAD"],
+       "AllowedHeaders": ["Range"],
+       "ExposeHeaders": ["Content-Length", "Content-Range", "ETag"],
+       "MaxAgeSeconds": 86400
+     }
+   ]
+   ```
+   The map reads the file in pieces, so `Range` must be allowed and `Content-Range` exposed.
+2. **Server:** set `MAP_URL` to the map file's public address (the Content-Security-Policy allows it).
+3. **Web build:** set `VITE_MAP_URL` (same address) and `VITE_MAP_ASSETS` (the `map-assets` folder) before `npm run build`.
+4. **Check:** open a transaction that has a place; the map shows with its pin. In the browser console there are no CORS errors.
+
+> [!todo] When the domain is settled (#203), give the bucket a custom domain and use it in steps 1–3 instead of the r2.dev address.
 
 ## Browser end-to-end tests (#113)
 The P0 paths (sign-in with 2FA, Home totals, connecting a sandbox bank, inviting a member, sharing) in a real browser, against the Go API, a **Supabase project just for tests** and the Plaid sandbox. They run weekly (Mondays) and by hand (GitHub → Actions → **End-to-end** → Run workflow), never on pull requests. Rows in [[Test Plan]].

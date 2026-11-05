@@ -240,7 +240,7 @@ body:has(.calm-page)::before {
     }
     .calm-page .btn {
       font-size: 13px;
-      padding: 7px 14px;
+      padding: var(--space-s2) var(--space-x14);
     }
   }
   .calm-page :is(.amount, .money, [class*='amount']) {
@@ -259,8 +259,8 @@ body:has(.calm-page)::before {
    screens keep their markup; these rules give it the draft's look over the old stylesheet. */
 @layer components {
   .calm-auth.page {
-    padding: 48px 16px 24px;
-    gap: 24px;
+    padding: var(--space-s7) var(--space-s4) var(--space-s5);
+    gap: var(--space-s5);
   }
   .calm-auth .logo {
     width: auto;
@@ -269,10 +269,10 @@ body:has(.calm-page)::before {
   }
   .calm-auth .card {
     max-width: 360px;
-    gap: 16px;
-    padding: 20px;
+    gap: var(--space-s4);
+    padding: var(--space-x20);
     border: 1px solid var(--color-zinc-200);
-    border-radius: 16px;
+    border-radius: var(--radius-medium);
     background: var(--color-white);
     box-shadow: none;
     backdrop-filter: none;
@@ -292,18 +292,18 @@ body:has(.calm-page)::before {
     font-weight: 400;
   }
   .calm-auth .card form {
-    gap: 16px;
+    gap: var(--space-s4);
   }
   .calm-auth .card :is(label, .field) {
-    gap: 4px;
+    gap: var(--space-s1);
     font-size: 14px;
     font-weight: 600;
   }
   .calm-auth .card :is(input:not([type='checkbox']):not([type='radio']), select) {
     height: 40px;
-    padding: 0 12px;
+    padding: 0 var(--space-s3);
     border: 1px solid var(--color-zinc-300);
-    border-radius: 12px;
+    border-radius: var(--radius-small);
     background: var(--color-white);
     font-size: 14px;
     font-weight: 400;
@@ -313,7 +313,7 @@ body:has(.calm-page)::before {
     align-self: center;
     min-width: 140px;
     height: 36px;
-    padding: 0 32px;
+    padding: 0 var(--space-s6);
     border: 0;
     border-radius: 999px;
     background: var(--color-redesign-button);
@@ -336,7 +336,7 @@ body:has(.calm-page)::before {
   .calm-auth .card .btn-small {
     min-width: 0;
     height: 32px;
-    padding: 0 12px;
+    padding: 0 var(--space-s3);
     font-size: 13px;
   }
   .calm-auth .card :is(.link, .link-quiet, .switch-link, a) {
@@ -369,8 +369,8 @@ body:has(.calm-page)::before {
   }
   .calm-auth .card :is(.info-note, .warn-note) {
     margin: 0;
-    padding: 12px;
-    border-radius: 12px;
+    padding: var(--space-s3);
+    border-radius: var(--radius-small);
     background: var(--color-zinc-50);
     color: var(--color-zinc-700);
     font-size: 13px;
@@ -387,7 +387,7 @@ body:has(.calm-page)::before {
     font-weight: 600;
   }
   .calm-auth .card .code-boxes {
-    gap: 6px;
+    gap: var(--space-x6);
   }
   .calm-auth .card .code-box {
     height: 48px;
@@ -414,7 +414,7 @@ body:has(.calm-page)::before {
     font-weight: 600;
   }
   .calm-auth .card .agree {
-    gap: 10px;
+    gap: var(--space-x10);
     color: var(--color-zinc-700);
     font-size: 13px;
     font-weight: 400;
@@ -422,7 +422,7 @@ body:has(.calm-page)::before {
   .calm-auth .card .agree input {
     width: 16px;
     height: 16px;
-    margin-top: 2px;
+    margin-top: var(--space-x2);
     accent-color: var(--color-redesign-button);
   }
   .calm-auth .card .reset-icon {
@@ -434,9 +434,9 @@ body:has(.calm-page)::before {
   .calm-auth .card .qr {
     width: 160px;
     height: 160px;
-    padding: 10px;
+    padding: var(--space-x10);
     border: 1px solid var(--color-zinc-200);
-    border-radius: 12px;
+    border-radius: var(--radius-small);
   }
   /* Setting up 2FA on wide screens (#220): the QR code sits beside steps 1 and 2, so the card
      stays short. Phones keep it stacked. */
@@ -444,18 +444,18 @@ body:has(.calm-page)::before {
     .calm-auth .card .qr-scan {
       display: grid;
       grid-template-columns: 112px minmax(0, 1fr);
-      gap: 14px;
+      gap: var(--space-x14);
       align-items: start;
     }
     .calm-auth .card .qr-scan > div {
       display: grid;
-      gap: 8px;
+      gap: var(--space-s2);
     }
     .calm-auth .card .qr-scan .qr {
       justify-self: start;
       width: 112px;
       height: 112px;
-      padding: 6px;
+      padding: var(--space-x6);
     }
     .calm-auth .card .qr-scan .secret {
       font-size: 12px;
@@ -487,13 +487,13 @@ body:has(.calm-page)::before {
   }
   .calm-auth .card ol:not(.codes-grid) {
     margin: 0;
-    padding-left: 18px;
+    padding-left: var(--space-x18);
   }
   .calm-auth .card .codes-grid {
-    gap: 6px 20px;
-    padding: 16px;
+    gap: var(--space-x6) var(--space-x20);
+    padding: var(--space-s4);
     border: 0;
-    border-radius: 12px;
+    border-radius: var(--radius-small);
     background: var(--color-zinc-50);
   }
   .calm-auth .card .codes-grid li::before {
@@ -505,7 +505,7 @@ body:has(.calm-page)::before {
   }
   .calm-auth .site-footer-brand {
     display: grid;
-    gap: 4px;
+    gap: var(--space-s1);
   }
   .calm-auth .site-footer-tag {
     font-family: var(--font-tagline);
@@ -518,7 +518,7 @@ body:has(.calm-page)::before {
   }
   .calm-auth .site-footer {
     max-width: 768px;
-    padding-top: 16px;
+    padding-top: var(--space-s4);
     border-top-color: var(--color-zinc-200);
     color: var(--color-zinc-500);
   }
@@ -650,7 +650,7 @@ body:has(.calm-page)::before {
 .calm-skeleton-mark {
   display: grid;
   justify-items: center;
-  gap: 8px;
+  gap: var(--space-s2);
   padding-top: 96px;
   min-height: 320px;
   color: var(--color-zinc-500);
@@ -794,7 +794,7 @@ body:has(.calm-page)::before {
 .launch-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
-  gap: 22px 28px;
+  gap: var(--space-x22) var(--space-x28);
 }
 .launch-hero .launch-logo {
   grid-column: 1 / -1;
@@ -803,7 +803,7 @@ body:has(.calm-page)::before {
 .launch-pitch {
   grid-column: 1 / -1;
   display: grid;
-  gap: 12px;
+  gap: var(--space-s3);
 }
 .launch-pitch h1 {
   margin: 0;
@@ -847,7 +847,7 @@ body:has(.calm-page)::before {
   padding: 56px 0;
 }
 .launch-section h2 {
-  margin: 0 0 10px;
+  margin: 0 0 var(--space-x10);
   font-family: var(--font-display);
   font-size: clamp(26px, 3.4vw, 34px);
   line-height: 1.15;
@@ -867,14 +867,14 @@ body:has(.calm-page)::before {
 .launch-features {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 24px;
+  gap: var(--space-x14);
+  margin-top: var(--space-s5);
 }
 .launch-feature {
   display: grid;
   align-content: start;
-  gap: 8px;
-  padding: 22px;
+  gap: var(--space-s2);
+  padding: var(--space-x22);
   border-radius: 22px;
 }
 .launch-feature h3 {
@@ -891,39 +891,39 @@ body:has(.calm-page)::before {
   place-items: center;
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: var(--radius-small);
   background: var(--color-zinc-100);
 }
 .launch-safe {
-  padding: 28px;
+  padding: var(--space-x28);
   border-radius: 22px;
 }
 .launch-safe ul {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 28px;
-  margin: 20px 0 0;
+  gap: var(--space-s3) var(--space-x28);
+  margin: var(--space-x20) 0 0;
   padding: 0;
   list-style: none;
   font-size: 15px;
 }
 .launch-safe li {
   display: flex;
-  gap: 10px;
+  gap: var(--space-x10);
 }
 .launch-safe li::before {
   content: '';
   flex: none;
   width: 8px;
   height: 8px;
-  margin-top: 8px;
-  border-radius: 2px;
+  margin-top: var(--space-s2);
+  border-radius: var(--radius-tiny);
   background: var(--color-redesign-in);
 }
 .launch-cta {
   display: grid;
   justify-items: center;
-  gap: 14px;
+  gap: var(--space-x14);
   margin: 56px auto;
   padding: 36px;
   border-radius: 22px;
@@ -987,7 +987,7 @@ body:has(.calm-page)::before {
   grid-template-rows: auto auto;
   /* Tiles fill their rows (the old footer rule centres them). */
   align-items: stretch;
-  gap: 10px;
+  gap: var(--space-x10);
   width: 100%;
   max-width: 1120px;
   /* Sits at the foot of the window on short pages (sign in, Before you start), like any footer;
@@ -1001,17 +1001,17 @@ body:has(.calm-page)::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
+  gap: var(--space-x18);
   min-width: 0;
-  padding: 22px 18px;
-  border-radius: 18px;
+  padding: var(--space-x22) var(--space-x18);
+  border-radius: var(--radius-medium);
   text-align: center;
 }
 .calm-auth .tile-footer-brand {
   grid-row: span 2;
   flex-direction: column;
-  gap: 12px;
-  padding: 32px 20px;
+  gap: var(--space-s3);
+  padding: var(--space-s6) var(--space-x20);
 }
 .calm-auth .tile-footer-brand img {
   height: 34px;
@@ -1046,7 +1046,7 @@ body:has(.calm-page)::before {
 .calm-auth .tile-footer :is(a, button):focus-visible {
   outline: 2px solid var(--color-zinc-900);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: var(--radius-tiny);
 }
 .tile-footer-copy {
   color: var(--color-zinc-500);
@@ -1098,7 +1098,7 @@ body:has(.calm-page)::before {
   position: absolute;
   left: 16px;
   bottom: 16px;
-  padding: 8px 14px;
+  padding: var(--space-s2) var(--space-x14);
   border-radius: 999px;
   background: rgb(24 24 27 / 0.82);
   color: var(--color-redesign-zinc-50);
@@ -1113,7 +1113,7 @@ body:has(.calm-page)::before {
   position: absolute;
   top: 12px;
   right: 14px;
-  padding: 3px 8px;
+  padding: var(--space-s1) var(--space-s2);
   border-radius: 999px;
   background: rgb(0 0 0 / 0.45);
   color: var(--color-white);
@@ -1166,7 +1166,7 @@ body:has(.calm-page)::before {
   height: 124px;
   overflow: hidden;
   border: 1px solid var(--color-zinc-200);
-  border-radius: 12px;
+  border-radius: var(--radius-small);
   background: var(--color-zinc-100);
 }
 .dark .tx-map {
@@ -1243,7 +1243,7 @@ body:has(.calm-page)::before {
    calm-rise); with reduced motion they are simply there. */
 .cat-month {
   display: flex;
-  gap: 2px;
+  gap: var(--space-x2);
   height: 16px;
   overflow: hidden;
   border-radius: 999px;
@@ -1259,8 +1259,8 @@ body:has(.calm-page)::before {
 }
 .cat-marks {
   display: flex;
-  gap: 2px;
-  margin-top: 6px;
+  gap: var(--space-x2);
+  margin-top: var(--space-x6);
   white-space: nowrap;
 }
 .cat-marks span {
@@ -1271,12 +1271,12 @@ body:has(.calm-page)::before {
   position: relative;
   display: flex;
   align-items: baseline;
-  gap: 12px;
+  gap: var(--space-s3);
   width: calc(100% + 16px);
   margin: 0 -8px;
-  padding: 8px;
+  padding: var(--space-s2);
   border: 0;
-  border-radius: 12px;
+  border-radius: var(--radius-small);
   background: none;
   color: inherit;
   font: inherit;
@@ -1289,7 +1289,7 @@ body:has(.calm-page)::before {
   cursor: default;
 }
 .cat-row-small {
-  padding: 4px 8px;
+  padding: var(--space-s1) var(--space-s2);
 }
 .cat-row:not(:disabled):hover,
 .cat-row[aria-pressed='true'] {
@@ -1307,7 +1307,7 @@ body:has(.calm-page)::before {
   bottom: 8px;
   left: 0;
   width: 3px;
-  border-radius: 2px;
+  border-radius: var(--radius-tiny);
   background: var(--color-redesign-spend-3);
 }
 .cat-row:active:not(:disabled) {
@@ -1507,7 +1507,7 @@ input[role='switch']:not(:checked) + span {
     overflow-x: auto;
     scrollbar-width: none;
     margin-inline: -4px;
-    padding: 2px 4px;
+    padding: var(--space-x2) var(--space-s1);
   }
 }
 
@@ -1546,6 +1546,8 @@ input[role='switch']:not(:checked) + span {
   --ni-ink: var(--color-white);
   --ni-text: var(--color-zinc-200);
   --ni-muted: var(--color-zinc-300);
+  --ni-track: rgb(255 255 255 / 0.18); /* the spending-limit ring's empty part (#55) */
+  --ni-owe: #e06b66; /* owe text on the dark chips: the owe token's dark-theme value, 5.5:1 */
   background: linear-gradient(160deg, var(--notif-sheen), transparent 40%), var(--notif-tint);
   backdrop-filter: blur(10px) saturate(160%);
   -webkit-backdrop-filter: blur(10px) saturate(160%);
@@ -1562,6 +1564,8 @@ input[role='switch']:not(:checked) + span {
   --ni-ink: var(--color-zinc-950);
   --ni-text: var(--color-zinc-800);
   --ni-muted: var(--color-zinc-600);
+  --ni-track: rgb(24 24 27 / 0.12);
+  --ni-owe: var(--color-redesign-accent); /* on the light chips, the logo red */
   box-shadow:
     inset 0 1px 1px var(--notif-edge),
     0 12px 32px rgb(0 0 0 / 0.4);
@@ -1570,7 +1574,7 @@ input[role='switch']:not(:checked) + span {
   background: var(--notif-chip);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-radius: 12px;
+  border-radius: var(--radius-small);
 }
 @supports not (backdrop-filter: blur(1px)) {
   .notif-glass {
