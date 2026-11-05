@@ -99,6 +99,12 @@
       "value": "#3f3f46",
       "$description": "Neutral badges"
     },
+    "redesign-zinc-50": { "value": "#fafafa", "$description": "Fixed grey, the same in both themes (#160): lightest surfaces" },
+    "redesign-zinc-100": { "value": "#f4f4f5", "$description": "Fixed grey (#160): soft fills" },
+    "redesign-zinc-200": { "value": "#e4e4e7", "$description": "Fixed grey (#160): hairlines on light" },
+    "redesign-zinc-800": { "value": "#27272a", "$description": "Fixed grey (#160): hairlines on dark" },
+    "redesign-zinc-900": { "value": "#18181b", "$description": "Fixed grey (#160): dark surfaces and ink" },
+    "redesign-zinc-950": { "value": "#09090b", "$description": "Fixed grey (#160): darkest page" },
     "redesign-spend-1": {
       "value": "#F7C6C2",
       "$description": "Spending scale, least",

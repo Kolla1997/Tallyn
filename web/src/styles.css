@@ -1,5 +1,6 @@
-/* Bare-bones auth screens (#7). Values come from design-tokens.json via
-   src/lib/tokens.js. Flat: no shadows or gradients (Design System). */
+/* The app's first stylesheet: sign-in pages, the shell and the older screens. Values come from
+   design-tokens.json via src/lib/tokens.js; app.css maps them to the redesign's colours (#187) and
+   holds the glass finish (#61). New screen styles go in app.css or in Tailwind classes (#160). */
 
 *,
 *::before,
@@ -1109,9 +1110,9 @@ body::before {
 
 /* Dark (#1): a dim amber note on the dark card, so its light text stays readable. */
 .dark .legal-note {
-  background: color-mix(in srgb, var(--color-warning) 16%, #18181b);
-  border-color: color-mix(in srgb, var(--color-warning) 45%, #18181b);
-  color: #fafafa;
+  background: color-mix(in srgb, var(--color-warning) 16%, var(--color-redesign-zinc-900));
+  border-color: color-mix(in srgb, var(--color-warning) 45%, var(--color-redesign-zinc-900));
+  color: var(--color-redesign-zinc-50);
 }
 
 .legal-table {
@@ -1947,12 +1948,6 @@ label.agree .agree-note {
     background: var(--color-white);
     border-color: var(--color-border);
   }
-}
-
-/* Dialogs are solid, so their chips need a visible edge. */
-.dialog .chip:not([aria-pressed='true']) {
-  background: var(--color-white);
-  border-color: var(--color-border);
 }
 
 /* Dialogs are solid, so their chips need a visible edge. */
