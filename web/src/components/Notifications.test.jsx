@@ -97,6 +97,20 @@ describe('NotificationBell', () => {
     expect(within(panel).getByText('1 needs you')).toBeInTheDocument()
     fireEvent.keyDown(document, { key: 'Escape' })
     expect(screen.queryByRole('region', { name: 'Notifications' })).toBeNull()
+    expect(bell).toHaveFocus() // back on the bell (#153)
+  })
+
+  it('closes when keyboard focus leaves it (#153)', async () => {
+    render(
+      <>
+        <NotificationBell />
+        <button type="button">Elsewhere</button>
+      </>,
+    )
+    fireEvent.click(await screen.findByRole('button', { name: /^Notifications/ }))
+    const panel = screen.getByRole('region', { name: 'Notifications' })
+    fireEvent.blur(within(panel).getByRole('button', { name: 'Mark all read' }), { relatedTarget: screen.getByRole('button', { name: 'Elsewhere' }) })
+    expect(screen.queryByRole('region', { name: 'Notifications' })).toBeNull()
   })
 
   it('Mark all read clears the count and tells the server', async () => {
@@ -116,6 +130,7 @@ describe('closing alerts', () => {
     await act(async () => fireEvent.click(within(panel).getAllByRole('button', { name: 'Close this alert' })[1]))
     expect(api).toHaveBeenCalledWith('/api/notifications/dismiss', { method: 'POST', body: { ids: ['n2'] } })
     expect(within(panel).queryByText(/Fake Store/)).toBeNull()
+    expect(within(panel).getByRole('heading', { name: 'Notifications' })).toHaveFocus() // focus stays in the panel (#153)
     await act(async () => fireEvent.click(within(panel).getAllByRole('button', { name: 'Close all' })[0]))
     expect(api).toHaveBeenLastCalledWith('/api/notifications/dismiss', { method: 'POST', body: { ids: ['n1'] } })
     expect(within(panel).queryByText('Today')).toBeNull()

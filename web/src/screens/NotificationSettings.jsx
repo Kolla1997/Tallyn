@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { api } from '../lib/api.js'
 import { fromMinor, toMinor } from '../lib/budgets.js'
 import { formatMoney } from '../lib/money.js'
@@ -42,6 +42,7 @@ function Amount({ label, minor, onSave, onTyping }) {
   const show = (m) => fromMinor(m, CUR).replace(/\.00$/, '')
   const [text, setText] = useState(show(minor))
   const [bad, setBad] = useState(false)
+  const errId = useId()
   const commit = () => {
     const m = toMinor(text, CUR)
     setBad(m === null)
@@ -56,6 +57,7 @@ function Amount({ label, minor, onSave, onTyping }) {
         inputMode="decimal"
         aria-label={label}
         aria-invalid={bad || undefined}
+        aria-describedby={bad ? errId : undefined}
         value={text}
         onChange={(e) => {
           setText(e.target.value)
@@ -65,6 +67,12 @@ function Amount({ label, minor, onSave, onTyping }) {
         onKeyDown={(e) => e.key === 'Enter' && commit()}
         className="w-16 border-0 bg-transparent p-0 font-semibold tabular-nums outline-none"
       />
+      {/* Said, not only shown in red (#153). */}
+      {bad && (
+        <span id={errId} role="alert" className="sr-only">
+          Enter an amount over $0.
+        </span>
+      )}
     </span>
   )
 }

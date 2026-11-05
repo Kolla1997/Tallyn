@@ -303,7 +303,7 @@ function Breakdown({ segments, parts, focus, label, format, onChoose }) {
                 aria-label={focus === i ? `Show all of ${label}` : `Show only ${name}`}
                 aria-pressed={focus === i}
                 className={cn(
-                  'flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm outline-none transition-[background-color,opacity] duration-150 ease-out hover:bg-zinc-50 focus-visible:ring-2 focus-visible:ring-zinc-400 dark:hover:bg-zinc-900',
+                  'flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm outline-none transition-[background-color,opacity] duration-150 ease-out hover:bg-zinc-50 focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] dark:hover:bg-zinc-900',
                   focus === i && 'bg-zinc-100 hover:bg-zinc-100 dark:bg-zinc-900',
                   focus !== null && focus !== i && 'opacity-50',
                 )}
@@ -575,7 +575,7 @@ export default function MetricCard({
             <button
               aria-pressed={days === period}
               className={cn(
-                'relative w-10 rounded-full py-1 font-medium tabular-nums outline-none transition-colors duration-200 ease-out focus-visible:ring-2 focus-visible:ring-zinc-400',
+                'relative w-10 rounded-full py-1 font-medium tabular-nums outline-none transition-colors duration-200 ease-out focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)]',
                 days === period ? 'text-zinc-900 dark:text-zinc-50' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100',
               )}
               key={days}
@@ -602,7 +602,7 @@ export default function MetricCard({
         </span>
         {ranged && (
           <button
-            className="ml-auto shrink-0 rounded-full px-2 py-0.5 text-xs text-zinc-500 outline-none transition-colors duration-150 ease-out hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-2 focus-visible:ring-zinc-400 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
+            className="ml-auto shrink-0 rounded-full px-2 py-0.5 text-xs text-zinc-500 outline-none transition-colors duration-150 ease-out hover:bg-zinc-100 hover:text-zinc-900 focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
             onClick={clearRead}
             type="button"
           >
@@ -617,7 +617,7 @@ export default function MetricCard({
         aria-valuemin={1}
         aria-valuenow={span ? span.hi + 1 : info.current.length}
         aria-valuetext={valueText}
-        className="relative mt-5 min-h-32 flex-1 cursor-crosshair touch-pan-y rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-4 dark:focus-visible:ring-offset-zinc-950"
+        className="relative mt-5 min-h-32 flex-1 cursor-crosshair touch-pan-y rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] focus-visible:ring-offset-4 dark:focus-visible:ring-offset-zinc-950"
         onBlur={() => setCursor(null)}
         onKeyDown={handleKeyDown}
         onLostPointerCapture={release}

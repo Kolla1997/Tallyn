@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { Plus, Lock, Check } from 'lucide-react'
 import { curveLinear } from '@visx/curve'
 import { LineChart } from '@/components/charts/line-chart'
@@ -394,6 +394,8 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
   const [sharedWith, setSharedWith] = useState(goal?.shared_with ?? '')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [badField, setBadField] = useState('') // the field the error is about (#153)
+  const errId = useId()
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   // Only that person's own accounts (a goal follows its own person's money).
@@ -408,8 +410,12 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
 
   async function save(e) {
     e.preventDefault()
-    if (!name.trim()) return setError('Give your goal a name.')
-    if (!minor) return setError('Enter a target above zero, like 5000.')
+    const fail = (msg, field = '') => {
+      setBadField(field)
+      setError(msg)
+    }
+    if (!name.trim()) return fail('Give your goal a name.', 'name')
+    if (!minor) return fail('Enter a target above zero, like 5000.', 'target')
     if (fills === 'account' && !chosen) return setError('Choose the account it follows, or update it yourself.')
     if (visibility === 'member' && !sharedWith) return setError('Choose who else can see it.')
     const body = {
@@ -424,6 +430,7 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
     }
     setBusy(true)
     setError('')
+    setBadField('')
     try {
       if (goal) {
         await api(`/api/goals/${goal.id}`, { method: 'PUT', body })
@@ -469,7 +476,16 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
         )}
         <label className="grid gap-1">
           <span className="font-semibold">Name</span>
-          <input className={FIELD} value={name} maxLength={80} onChange={(e) => setName(e.target.value)} placeholder="Beach trip" required />
+          <input
+            className={FIELD}
+            value={name}
+            maxLength={80}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Beach trip"
+            required
+            aria-invalid={badField === 'name' || undefined}
+            aria-describedby={badField === 'name' ? errId : undefined}
+          />
         </label>
         <fieldset className="m-0 grid gap-2 border-0 p-0">
           <legend className="mb-1 p-0 font-semibold">How it fills</legend>
@@ -518,6 +534,8 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
               onChange={(e) => setTarget(e.target.value)}
               placeholder="5000"
               required
+              aria-invalid={badField === 'target' || undefined}
+              aria-describedby={badField === 'target' ? errId : undefined}
             />
           </label>
           {fills === 'hand' && (
@@ -557,7 +575,7 @@ function GoalDialog({ goal, me, household, members, banks, whoName, onClose, onS
         )}
         {fills === 'account' && <p className={NOTE}>People who can&apos;t see that account&apos;s balance see the goal&apos;s name and target only.</p>}
         {error && (
-          <p className="m-0 font-semibold" style={OWE} role="alert">
+          <p id={errId} className="m-0 font-semibold" style={OWE} role="alert">
             {error}
           </p>
         )}

@@ -522,7 +522,7 @@ export default function LiquidGauge({
       aria-valuetext={`${Math.round(value)}%, ${used} of ${total} ${unit} used`}
       className={cn(
         'relative h-[22.5rem] w-72 touch-none select-none overflow-hidden rounded-3xl border border-zinc-200 bg-white text-zinc-900 outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100',
-        'focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-950',
+        'focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-950',
         !readOnly && (dragging ? 'cursor-grabbing' : 'cursor-ns-resize'),
         className,
       )}

@@ -116,6 +116,7 @@ describe('NotificationSettings', () => {
     fireEvent.change(amt, { target: { value: 'abc' } })
     fireEvent.blur(amt)
     expect(amt).toHaveAttribute('aria-invalid', 'true')
+    expect(amt).toHaveAccessibleDescription('Enter an amount over $0.') // said, not only red (#153)
     expect(api.mock.calls.length).toBe(before)
   })
 

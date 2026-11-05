@@ -29,15 +29,21 @@ export function NotificationBell({ className = '' }) {
   const { list } = useNotifications()
   const [open, setOpen] = useState(false)
   const box = useRef(null)
+  const bellRef = useRef(null)
+  const headRef = useRef(null)
   const panelId = useId()
   const visible = list && shown(list)
   const unread = (visible ?? []).filter((n) => !n.read).length
   const needs = needsYou(list).length
 
-  // Close on Escape or a click outside.
+  // Close on Escape (focus back on the bell, #153), a click outside, or Tab leaving the panel.
   useEffect(() => {
     if (!open) return
-    const key = (e) => e.key === 'Escape' && setOpen(false)
+    const key = (e) => {
+      if (e.key !== 'Escape') return
+      setOpen(false)
+      bellRef.current?.focus()
+    }
     const click = (e) => box.current && !box.current.contains(e.target) && setOpen(false)
     document.addEventListener('keydown', key)
     document.addEventListener('mousedown', click)
@@ -47,6 +53,17 @@ export function NotificationBell({ className = '' }) {
     }
   }, [open])
 
+  // Keyboard focus that leaves the bell and its panel closes it, like the menus (#153, F3).
+  const leave = (e) => {
+    if (open && e.relatedTarget && !box.current?.contains(e.relatedTarget)) setOpen(false)
+  }
+
+  // Closing alerts removes the button that had focus: keep it in the panel (#153).
+  const close = (ids) => {
+    dismiss(ids)
+    headRef.current?.focus({ preventScroll: true })
+  }
+
   const go = (n, to) => {
     if (!n.read) markRead(n.id)
     setOpen(false)
@@ -54,8 +71,9 @@ export function NotificationBell({ className = '' }) {
   }
 
   return (
-    <div ref={box} className={`relative ${className}`}>
+    <div ref={box} className={`relative ${className}`} onBlur={leave}>
       <button
+        ref={bellRef}
         type="button"
         className="relative flex size-10 shrink-0 items-center justify-center rounded-full border border-zinc-300 bg-white p-0 text-zinc-700 transition-colors duration-150 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:text-white"
         aria-label={unread ? `Notifications, ${unread} unread` : 'Notifications'}
@@ -77,7 +95,9 @@ export function NotificationBell({ className = '' }) {
           className="notif-panel fixed inset-x-4 top-16 notif-glass text-[var(--ni-ink)] z-50 flex max-h-[min(560px,75vh)] lg:absolute lg:inset-x-auto lg:right-0 lg:top-[calc(100%+8px)] lg:w-[380px] flex-col rounded-3xl p-4"
         >
           <div className="notif-chip flex items-baseline justify-between px-2 py-2">
-            <h2 className="text-[16px] font-semibold">Notifications</h2>
+            <h2 ref={headRef} tabIndex={-1} className="text-[16px] font-semibold outline-none">
+              Notifications
+            </h2>
             {unread > 0 && (
               <button type="button" className="link text-[13px] !text-[var(--ni-text)]" onClick={() => markRead()}>
                 Mark all read
@@ -97,7 +117,7 @@ export function NotificationBell({ className = '' }) {
                     <button
                       type="button"
                       className="notif-chip border-0 px-2 py-0.5 text-[12px] font-semibold text-[var(--ni-text)] hover:brightness-[1.04]"
-                      onClick={() => dismiss(items.map((n) => n.id))}
+                      onClick={() => close(items.map((n) => n.id))}
                     >
                       Close all
                     </button>
@@ -124,7 +144,7 @@ export function NotificationBell({ className = '' }) {
                             type="button"
                             className="absolute top-1 right-1 flex size-8 items-center justify-center rounded-full border-0 bg-transparent p-0 text-[var(--ni-muted)] hover:text-[var(--ni-ink)]"
                             aria-label="Close this alert"
-                            onClick={() => dismiss([n.id])}
+                            onClick={() => close([n.id])}
                           >
                             <X className="size-4" aria-hidden="true" />
                           </button>

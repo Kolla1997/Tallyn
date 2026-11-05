@@ -703,7 +703,7 @@ export default function ReceiptPrinter({
         )}
       >
         <button
-          className="rounded-full bg-zinc-900 px-4 py-2 font-medium text-sm text-white outline-none transition-colors duration-150 ease-out hover:bg-zinc-700 focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+          className="rounded-full bg-zinc-900 px-4 py-2 font-medium text-sm text-white outline-none transition-colors duration-150 ease-out hover:bg-zinc-700 focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] focus-visible:ring-offset-2 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
           disabled={phase !== 'idle'}
           onClick={(event) => {
             // detail is 0 for a click from Enter or Space.

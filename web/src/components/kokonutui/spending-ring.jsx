@@ -371,7 +371,7 @@ export default function SpendingRing({ title = 'October spending', categories = 
         aria-valuenow={selected + 1}
         aria-valuetext={current ? `${current.name}, ${money.format(current.amount)}` : ''}
         className={cn(
-          'relative mx-auto mt-3 aspect-square w-full max-w-[240px] touch-none select-none rounded-full outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 focus-visible:ring-offset-4 dark:focus-visible:ring-offset-zinc-950',
+          'relative mx-auto mt-3 aspect-square w-full max-w-[240px] touch-none select-none rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)] focus-visible:ring-offset-4 dark:focus-visible:ring-offset-zinc-950',
           dragging ? 'cursor-grabbing' : 'cursor-grab',
         )}
         onKeyDown={handleKeyDown}
@@ -421,7 +421,7 @@ export default function SpendingRing({ title = 'October spending', categories = 
                   'mt-0.5 text-xs tabular-nums',
                   change > 0 && 'text-rose-600 dark:text-rose-400',
                   change < 0 && 'text-emerald-600 dark:text-emerald-400',
-                  change === 0 && 'text-zinc-400 dark:text-zinc-500',
+                  change === 0 && 'text-zinc-500 dark:text-zinc-400',
                 )}
               >
                 {change === 0 ? 'Same as last month' : `${change > 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(1)}% vs last month`}
@@ -437,7 +437,7 @@ export default function SpendingRing({ title = 'October spending', categories = 
             <button
               aria-pressed={i === selected}
               className={cn(
-                'flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs outline-none transition-colors duration-150 ease-out focus-visible:ring-2 focus-visible:ring-zinc-400',
+                'flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs outline-none transition-colors duration-150 ease-out focus-visible:ring-2 focus-visible:ring-[var(--color-redesign-focus)]',
                 i === selected
                   ? 'bg-zinc-100 dark:bg-zinc-900'
                   : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900/60 dark:hover:text-zinc-100',
