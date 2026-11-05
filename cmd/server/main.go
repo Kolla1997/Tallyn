@@ -67,6 +67,7 @@ func main() {
 	// A malformed key stops the server: better than failing on the first link.
 	var box *tokencrypt.Box
 	var plaidClient *plaid.Client
+	mailer := emailSender() // alerts, summaries, welcome and invite emails (#269, #280)
 	var codeKey, closingKey, linkKey []byte
 	if key := os.Getenv("TOKEN_ENCRYPTION_KEY"); key != "" && key != "replace-me" {
 		b, err := tokencrypt.New(key)
@@ -135,7 +136,7 @@ func main() {
 		reconnected = syncer.Reconnected
 		go syncer.Run(ctx)
 		go purgeClosingRecords(ctx, system)
-		go emailJob(system, linkKey).Run(ctx)
+		go emailJob(system, linkKey, mailer).Run(ctx)
 		log.Printf("tallyn: bank sync every %s", every)
 	}
 
@@ -159,6 +160,9 @@ func main() {
 			Accounts:        accounts,
 			ClosingKey:      closingKey,
 			LinkKey:         linkKey,
+			Mailer:          mailer,
+			AppURL:          appURL(),
+			Logo:            os.Getenv("EMAIL_LOGO_URL"),
 		}),
 		ReadHeaderTimeout: 10 * time.Second,
 		// #24: slow or stuck clients can't hold connections open.
@@ -186,12 +190,11 @@ func main() {
 	}
 }
 
-// emailJob checks payments due and sends notification emails (#269), every
-// 5 minutes, with the sync's login. Without BREVO_API_KEY it only logs.
-// With a key, every email goes to EMAIL_TEST_TO until EMAIL_LIVE=true, set
-// once coinroof.us is verified in Brevo: a half-ready setup never reaches a
-// family.
-func emailJob(system *db.System, linkKey []byte) *email.Job {
+// emailSender sends Coinroof's emails (#269) through Brevo. Without
+// BREVO_API_KEY it only logs. With a key, every email goes to EMAIL_TEST_TO
+// until EMAIL_LIVE=true, set once coinroof.us is verified in Brevo: a
+// half-ready setup never reaches a family.
+func emailSender() email.Sender {
 	var sender email.Sender = email.Logger{}
 	if k := os.Getenv("BREVO_API_KEY"); k != "" && k != "replace-me" {
 		sender = email.Brevo{Key: k, FromEmail: getenv("EMAIL_FROM", "alerts@coinroof.us"), FromName: "Coinroof"}
@@ -204,7 +207,15 @@ func emailJob(system *db.System, linkKey []byte) *email.Job {
 			sender = email.Logger{}
 		}
 	}
-	return &email.Job{Outbox: system, Sender: sender, LinkKey: linkKey, AppURL: strings.TrimRight(getenv("APP_URL", "http://localhost:8080"), "/"), LogoURL: os.Getenv("EMAIL_LOGO_URL"), Every: 5 * time.Minute}
+	return sender
+}
+
+func appURL() string { return strings.TrimRight(getenv("APP_URL", "http://localhost:8080"), "/") }
+
+// emailJob checks payments due and sends notification, summary and welcome
+// emails, every 5 minutes, with the sync's login.
+func emailJob(system *db.System, linkKey []byte, sender email.Sender) *email.Job {
+	return &email.Job{Outbox: system, Sender: sender, LinkKey: linkKey, AppURL: appURL(), LogoURL: os.Getenv("EMAIL_LOGO_URL"), Every: 5 * time.Minute}
 }
 
 func getenv(key, fallback string) string {

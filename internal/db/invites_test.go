@@ -43,6 +43,9 @@ func TestInviteAndJoin(t *testing.T) {
 	if inv.Email != "erin@example.test" || inv.Role != "adult" || len(token) != 43 {
 		t.Fatalf("invite = %+v, token length %d", inv, len(token))
 	}
+	if inv.Household == "" {
+		t.Errorf("invite has no household name for its email (#280): %+v", inv)
+	}
 
 	t.Run("the token itself is never stored", func(t *testing.T) {
 		var stored []byte
