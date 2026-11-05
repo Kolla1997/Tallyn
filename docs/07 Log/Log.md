@@ -11,6 +11,10 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-11-05
+- #280 Welcome and invite emails (PR #282): Dinesh picked F, the short letter, after two rounds of drafts (`drafts/280-welcome-emails.html`). Welcome sent once after agreeing to the terms (last 7 days only); invite sent by the API when made, with the join link. Brevo, no stop link. 0026 applied to the sandbox; both tested to the test address.
+- #281 Newsletter through Resend created: switch shown on at sign-up, off for EU/UK; Dinesh to make the Resend account. Waits for coinroof.us.
+- Decision: Dinesh said Coinroof is US only, in USD. Emails drop currency wording. Open: update Vision and CLAUDE.md, and what happens to multi-currency (#11).
+- Decision: password reset stays on Supabase's sender for now; revisit Brevo SMTP after the domain (#131). Domain bought after the backlog is done.
 - #274 Monthly highlights email: Dinesh picked D (`drafts/274-monthly-highlights.html`) with "Where it went" as a split bar, option 3 (`drafts/274-where-it-went.html`); a pie chart can't be drawn in email, so the bklit pie chart is for an app screen later. Sent on the 1st at 9am local; quiet months skipped (`0025_monthly_highlights.sql`).
 - #274 Gmail hid ("•••") blocks that matched earlier emails from us: every email now has its own `X-Entity-Ref-ID` and a hidden unique marker in each block. Checked by Dinesh in Gmail.
 - #274 Spending colours in the summary emails: red for the most spent, green for the least (calendar, split bar, weekly day bars). Recorded in the Design System; the light green is a proposed token.
