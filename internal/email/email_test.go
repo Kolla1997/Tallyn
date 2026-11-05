@@ -117,9 +117,8 @@ func TestBrevo(t *testing.T) {
 		t.Fatal(err)
 	}
 	to := got["to"].([]any)[0].(map[string]any)["email"]
-	h := got["headers"].(map[string]any)
-	if apiKey != "test-only-key" || to != "me@example.com" || got["subject"] != "[test] Hi" ||
-		h["List-Unsubscribe-Post"] != "List-Unsubscribe=One-Click" || h["List-Unsubscribe"] != "<https://coinroof.us/api/email/unsubscribe?t=a>" {
+	// No List-Unsubscribe: a mail app's button would make Brevo block every email.
+	if apiKey != "test-only-key" || to != "me@example.com" || got["subject"] != "[test] Hi" || got["headers"] != nil {
 		t.Errorf("sent %v with key %q", got, apiKey)
 	}
 

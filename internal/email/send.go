@@ -18,7 +18,7 @@ type Message struct {
 	Subject     string
 	HTML        string
 	Text        string
-	Unsubscribe string // the one-click unsubscribe URL (List-Unsubscribe)
+	Unsubscribe string // the one-click unsubscribe URL; not sent as a header (see Brevo.Send)
 }
 
 // Sender sends an email.
@@ -71,13 +71,9 @@ func (b Brevo) Send(ctx context.Context, m Message) error {
 		"htmlContent": m.HTML,
 		"textContent": m.Text,
 	}
-	if m.Unsubscribe != "" {
-		// One-click unsubscribe (RFC 8058): mail apps POST to the link.
-		body["headers"] = map[string]string{
-			"List-Unsubscribe":      "<" + m.Unsubscribe + ">",
-			"List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-		}
-	}
+	// No List-Unsubscribe header (Dinesh, 2026-11-04): a mail app's own
+	// Unsubscribe button made Brevo block every email to that address, not
+	// just one kind. The "Stop … emails" link in each email does that instead.
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return err

@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-11-04
+- #269 Removed the `List-Unsubscribe` header (Dinesh): Gmail's own Unsubscribe button made Brevo block every email to that address, not just one kind. Each email's "Stop … emails" link stays; the API still accepts one-click posts.
 - #273 Weekly summary email: Dinesh picked D (`drafts/273-weekly-summary.html`): the week as one big number, a bar per day, tiles for month so far / last month / cash, where it went, coming up, and a shared section. Sent Monday 9am in each person's own time zone (saved from the browser; Central until then); quiet weeks skipped (`0024_weekly_summary.sql`).
 - #269 Notification emails: scope agreed with Dinesh (Brevo from day one, test sends to him only until coinroof.us is verified; owners only; a parent can opt in to a child's reconnect emails). Weekly summary is #273, monthly highlights #274.
 - #269 Payment due is a new alert (in the app always, email by choice): three days before a card or loan is due, and again when overdue, checked by the server every 5 minutes with the sync's login (`0023_notification_emails.sql`).
