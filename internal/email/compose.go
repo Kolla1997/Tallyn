@@ -2,6 +2,8 @@ package email
 
 import (
 	"bytes"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -239,7 +241,7 @@ const (
 <tr><td class="band" align="center" style="background:#18181b;padding:18px 24px;border-radius:21px 21px 0 0"><img src="{{.LogoURL}}" alt="Coinroof" width="138" height="28" style="display:block;height:28px;width:138px;border:0;margin:0 auto;{{head}};font-weight:700;font-size:18px;color:#ffffff"></td></tr>`
 	frameSlip = `{{define "slip"}}<table class="slipo" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fafafa;border-top:2px dashed #e4e4e7;border-bottom:2px dashed #e4e4e7;margin-top:10px"><tr><td align="center">
 <table class="slipi" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto">
-{{range $i, $r := .}}<tr><td style="padding:10px 0 10px 24px;font-size:15px;color:#3f3f46;text-align:left{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{$r.Label}}{{if $r.Meta}}<div style="font-size:12px;color:#52525b">{{$r.Meta}}</div>{{end}}</td>
+{{range $i, $r := .}}<tr><td style="padding:10px 0 10px 24px;font-size:15px;color:#3f3f46;text-align:left{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{uniq}}{{$r.Label}}{{if $r.Meta}}<div style="font-size:12px;color:#52525b">{{$r.Meta}}</div>{{end}}</td>
 <td align="right" style="padding:10px 24px 10px 8px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{if $r.Chip}}<span style="display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;background:#fde8e7;color:#a30700">{{$r.Value}}</span>{{else if $r.Total}}<span style="{{head}};font-weight:700;font-size:22px;color:{{if $r.Red}}#cb0900{{else}}#18181b{{end}}">{{$r.Value}}</span>{{else}}<b style="font-weight:700;color:{{if $r.Red}}#cb0900{{else}}#18181b{{end}}">{{$r.Value}}</b>{{end}}</td></tr>
 {{end}}</table></td></tr></table>{{end}}`
 	frameEnd = `</table>
@@ -247,7 +249,16 @@ const (
 </td></tr></table></body></html>`
 )
 
-var funcs = template.FuncMap{"head": func() template.CSS { return head }, "body": func() template.CSS { return body }}
+var funcs = template.FuncMap{"head": func() template.CSS { return head }, "body": func() template.CSS { return body }, "uniq": uniq}
+
+// uniq is a hidden, different marker for each block: Gmail hides ("•••")
+// blocks that match ones in earlier emails from us, and a summary repeats
+// last week's purchases or bills (#274).
+func uniq() template.HTML {
+	b := make([]byte, 6)
+	_, _ = rand.Read(b)
+	return template.HTML(`<span style="display:none;font-size:0;line-height:0;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all">` + hex.EncodeToString(b) + `</span>`)
+}
 
 var page = template.Must(template.New("email").Funcs(funcs).Parse(frameHead + `<title>{{.Heading}}</title></head>
 ` + frameTop + `

@@ -261,12 +261,12 @@ var weeklyPage = template.Must(template.New("weekly").Funcs(funcs).Parse(frameHe
 {{range .Tiles}}<td align="center" width="33%" style="background:#fafafa;border:1px solid #e4e4e7;border-radius:14px;padding:10px 4px;text-align:center"><div style="font-size:12px;color:#52525b">{{.Label}}</div><div style="{{head}};font-weight:700;font-size:16px;color:#18181b;font-variant-numeric:tabular-nums">{{.Value}}</div></td>{{end}}
 </tr></table></div></td></tr>
 <tr><td style="padding:0"><div class="cols" style="margin:0 auto;font-size:0">
-<div class="col" style="font-size:16px">{{if .Rows}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">Where it went</div>{{template "slip" .Rows}}{{end}}</div><div class="col" style="font-size:16px">
-{{if .Due}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">Coming up</div>{{template "slip" .Due}}{{end}}
+<div class="col" style="font-size:16px">{{if .Rows}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">{{uniq}}Where it went</div>{{template "slip" .Rows}}{{end}}</div><div class="col" style="font-size:16px">
+{{if .Due}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">{{uniq}}Coming up</div>{{template "slip" .Due}}{{end}}
 {{if .Shared}}<div class="shw" style="padding:20px 24px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px dashed #a1a1aa;border-radius:16px;border-collapse:separate">
-<tr><td style="padding:14px 16px 0;{{head}};font-weight:700;font-size:16px;text-align:center">Shared with you</td></tr>
+<tr><td style="padding:14px 16px 0;{{head}};font-weight:700;font-size:16px;text-align:center">{{uniq}}Shared with you</td></tr>
 <tr><td style="padding:4px 16px 0;font-size:13px;color:#3f3f46;text-align:center">Only what's shared with you in Family, and your children's totals.</td></tr>
-{{range .Shared}}<tr><td style="padding:12px 16px 0;font-size:14px">
+{{range .Shared}}<tr><td style="padding:12px 16px 0;font-size:14px">{{uniq}}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="text-align:left">{{.NowLabel}}</td><td align="right" style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums">{{.Now}}</td></tr></table>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:4px;background:#f4f4f5;border-radius:999px"><tr><td width="{{.NowPct}}%" style="height:8px;font-size:0;line-height:0;background:#18181b;border-radius:999px">&nbsp;</td><td style="font-size:0;line-height:0">&nbsp;</td></tr></table>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;color:#52525b"><tr><td style="text-align:left">{{.ThenLabel}}</td><td align="right" style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums">{{.Then}}</td></tr></table>

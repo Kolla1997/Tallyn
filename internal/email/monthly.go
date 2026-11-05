@@ -298,29 +298,29 @@ var monthlyPage = template.Must(template.New("monthly").Funcs(funcs).Parse(frame
 </tr></table></div></td></tr>
 <tr><td style="padding:0"><div class="cols" style="margin:0 auto;font-size:0">
 <div class="col" style="font-size:16px">
-{{if .Highlights}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">Highlights</div>
+{{if .Highlights}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">{{uniq}}Highlights</div>
 <div class="shw" style="padding:10px 24px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="6" style="border-collapse:separate;margin:0 -6px"><tr>
-{{range $i, $h := .Highlights}}{{if and $i (eq $i 2)}}</tr><tr>{{end}}<td width="50%" valign="top" style="background:#fafafa;border:1px solid #e4e4e7;border-radius:14px;padding:12px;text-align:left"><div style="font-size:12px;color:#52525b">{{$h.Label}}</div><div style="{{head}};font-weight:700;font-size:18px;color:#18181b;font-variant-numeric:tabular-nums">{{$h.Value}}</div><div style="font-size:12px;color:#3f3f46">{{$h.Meta}}</div></td>{{end}}
+{{range $i, $h := .Highlights}}{{if and $i (eq $i 2)}}</tr><tr>{{end}}<td width="50%" valign="top" style="background:#fafafa;border:1px solid #e4e4e7;border-radius:14px;padding:12px;text-align:left"><div style="font-size:12px;color:#52525b">{{$h.Label}}</div>{{uniq}}<div style="{{head}};font-weight:700;font-size:18px;color:#18181b;font-variant-numeric:tabular-nums">{{$h.Value}}</div><div style="font-size:12px;color:#3f3f46">{{$h.Meta}}</div></td>{{end}}
 </tr></table></div>{{end}}
-<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">Day by day</div>
+<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">{{uniq}}Day by day</div>
 <div class="shw" style="padding:10px 24px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="4" style="border-collapse:separate">
 <tr><td align="center" style="font-size:11px;font-weight:600;color:#52525b">M</td><td align="center" style="font-size:11px;font-weight:600;color:#52525b">T</td><td align="center" style="font-size:11px;font-weight:600;color:#52525b">W</td><td align="center" style="font-size:11px;font-weight:600;color:#52525b">T</td><td align="center" style="font-size:11px;font-weight:600;color:#52525b">F</td><td align="center" style="font-size:11px;font-weight:600;color:#52525b">S</td><td align="center" style="font-size:11px;font-weight:600;color:#52525b">S</td></tr>
 {{range .Weeks}}<tr>{{range .}}{{if .Pad}}<td></td>{{else}}<td align="center" style="height:32px;border-radius:8px;font-size:12px;font-variant-numeric:tabular-nums;background:{{.Bg}};color:{{.Fg}}{{if .Empty}};border:1px solid #f4f4f5{{end}}">{{.Day}}</td>{{end}}{{end}}</tr>{{end}}
 </table>{{if .CalNote}}<p style="margin:8px 0 0;font-size:13px;color:#3f3f46;text-align:center">{{.CalNote}}</p>{{end}}</div>
 </div><div class="col" style="font-size:16px">
-{{if .Split}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">Where it went</div>
+{{if .Split}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">{{uniq}}Where it went</div>
 <div class="shw" style="padding:12px 24px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-radius:8px;overflow:hidden;border-collapse:separate"><tr>
 {{range .Split}}<td width="{{printf "%.2f" .Width}}%" align="center" style="height:22px;background:{{.Color}};color:{{.Text}};font-size:11px;font-weight:700">{{if .Label}}{{.Pct}}{{end}}</td>{{end}}
 </tr></table>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px">
-{{range $i, $c := .Split}}<tr><td style="padding:7px 0;font-size:14px;color:#18181b;text-align:left{{if $i}};border-top:1px dotted #e4e4e7{{end}}"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px;background:{{$c.Color}};border:1px solid #d4d4d8;vertical-align:middle"></span>{{$c.Name}}</td>
+{{range $i, $c := .Split}}<tr><td style="padding:7px 0;font-size:14px;color:#18181b;text-align:left{{if $i}};border-top:1px dotted #e4e4e7{{end}}"><span style="display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px;background:{{$c.Color}};border:1px solid #d4d4d8;vertical-align:middle"></span>{{uniq}}{{$c.Name}}</td>
 <td align="right" style="padding:7px 0;font-size:14px;font-weight:700;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{$c.Value}}</td>
 <td align="right" style="padding:7px 0 7px 8px;width:40px;font-size:14px;color:#52525b;text-align:right;font-variant-numeric:tabular-nums{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{$c.Pct}}</td></tr>{{end}}
 </table>{{if .CatNote}}<p style="margin:8px 0 0;font-size:13px;color:#3f3f46;text-align:left">{{.CatNote}}</p>{{end}}</div>{{end}}
 {{if .Shared}}<div class="shw" style="padding:20px 24px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px dashed #a1a1aa;border-radius:16px;border-collapse:separate">
-<tr><td style="padding:14px 16px 0;{{head}};font-weight:700;font-size:16px;text-align:center">Shared with you</td></tr>
+<tr><td style="padding:14px 16px 0;{{head}};font-weight:700;font-size:16px;text-align:center">{{uniq}}Shared with you</td></tr>
 <tr><td style="padding:4px 16px 0;font-size:13px;color:#3f3f46;text-align:center">Only what's shared with you in Family, and your children's totals.</td></tr>
-{{range .Shared}}<tr><td style="padding:12px 16px 0;font-size:14px">
+{{range .Shared}}<tr><td style="padding:12px 16px 0;font-size:14px">{{uniq}}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="text-align:left">{{.NowLabel}}</td><td align="right" style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums">{{.Now}}</td></tr></table>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:4px;background:#f4f4f5;border-radius:999px"><tr><td width="{{.NowPct}}%" style="height:8px;font-size:0;line-height:0;background:#18181b;border-radius:999px">&nbsp;</td><td style="font-size:0;line-height:0">&nbsp;</td></tr></table>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;color:#52525b"><tr><td style="text-align:left">{{.ThenLabel}}</td><td align="right" style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums">{{.Then}}</td></tr></table>
