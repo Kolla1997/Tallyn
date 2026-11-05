@@ -118,7 +118,10 @@ func TestBrevo(t *testing.T) {
 	}
 	to := got["to"].([]any)[0].(map[string]any)["email"]
 	// No List-Unsubscribe: a mail app's button would make Brevo block every email.
-	if apiKey != "test-only-key" || to != "me@example.com" || got["subject"] != "[test] Hi" || got["headers"] != nil {
+	// A fresh X-Entity-Ref-ID keeps Gmail from grouping and trimming emails.
+	h, _ := got["headers"].(map[string]any)
+	ref, _ := h["X-Entity-Ref-ID"].(string)
+	if apiKey != "test-only-key" || to != "me@example.com" || got["subject"] != "[test] Hi" || len(ref) != 32 || h["List-Unsubscribe"] != nil {
 		t.Errorf("sent %v with key %q", got, apiKey)
 	}
 

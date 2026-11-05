@@ -4,6 +4,8 @@ package email
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -71,6 +73,13 @@ func (b Brevo) Send(ctx context.Context, m Message) error {
 		"htmlContent": m.HTML,
 		"textContent": m.Text,
 	}
+	// A new X-Entity-Ref-ID on every email keeps Gmail from grouping them into
+	// one conversation and hiding the parts that match an earlier one (#274).
+	ref := make([]byte, 16)
+	if _, err := rand.Read(ref); err != nil {
+		return err
+	}
+	body["headers"] = map[string]string{"X-Entity-Ref-ID": hex.EncodeToString(ref)}
 	// No List-Unsubscribe header (Dinesh, 2026-11-04): a mail app's own
 	// Unsubscribe button made Brevo block every email to that address, not
 	// just one kind. The "Stop … emails" link in each email does that instead.
