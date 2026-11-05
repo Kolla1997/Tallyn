@@ -119,6 +119,10 @@
       "$description": "Spending scale, most",
       "dark": "#E06B66"
     },
+    "redesign-spend-low": {
+      "value": "#8CC785",
+      "$description": "Spending heat, spent little (#274): light green between spend-1 and money-in green in the summary emails. Fill only, with #14361A text (6.6:1); emails only, so no dark value"
+    },
     "redesign-focus": {
       "value": "#18181b",
       "$description": "Focus ring",
