@@ -2,7 +2,7 @@
 type: log
 status: active
 owner: Dinesh
-updated: 2026-11-04
+updated: 2026-11-05
 tags: [log]
 ---
 
@@ -14,6 +14,7 @@ Newest first. One entry per working session or decision.
 - #274 Monthly highlights email: Dinesh picked D (`drafts/274-monthly-highlights.html`) with "Where it went" as a split bar, option 3 (`drafts/274-where-it-went.html`); a pie chart can't be drawn in email, so the bklit pie chart is for an app screen later. Sent on the 1st at 9am local; quiet months skipped (`0025_monthly_highlights.sql`).
 - #274 Gmail hid ("•••") blocks that matched earlier emails from us: every email now has its own `X-Entity-Ref-ID` and a hidden unique marker in each block. Checked by Dinesh in Gmail.
 - #274 Spending colours in the summary emails: red for the most spent, green for the least (calendar, split bar, weekly day bars). Recorded in the Design System; the light green is a proposed token.
+- #1 Light green #8CC785 added as token `redesign-spend-low` (PR #278): fill only with #14361A text; emails only, no dark value.
 
 ## 2026-11-04
 - #273 Emails edge to edge on a computer (Dinesh picked D in `drafts/273-email-edge-to-edge.html`): full-width band and footer, weekly in two columns; phones keep the card. Applies to the alert emails too. Checked with real sends to Gmail (sandbox, test address only).
