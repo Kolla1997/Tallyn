@@ -27,6 +27,7 @@ Rules (see `CLAUDE.md` §7):
 | `0021_notification_settings.sql` | each person's alert switches and amounts; parents hear their kids' big purchases and reconnects; one partner by choice, only for what is already shared (#268) |
 | `0022_notification_dismiss.sql` | close an alert in the bell's list (`dismissed_at`); a bank to reconnect stays on Home until fixed (#267) |
 | `0023_notification_emails.sql` | payment-due alerts, the email outbox (`emailed_at`) and a parent's opt-in for a child's reconnect emails (#269) |
+| `0025_monthly_highlights.sql` | monthly highlights email: switch, what it shows (`monthly_summary`), who's due (`monthly_due`) and months already looked at (#274) |
 | `0024_weekly_summary.sql` | weekly summary email: switches, the person's time zone, what the email shows (`weekly_summary`), who's due (`weekly_due`) and weeks already looked at (#273) |
 
 Apply them in order on the Supabase project (SQL editor, or `psql "$ADMIN_DATABASE_URL" -f <file>`). Migrations run as `postgres`; the app itself never does (ADR 0006).

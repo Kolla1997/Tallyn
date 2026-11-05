@@ -136,6 +136,20 @@ type fakeOutbox struct {
 	weeklyDue    []db.WeeklyDue
 	summaries    map[string]json.RawMessage
 	weeklyMarked []string
+	monthlyDue   []db.WeeklyDue
+	monthly      map[string]json.RawMessage
+	monthMarked  []string
+}
+
+func (f *fakeOutbox) MonthlyDue(context.Context, time.Time) ([]db.WeeklyDue, error) {
+	return f.monthlyDue, nil
+}
+func (f *fakeOutbox) MonthlySummary(_ context.Context, _, user string, _ time.Time) (json.RawMessage, error) {
+	return f.monthly[user], nil
+}
+func (f *fakeOutbox) MarkMonthly(_ context.Context, _, user string, _ time.Time, sent bool) error {
+	f.monthMarked = append(f.monthMarked, user+":"+map[bool]string{true: "sent", false: "skipped"}[sent])
+	return nil
 }
 
 func (f *fakeOutbox) NotifyPaymentsDue(context.Context, time.Time) (int, error) { return 0, nil }
@@ -262,5 +276,88 @@ func TestJobWeekly(t *testing.T) {
 	tok := s.sent[0].Unsubscribe[strings.Index(s.sent[0].Unsubscribe, "t=")+2:]
 	if l, err := Verify(key, strings.ReplaceAll(tok, "%2E", ".")); err != nil || l.Kind != db.EmailWeekly {
 		t.Errorf("weekly link = %+v, %v", l, err)
+	}
+}
+
+// October 2026 from the sandbox (a Thursday start).
+const sampleMonth = `{"month_start":"2026-10-01","month_end":"2026-10-31","currency":"USD","spent":439192,"came_in":100000,
+ "compare":{"spent":439192,"last":439192,"avg3":429347},
+ "days":[0,0,0,0,0,0,17880,3266,15700,0,1080,0,0,0,0,0,0,0,0,200000,100000,0,0,1266,0,100000,0,0,0,0,0],
+ "busiest":{"date":"2026-10-20","amount_minor":200000},
+ "biggest":{"name":"United Airlines","date":"2026-10-26","amount_minor":50000},
+ "biggest_in":{"name":"United Airlines","date":"2026-10-09","amount_minor":50000},
+ "categories":[{"category":"FOOD_AND_DRINK","amount_minor":103266},{"category":"TRANSPORTATION","amount_minor":102346},
+  {"category":"RENT_AND_UTILITIES","amount_minor":100000},{"category":"TRAVEL","amount_minor":100000},
+  {"category":"GENERAL_MERCHANDISE","amount_minor":17880},{"category":"PERSONAL_CARE","amount_minor":15700}],
+ "shared":[{"name":"Mia","kid":true,"compare":{"spent":3000,"last":0,"avg3":null},"biggest":null}]}`
+
+func TestComposeMonthly(t *testing.T) {
+	var mo Monthly
+	if err := json.Unmarshal([]byte(sampleMonth), &mo); err != nil {
+		t.Fatal(err)
+	}
+	m, err := ComposeMonthly(mo, Links{App: "https://coinroof.us"}, "tok.en", "Trail House")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m.Subject != "Your October: $4,391.92 spent" {
+		t.Errorf("subject = %q", m.Subject)
+	}
+	for _, want := range []string{"Your October", "spent, and $1,000.00 came in", ">vs September<", ">Same<", ">$98.45 more<",
+		"Busiest day", "Tue, Oct 20", "Biggest purchase", "United Airlines, Oct 26", "Most spent on", ">Food and drink<", "Came in",
+		"Day by day", "Busiest: Tue, Oct 20 ($2,000.00)", "Where it went", ">24%<", "Same as September. Food and drink was the biggest share.",
+		"Mia, October", "Stop monthly highlights", "https://coinroof.us/unsubscribe?t=tok.en"} {
+		if !strings.Contains(m.HTML, want) {
+			t.Errorf("HTML is missing %q", want)
+		}
+	}
+	// Red for the biggest day and category, green for the smallest.
+	if !strings.Contains(m.HTML, "background:#cb0900;color:#ffffff\">20<") {
+		t.Error("Oct 20 isn't red")
+	}
+	if !strings.Contains(m.HTML, "background:#067b00;color:#ffffff\">11<") {
+		t.Error("Oct 11 ($10.80) isn't green")
+	}
+	if strings.Count(m.HTML, "background:#f7c6c2;color:#3f1a17") != 2 {
+		t.Error("the two equal categories don't share a colour")
+	}
+	if strings.Contains(m.HTML, "Biggest this month") {
+		t.Error("a child's biggest purchase is shown")
+	}
+	if _, err := ComposeMonthly(Monthly{}, Links{}, "", ""); err == nil {
+		t.Error("composed a month without dates")
+	}
+}
+
+func TestJobMonthly(t *testing.T) {
+	quiet := `{"month_start":"2026-10-01","month_end":"2026-10-31","currency":"USD","spent":0,"came_in":0,"days":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}`
+	mo := time.Date(2026, 10, 1, 0, 0, 0, 0, time.UTC)
+	out := &fakeOutbox{
+		monthlyDue: []db.WeeklyDue{{UserID: ann, HouseholdID: home, Household: "Trail House", Email: "ann@example.com", WeekStart: mo},
+			{UserID: "quiet", HouseholdID: home, Household: "Trail House", Email: "q@example.com", WeekStart: mo}},
+		monthly: map[string]json.RawMessage{ann: json.RawMessage(sampleMonth), "quiet": json.RawMessage(quiet)},
+	}
+	s := &fakeSender{}
+	j := Job{Outbox: out, Sender: s, LinkKey: key, AppURL: "https://coinroof.us"}
+	j.Once(context.Background(), time.Now())
+	if len(s.sent) != 1 || strings.Join(out.monthMarked, ",") != ann+":sent,quiet:skipped" {
+		t.Fatalf("sent %d, marked %v", len(s.sent), out.monthMarked)
+	}
+	tok := s.sent[0].Unsubscribe[strings.Index(s.sent[0].Unsubscribe, "t=")+2:]
+	if l, err := Verify(key, strings.ReplaceAll(tok, "%2E", ".")); err != nil || l.Kind != db.EmailMonthly {
+		t.Errorf("monthly link = %+v, %v", l, err)
+	}
+}
+
+func TestWeeklyBarColours(t *testing.T) {
+	var w Weekly
+	_ = json.Unmarshal([]byte(sampleWeek), &w)
+	m, _ := ComposeWeekly(w, Links{App: "https://coinroof.us"}, "t", "Trail House")
+	// Tue is the week's biggest (red), Wed half of it (light red), Sat tiny (green).
+	for _, want := range []string{"height:64px;line-height:64px;font-size:0;max-width:34px;margin:0 auto;border-radius:6px 6px 2px 2px;background:#cb0900",
+		"height:32px;line-height:32px;font-size:0;max-width:34px;margin:0 auto;border-radius:6px 6px 2px 2px;background:#e06b66", "background:#067b00"} {
+		if !strings.Contains(m.HTML, want) {
+			t.Errorf("weekly bars missing %q", want)
+		}
 	}
 }

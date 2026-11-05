@@ -73,6 +73,7 @@ type bar struct {
 	Day    string
 	Height int // px, 2 for an empty day
 	Empty  bool
+	Color  string // red for the week's big days, green for small ones (#274)
 }
 
 type tile struct{ Label, Value string }
@@ -118,7 +119,7 @@ func ComposeWeekly(w Weekly, links Links, token, household string) (Message, err
 		if top > 0 && d > 0 {
 			h = max(4, int(d*64/top))
 		}
-		v.Bars = append(v.Bars, bar{Day: start.AddDate(0, 0, i).Format("Mon"), Height: h, Empty: d == 0})
+		v.Bars = append(v.Bars, bar{Day: start.AddDate(0, 0, i).Format("Mon"), Height: h, Empty: d == 0, Color: heatFor(d, top)})
 	}
 	v.Tiles = []tile{
 		{"Month so far", m(w.Month.Spent)},
@@ -254,7 +255,7 @@ var weeklyPage = template.Must(template.New("weekly").Funcs(funcs).Parse(frameHe
 <div style="margin-top:12px;{{head}};font-weight:700;font-size:40px;line-height:1.1;color:#18181b;font-variant-numeric:tabular-nums">{{.Big}}</div>
 <p style="margin:6px 0 0;font-size:14px;color:#3f3f46">{{.Under}}</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;max-width:480px;margin-left:auto;margin-right:auto"><tr>
-{{range .Bars}}<td align="center" valign="bottom" style="padding:0 3px;height:66px;vertical-align:bottom"><div style="height:{{.Height}}px;line-height:{{.Height}}px;font-size:0;max-width:34px;margin:0 auto;border-radius:6px 6px 2px 2px;background:{{if .Empty}}#e4e4e7{{else}}#18181b{{end}}">&nbsp;</div></td>{{end}}
+{{range .Bars}}<td align="center" valign="bottom" style="padding:0 3px;height:66px;vertical-align:bottom"><div style="height:{{.Height}}px;line-height:{{.Height}}px;font-size:0;max-width:34px;margin:0 auto;border-radius:6px 6px 2px 2px;background:{{.Color}}">&nbsp;</div></td>{{end}}
 </tr><tr>{{range .Bars}}<td align="center" style="padding-top:4px;font-size:12px;color:#52525b">{{.Day}}</td>{{end}}</tr></table>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="6" style="margin-top:8px;border-collapse:separate;max-width:560px;margin-left:auto;margin-right:auto"><tr>
 {{range .Tiles}}<td align="center" width="33%" style="background:#fafafa;border:1px solid #e4e4e7;border-radius:14px;padding:10px 4px;text-align:center"><div style="font-size:12px;color:#52525b">{{.Label}}</div><div style="{{head}};font-weight:700;font-size:16px;color:#18181b;font-variant-numeric:tabular-nums">{{.Value}}</div></td>{{end}}

@@ -10,6 +10,7 @@ const WHAT = {
   payment_due: { name: 'payment-due emails', still: 'You’ll still see payments due in the app.' },
   kid_reconnect: { name: 'emails about your child’s bank', still: 'You’ll still see them in the app.' },
   weekly: { name: 'weekly summaries', still: 'Your week is still on Home and in Transactions.' },
+  monthly: { name: 'monthly highlights', still: 'Your month is still on Home and in Transactions.' },
 }
 
 async function call(token, body) {

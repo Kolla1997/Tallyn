@@ -26,6 +26,7 @@ const SETTINGS = {
   email_kid_reconnect: [],
   email_weekly: false,
   email_include_shared: false,
+  email_monthly: false,
   time_zone: null,
 }
 
@@ -77,7 +78,7 @@ describe('NotificationSettings', () => {
 
   it('turns on the weekly summary, then what is shared, and saves the time zone (#273)', async () => {
     render(<NotificationSettings me={me} household={household} />)
-    const shared = await screen.findByRole('switch', { name: "Include what's shared with me in the weekly summary" })
+    const shared = await screen.findByRole('switch', { name: "Include what's shared with me in the summaries" })
     expect(shared).toBeDisabled()
     fireEvent.click(screen.getByRole('switch', { name: 'Weekly summary email' }))
     await act(async () => {})
@@ -86,6 +87,15 @@ describe('NotificationSettings', () => {
     fireEvent.click(shared)
     await act(async () => {})
     expect(lastPut()).toMatchObject({ email_include_shared: true })
+  })
+
+  it('turns on monthly highlights, which also lets what is shared be included (#274)', async () => {
+    render(<NotificationSettings me={me} household={household} />)
+    const shared = await screen.findByRole('switch', { name: "Include what's shared with me in the summaries" })
+    fireEvent.click(screen.getByRole('switch', { name: 'Monthly highlights email' }))
+    await act(async () => {})
+    expect(lastPut()).toMatchObject({ email_monthly: true })
+    expect(shared).not.toBeDisabled()
   })
 
   it('turns down an amount that is not a positive number', async () => {
