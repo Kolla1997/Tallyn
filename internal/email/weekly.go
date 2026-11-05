@@ -62,11 +62,11 @@ type weeklyMonth struct {
 func (w Weekly) Quiet() bool { return w.Spent == 0 && w.CameIn == 0 }
 
 type weeklyView struct {
-	Heading, Big, Under, LogoURL, OpenURL, StopURL, SettingsURL, Household string
-	Bars                                                                   []bar
-	Tiles                                                                  []tile
-	Rows, Due                                                              []slipRow
-	Shared                                                                 []sharedView
+	Heading, Big, Under, LogoURL, OpenURL, StopURL, SettingsURL, Household, Why, StopText string
+	Bars                                                                                  []bar
+	Tiles                                                                                 []tile
+	Rows, Due                                                                             []slipRow
+	Shared                                                                                []sharedView
 }
 
 type bar struct {
@@ -102,6 +102,7 @@ func ComposeWeekly(w Weekly, links Links, token, household string) (Message, err
 	}
 	v := weeklyView{
 		Heading: "Your week, " + span, Big: m(w.Spent), LogoURL: logo, Household: household,
+		Why: "You're getting this because the weekly summary is on for " + household + ".", StopText: "Stop weekly summaries",
 		OpenURL: links.App + "/", SettingsURL: links.App + "/settings", StopURL: links.App + "/unsubscribe?t=" + url.QueryEscape(token),
 	}
 	v.Under = "spent, and nothing came in"
@@ -244,29 +245,24 @@ func weeklyText(v weeklyView) string {
 	return b.String()
 }
 
-var weeklyPage = template.Must(template.New("weekly").Funcs(template.FuncMap{"head": func() template.CSS { return head }, "body": func() template.CSS { return body }}).Parse(`<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet"><title>{{.Heading}}</title></head>
-<body style="margin:0;padding:0;background:#ffffff;{{body}};color:#18181b">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff"><tr><td style="padding:24px 12px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#ffffff;border:1px solid #e4e4e7;border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 6px 20px rgba(24,24,27,.08),0 1px 3px rgba(24,24,27,.06)">
-<tr><td align="center" style="background:#18181b;padding:18px 24px;border-radius:21px 21px 0 0"><img src="{{.LogoURL}}" alt="Coinroof" width="138" height="28" style="display:block;height:28px;width:138px;border:0;margin:0 auto;{{head}};font-weight:700;font-size:18px;color:#ffffff"></td></tr>
-<tr><td align="center" style="padding:24px 24px 0;text-align:center">
+// weeklyPage: on a computer "Where it went" and "Coming up" sit side by side
+// (.cols, .col in frameCSS); on a phone they stack, as in the card.
+var weeklyPage = template.Must(template.New("weekly").Funcs(funcs).Parse(frameHead + `<title>{{.Heading}}</title></head>
+` + frameTop + `
+<tr><td align="center" style="padding:24px 24px 0;text-align:center"><div style="max-width:760px;margin:0 auto">
 <h1 style="margin:0;{{head}};font-weight:700;font-size:22px;line-height:1.25;color:#18181b">{{.Heading}}</h1>
 <div style="margin-top:12px;{{head}};font-weight:700;font-size:40px;line-height:1.1;color:#18181b;font-variant-numeric:tabular-nums">{{.Big}}</div>
 <p style="margin:6px 0 0;font-size:14px;color:#3f3f46">{{.Under}}</p>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px"><tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;max-width:480px;margin-left:auto;margin-right:auto"><tr>
 {{range .Bars}}<td align="center" valign="bottom" style="padding:0 3px;height:66px;vertical-align:bottom"><div style="height:{{.Height}}px;line-height:{{.Height}}px;font-size:0;max-width:34px;margin:0 auto;border-radius:6px 6px 2px 2px;background:{{if .Empty}}#e4e4e7{{else}}#18181b{{end}}">&nbsp;</div></td>{{end}}
 </tr><tr>{{range .Bars}}<td align="center" style="padding-top:4px;font-size:12px;color:#52525b">{{.Day}}</td>{{end}}</tr></table>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="6" style="margin-top:8px;border-collapse:separate"><tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="6" style="margin-top:8px;border-collapse:separate;max-width:560px;margin-left:auto;margin-right:auto"><tr>
 {{range .Tiles}}<td align="center" width="33%" style="background:#fafafa;border:1px solid #e4e4e7;border-radius:14px;padding:10px 4px;text-align:center"><div style="font-size:12px;color:#52525b">{{.Label}}</div><div style="{{head}};font-weight:700;font-size:16px;color:#18181b;font-variant-numeric:tabular-nums">{{.Value}}</div></td>{{end}}
-</tr></table></td></tr>
-{{define "slip"}}<tr><td style="padding:10px 0 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fafafa;border-top:2px dashed #e4e4e7;border-bottom:2px dashed #e4e4e7">
-{{range $i, $r := .}}<tr><td style="padding:10px 0 10px 24px;font-size:15px;color:#3f3f46;text-align:left{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{$r.Label}}{{if $r.Meta}}<div style="font-size:12px;color:#52525b">{{$r.Meta}}</div>{{end}}</td>
-<td align="right" style="padding:10px 24px 10px 8px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums{{if $i}};border-top:1px dotted #e4e4e7{{end}}"><b style="font-weight:700;color:{{if $r.Red}}#cb0900{{else}}#18181b{{end}}">{{$r.Value}}</b></td></tr>
-{{end}}</table></td></tr>{{end}}
-{{if .Rows}}<tr><td style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">Where it went</td></tr>{{template "slip" .Rows}}{{end}}
-{{if .Due}}<tr><td style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">Coming up</td></tr>{{template "slip" .Due}}{{end}}
-{{if .Shared}}<tr><td style="padding:20px 24px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px dashed #a1a1aa;border-radius:16px;border-collapse:separate">
+</tr></table></div></td></tr>
+<tr><td style="padding:0"><div class="cols" style="margin:0 auto;font-size:0">
+<div class="col" style="font-size:16px">{{if .Rows}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">Where it went</div>{{template "slip" .Rows}}{{end}}</div><div class="col" style="font-size:16px">
+{{if .Due}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">Coming up</div>{{template "slip" .Due}}{{end}}
+{{if .Shared}}<div class="shw" style="padding:20px 24px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px dashed #a1a1aa;border-radius:16px;border-collapse:separate">
 <tr><td style="padding:14px 16px 0;{{head}};font-weight:700;font-size:16px;text-align:center">Shared with you</td></tr>
 <tr><td style="padding:4px 16px 0;font-size:13px;color:#3f3f46;text-align:center">Only what's shared with you in Family, and your children's totals.</td></tr>
 {{range .Shared}}<tr><td style="padding:12px 16px 0;font-size:14px">
@@ -277,8 +273,7 @@ var weeklyPage = template.Must(template.New("weekly").Funcs(template.FuncMap{"he
 <p style="margin:8px 0 0;font-size:13px;color:#3f3f46;text-align:left">{{.Note}}</p>
 {{with .Biggest}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;border-top:1px dotted #e4e4e7"><tr><td style="padding-top:8px;text-align:left">{{.Label}}<div style="font-size:12px;color:#52525b">{{.Meta}}</div></td><td align="right" style="padding-top:8px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums">{{.Value}}</td></tr></table>{{end}}
 </td></tr>{{end}}
-<tr><td style="padding:0 0 14px"></td></tr></table></td></tr>{{end}}
+<tr><td style="padding:0 0 14px"></td></tr></table></div>{{end}}
+</div></div></td></tr>
 <tr><td align="center" style="padding:20px 24px 24px;text-align:center"><a href="{{.OpenURL}}" style="display:inline-block;background:#18181b;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;border-radius:999px;padding:12px 24px">Open Coinroof</a></td></tr>
-</table>
-<p style="max-width:480px;margin:14px auto 0;font-size:12px;line-height:1.5;color:#52525b;text-align:center">You're getting this because the weekly summary is on for {{.Household}}.<br><a href="{{.StopURL}}" style="color:#3f3f46">Stop weekly summaries</a> · <a href="{{.SettingsURL}}" style="color:#3f3f46">Email settings</a></p>
-</td></tr></table></body></html>`))
+` + frameEnd + frameSlip))

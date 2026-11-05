@@ -202,32 +202,64 @@ func formatMoney(minor int64, currency string) string {
 	return sign + currency + " " + s
 }
 
-// page is the email, with inline styles: many mail apps drop <style>.
+// page is the email, with inline styles: many mail apps drop <style>. The
+// inline styles are the phone layout (the card, D1); frameCSS turns it edge
+// to edge on a computer (Dinesh picked D in drafts/273-email-edge-to-edge.html):
+// a full-width black band and footer, the words in a centred column. Mail apps
+// that ignore <style> show the phone card.
 const (
 	head = "font-family:'Space Grotesk','Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif"
 	body = "font-family:Montserrat,'Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif"
 )
 
-var page = template.Must(template.New("email").Funcs(template.FuncMap{"head": func() template.CSS { return head }, "body": func() template.CSS { return body }}).Parse(`<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet"><title>{{.Heading}}</title></head>
-<body style="margin:0;padding:0;background:#ffffff;{{body}};color:#18181b">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff"><tr><td style="padding:24px 12px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#ffffff;border:1px solid #e4e4e7;border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 6px 20px rgba(24,24,27,.08),0 1px 3px rgba(24,24,27,.06)">
-<tr><td align="center" style="background:#18181b;padding:18px 24px;border-radius:21px 21px 0 0"><img src="{{.LogoURL}}" alt="Coinroof" width="138" height="28" style="display:block;height:28px;width:138px;border:0;margin:0 auto;{{head}};font-weight:700;font-size:18px;color:#ffffff"></td></tr>
-<tr><td align="center" style="padding:24px 24px 0;text-align:center">
+const frameHead = `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+<style>
+@media only screen and (min-width:600px) {
+  .pg { padding:0 !important }
+  .card { max-width:none !important; border:0 !important; border-radius:0 !important; box-shadow:none !important }
+  .band { border-radius:0 !important }
+  .foot { max-width:none !important; margin:0 !important; background:#18181b !important; color:#d4d4d8 !important; padding:20px !important }
+  .foot a { color:#ffffff !important }
+  .cols { max-width:960px !important; padding:0 24px !important }
+  .col { display:inline-block !important; width:47% !important; margin:0 1.5% !important; vertical-align:top !important }
+  .col .slipo { background:transparent !important; border:0 !important; padding:10px 0 0 !important }
+  .col .slipi { max-width:none !important; background:#fafafa !important; border:1px solid #e4e4e7 !important; border-radius:14px !important }
+  .col .sh { padding-left:0 !important }
+  .col .shw { padding:20px 0 0 !important }
+}
+</style>`
+
+// The parts both emails share: the start of the card with the band, the
+// slip, and the end with the footer.
+const (
+	frameTop = `<body style="margin:0;padding:0;background:#ffffff;{{body}};color:#18181b">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff"><tr><td class="pg" style="padding:24px 12px">
+<table class="card" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#ffffff;border:1px solid #e4e4e7;border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 6px 20px rgba(24,24,27,.08),0 1px 3px rgba(24,24,27,.06)">
+<tr><td class="band" align="center" style="background:#18181b;padding:18px 24px;border-radius:21px 21px 0 0"><img src="{{.LogoURL}}" alt="Coinroof" width="138" height="28" style="display:block;height:28px;width:138px;border:0;margin:0 auto;{{head}};font-weight:700;font-size:18px;color:#ffffff"></td></tr>`
+	frameSlip = `{{define "slip"}}<table class="slipo" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fafafa;border-top:2px dashed #e4e4e7;border-bottom:2px dashed #e4e4e7;margin-top:10px"><tr><td align="center">
+<table class="slipi" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto">
+{{range $i, $r := .}}<tr><td style="padding:10px 0 10px 24px;font-size:15px;color:#3f3f46;text-align:left{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{$r.Label}}{{if $r.Meta}}<div style="font-size:12px;color:#52525b">{{$r.Meta}}</div>{{end}}</td>
+<td align="right" style="padding:10px 24px 10px 8px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{if $r.Chip}}<span style="display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;background:#fde8e7;color:#a30700">{{$r.Value}}</span>{{else if $r.Total}}<span style="{{head}};font-weight:700;font-size:22px;color:{{if $r.Red}}#cb0900{{else}}#18181b{{end}}">{{$r.Value}}</span>{{else}}<b style="font-weight:700;color:{{if $r.Red}}#cb0900{{else}}#18181b{{end}}">{{$r.Value}}</b>{{end}}</td></tr>
+{{end}}</table></td></tr></table>{{end}}`
+	frameEnd = `</table>
+<p class="foot" style="max-width:480px;margin:14px auto 0;font-size:12px;line-height:1.5;color:#52525b;text-align:center">{{if .Why}}{{.Why}}<br>{{end}}<a href="{{.StopURL}}" style="color:#3f3f46">{{.StopText}}</a> · <a href="{{.SettingsURL}}" style="color:#3f3f46">Email settings</a></p>
+</td></tr></table></body></html>`
+)
+
+var funcs = template.FuncMap{"head": func() template.CSS { return head }, "body": func() template.CSS { return body }}
+
+var page = template.Must(template.New("email").Funcs(funcs).Parse(frameHead + `<title>{{.Heading}}</title></head>
+` + frameTop + `
+<tr><td align="center" style="padding:24px 24px 0;text-align:center"><div style="max-width:560px;margin:0 auto">
 {{with .Date}}<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="width:92px;margin:0 auto 16px;border:1px solid #e4e4e7;border-radius:16px;border-collapse:separate;overflow:hidden;background:#ffffff">
 <tr><td align="center" style="background:#cb0900;color:#ffffff;font-size:12px;font-weight:700;padding:4px 0;border-radius:15px 15px 0 0">{{.Month}}</td></tr>
 <tr><td align="center" style="{{head}};font-weight:700;font-size:34px;line-height:1.2;padding-top:6px;color:#18181b">{{.Day}}</td></tr>
 <tr><td align="center" style="font-size:12px;color:#52525b;padding-bottom:8px">{{.Weekday}}</td></tr></table>{{end}}
 <h1 style="margin:0;{{head}};font-weight:700;font-size:22px;line-height:1.25;color:#18181b">{{.Heading}}</h1>
-</td></tr>
-{{if .Rows}}<tr><td style="padding:20px 0 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fafafa;border-top:2px dashed #e4e4e7;border-bottom:2px dashed #e4e4e7">
-{{range $i, $r := .Rows}}<tr><td style="padding:{{if $i}}8px{{else}}14px{{end}} 0 {{if $r.Total}}14px{{else}}8px{{end}} 24px;font-size:15px;color:#3f3f46;text-align:left{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{$r.Label}}</td>
-<td align="right" style="padding:{{if $i}}8px{{else}}14px{{end}} 24px {{if $r.Total}}14px{{else}}8px{{end}} 0;text-align:right;font-variant-numeric:tabular-nums{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{if $r.Chip}}<span style="display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;background:#fde8e7;color:#a30700">{{$r.Value}}</span>{{else if $r.Total}}<span style="{{head}};font-weight:700;font-size:22px;color:{{if $r.Red}}#cb0900{{else}}#18181b{{end}}">{{$r.Value}}</span>{{else}}<b style="font-weight:700;color:#18181b">{{$r.Value}}</b>{{end}}</td></tr>
-{{end}}</table></td></tr>{{end}}
-<tr><td align="center" style="padding:0 24px 24px;text-align:center">
+</div></td></tr>
+{{if .Rows}}<tr><td style="padding:10px 0 0">{{template "slip" .Rows}}</td></tr>{{end}}
+<tr><td align="center" style="padding:0 24px 24px;text-align:center"><div style="max-width:560px;margin:0 auto">
 {{if .Body}}<p style="margin:16px 0 0;font-size:15px;line-height:1.5;color:#3f3f46">{{.Body}}</p>{{end}}
 <a href="{{.ButtonURL}}" style="display:inline-block;margin-top:20px;background:#18181b;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;border-radius:999px;padding:12px 24px">{{.Button}}</a>
-</td></tr></table>
-<p style="max-width:480px;margin:14px auto 0;font-size:12px;line-height:1.5;color:#52525b;text-align:center">{{if .Why}}{{.Why}}<br>{{end}}<a href="{{.StopURL}}" style="color:#3f3f46">{{.StopText}}</a> · <a href="{{.SettingsURL}}" style="color:#3f3f46">Email settings</a></p>
-</td></tr></table></body></html>`))
+</div></td></tr>` + frameEnd + frameSlip))
