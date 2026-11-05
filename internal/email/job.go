@@ -20,6 +20,8 @@ type Outbox interface {
 	MonthlyDue(ctx context.Context, now time.Time) ([]db.WeeklyDue, error)
 	MonthlySummary(ctx context.Context, householdID, userID string, monthStart time.Time) (json.RawMessage, error)
 	MarkMonthly(ctx context.Context, householdID, userID string, monthStart time.Time, sent bool) error
+	WelcomeDue(ctx context.Context, now time.Time) ([]db.WelcomeDue, error)
+	MarkWelcome(ctx context.Context, userID string, sent bool) error
 }
 
 // Job checks payments due and sends the emails alerts call for, every few
@@ -86,8 +88,40 @@ func (j *Job) Once(ctx context.Context, now time.Time) {
 	if sent > 0 {
 		log.Printf("email: sent %d", sent)
 	}
+	j.welcome(ctx, now)
 	j.weekly(ctx, now)
 	j.monthly(ctx, now)
+}
+
+// welcome sends the welcome email (#280) once to each new account; a failed
+// send is tried again next round.
+func (j *Job) welcome(ctx context.Context, now time.Time) {
+	due, err := j.Outbox.WelcomeDue(ctx, now)
+	if err != nil {
+		log.Printf("email: welcome due: %v", err)
+		return
+	}
+	sent := 0
+	for _, d := range due {
+		m, err := ComposeWelcome(Welcome{Name: d.Name}, Links{App: j.AppURL, Logo: j.LogoURL})
+		if err != nil {
+			log.Printf("email: welcome compose: %v", err)
+			_ = j.Outbox.MarkWelcome(ctx, d.UserID, false) // can't be built: don't retry forever
+			continue
+		}
+		m.To = d.Email
+		if err := j.Sender.Send(ctx, m); err != nil {
+			log.Printf("email: send welcome: %v", err)
+			continue
+		}
+		if err := j.Outbox.MarkWelcome(ctx, d.UserID, true); err != nil {
+			log.Printf("email: mark welcome: %v", err)
+		}
+		sent++
+	}
+	if sent > 0 {
+		log.Printf("email: sent %d welcome emails", sent)
+	}
 }
 
 // monthly sends the monthly highlights due now (#274), as weekly does.

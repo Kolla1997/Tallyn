@@ -33,6 +33,10 @@ type Invite struct {
 	ExpiresAt  time.Time  `json:"expires_at"`
 	AcceptedAt *time.Time `json:"accepted_at"`
 	RevokedAt  *time.Time `json:"revoked_at"`
+
+	// For the invite email (#280); only CreateInvite fills them.
+	Household string `json:"-" db:"-"`
+	From      string `json:"-" db:"-"` // the inviter's display name
 }
 
 // ErrAlreadyMember means the invited email already belongs to a member.
@@ -77,9 +81,13 @@ func (d *DB) CreateInvite(ctx context.Context, userID, householdID, email, role 
 			householdID, email, role, hash[:], expires).Scan(&id); err != nil {
 			return err
 		}
-		return tx.QueryRow(ctx, `select id, email, role, created_at, expires_at, accepted_at, revoked_at
+		if err := tx.QueryRow(ctx, `select id, email, role, created_at, expires_at, accepted_at, revoked_at
 			from public.household_invites where id = $1`, id).
-			Scan(&inv.ID, &inv.Email, &inv.Role, &inv.CreatedAt, &inv.ExpiresAt, &inv.AcceptedAt, &inv.RevokedAt)
+			Scan(&inv.ID, &inv.Email, &inv.Role, &inv.CreatedAt, &inv.ExpiresAt, &inv.AcceptedAt, &inv.RevokedAt); err != nil {
+			return err
+		}
+		return tx.QueryRow(ctx, `select h.name, coalesce((select p.display_name from public.profiles p where p.id = $2), '')
+			from public.households h where h.id = $1`, householdID, userID).Scan(&inv.Household, &inv.From)
 	})
 	if err != nil {
 		if errors.Is(mapErr(err), ErrAlreadyLinked) { // unique_violation raised for "already a member"

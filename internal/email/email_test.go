@@ -142,6 +142,16 @@ type fakeOutbox struct {
 	monthlyDue   []db.WeeklyDue
 	monthly      map[string]json.RawMessage
 	monthMarked  []string
+	welcomeDue   []db.WelcomeDue
+	welcomed     []string
+}
+
+func (f *fakeOutbox) WelcomeDue(context.Context, time.Time) ([]db.WelcomeDue, error) {
+	return f.welcomeDue, nil
+}
+func (f *fakeOutbox) MarkWelcome(_ context.Context, user string, sent bool) error {
+	f.welcomed = append(f.welcomed, user+":"+map[bool]string{true: "sent", false: "skipped"}[sent])
+	return nil
 }
 
 func (f *fakeOutbox) MonthlyDue(context.Context, time.Time) ([]db.WeeklyDue, error) {

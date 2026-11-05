@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/Kolla1997/Tallyn/internal/auth"
 	"github.com/Kolla1997/Tallyn/internal/db"
+	"github.com/Kolla1997/Tallyn/internal/email"
 )
 
 // Members and invitations (#12, ADR 0008). Every rule is enforced in the
@@ -132,7 +134,7 @@ func invites(store Store) http.HandlerFunc {
 }
 
 // createInvite returns the invite and, this one time only, its token.
-func createInvite(store Store) http.HandlerFunc {
+func createInvite(store Store, mail inviteMailer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		uid, ok := userID(w, r)
 		if !ok {
@@ -150,6 +152,7 @@ func createInvite(store Store) http.HandlerFunc {
 			memberError(w, "create invite", err)
 			return
 		}
+		mail.send(inv, token)
 		w.Header().Set("Cache-Control", "no-store")
 		writeJSON(w, http.StatusCreated, map[string]any{"invite": inv, "token": token})
 	}
@@ -187,5 +190,32 @@ func acceptInvite(store Store) http.HandlerFunc {
 			return
 		}
 		writeJSON(w, http.StatusOK, map[string]string{"household_id": hh})
+	}
+}
+
+// inviteMailer emails the join link to the person invited (#280). A failed
+// send is only logged: the owner still gets the link to share.
+type inviteMailer struct {
+	sender email.Sender
+	links  email.Links
+}
+
+func (m inviteMailer) send(inv db.Invite, token string) {
+	if m.sender == nil {
+		return
+	}
+	msg, err := email.ComposeInvite(email.Invited{
+		From: inv.From, Household: inv.Household, Role: inv.Role,
+		Link: m.links.App + "/join#" + token, Days: int(db.InviteLifetime / (24 * time.Hour)),
+	}, m.links)
+	if err != nil {
+		log.Printf("api: invite email: %v", err)
+		return
+	}
+	msg.To = inv.Email
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := m.sender.Send(ctx, msg); err != nil {
+		log.Printf("api: send invite email: %v", err)
 	}
 }

@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/Kolla1997/Tallyn/internal/db"
+	"github.com/Kolla1997/Tallyn/internal/email"
 )
 
 // All data here is fake.
@@ -146,4 +147,31 @@ func sendFresh(h http.Handler, method, path, body string) *httptest.ResponseReco
 	rec := httptest.NewRecorder()
 	h.ServeHTTP(rec, req)
 	return rec
+}
+
+type mailbox struct{ sent []email.Message }
+
+func (m *mailbox) Send(_ context.Context, msg email.Message) error {
+	m.sent = append(m.sent, msg)
+	return nil
+}
+
+// The invite email (#280) goes to the invited address with the join link.
+func TestInviteEmail(t *testing.T) {
+	s := &memberStore{}
+	box := &mailbox{}
+	h := NewRouter(Deps{WebDir: t.TempDir(), RequireAuth: fakeAuth, Store: s, Mailer: box, AppURL: "https://coinroof.us"})
+	if rec := send(h, "POST", "/api/households/"+testHH+"/invites", `{"email":"x@example.test","role":"teen"}`); rec.Code != http.StatusCreated {
+		t.Fatalf("status %d", rec.Code)
+	}
+	if len(box.sent) != 1 || box.sent[0].To != "x@example.test" || !strings.Contains(box.sent[0].HTML, "https://coinroof.us/join#"+fakeInviteToken) {
+		t.Fatalf("sent %+v", box.sent)
+	}
+
+	s.err = db.ErrAlreadyMember
+	box.sent = nil
+	send(h, "POST", "/api/households/"+testHH+"/invites", `{"email":"x@example.test","role":"teen"}`)
+	if len(box.sent) != 0 {
+		t.Error("emailed an invite that wasn't made")
+	}
 }

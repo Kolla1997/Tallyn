@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/Kolla1997/Tallyn/internal/email"
 	"log"
 	"net/http"
 	"os"
@@ -97,6 +98,12 @@ type Deps struct {
 	Accounts   AccountDeleter // *supabaseadmin.Client
 	ClosingKey []byte         // DeriveClosingKey(token key)
 	LinkKey    []byte         // email.DeriveLinkKey(token key): unsubscribe links (#269)
+
+	// The invite email (#280): sent when an invite is made, with the join
+	// link. Without a Mailer, the owner only gets the link to share.
+	Mailer email.Sender
+	AppURL string // e.g. https://coinroof.us
+	Logo   string // EMAIL_LOGO_URL; defaults to AppURL's
 }
 
 // NewRouter returns the server's handler: JSON API under /api/ and the
@@ -125,7 +132,7 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("PUT /api/households/{id}/members/{user}", setMemberRole(d.Store))
 	api.HandleFunc("DELETE /api/households/{id}/members/{user}", removeMember(d.Store))
 	api.HandleFunc("GET /api/households/{id}/invites", invites(d.Store))
-	api.Handle("POST /api/households/{id}/invites", limited(lim.invites, createInvite(d.Store)))
+	api.Handle("POST /api/households/{id}/invites", limited(lim.invites, createInvite(d.Store, inviteMailer{d.Mailer, email.Links{App: d.AppURL, Logo: d.Logo}})))
 	api.HandleFunc("DELETE /api/invites/{id}", revokeInvite(d.Store))
 	api.Handle("POST /api/invites/accept", limited(lim.accepts, acceptInvite(d.Store)))
 	api.HandleFunc("POST /api/households", createHousehold(d.Store))
