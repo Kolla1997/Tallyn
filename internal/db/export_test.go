@@ -24,6 +24,8 @@ func TestExportOnlyYours(t *testing.T) {
 		values ($1, null, 'FOOD_AND_DRINK', 'month', 50000, 'USD', $2), ($1, $3, null, 'week', 2000, 'USD', $2)`, f.testHH, alice, carl)
 	mustExec(t, f.admin, `insert into consents (user_id, document, version) values ($1, 'terms', '2026-10-01'), ($2, 'terms', '2026-10-01')`, alice, carl)
 	mustExec(t, f.admin, `update profiles set display_name = 'Carl' where id = $1`, carl)
+	mustExec(t, f.admin, `insert into news_choices (user_id, subscribed, source, privacy_version) values ($1, true, 'signup', 'v1'), ($1, false, 'stop_link', 'v1'), ($2, true, 'settings', 'v1')`, alice, carl)
+	mustExec(t, f.admin, `insert into notification_settings (household_id, user_id, big_purchase_minor, email_weekly, email_kid_reconnect) values ($1, $2, 75000, true, array[$3::uuid])`, f.testHH, alice, carl)
 	mustExec(t, f.admin, `insert into goals (household_id, owner_user_id, name, target_minor, currency, visibility, saved_minor) values ($1, $2, 'Beach trip', 500000, 'USD', 'everyone', 340000), ($1, $3, 'Carl''s laptop', 90000, 'USD', 'me', 0)`, f.testHH, alice, carl)
 
 	if n := f.count(t, alice, `select count(*) from transactions`); n != 2 {
@@ -54,6 +56,14 @@ func TestExportOnlyYours(t *testing.T) {
 	}
 	if len(e.Agreements) != 1 {
 		t.Errorf("agreements = %+v, want only alice's", e.Agreements)
+	}
+	// Product news and notification settings (#290).
+	if len(e.ProductNews) != 2 || !e.ProductNews[0].Subscribed || e.ProductNews[1].Where != "stop_link" {
+		t.Errorf("product news = %+v, want alice's two, oldest first", e.ProductNews)
+	}
+	if n := e.Notifications; len(n) != 1 || n[0].Household != "Test household" || n[0].BigPurchaseMinor != 75000 || !n[0].EmailWeekly ||
+		len(n[0].EmailKidReconnect) != 1 || n[0].EmailKidReconnect[0] != "Carl" {
+		t.Errorf("notification settings = %+v", n)
 	}
 
 	// Nothing secret or internal: no tokens, Plaid ids or cursors.
