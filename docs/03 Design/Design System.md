@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-10-29
+updated: 2026-11-04
 issue: 10
 tags: [design]
 ---
@@ -175,3 +175,4 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-10-29 | Loading motion rule (#228): every new screen, card, chart or figure gets a planned loading effect in its draft, with a reduced-motion version; reuse the patterns under Motion → Loading motion | Dinesh asked for it after the Home (#221) and Accounts (#228) loading work |
 | 2026-10-29 | Signed-out launch page (#220): headline across the top, product video and the auth card side by side at the same height, every auth screen in that one card slot; then About, three features, safety and a closing call; card first on phones. Footer: frosted tiles in a grid (a tall brand tile with the lockup and "It all adds up." in Bricolage Grotesque, `--font-tagline`; the page sections; Create an account; Terms; Privacy; the copyright), Dinesh picked B from the footer drafts and asked for the brand tile bigger | Dinesh picked C over A (card first, story below) and B (split hero), then asked for the video and card on one level and all auth in one place |
 | 2026-10-29 | Active page in dark mode (#230): the sidebar's current page is green (`redesign-in-text`) with a 3px green bar on its left; light mode stays red, and gets the same bar in red (#232) | Dinesh picked C (green plus edge mark) over A (green only) and B (green plus tint) |
+| 2026-11-04 | Notification emails (#269): white page, white card with a thin grey edge, a black band with the red-fade Coinroof lockup, a calendar leaf for due dates, the figures on a light-grey slip (total last and biggest), one black button. Solid, inline-styled; red only for the calendar top and what is overdue. Web fonts fall back to Avenir Next / Segoe UI. Unsubscribe and other one-task pages from an email have no site footer | Dinesh picked D1 (`drafts/269-email-backgrounds.html`) after rounds C and D; glass and clay don't survive mail apps |
