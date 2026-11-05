@@ -8,12 +8,9 @@ kanban-plugin: board
 
 ## Backlog
 
-- [ ] [#55 Notifications](https://github.com/Kolla1997/Tallyn/issues/55) #type/feature #area/frontend #area/backend #priority/p2
 - [ ] [#11 Multi-currency total balance](https://github.com/Kolla1997/Tallyn/issues/11) #type/feature #area/backend #priority/p3
 - [ ] [#156 Say what other currencies are left out](https://github.com/Kolla1997/Tallyn/issues/156) #type/design #area/design #area/frontend #priority/p2
-- [ ] [#160 CSS cleanup and tokens](https://github.com/Kolla1997/Tallyn/issues/160) #type/tech-debt #area/design #area/frontend #priority/p3
 - [ ] [#255 Turn on the transaction map where the app is hosted](https://github.com/Kolla1997/Tallyn/issues/255) #type/feature #area/infra #priority/p2
-- [ ] [#263 Measure the cost of the card blur on a mid-range phone](https://github.com/Kolla1997/Tallyn/issues/263) #type/tech-debt #area/frontend #priority/p2
 
 
 ## In Progress
@@ -60,6 +57,7 @@ kanban-plugin: board
 - [x] [#51 Reconnect a bank that needs sign-in (Plaid update mode)](https://github.com/Kolla1997/Tallyn/issues/51) #type/feature #area/frontend #area/backend #priority/p1
 - [x] [#53 Rename a household](https://github.com/Kolla1997/Tallyn/issues/53) #type/feature #area/frontend #area/backend #priority/p2
 - [x] [#54 Download your data](https://github.com/Kolla1997/Tallyn/issues/54) #type/feature #area/frontend #area/backend #priority/p1
+- [x] [#55 Notifications](https://github.com/Kolla1997/Tallyn/issues/55) #type/feature #area/frontend #area/backend #priority/p2
 - [x] [#56 Close your Tallyn account](https://github.com/Kolla1997/Tallyn/issues/56) #type/feature #area/frontend #area/backend #priority/p1
 - [x] [#58 Transactions: summary and details panel](https://github.com/Kolla1997/Tallyn/issues/58) #type/feature #area/frontend #area/backend #priority/p1
 - [x] [#60 Maps: choose a provider and show purchase locations on a map](https://github.com/Kolla1997/Tallyn/issues/60) #type/feature #area/frontend #area/infra #priority/p2
@@ -104,6 +102,7 @@ kanban-plugin: board
 - [x] [#157 Cheaper and calmer motion](https://github.com/Kolla1997/Tallyn/issues/157) #type/tech-debt #area/frontend #priority/p2
 - [x] [#158 Tap areas and control contrast](https://github.com/Kolla1997/Tallyn/issues/158) #type/design #area/design #area/frontend #priority/p2
 - [x] [#159 Load speed: requests wait on each other](https://github.com/Kolla1997/Tallyn/issues/159) #type/tech-debt #area/frontend #area/backend #priority/p2
+- [x] [#160 CSS cleanup and tokens](https://github.com/Kolla1997/Tallyn/issues/160) #type/tech-debt #area/design #area/frontend #priority/p3
 - [x] [#180 Tallyn design skill: Tallyn rules plus taste-skill's app-screen method](https://github.com/Kolla1997/Tallyn/issues/180) #type/docs #area/design #priority/p2
 - [x] [#182 Home: explore bolder directions with taste-skill](https://github.com/Kolla1997/Tallyn/issues/182) #type/design #area/design #priority/p2
 - [x] [#183 Add shadcn, Bklit charts, Kokonut UI (free) and anime.js to web/ for drafts](https://github.com/Kolla1997/Tallyn/issues/183) #type/tech-debt #area/frontend #priority/p2
@@ -113,6 +112,7 @@ kanban-plugin: board
 - [x] [#202 Rename Terms and Privacy to Coinroof](https://github.com/Kolla1997/Tallyn/issues/202) #type/docs #area/backend #priority/p1
 - [x] [#209 Focus ring shows around page headings after a keyboard sign-in](https://github.com/Kolla1997/Tallyn/issues/209) #type/bug #area/frontend #priority/p2
 - [x] [#253 Transactions: By category shows honest shares of the month](https://github.com/Kolla1997/Tallyn/issues/253) #type/feature #area/frontend #priority/p2
+- [x] [#263 Measure the cost of the card blur on a mid-range phone](https://github.com/Kolla1997/Tallyn/issues/263) #type/tech-debt #area/frontend #priority/p2
 
 
 %% kanban:settings
