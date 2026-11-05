@@ -272,3 +272,25 @@ describe('Settings: profile, legal and coming soon (#114)', () => {
     })
   })
 })
+
+// US only for now (#287, Dinesh picked C): the household's currency, with no promise of conversion.
+describe('Settings: household currency', () => {
+  it('says US dollars and that Coinroof is US only for now', async () => {
+    api.mockReset()
+    api.mockResolvedValue({ members: [] })
+    window.history.replaceState(null, '', '/settings?section=household')
+    await act(async () =>
+      render(
+        <Settings
+          me={{ display_name: 'Sam' }}
+          household={{ id: 'hh-1', name: 'Test family', role: 'owner', home_currency: 'USD' }}
+          email="you@example.com"
+          onSaved={() => {}}
+          onSignOut={() => {}}
+        />,
+      ),
+    )
+    expect(screen.getByText('US dollars. Coinroof is US only for now.')).toBeInTheDocument()
+    expect(screen.queryByText(/conversion/)).toBeNull()
+  })
+})

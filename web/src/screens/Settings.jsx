@@ -507,7 +507,8 @@ function Household({ household, onSaved }) {
             )}
           </Row>
         )}
-        <Row label="Home currency" note={`${household.home_currency}. Totals in one currency come with conversion.`} />
+        {/* US only for now (#287, Dinesh picked C): no promise of conversion. */}
+        <Row label="Currency" note={household.home_currency === 'USD' ? 'US dollars. Coinroof is US only for now.' : household.home_currency} />
         <Row label="Your role" note={ROLE_LABEL[household.role] ?? household.role} />
         <Row label="People" note={count == null ? '' : `${count} ${count === 1 ? 'member' : 'members'}`}>
           <Link to="/family" className={TEXT_LINK}>

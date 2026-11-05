@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { api } from '../lib/api.js'
 
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'INR', 'MXN', 'JPY']
+// Coinroof is US only for now (#287, Dinesh picked C in drafts/287-usd-only.html): every new
+// household is in US dollars, with no choice to make. More currencies may come with #11.
+const CURRENCY = 'USD'
 
 // First step after sign-up: a household to link banks into (#8).
 export default function CreateHousehold({ onCreated }) {
   const [name, setName] = useState('')
-  const [currency, setCurrency] = useState('USD')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -18,7 +19,7 @@ export default function CreateHousehold({ onCreated }) {
     setError('')
     setBusy(true)
     try {
-      await api('/api/households', { method: 'POST', body: { name: name.trim(), home_currency: currency } })
+      await api('/api/households', { method: 'POST', body: { name: name.trim(), home_currency: CURRENCY } })
       onCreated()
     } catch {
       setError("We couldn't create your household. Check the name and try again.")
@@ -40,14 +41,6 @@ export default function CreateHousehold({ onCreated }) {
           onChange={(e) => setName(e.target.value)}
           placeholder="The Rivera family"
         />
-      </label>
-      <label>
-        Home currency
-        <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
-          {CURRENCIES.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
       </label>
       {error && (
         <p className="error" id="household-error" role="alert">
