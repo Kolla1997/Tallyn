@@ -57,27 +57,28 @@ func TestComposePaymentDue(t *testing.T) {
 	if m.Subject != "Payment due Saturday: Plaid Credit Card" {
 		t.Errorf("subject = %q", m.Subject)
 	}
-	for _, want := range []string{"$20.00", "<b style=\"font-weight:700;color:#18181b\">$410.00</b>", "Due Nov 7", "https://coinroof.us/unsubscribe?t=tok.en", "Stop payment-due emails", "coinroof-logo.png", "Trail House"} {
+	for _, want := range []string{">NOV<", ">7<", ">Saturday<", ">Statement balance<", ">$410.00<", ">Minimum payment<", ">$20.00<",
+		"https://coinroof.us/unsubscribe?t=tok.en", "Stop payment-due emails", "coinroof-logo.png", "Trail House", "avoids interest"} {
 		if !strings.Contains(m.HTML, want) {
 			t.Errorf("HTML is missing %q", want)
 		}
 	}
-	if strings.Contains(m.HTML, "#cb0900") {
+	if strings.Contains(m.HTML, `#cb0900">$20.00`) {
 		t.Error("a payment not yet due is shown in red")
 	}
-	if m.Unsubscribe != "https://coinroof.us/api/email/unsubscribe?t=tok.en" || !strings.Contains(m.Text, "$20.00") {
+	if m.Unsubscribe != "https://coinroof.us/api/email/unsubscribe?t=tok.en" || !strings.Contains(m.Text, "Minimum payment: $20.00") {
 		t.Errorf("unsubscribe %q, text %q", m.Unsubscribe, m.Text)
 	}
 
 	o := compose(t, "payment_due", `{"account":"Plaid Credit Card","due_date":"2026-11-07","amount_minor":2000,"currency":"USD","overdue":true}`)
-	if o.Subject != "Overdue: Plaid Credit Card" || !strings.Contains(o.HTML, "#cb0900") || !strings.Contains(o.HTML, "November 7") {
+	if o.Subject != "Overdue: Plaid Credit Card" || !strings.Contains(o.HTML, `#cb0900">$20.00`) || !strings.Contains(o.HTML, ">Past due<") || !strings.Contains(o.HTML, "November 7") {
 		t.Errorf("overdue: %q", o.Subject)
 	}
 }
 
 func TestComposeReconnect(t *testing.T) {
 	m := compose(t, "reconnect", `{"bank":"First Platypus <Bank>"}`)
-	if m.Subject != "Reconnect First Platypus <Bank>" || !strings.Contains(m.HTML, "First Platypus &lt;Bank&gt;") {
+	if m.Subject != "Reconnect First Platypus <Bank>" || !strings.Contains(m.HTML, "First Platypus &lt;Bank&gt;") || !strings.Contains(m.HTML, ">Needs sign-in<") || strings.Contains(m.HTML, ">NOV<") {
 		t.Errorf("subject %q; bank name not escaped in HTML", m.Subject)
 	}
 	k := compose(t, "reconnect", `{"bank":"First Platypus Bank","person":"Mia"}`)

@@ -12,11 +12,13 @@ import (
 	"github.com/Kolla1997/Tallyn/internal/money"
 )
 
-// The emails Dinesh picked (option C in drafts/269-notification-emails.html):
-// a plain heading that says what to do, the amount in a tile, one button.
-// Solid colours only: mail apps don't blur. Red only for overdue. Gmail
-// doesn't load web fonts, so each face falls back to a close one already on
-// the device (Avenir Next on Apple, Segoe UI on Windows).
+// The emails Dinesh picked (D1 in drafts/269-email-backgrounds.html): a
+// white page and a white card with a thin edge; a black band with the
+// red-fade logo; for a payment, a calendar leaf with the due date; the
+// figures on a slip, the total last and biggest; one button. Solid colours
+// only: mail apps don't blur. Red only for the calendar top and what you owe.
+// Gmail doesn't load web fonts, so each face falls back to a close one
+// already on the device (Avenir Next on Apple, Segoe UI on Windows).
 
 // Alert is what an email is about, from the alert's data (0023).
 type Alert struct {
@@ -37,9 +39,19 @@ type alertData struct {
 
 // view is what the template shows.
 type view struct {
-	Heading, Label, Figure, Chip, Body, Statement, Note, Button, ButtonURL, Why, StopText, StopURL, SettingsURL, LogoURL string
-	Red, Kid                                                                                                             bool
-	Tile                                                                                                                 string // bank name, for reconnect
+	Heading, Body, Note, Button, ButtonURL, Why, StopText, StopURL, SettingsURL, LogoURL string
+	Date                                                                                 *leaf // payment due: the calendar leaf
+	Rows                                                                                 []slipRow
+}
+
+// leaf is the calendar leaf: NOV · 7 · Saturday.
+type leaf struct{ Month, Day, Weekday string }
+
+// slipRow is one line on the slip. Total is the last, biggest figure; Chip
+// shows the value as a red chip ("Needs sign-in"); Red marks what's overdue.
+type slipRow struct {
+	Label, Value     string
+	Total, Chip, Red bool
 }
 
 // Links are where an email's links and logo point.
@@ -67,9 +79,9 @@ func Compose(a Alert, links Links, token, household string) (Message, error) {
 	switch a.Kind {
 	case "reconnect":
 		bank := orDefault(d.Bank, "Your bank")
-		v.Tile, v.Chip, v.Button, v.ButtonURL = bank, "Needs sign-in", "Reconnect", appURL+"/accounts"
+		v.Rows = []slipRow{{Label: bank, Value: "Needs sign-in", Chip: true}}
+		v.Button, v.ButtonURL = "Reconnect", appURL+"/accounts"
 		if d.Person != "" {
-			v.Kid = true
 			subject = d.Person + "'s bank needs reconnecting"
 			v.Heading = d.Person + "'s bank needs signing in again"
 			v.Body = "Only " + d.Person + " can reconnect it. You're getting this because you asked for " + d.Person + "'s reconnect emails."
@@ -82,24 +94,31 @@ func Compose(a Alert, links Links, token, household string) (Message, error) {
 		}
 	case "payment_due":
 		account := orDefault(d.Account, "card")
-		due := longDate(d.DueDate)
 		v.Button, v.ButtonURL = "See your card", appURL+"/debts"
 		v.Why, v.StopText = "You're getting this because payment-due emails are on for "+household+".", "Stop payment-due emails"
+		if t, ok := parse(d.DueDate); ok {
+			v.Date = &leaf{Month: strings.ToUpper(t.Format("Jan")), Day: t.Format("2"), Weekday: t.Format("Monday")}
+		}
+		if d.StatementMinor != nil && *d.StatementMinor > 0 && !d.Overdue {
+			v.Rows = append(v.Rows, slipRow{Label: "Statement balance", Value: formatMoney(*d.StatementMinor, d.Currency)})
+		}
 		if d.AmountMinor != nil {
-			v.Figure = formatMoney(*d.AmountMinor, d.Currency)
+			label := "Minimum payment"
+			if d.Overdue {
+				label = "Past due"
+			}
+			v.Rows = append(v.Rows, slipRow{Label: label, Value: formatMoney(*d.AmountMinor, d.Currency), Total: true, Red: d.Overdue})
 		}
 		if d.Overdue {
 			subject = "Overdue: " + account
 			v.Heading = "Your " + account + " payment is overdue"
-			v.Label, v.Chip, v.Red = "Past due", "Overdue", true
-			v.Body = "It was due " + due + ". Paying soon can limit late fees. If you've already paid, this clears on the next update."
+			v.Body = "It was due " + longDate(d.DueDate) + ". Paying soon can limit late fees. If you've already paid, this clears on the next update."
 		} else {
 			day := weekday(d.DueDate)
 			subject = "Payment due " + day + ": " + account
 			v.Heading = "Your " + account + " payment is due " + day
-			v.Label, v.Chip = "Minimum payment", "Due "+shortDate(d.DueDate)
-			if d.StatementMinor != nil && *d.StatementMinor > 0 {
-				v.Statement = formatMoney(*d.StatementMinor, d.Currency) // bold in the HTML
+			if len(v.Rows) > 1 {
+				v.Body = "Paying the full statement balance avoids interest."
 			}
 		}
 	default:
@@ -115,14 +134,8 @@ func Compose(a Alert, links Links, token, household string) (Message, error) {
 func text(v view) string {
 	var b strings.Builder
 	b.WriteString(v.Heading + "\n\n")
-	if v.Figure != "" {
-		b.WriteString(v.Label + ": " + v.Figure + " (" + v.Chip + ")\n")
-	}
-	if v.Tile != "" {
-		b.WriteString(v.Tile + ": " + v.Chip + "\n")
-	}
-	if v.Statement != "" {
-		b.WriteString("\nYour statement balance is " + v.Statement + ". Paying it in full avoids interest.\n")
+	for _, r := range v.Rows {
+		b.WriteString(r.Label + ": " + r.Value + "\n")
 	}
 	if v.Body != "" {
 		b.WriteString("\n" + v.Body + "\n")
@@ -150,13 +163,6 @@ func parse(d string) (time.Time, bool) {
 func weekday(d string) string {
 	if t, ok := parse(d); ok {
 		return t.Format("Monday")
-	}
-	return "soon"
-}
-
-func shortDate(d string) string {
-	if t, ok := parse(d); ok {
-		return t.Format("Jan 2")
 	}
 	return "soon"
 }
@@ -197,22 +203,31 @@ func formatMoney(minor int64, currency string) string {
 }
 
 // page is the email, with inline styles: many mail apps drop <style>.
-var page = template.Must(template.New("email").Parse(`<!doctype html>
+const (
+	head = "font-family:'Space Grotesk','Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif"
+	body = "font-family:Montserrat,'Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif"
+)
+
+var page = template.Must(template.New("email").Funcs(template.FuncMap{"head": func() template.CSS { return head }, "body": func() template.CSS { return body }}).Parse(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet"><title>{{.Heading}}</title></head>
-<body style="margin:0;padding:0;background:#f6f1ea;font-family:Montserrat,'Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif;color:#18181b">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea"><tr><td style="padding:24px 16px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid #ece6dd;border-radius:22px"><tr><td align="center" style="padding:28px 24px;text-align:center">
-<img src="{{.LogoURL}}" alt="Coinroof" width="138" height="28" style="display:block;height:28px;width:138px;border:0;margin:0 auto 20px;font-family:'Space Grotesk','Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif;font-weight:700;font-size:18px;color:#18181b">
-<h1 style="margin:0 0 8px;font-family:'Space Grotesk','Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif;font-size:22px;line-height:1.25;color:#18181b">{{.Heading}}</h1>
-{{if .Figure}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea;border-radius:16px;margin-top:16px"><tr>
-<td align="center" style="padding:16px;text-align:center"><div style="font-size:13px;color:#52525b">{{.Label}}</div><div style="font-family:'Space Grotesk','Avenir Next',Avenir,'Segoe UI',Helvetica,Arial,sans-serif;font-weight:700;font-size:30px;line-height:1.2;font-variant-numeric:tabular-nums;color:{{if .Red}}#cb0900{{else}}#18181b{{end}}">{{.Figure}}</div>
-<span style="display:inline-block;margin-top:6px;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;{{if .Red}}background:#fde8e7;color:#a30700{{else}}background:#e4e4e7;color:#3f3f46{{end}}">{{.Chip}}</span></td></tr></table>{{end}}
-{{if .Tile}}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f1ea;border-radius:16px;margin-top:16px"><tr>
-<td align="center" style="padding:16px;text-align:center"><div style="font-weight:700;font-size:16px;color:#18181b">{{.Tile}}</div>
-<span style="display:inline-block;margin-top:6px;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;background:#fde8e7;color:#a30700">{{.Chip}}</span></td></tr></table>{{end}}
-{{if .Statement}}<p style="margin:16px 0 0;font-size:15px;line-height:1.5;color:#3f3f46">Your statement balance is <b style="font-weight:700;color:#18181b">{{.Statement}}</b>. Paying it in full avoids interest.</p>{{end}}
+<body style="margin:0;padding:0;background:#ffffff;{{body}};color:#18181b">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff"><tr><td style="padding:24px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#ffffff;border:1px solid #e4e4e7;border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 6px 20px rgba(24,24,27,.08),0 1px 3px rgba(24,24,27,.06)">
+<tr><td align="center" style="background:#18181b;padding:18px 24px;border-radius:21px 21px 0 0"><img src="{{.LogoURL}}" alt="Coinroof" width="138" height="28" style="display:block;height:28px;width:138px;border:0;margin:0 auto;{{head}};font-weight:700;font-size:18px;color:#ffffff"></td></tr>
+<tr><td align="center" style="padding:24px 24px 0;text-align:center">
+{{with .Date}}<table role="presentation" cellpadding="0" cellspacing="0" align="center" style="width:92px;margin:0 auto 16px;border:1px solid #e4e4e7;border-radius:16px;border-collapse:separate;overflow:hidden;background:#ffffff">
+<tr><td align="center" style="background:#cb0900;color:#ffffff;font-size:12px;font-weight:700;padding:4px 0;border-radius:15px 15px 0 0">{{.Month}}</td></tr>
+<tr><td align="center" style="{{head}};font-weight:700;font-size:34px;line-height:1.2;padding-top:6px;color:#18181b">{{.Day}}</td></tr>
+<tr><td align="center" style="font-size:12px;color:#52525b;padding-bottom:8px">{{.Weekday}}</td></tr></table>{{end}}
+<h1 style="margin:0;{{head}};font-weight:700;font-size:22px;line-height:1.25;color:#18181b">{{.Heading}}</h1>
+</td></tr>
+{{if .Rows}}<tr><td style="padding:20px 0 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fafafa;border-top:2px dashed #e4e4e7;border-bottom:2px dashed #e4e4e7">
+{{range $i, $r := .Rows}}<tr><td style="padding:{{if $i}}8px{{else}}14px{{end}} 0 {{if $r.Total}}14px{{else}}8px{{end}} 24px;font-size:15px;color:#3f3f46;text-align:left{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{$r.Label}}</td>
+<td align="right" style="padding:{{if $i}}8px{{else}}14px{{end}} 24px {{if $r.Total}}14px{{else}}8px{{end}} 0;text-align:right;font-variant-numeric:tabular-nums{{if $i}};border-top:1px dotted #e4e4e7{{end}}">{{if $r.Chip}}<span style="display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;background:#fde8e7;color:#a30700">{{$r.Value}}</span>{{else if $r.Total}}<span style="{{head}};font-weight:700;font-size:22px;color:{{if $r.Red}}#cb0900{{else}}#18181b{{end}}">{{$r.Value}}</span>{{else}}<b style="font-weight:700;color:#18181b">{{$r.Value}}</b>{{end}}</td></tr>
+{{end}}</table></td></tr>{{end}}
+<tr><td align="center" style="padding:0 24px 24px;text-align:center">
 {{if .Body}}<p style="margin:16px 0 0;font-size:15px;line-height:1.5;color:#3f3f46">{{.Body}}</p>{{end}}
-<a href="{{.ButtonURL}}" style="display:inline-block;margin-top:20px;background:#18181b;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;border-radius:999px;padding:12px 22px">{{.Button}}</a>
+<a href="{{.ButtonURL}}" style="display:inline-block;margin-top:20px;background:#18181b;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;border-radius:999px;padding:12px 24px">{{.Button}}</a>
 </td></tr></table>
-<p style="max-width:520px;margin:16px auto 0;font-size:12px;line-height:1.5;color:#52525b;text-align:center">{{if .Why}}{{.Why}}<br>{{end}}<a href="{{.StopURL}}" style="color:#3f3f46">{{.StopText}}</a> · <a href="{{.SettingsURL}}" style="color:#3f3f46">Email settings</a></p>
+<p style="max-width:480px;margin:14px auto 0;font-size:12px;line-height:1.5;color:#52525b;text-align:center">{{if .Why}}{{.Why}}<br>{{end}}<a href="{{.StopURL}}" style="color:#3f3f46">{{.StopText}}</a> · <a href="{{.SettingsURL}}" style="color:#3f3f46">Email settings</a></p>
 </td></tr></table></body></html>`))
