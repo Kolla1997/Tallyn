@@ -32,9 +32,11 @@ jobs:
           GH_TOKEN: ${{ secrets.BOARD_TOKEN }}
         run: |
           if [ -z "$GH_TOKEN" ]; then
-            echo "::error::Missing repo secret BOARD_TOKEN (classic PAT with repo + project scopes)."
+            echo "::error::Missing repo secret BOARD_TOKEN (classic PAT with repo, project and read:org scopes)."
             exit 1
           fi
+          # Which scopes the token has (names only, never the token), so a failure says what's missing (#1).
+          echo "BOARD_TOKEN scopes: $(gh api -i user 2>/dev/null | tr -d '\r' | sed -n 's/^[Xx]-[Oo][Aa]uth-[Ss]copes: //p')"
           python3 scripts/sync_board.py
 
       - name: Commit changed mirrors
