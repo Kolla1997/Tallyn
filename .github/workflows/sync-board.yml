@@ -32,7 +32,7 @@ jobs:
           GH_TOKEN: ${{ secrets.BOARD_TOKEN }}
         run: |
           if [ -z "$GH_TOKEN" ]; then
-            echo "::error::Missing repo secret BOARD_TOKEN (classic PAT with repo, project and read:org scopes)."
+            echo "::error::Missing repo secret BOARD_TOKEN (classic PAT with repo, project, read:org and read:discussion scopes)."
             exit 1
           fi
           # Which scopes the token has (names only, never the token), so a failure says what's missing (#1).

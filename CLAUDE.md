@@ -168,7 +168,7 @@ The Ideas board also has **Impact** (High/Medium/Low) and **Effort** (S/M/L) fie
    - after every `/i` and `/promote`
    - whenever Dinesh runs it by hand
 
-   Use `--no-promote` to mirror without adding or moving anything. A run that would only change the date stamp writes nothing. The Action needs the repo secret `BOARD_TOKEN`: a classic personal access token with `repo` and `project` scopes. Never put the token in the repo.
+   Use `--no-promote` to mirror without adding or moving anything. A run that would only change the date stamp writes nothing. The Action needs the repo secret `BOARD_TOKEN`: a **classic** personal access token with `repo`, `project`, `read:org` and `read:discussion` scopes (fine-grained tokens can't read personal-account Projects). Set it with `gh secret set BOARD_TOKEN`; each run logs the token's scope names, so an expired or short token shows in the log. Never put the token in the repo.
 
 **CI minutes (#1).** GitHub Actions has 2,000 free minutes a month on a private repo; running out stops every check (October 2026). Keep usage down:
 - Run lint, format and tests locally before pushing, so a PR goes green the first time.

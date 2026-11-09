@@ -10,6 +10,9 @@ tags: [log]
 
 Newest first. One entry per working session or decision.
 
+## 2026-11-08
+- #1 Board sync failed from Nov 8: the BOARD_TOKEN classic token expired (30 days), and newer `gh` also needs `read:org` and `read:discussion` to read Projects. New token with repo, project, read:org, read:discussion; sync uses `--owner @me` and logs the token's scopes (PR #303). CLAUDE.md updated.
+
 ## 2026-11-05
 - #55 Spending-limit alerts: a heads-up at 80% of a budget and another when it goes over, once per period, to whoever can see the budget; own switch (on) and email switch (off); 0028. Dinesh picked the small F1 card (ring left, amount right).
 - #160 G9 sizes, option C: in-between steps became spacing and corner tokens, one-offs snapped.
