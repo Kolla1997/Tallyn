@@ -355,7 +355,7 @@ function Recent({ txs, me, people, everyone }) {
               key={t.id}
               lead={<TxIcon tx={t} />}
               name={cleanName(t.merchant || t.name || 'Transaction')}
-              sub={`${categoryLabel(t.category_primary)} · ${shortDate(t.date)}${t.pending ? ' · pending' : ''}${everyone ? ` · ${who}` : ''}`}
+              sub={`${categoryLabel(t.category_primary)} · ${shortDate(t.date)}${t.pending ? ' · pending' : ''}${t.bill_id ? ' · Added by you' : everyone ? ` · ${who}` : ''}`}
             >
               <Money className="text-[14px]" tone={out ? undefined : IN}>
                 {out ? '−' : '+'}

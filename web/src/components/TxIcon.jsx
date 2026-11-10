@@ -39,6 +39,29 @@ export const categoryPath = (category) => (CATEGORIES[category] ?? OTHER).d
 // its logo hosts, no referrer), otherwise the category's icon.
 export default function TxIcon({ tx }) {
   const [failed, setFailed] = useState(false)
+  // A paid bill (#127, Dinesh's pick C): a receipt in a dashed tile, "not from a bank".
+  if (tx.bill_id) {
+    return (
+      <span
+        className="flex size-8 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-dashed border-zinc-400 text-zinc-700 dark:border-zinc-600 dark:text-zinc-200"
+        aria-hidden="true"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          focusable="false"
+        >
+          <path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 3 2V2l-3 2-3-2-3 2-3-2-3 2zM8 8h8M8 12h8M8 16h5" />
+        </svg>
+      </span>
+    )
+  }
   const logo = tx.logo_url && LOGO_RE.test(tx.logo_url) && !failed ? tx.logo_url : null
   if (logo) {
     return (

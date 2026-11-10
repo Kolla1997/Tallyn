@@ -263,9 +263,11 @@ func (d *DB) DeleteBill(ctx context.Context, userID, billID string) error {
 }
 
 // MarkBillPaid records (or corrects) the payment for the period due on due.
-// ErrInvalid if the bill isn't due that day.
-func (d *DB) MarkBillPaid(ctx context.Context, userID, billID string, due time.Time, paidMinor int64, paidOn time.Time) error {
-	if !uuidRE.MatchString(billID) || paidMinor <= 0 || paidMinor > 100_000_000_000 {
+// ErrInvalid if the bill isn't due that day. transactionID, when set, is the
+// bank transaction it was paid with: that payment adds no spending line of its
+// own (0030), so it isn't counted twice.
+func (d *DB) MarkBillPaid(ctx context.Context, userID, billID string, due time.Time, paidMinor int64, paidOn time.Time, transactionID string) error {
+	if !uuidRE.MatchString(billID) || paidMinor <= 0 || paidMinor > 100_000_000_000 || (transactionID != "" && !uuidRE.MatchString(transactionID)) {
 		return ErrInvalid
 	}
 	return mapErr(d.AsUser(ctx, userID, func(tx pgx.Tx) error {
@@ -282,9 +284,9 @@ func (d *DB) MarkBillPaid(ctx context.Context, userID, billID string, due time.T
 			return ErrInvalid
 		}
 		_, err := tx.Exec(ctx, `
-			insert into public.bill_payments (bill_id, period, paid_minor, paid_on) values ($1, $2, $3, $4)
-			on conflict (bill_id, period) do update set paid_minor = excluded.paid_minor, paid_on = excluded.paid_on`,
-			billID, due, paidMinor, paidOn)
+			insert into public.bill_payments (bill_id, period, paid_minor, paid_on, transaction_id) values ($1, $2, $3, $4, $5)
+			on conflict (bill_id, period) do update set paid_minor = excluded.paid_minor, paid_on = excluded.paid_on, transaction_id = excluded.transaction_id`,
+			billID, due, paidMinor, paidOn, nullable(transactionID))
 		return err
 	}))
 }

@@ -86,7 +86,7 @@ describe('BillsPage', () => {
     expect(dialog.getByLabelText('Paid on')).toHaveValue('2026-11-08')
     await act(async () => fireEvent.click(dialog.getByRole('button', { name: 'Mark paid' })))
     const [[, opts]] = callsTo(api, '/api/bills/gas/payments/2026-11-09', 'PUT')
-    expect(opts.body).toEqual({ paid_minor: 7135, paid_on: '2026-11-08' })
+    expect(opts.body).toEqual({ paid_minor: 7135, paid_on: '2026-11-08', transaction_id: 't1' })
   })
 
   it('picks another day', async () => {

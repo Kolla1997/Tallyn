@@ -20,6 +20,7 @@ type billStore struct {
 	paidDue  time.Time
 	paid     int64
 	paidOn   time.Time
+	paidTx   string
 	unmarked time.Time
 	deleted  string
 	err      error
@@ -36,8 +37,8 @@ func (s *billStore) CreateBill(_ context.Context, _, _ string, b db.NewBill) (st
 }
 func (s *billStore) UpdateBill(context.Context, string, string, db.NewBill) error { return s.err }
 func (s *billStore) DeleteBill(_ context.Context, _, id string) error             { s.deleted = id; return s.err }
-func (s *billStore) MarkBillPaid(_ context.Context, _, id string, due time.Time, n int64, on time.Time) error {
-	s.paidID, s.paidDue, s.paid, s.paidOn = id, due, n, on
+func (s *billStore) MarkBillPaid(_ context.Context, _, id string, due time.Time, n int64, on time.Time, txID string) error {
+	s.paidID, s.paidDue, s.paid, s.paidOn, s.paidTx = id, due, n, on, txID
 	return s.err
 }
 func (s *billStore) UnmarkBillPaid(_ context.Context, _, _ string, due time.Time) error {
@@ -59,8 +60,8 @@ func TestBillRoutes(t *testing.T) {
 	if rec.Code != http.StatusCreated || s.created.Name != "Rent" || s.created.DueDay != 1 {
 		t.Fatalf("POST bill: %d %s %+v", rec.Code, rec.Body, s.created)
 	}
-	rec = send(h, "PUT", "/api/bills/b1/payments/2026-11-15", `{"paid_minor":7135,"paid_on":"2026-11-09"}`)
-	if rec.Code != http.StatusNoContent || s.paidID != "b1" || s.paid != 7135 || s.paidDue.Day() != 15 || s.paidOn.Day() != 9 {
+	rec = send(h, "PUT", "/api/bills/b1/payments/2026-11-15", `{"paid_minor":7135,"paid_on":"2026-11-09","transaction_id":"t1"}`)
+	if rec.Code != http.StatusNoContent || s.paidID != "b1" || s.paid != 7135 || s.paidDue.Day() != 15 || s.paidOn.Day() != 9 || s.paidTx != "t1" {
 		t.Fatalf("PUT payment: %d %+v", rec.Code, s)
 	}
 	if rec := send(h, "PUT", "/api/bills/b1/payments/2026-11-15", `{"paid_minor":7135,"paid_on":"soon"}`); rec.Code != http.StatusBadRequest {

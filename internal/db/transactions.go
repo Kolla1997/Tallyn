@@ -30,6 +30,7 @@ type Transaction struct {
 	PaymentChannel   *string      `json:"payment_channel"`
 	LogoURL          *string      `json:"logo_url"`    // Plaid's logo hosts only (0009)
 	Whereabouts      *Whereabouts `json:"whereabouts"` // nil when unknown or not visible to this user
+	BillID           *string      `json:"bill_id"`     // a paid bill, not a bank transaction (#127); no account
 }
 
 // Whereabouts is when and where a purchase happened. Visible to the person who
@@ -157,13 +158,13 @@ func (d *DB) Transactions(ctx context.Context, userID, householdID string, f TxF
 
 	err = d.AsUser(ctx, userID, func(tx pgx.Tx) error {
 		rows, err := tx.Query(ctx, `
-			select t.id, t.account_id, coalesce(a.name, ''), a.mask, i.institution_name, coalesce(o.owner::text, ''), t.amount_minor, t.currency,
+			select t.id, coalesce(t.account_id::text, ''), coalesce(a.name, ''), a.mask, i.institution_name, coalesce(o.owner::text, ''), t.amount_minor, t.currency,
 			       t.date::text, t.authorized_date::text, coalesce(t.merchant_name, t.name),
 			       t.category_primary, t.category_detailed, t.pending, t.payment_channel, t.logo_url,
 			       d.transaction_id is not null,
 			       d.authorized_at, d.posted_at, d.address, d.city, d.region, d.postal_code, d.country,
-			       d.lat, d.lon, d.store_number
-			from public.transactions t
+			       d.lat, d.lon, d.store_number, t.bill_id
+			from public.spend_lines t
 			-- left join: transactions can be shared without balances, so the
 			-- account itself may be hidden (0007_sharing.sql)
 			left join public.accounts a on a.id = t.account_id
@@ -183,7 +184,7 @@ func (d *DB) Transactions(ctx context.Context, userID, householdID string, f TxF
 			if err := rows.Scan(&t.ID, &t.AccountID, &t.AccountName, &t.AccountMask, &t.BankName, &t.OwnerUserID, &t.AmountMinor, &t.Currency,
 				&t.Date, &t.AuthorizedDate, &t.Merchant, &t.CategoryPrimary, &t.CategoryDetailed, &t.Pending, &t.PaymentChannel,
 				&t.LogoURL, &visible, &w.AuthorizedAt, &w.PostedAt, &w.Address, &w.City, &w.Region, &w.PostalCode, &w.Country,
-				&w.Lat, &w.Lon, &w.StoreNumber); err != nil {
+				&w.Lat, &w.Lon, &w.StoreNumber, &t.BillID); err != nil {
 				return err
 			}
 			if visible {
@@ -222,7 +223,7 @@ func (d *DB) Spending(ctx context.Context, userID, householdID, month string) ([
 	err := d.AsUser(ctx, userID, func(tx pgx.Tx) error {
 		rows, err := tx.Query(ctx, `
 			select coalesce(category_primary, 'OTHER'), currency, sum(amount_minor)::bigint, count(*)::int
-			from public.transactions
+			from public.spend_lines
 			where household_id = $1
 			  and date >= ($2 || '-01')::date and date < ($2 || '-01')::date + interval '1 month'
 			  and amount_minor > 0
@@ -291,7 +292,7 @@ func (d *DB) Summary(ctx context.Context, userID, householdID string, f TxFilter
 
 		rows, err := tx.Query(ctx, `
 			select t.currency, `+kindSQL+` as kind, sum(abs(t.amount_minor))::bigint
-			from public.transactions t
+			from public.spend_lines t
 			where `+filterSQL+`
 			group by 1, 2`, args...)
 		if err != nil {
@@ -317,7 +318,7 @@ func (d *DB) Summary(ctx context.Context, userID, householdID string, f TxFilter
 
 		rows, err = tx.Query(ctx, `
 			select t.currency, sum(t.amount_minor)::bigint
-			from public.transactions t
+			from public.spend_lines t
 			where `+filterSQL+` and (`+kindSQL+`) = 'transfer' and t.amount_minor > 0
 			group by 1`, args...)
 		if err != nil {
@@ -337,7 +338,7 @@ func (d *DB) Summary(ctx context.Context, userID, householdID string, f TxFilter
 
 		rows, err = tx.Query(ctx, `
 			select coalesce(t.category_primary, 'OTHER'), t.currency, sum(t.amount_minor)::bigint, count(*)::int
-			from public.transactions t
+			from public.spend_lines t
 			where `+filterSQL+` and (`+kindSQL+`) = 'spent'
 			group by 1, 2
 			order by 3 desc, 1`, args...)
@@ -358,7 +359,7 @@ func (d *DB) Summary(ctx context.Context, userID, householdID string, f TxFilter
 			  select t.currency, coalesce(t.merchant_name, t.name) as merchant,
 			         sum(t.amount_minor)::bigint as amount, count(*)::int as n,
 			         row_number() over (partition by t.currency order by sum(t.amount_minor) desc, coalesce(t.merchant_name, t.name)) as rank
-			  from public.transactions t
+			  from public.spend_lines t
 			  where `+filterSQL+` and (`+kindSQL+`) = 'spent'
 			  group by 1, 2
 			) m where rank <= 5
@@ -425,7 +426,7 @@ func (d *DB) Daily(ctx context.Context, userID, householdID string, f TxFilter) 
 	err = d.AsUser(ctx, userID, func(tx pgx.Tx) error {
 		rows, err := tx.Query(ctx, `
 			select t.date::text, t.currency, sum(t.amount_minor)::bigint, count(*)::int
-			from public.transactions t
+			from public.spend_lines t
 			where `+filterSQL+` and (`+kindSQL+`) = 'spent'
 			group by 1, 2
 			order by 1, 2`, args...)
@@ -450,7 +451,7 @@ func (d *DB) Daily(ctx context.Context, userID, householdID string, f TxFilter) 
 			  select t.date::text as date, t.currency, coalesce(t.merchant_name, t.name) as merchant,
 			         t.amount_minor as amount, t.category_primary as category,
 			         row_number() over (partition by t.date, t.currency order by t.amount_minor desc, t.id) as rank
-			  from public.transactions t
+			  from public.spend_lines t
 			  where `+filterSQL+` and (`+kindSQL+`) = 'spent'
 			) x where rank <= 3
 			order by date, currency, amount desc`, args...)

@@ -26,7 +26,9 @@ Account owners only. The screen answers: **"What's due this month, and what have
   - leaves it as **Not yet**. Past its due day it shows as **Late**.
   - **Undo** takes a payment back if it was marked by mistake.
 - **Spending:** paid bills count in spending and Budgets on their paid date, marked "Added by you". They never change bank balances, which come from Plaid only.
-  > [!todo] Second PR under #127: count paid bills in Spending, Budgets, Home and the summary emails. The first PR ships the Bills page on its own.
+  - **Step 1 (0030, done):** paid bills count on Transactions (list, totals, day bars), Home's spending and **household** budgets, for owners only. A bill row has a dashed receipt icon and "Added by you" (Dinesh picked C of `drafts/127-bill-rows.html`); tapping it opens Bills. Kinds map to categories: housing and utilities → Rent and utilities; the rest → General services. A person filter or bank filter leaves bills out (they have no person or bank).
+  - **No double counting:** a bill marked paid from a "Paid from your bank?" match keeps that transaction's ID and adds no line of its own.
+  > [!todo] Step 2: weekly and monthly emails, income plans. Spending-limit alerts reach adults and kids, so counting bills there would show bill amounts to non-owners: ask Dinesh how alerts should treat bills.
 - **Paid from your bank?** When a money-out Plaid transaction with a close amount (±10%) and date (±5 days) appears for an unpaid bill, today's panel suggests it. "Yes, mark paid" opens the paid dialog filled with that amount and date; the owner confirms. Never applied on its own. (Name matching left out: bank names rarely match what people call a bill.)
 - **Credit cards from Plaid** (added 2026-11-09, Dinesh): each linked card's next payment sits on its due date with a card icon, read-only. Its card shows the minimum, the statement balance and **Open in Debts**. The bank says when it's paid (a payment on or after the last statement that covers the minimum); overdue shows as late. **Left to pay counts the minimum.** Only cards the owner can already see. Plaid gives only the next due date, so past months show no card payments. (Plaid's sandbox cards are due May 28, 2020.)
 - **Edit, pause, delete** a bill (tap its name). Deleting asks first and removes its payments too; pausing keeps them.
@@ -50,7 +52,7 @@ Loading effect: the page mark, then cards fade in (`.calm-card`), day cells rise
 - **`internal/db/bills.go`:** `DueIn` works out each period's due date (the 31st becomes a short month's last day; every 3 months and yearly count from the start month), late status and the bank match.
 - **API** (`internal/api/bills.go`): `GET /api/bills?household_id=&month=YYYY-MM`, `POST /api/bills`, `PUT|DELETE /api/bills/{id}`, `PUT|DELETE /api/bills/{id}/payments/{due}`.
 - **Web:** `screens/BillsPage.jsx`, `lib/bills.js`, `BillsIcon`; the preview's fake API has a month of bills.
-- **Spending and Budgets** read paid bill payments alongside transactions.
+- **Spending (0030):** `spend_lines` view (security_invoker) = transactions + paid bills without a matched transaction. Transactions, Spending, Summary and Daily read it; `budget_spending` adds paid bills to household budgets when the viewer is an owner. `bill_payments.transaction_id` records the matched bank transaction.
 
 ## Open questions
 > [!todo] Category list: a short fixed list for now (housing, utilities, insurance, childcare, subscriptions, other). Reuse the transaction categories when bills join Spending? Ask Dinesh.
