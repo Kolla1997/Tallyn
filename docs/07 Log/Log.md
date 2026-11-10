@@ -11,6 +11,9 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-11-09
+- #127 Bills Plaid can't see: promoted and scoped with Dinesh (owners only; reminders in-app and email). Split out #306 loans and debts and #307 onboarding "Monthly commitments" step; #126 carries reminders. Build order #127 → #306 → #307 → #126.
+- #127 Design: Dinesh turned down the month-strip and tally-tape drafts and shared a calendar-schedule reference; picked C · Mix (calendar with bills on their due days, picked day over the month total). KokonutUI Pro wasn't used (paid registry); built with the app's own parts.
+- #127 Built: 0029 `bills` and `bill_payments` (RLS: household owners only), due dates worked out per month (31st → month end), late status, "Paid from your bank?" match (±10%, ±5 days), Bills page at `/bills`. Counting bills in Spending and Budgets is the second #127 PR.
 - #113 Weekly End-to-end run failed since Oct 27: the app was fine, but four P0 tests used labels and class names the redesigns changed. Locators now use roles and visible text.
 
 ## 2026-11-08

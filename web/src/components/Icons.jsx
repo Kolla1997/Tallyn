@@ -56,6 +56,13 @@ export const GoalsIcon = (p) => (
     <circle cx="12" cy="12" r="1" fill="currentColor" />
   </svg>
 )
+// A receipt with a due-date fold (#127).
+export const BillsIcon = (p) => (
+  <svg {...base} {...p}>
+    <rect x="4" y="5" width="16" height="15" rx="2" />
+    <path d="M8 3v4M16 3v4M4 10h16M8 14h3M8 17h5" />
+  </svg>
+)
 // A gear (#66), so Settings reads as settings, not a sun.
 export const SettingsIcon = (p) => (
   <svg {...base} {...p}>

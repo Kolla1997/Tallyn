@@ -148,6 +148,11 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Spending by category | P1 | — | Yes | No | `TestSpending`, `TestSpendingRoute` |
 | Home page: balance, net worth, accounts, recent | P0 | Yes | Partly | No (#113) | `HomePage.test.jsx` (balance, net worth, Yours / Everyone, have and owe, biggest balances, shared with you, spending, who may link, empty, error) |
 | Accounts page, bank cards, hidden balances | P1 | Yes | Yes | No | `AccountsPage.test.jsx` (columns by type, hidden balance as —, whose accounts, bank chips, status, Reconnect, Unlink); `TestBankHiddenWithoutBalances` |
+| Bills Plaid can't see (#127): add, edit, pause and delete a bill; each period makes an expected payment (31st → month's last day; every 3 months; yearly; once) | P1 | Yes | Yes | — | `db/bills_test.go` (`TestDueIn`, `TestBills`), `api/bills_test.go` (`TestBillRoutes`) |
+| Mark a bill paid, paid a different amount, or undo; late after its due day; the calendar, picked day and month totals | P1 | Yes | Yes | — | `db/bills_test.go` (`TestBills`), `BillsPage.test.jsx`, `lib/bills.test.js`. Gap: end-to-end mark paid (#113) once 0029 is on the sandbox |
+| Paid bills count in Spending and Budgets, never in bank balances | P1 | — | — | — | Gap: comes with the second #127 PR |
+| Bills visible and editable by household owners only (RLS); adults, kids and other households see nothing; Bills hidden from their menus | P0 | — | Yes | — | `db/bills_test.go` (`TestBills/only_owners`), `BillsPage.test.jsx` (non-owner message) |
+| "Paid from your bank?" hint when a Plaid transaction matches an unpaid bill (±10% amount, ±5 days); opens the paid dialog filled in, never applied on its own | P1 | Yes | Yes | — | `db/bills_test.go` (`TestBills/possible_match_from_the_bank`), `BillsPage.test.jsx`. Gap: a real bank month on the sandbox is a release-checklist item |
 
 ### App-wide
 | Use case | P | Unit | Integration | End-to-end | Tests today |
