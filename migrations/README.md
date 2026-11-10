@@ -32,6 +32,7 @@ Rules (see `CLAUDE.md` §7):
 | `0029_bills.sql` | bills Plaid can't see and their payments; household owners only (#127) |
 | `0030_bills_in_spending.sql` | `spend_lines` view: transactions plus paid bills; household budgets count bills for owners; matched payments not counted twice (#127) |
 | `0031_bills_in_emails_and_plans.sql` | `email_bills` for the summary emails (owners only), `bill_due_date`, household income plans count paid bills (#127) |
+| `0032_loans_manual.sql` | loans Plaid can't see: terms on a 'loan' bill, extra payments, balance corrections; owners only (#306) |
 
 Apply them in order on the Supabase project (SQL editor, or `psql "$ADMIN_DATABASE_URL" -f <file>`). Migrations run as `postgres`; the app itself never does (ADR 0006).
 Tests apply them to a throwaway Postgres: see `internal/db/db_test.go`. `TestEveryTableHasRLS` fails if a table is missing RLS.

@@ -78,6 +78,21 @@ func (stubStore) DeleteBill(context.Context, string, string) error { return erro
 func (stubStore) MarkBillPaid(context.Context, string, string, time.Time, int64, time.Time, string) error {
 	return errors.New("stub")
 }
+func (stubStore) Loans(context.Context, string, string, time.Time) ([]db.ManualLoan, error) {
+	return nil, errors.New("stub")
+}
+func (stubStore) CreateLoan(context.Context, string, string, db.NewLoan, time.Time) (string, error) {
+	return "", errors.New("stub")
+}
+func (stubStore) UpdateLoan(context.Context, string, string, db.NewLoan) error {
+	return errors.New("stub")
+}
+func (stubStore) SetLoanBalance(context.Context, string, string, int64, time.Time) error {
+	return errors.New("stub")
+}
+func (stubStore) AddLoanExtra(context.Context, string, string, int64, time.Time) error {
+	return errors.New("stub")
+}
 func (stubStore) UnmarkBillPaid(context.Context, string, string, time.Time) error {
 	return errors.New("stub")
 }

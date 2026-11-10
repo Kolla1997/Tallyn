@@ -51,6 +51,15 @@ describe('cardDues', () => {
         card('3333', { next_payment_due_date: '2026-11-02', minimum_payment_minor: 2500, is_overdue: true }),
         card('4444', { next_payment_due_date: '2026-12-02', minimum_payment_minor: 2500 }),
         { id: 'chk', name: 'Checking', currency: 'USD', card: null },
+        {
+          id: 'mtg',
+          name: 'Mortgage',
+          mask: '8888',
+          currency: 'USD',
+          card: null,
+          loan: { next_payment_due_date: '2026-11-01', next_payment_minor: 314154, is_overdue: true, past_due_minor: 230400 },
+        },
+        { id: 'stu', name: 'Student Loan', mask: '7777', currency: 'USD', card: null, loan: { next_payment_due_date: '2026-11-28', next_payment_minor: 2500 } },
       ],
     },
   ]
@@ -60,8 +69,10 @@ describe('cardDues', () => {
       ['Gold Card ••1111', 'due', 4000],
       ['Gold Card ••2222', 'paid', 3500],
       ['Gold Card ••3333', 'late', 2500],
+      ['Mortgage ••8888', 'late', 230400],
+      ['Student Loan ••7777', 'due', 2500],
     ])
     expect(d[0].statement_minor).toBe(120000)
-    expect(totals(d)).toEqual({ total: 10000, paid: 3500, left: 6500, late: 1 })
+    expect(totals(d.slice(0, 3))).toEqual({ total: 10000, paid: 3500, left: 6500, late: 1 })
   })
 })
