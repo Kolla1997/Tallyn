@@ -129,7 +129,7 @@ test('share balances with a member, then stop sharing', async ({ page, browser, 
     .getByRole('button', { name: /Test Partner/ })
     .click()
   const balances = page.getByRole('switch', { name: 'Balances' })
-  const balancesSwitch = page.locator('label.switch', { hasText: 'Balances' }) // the styled switch people click; the checkbox itself is hidden
+  const balancesSwitch = page.locator('label', { has: balances }) // the styled switch people click; the checkbox itself is hidden
   await balancesSwitch.click()
   await expect(balances).toBeChecked()
 
