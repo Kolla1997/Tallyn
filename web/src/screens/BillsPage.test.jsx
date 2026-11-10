@@ -113,6 +113,44 @@ describe('BillsPage', () => {
     expect(opts.body).toMatchObject({ household_id: 'hh-1', name: 'Rent', amount_minor: 150000, due_day: 1, frequency: 'monthly', starts_on: '2026-11' })
   })
 
+  it('shows a linked card on its due day, read-only, with its minimum in Left to pay', async () => {
+    routeApi(api, [
+      ['/api/bills', { today: '2026-11-09', month: '2026-11', bills: BILLS, dues: DUES }],
+      [
+        '/api/banks',
+        {
+          banks: [
+            {
+              accounts: [
+                {
+                  id: 'a-amex',
+                  name: 'Gold Card',
+                  mask: '3006',
+                  currency: 'USD',
+                  card: {
+                    next_payment_due_date: '2026-11-20',
+                    minimum_payment_minor: 4000,
+                    last_statement_balance_minor: 125840,
+                    last_statement_date: '2026-10-25',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    ])
+    await open()
+    expect(screen.getByText('4 bills · $1,674.90 this month')).toBeInTheDocument()
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: /^Friday, November 20, 1 bill/ })))
+    const side = within(screen.getByRole('complementary'))
+    expect(side.getByText('Gold Card ••3006')).toBeInTheDocument()
+    expect(side.getByText('Statement $1,258.40')).toBeInTheDocument()
+    expect(side.getByRole('link', { name: 'Open in Debts' })).toHaveAttribute('href', '/debts')
+    expect(side.queryByRole('button', { name: 'Mark paid' })).not.toBeInTheDocument()
+    expect(side.getByText('$174.90')).toBeInTheDocument() // 70.00 + 64.90 + 40.00 minimum
+  })
+
   it('tells non-owners bills are for owners', async () => {
     routeApi(api, [['/api/bills', Object.assign(new Error('forbidden'), { status: 403 })]])
     await open()

@@ -55,3 +55,31 @@ export const CATEGORIES = [
   ['other', 'Other'],
 ]
 export const frequencyName = (f) => FREQUENCIES.find(([k]) => k === f)?.[1] ?? f
+
+// Credit cards' next payments from Plaid, as dues in month ('YYYY-MM'). The bank says
+// when it's paid: a payment on or after the last statement that covers the minimum.
+// Left to pay counts the minimum (Dinesh, 2026-11-09).
+export function cardDues(banks, month) {
+  const out = []
+  for (const b of banks ?? []) {
+    for (const a of b.accounts ?? []) {
+      const c = a.card
+      if (!c?.next_payment_due_date || c.next_payment_due_date.slice(0, 7) !== month) continue
+      const min = c.minimum_payment_minor ?? 0
+      const paid = !!c.last_payment_date && !!c.last_statement_date && c.last_payment_date >= c.last_statement_date && (c.last_payment_minor ?? 0) >= min
+      out.push({
+        bill_id: `card-${a.id}`,
+        card: true,
+        name: a.mask ? `${a.name} ••${a.mask}` : a.name,
+        currency: a.currency,
+        due: c.next_payment_due_date,
+        status: c.is_overdue ? 'late' : paid ? 'paid' : 'due',
+        expected_minor: min,
+        paid_minor: paid ? min : null,
+        paid_on: paid ? c.last_payment_date : null,
+        statement_minor: c.last_statement_balance_minor ?? null,
+      })
+    }
+  }
+  return out
+}

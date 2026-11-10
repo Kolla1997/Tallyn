@@ -1,20 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AlertCircle, CalendarDays, Check, ChevronLeft, ChevronRight, Clock, Plus, Repeat } from 'lucide-react'
+import { AlertCircle, CalendarDays, Check, ChevronLeft, ChevronRight, Clock, CreditCard, Plus, Repeat } from 'lucide-react'
 import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import LoadFailed from '../components/LoadFailed.jsx'
 import PageSkeleton from '../components/calm/PageSkeleton.jsx'
 import { api } from '../lib/api.js'
-import { CATEGORIES, FREQUENCIES, amountOf, byDay, frequencyName, monthGrid, shiftMonth, totals } from '../lib/bills.js'
+import { CATEGORIES, FREQUENCIES, amountOf, byDay, cardDues, frequencyName, monthGrid, shiftMonth, totals } from '../lib/bills.js'
 import { fromMinor, toMinor } from '../lib/budgets.js'
 import { formatMoney } from '../lib/money.js'
 import { useRetry } from '../lib/retry.js'
 import { useModal } from '../lib/modal.js'
-import { Head, Panel, Pill, NUM, MUTED, OWE, IN } from '../components/calm/ui.jsx'
+import { Head, Panel, Pill, See, NUM, MUTED, OWE, IN } from '../components/calm/ui.jsx'
 
 // Bills Plaid can't see (#127), Dinesh's pick C of drafts/127-bills-calendar.html: the month as a
 // calendar with each bill on its due day, and beside it the day you pick (bills to mark paid) over
 // the month's total. On today it brings late bills and "paid from your bank?" hints up first.
 // Only household owners see bills; the server enforces it. Bills never change bank balances.
+// Linked credit cards' next payments from Plaid sit on the calendar too, read-only: the bank
+// says when they're paid, and Left to pay counts their minimum (#127, Dinesh 2026-11-09).
 
 const today = () => new Date().toLocaleDateString('en-CA') // YYYY-MM-DD, local
 const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
@@ -54,9 +56,15 @@ export default function BillsPage({ household, refreshKey }) {
 
   const load = useCallback(() => {
     const hh = encodeURIComponent(household.id)
-    return api(`/api/bills?household_id=${hh}&month=${month}&today=${now}`).then(
-      (d) => {
-        setData(d)
+    // Cards are a bonus: if the banks can't load, bills still show.
+    const banks = api(`/api/banks?household_id=${hh}`).then(
+      (b) => b.banks ?? [],
+      () => [],
+    )
+    return Promise.all([api(`/api/bills?household_id=${hh}&month=${month}&today=${now}`), banks]).then(
+      ([d, b]) => {
+        const dues = [...d.dues, ...cardDues(b, month)].sort((x, y) => x.due.localeCompare(y.due))
+        setData({ ...d, dues })
         setFailed(null)
       },
       (e) => setFailed(e?.status === 403 ? 'owners' : 'load'),
@@ -105,7 +113,7 @@ export default function BillsPage({ household, refreshKey }) {
         ) : (
           <PageSkeleton />
         )
-      ) : data.bills.length === 0 ? (
+      ) : data.bills.length === 0 && data.dues.length === 0 ? (
         <Panel id="bills-empty" title="No bills yet">
           <p className={`m-0 mb-3 text-[14px] ${MUTED}`}>
             Add rent, utilities or anything you pay that your bank feed doesn&apos;t show. Coinroof shows when each is due and keeps count of what you&apos;ve
@@ -190,18 +198,21 @@ function Calendar({ data, month, now, picked, money, onPick, onMonth, onMarkPaid
   const isToday = picked === now
   const late = isToday ? data.dues.filter((d) => d.status === 'late' && d.due !== picked) : []
   const matches = isToday ? data.dues.filter((d) => d.match && d.status !== 'paid') : []
-  const card = (d) => (
-    <BillCard
-      key={d.bill_id}
-      bill={bills[d.bill_id]}
-      due={d}
-      money={money}
-      onMarkPaid={() => onMarkPaid(d)}
-      onUnmark={() => onUnmark(d)}
-      onDifferent={() => onDifferent(bills[d.bill_id], d)}
-      onEdit={() => onEdit(bills[d.bill_id])}
-    />
-  )
+  const card = (d) =>
+    d.card ? (
+      <CardDue key={d.bill_id} due={d} money={money} />
+    ) : (
+      <BillCard
+        key={d.bill_id}
+        bill={bills[d.bill_id]}
+        due={d}
+        money={money}
+        onMarkPaid={() => onMarkPaid(d)}
+        onUnmark={() => onUnmark(d)}
+        onDifferent={() => onDifferent(bills[d.bill_id], d)}
+        onEdit={() => onEdit(bills[d.bill_id])}
+      />
+    )
 
   return (
     <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-12 [&>*]:min-w-0">
@@ -268,7 +279,7 @@ function Calendar({ data, month, now, picked, money, onPick, onMonth, onMarkPaid
                     {d}
                   </span>
                   {list.slice(0, 2).map((due) => {
-                    const I = STATUS_ICON[due.status]
+                    const I = due.card ? CreditCard : STATUS_ICON[due.status]
                     return (
                       <span
                         key={due.bill_id}
@@ -276,7 +287,7 @@ function Calendar({ data, month, now, picked, money, onPick, onMonth, onMarkPaid
                         style={TONE[due.status]}
                       >
                         <I className="size-3 shrink-0" aria-hidden="true" />
-                        <span className="hidden truncate sm:inline">{bills[due.bill_id]?.name}</span>
+                        <span className="hidden truncate sm:inline">{due.name ?? bills[due.bill_id]?.name}</span>
                       </span>
                     )
                   })}
@@ -346,6 +357,44 @@ function Calendar({ data, month, now, picked, money, onPick, onMonth, onMarkPaid
   )
 }
 
+// A credit card's next payment, from the bank. Read-only: the bank says when it's paid.
+function CardDue({ due, money }) {
+  const dot = { paid: 'var(--color-redesign-in)', late: 'var(--color-redesign-accent)', due: 'var(--color-redesign-grey-3)' }[due.status]
+  return (
+    <div className="calm-row mb-2 grid grid-cols-1 gap-1.5 rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="flex min-w-0 items-center gap-2 text-[15px] font-semibold">
+          <i className="size-2 shrink-0 rounded-full" style={{ background: dot }} aria-hidden="true" />
+          <span className="truncate">{due.name}</span>
+        </span>
+        <span className={`shrink-0 ${NUM}`} style={due.status === 'late' ? OWE : undefined}>
+          <span className={`text-[12px] font-medium ${MUTED}`}>min </span>
+          {money(due.expected_minor, due.currency)}
+        </span>
+      </div>
+      <div className={`flex flex-wrap gap-3 text-[13px] ${MUTED}`}>
+        <span className="inline-flex items-center gap-1">
+          <CreditCard className="size-3.5" aria-hidden="true" />
+          Card · {short(due.due)}
+          {due.status === 'late' && ' · overdue'}
+        </span>
+        {due.statement_minor != null && <span className="tabular-nums">Statement {money(due.statement_minor, due.currency)}</span>}
+      </div>
+      <div className="flex flex-wrap items-center gap-3 text-[13px]">
+        {due.status === 'paid' ? (
+          <span className="inline-flex items-center gap-1 font-semibold" style={IN}>
+            <Check className="size-3.5" aria-hidden="true" />
+            Paid {short(due.paid_on)}, says your bank
+          </span>
+        ) : (
+          <span className={MUTED}>Pay it in your bank&apos;s app; it ticks when the bank tells us.</span>
+        )}
+        <See to="/debts">Open in Debts</See>
+      </div>
+    </div>
+  )
+}
+
 function BillCard({ bill, due, money, onMarkPaid, onUnmark, onDifferent, onEdit }) {
   const [busy, setBusy] = useState(false)
   if (!bill) return null
@@ -359,7 +408,7 @@ function BillCard({ bill, due, money, onMarkPaid, onUnmark, onDifferent, onEdit 
   }
   const dot = { paid: 'var(--color-redesign-in)', late: 'var(--color-redesign-accent)', due: 'var(--color-redesign-grey-3)' }[due.status]
   return (
-    <div className="calm-row mb-2 grid gap-1.5 rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="calm-row mb-2 grid grid-cols-1 gap-1.5 rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
       <div className="flex items-baseline justify-between gap-2">
         <button type="button" onClick={onEdit} className="flex min-w-0 items-center gap-2 text-left text-[15px] font-semibold hover:underline">
           <i className="size-2 shrink-0 rounded-full" style={{ background: dot }} aria-hidden="true" />

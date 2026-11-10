@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { byDay, monthGrid, shiftMonth, totals } from './bills.js'
+import { byDay, cardDues, monthGrid, shiftMonth, totals } from './bills.js'
 
 // Bills (#127). Amounts are made up.
 const dues = [
@@ -25,5 +25,43 @@ describe('bills', () => {
     const m = byDay(dues)
     expect(m.get(15).map((d) => d.bill_id)).toEqual(['gas', 'water'])
     expect(m.get(2)).toBeUndefined()
+  })
+})
+
+describe('cardDues', () => {
+  const card = (id, card, extra = {}) => ({ id, name: 'Gold Card', mask: id, currency: 'USD', card, ...extra })
+  const banks = [
+    {
+      accounts: [
+        card('1111', {
+          next_payment_due_date: '2026-11-20',
+          minimum_payment_minor: 4000,
+          last_statement_balance_minor: 120000,
+          last_statement_date: '2026-10-25',
+          last_payment_date: '2026-09-20',
+          last_payment_minor: 4000,
+        }),
+        card('2222', {
+          next_payment_due_date: '2026-11-05',
+          minimum_payment_minor: 3500,
+          last_statement_date: '2026-10-10',
+          last_payment_date: '2026-11-01',
+          last_payment_minor: 3500,
+        }),
+        card('3333', { next_payment_due_date: '2026-11-02', minimum_payment_minor: 2500, is_overdue: true }),
+        card('4444', { next_payment_due_date: '2026-12-02', minimum_payment_minor: 2500 }),
+        { id: 'chk', name: 'Checking', currency: 'USD', card: null },
+      ],
+    },
+  ]
+  it('puts this month’s cards on their due days, paid when the bank says so', () => {
+    const d = cardDues(banks, '2026-11')
+    expect(d.map((x) => [x.name, x.status, x.expected_minor])).toEqual([
+      ['Gold Card ••1111', 'due', 4000],
+      ['Gold Card ••2222', 'paid', 3500],
+      ['Gold Card ••3333', 'late', 2500],
+    ])
+    expect(d[0].statement_minor).toBe(120000)
+    expect(totals(d)).toEqual({ total: 10000, paid: 3500, left: 6500, late: 1 })
   })
 })
