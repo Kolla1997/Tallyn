@@ -54,4 +54,4 @@ Loading effect: the page mark, then cards fade in (`.calm-card`), day cells rise
 ## Open questions
 > [!todo] Category list: a short fixed list for now (housing, utilities, insurance, childcare, subscriptions, other). Reuse the transaction categories when bills join Spending? Ask Dinesh.
 
-> [!todo] "Account owners" is built as the household **owner** role. Should **adults** (a partner) see bills too? Ask Dinesh.
+Decided 2026-11-09: bills are for household **owners** only; adults, teens and children don't see them.
