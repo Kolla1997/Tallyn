@@ -230,8 +230,24 @@ func TestBillsInSpending(t *testing.T) {
 	if bills != 1 {
 		t.Errorf("%d bill lines in Transactions, want 1 (rent; gas came from the bank)", bills)
 	}
-	if list, _, _ := f.db.Transactions(ctx, alice, f.testHH, TxFilter{Month: "2026-11", Owner: alice}); len(list) > 0 && list[0].BillID != nil {
-		t.Error("a person filter shows household bills")
+	countBills := func(owner string) int {
+		list, _, err := f.db.Transactions(ctx, alice, f.testHH, TxFilter{Month: "2026-11", Owner: owner})
+		if err != nil {
+			t.Fatal(err)
+		}
+		n := 0
+		for _, tx := range list {
+			if tx.BillID != nil {
+				n++
+			}
+		}
+		return n
+	}
+	if n := countBills(alice); n != 1 {
+		t.Errorf("alice's own view (Yours) has %d bill lines, want 1", n)
+	}
+	if n := countBills(carl); n != 0 {
+		t.Errorf("filtering to Carl shows %d household bills", n)
 	}
 
 	// Alice counts her own spending in household budgets, so the bank's gas shows there too.

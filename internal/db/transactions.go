@@ -72,7 +72,9 @@ var (
 // list and its totals always agree: $1 is the household, then the filter's
 // arguments from args.
 const filterSQL = `t.household_id = $1
-			  and ($2 = '' or public.transaction_owner(t.account_id) = nullif($2, '')::uuid)
+			  -- a paid bill has no person: it shows under the owner's own "Yours" (#127)
+			  and ($2 = '' or public.transaction_owner(t.account_id) = nullif($2, '')::uuid
+			       or (t.bill_id is not null and nullif($2, '')::uuid = auth.uid()))
 			  and ($3 = '%%' or coalesce(t.merchant_name, t.name) ilike $3)
 			  and ($4 = '' or t.category_primary = $4)
 			  and ($5::date is null or t.date >= $5::date)
