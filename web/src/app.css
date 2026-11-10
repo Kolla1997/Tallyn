@@ -1628,3 +1628,29 @@ input[role='switch']:not(:checked) + span {
     stroke-dashoffset: 30;
   }
 }
+
+/* Bill reminder on opening (#126, Dinesh's pick B): the page dims, then the dialog grows in. */
+@keyframes bill-reminder-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+@keyframes bill-reminder-dim {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bill-reminder[open] {
+    animation: bill-reminder-in 280ms cubic-bezier(0.23, 1, 0.32, 1) 80ms both;
+  }
+  .bill-reminder[open]::backdrop {
+    animation: bill-reminder-dim 200ms ease-out both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bill-reminder[open] {
+    animation: bill-reminder-dim 150ms linear both;
+  }
+}

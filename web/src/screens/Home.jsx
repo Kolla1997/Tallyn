@@ -7,6 +7,7 @@ import CreateHousehold from './CreateHousehold.jsx'
 import HomePage from './HomePage.jsx'
 import Join from './Join.jsx'
 import Shell, { PageHead } from './Shell.jsx'
+import BillReminder from '../components/BillReminder.jsx'
 import TallynLoader from '../components/TallynLoader.jsx'
 import Heading from '../components/Heading.jsx'
 import { loadMe } from '../lib/me.js'
@@ -175,6 +176,7 @@ export default function Home({ email, onSignOut }) {
   return (
     <Shell me={me} household={household} households={households} onChooseHousehold={choose} onSignOut={onSignOut}>
       <div key={household.id}>
+        <BillReminder household={household} onChanged={refresh} />
         {passwordChanged && path === firstPath && (
           <p className="info-note password-changed" role="status">
             <svg
