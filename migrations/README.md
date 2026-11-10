@@ -29,6 +29,8 @@ Rules (see `CLAUDE.md` §7):
 | `0023_notification_emails.sql` | payment-due alerts, the email outbox (`emailed_at`) and a parent's opt-in for a child's reconnect emails (#269) |
 | `0025_monthly_highlights.sql` | monthly highlights email: switch, what it shows (`monthly_summary`), who's due (`monthly_due`) and months already looked at (#274) |
 | `0024_weekly_summary.sql` | weekly summary email: switches, the person's time zone, what the email shows (`weekly_summary`), who's due (`weekly_due`) and weeks already looked at (#273) |
+| `0029_bills.sql` | bills Plaid can't see and their payments; household owners only (#127) |
+| `0030_bills_in_spending.sql` | `spend_lines` view: transactions plus paid bills; household budgets count bills for owners; matched payments not counted twice (#127) |
 
 Apply them in order on the Supabase project (SQL editor, or `psql "$ADMIN_DATABASE_URL" -f <file>`). Migrations run as `postgres`; the app itself never does (ADR 0006).
 Tests apply them to a throwaway Postgres: see `internal/db/db_test.go`. `TestEveryTableHasRLS` fails if a table is missing RLS.

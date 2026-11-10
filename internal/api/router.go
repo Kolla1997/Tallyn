@@ -69,7 +69,7 @@ type Store interface {
 	CreateBill(ctx context.Context, userID, householdID string, b db.NewBill) (string, error)
 	UpdateBill(ctx context.Context, userID, billID string, b db.NewBill) error
 	DeleteBill(ctx context.Context, userID, billID string) error
-	MarkBillPaid(ctx context.Context, userID, billID string, due time.Time, paidMinor int64, paidOn time.Time) error
+	MarkBillPaid(ctx context.Context, userID, billID string, due time.Time, paidMinor int64, paidOn time.Time, transactionID string) error
 	UnmarkBillPaid(ctx context.Context, userID, billID string, due time.Time) error
 	// In-app notifications (#267).
 	Notifications(ctx context.Context, userID string) ([]db.Notification, error)

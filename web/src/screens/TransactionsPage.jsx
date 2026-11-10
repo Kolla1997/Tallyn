@@ -6,6 +6,7 @@ import { Head, Panel, Rows, Money, Pill, Chips, MUTED, IN } from '../components/
 import SpendingBars from '../components/SpendingBars.jsx'
 import { TxDetails, TxSummary } from '../components/TxSummary.jsx'
 import { api } from '../lib/api.js'
+import { navigate } from '../lib/router.jsx'
 import { categoryLabel, formatMoney } from '../lib/money.js'
 import { nameOf } from '../lib/people.jsx'
 import PageSkeleton from '../components/calm/PageSkeleton.jsx'
@@ -380,7 +381,7 @@ export default function TransactionsPage({ me, household, refreshKey }) {
                           tx={tx}
                           who={tx.owner_user_id === me.user_id ? 'You' : nameOf(people[tx.owner_user_id] ?? { user_id: tx.owner_user_id })}
                           selected={tx.id === picked}
-                          onSelect={() => setPicked(tx.id === picked ? '' : tx.id)}
+                          onSelect={() => (tx.bill_id ? navigate('/bills') : setPicked(tx.id === picked ? '' : tx.id))}
                         />
                       ))}
                     </Rows>
@@ -447,7 +448,10 @@ function TxRow({ tx, who, selected, onSelect }) {
             )}
           </span>
           <span className={`block truncate text-[13px] ${MUTED}`}>
-            {[categoryLabel(tx.category_primary), tx.bank_name && `${tx.bank_name}${tx.account_mask ? ` ··${tx.account_mask}` : ''}`, who]
+            {(tx.bill_id
+              ? [categoryLabel(tx.category_primary), 'Added by you']
+              : [categoryLabel(tx.category_primary), tx.bank_name && `${tx.bank_name}${tx.account_mask ? ` ··${tx.account_mask}` : ''}`, who]
+            )
               .filter(Boolean)
               .join(' · ')}
           </span>

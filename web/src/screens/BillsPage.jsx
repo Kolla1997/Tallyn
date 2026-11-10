@@ -471,7 +471,10 @@ function PaidDialog({ bill, due, now, onClose, onSaved }) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(on)) return setError('Pick the day you paid.')
     setBusy(true)
     try {
-      await api(`/api/bills/${bill.id}/payments/${due.due}`, { method: 'PUT', body: { paid_minor: minor, paid_on: on } })
+      await api(`/api/bills/${bill.id}/payments/${due.due}`, {
+        method: 'PUT',
+        body: { paid_minor: minor, paid_on: on, transaction_id: due.suggest?.transaction_id ?? '' },
+      })
       onSaved()
     } catch {
       setError("We couldn't save it. Try again in a moment.")

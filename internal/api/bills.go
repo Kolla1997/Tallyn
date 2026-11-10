@@ -92,7 +92,7 @@ func deleteBill(store Store) http.HandlerFunc {
 	}
 }
 
-// PUT /api/bills/{id}/payments/{due} {"paid_minor": n, "paid_on": "YYYY-MM-DD"}
+// PUT /api/bills/{id}/payments/{due} {"paid_minor": n, "paid_on": "YYYY-MM-DD", "transaction_id": optional}
 func markBillPaid(store Store) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		uid, ok := userID(w, r)
@@ -101,8 +101,9 @@ func markBillPaid(store Store) http.HandlerFunc {
 		}
 		due, err := time.Parse("2006-01-02", r.PathValue("due"))
 		var in struct {
-			PaidMinor int64  `json:"paid_minor"`
-			PaidOn    string `json:"paid_on"`
+			PaidMinor     int64  `json:"paid_minor"`
+			PaidOn        string `json:"paid_on"`
+			TransactionID string `json:"transaction_id"` // the matched bank transaction, if any
 		}
 		if !readJSON(w, r, &in) {
 			return
@@ -112,7 +113,7 @@ func markBillPaid(store Store) http.HandlerFunc {
 			writeError(w, http.StatusBadRequest, "bad_request")
 			return
 		}
-		if err := store.MarkBillPaid(r.Context(), uid, r.PathValue("id"), due, in.PaidMinor, on); err != nil {
+		if err := store.MarkBillPaid(r.Context(), uid, r.PathValue("id"), due, in.PaidMinor, on, in.TransactionID); err != nil {
 			memberError(w, "mark bill paid", err)
 			return
 		}

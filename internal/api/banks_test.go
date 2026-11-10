@@ -75,7 +75,7 @@ func (stubStore) UpdateBill(context.Context, string, string, db.NewBill) error {
 	return errors.New("stub")
 }
 func (stubStore) DeleteBill(context.Context, string, string) error { return errors.New("stub") }
-func (stubStore) MarkBillPaid(context.Context, string, string, time.Time, int64, time.Time) error {
+func (stubStore) MarkBillPaid(context.Context, string, string, time.Time, int64, time.Time, string) error {
 	return errors.New("stub")
 }
 func (stubStore) UnmarkBillPaid(context.Context, string, string, time.Time) error {

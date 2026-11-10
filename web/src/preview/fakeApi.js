@@ -102,6 +102,8 @@ const TXS = [
   tx('t2', 24, 'Shell', 'TRANSPORTATION', 4810, 'u-james'),
   tx('t3', 23, 'Little Sprouts', 'GENERAL_SERVICES', 12000, 'u-james'),
   tx('t4', 23, 'Spotify', 'ENTERTAINMENT', 1699),
+  // A paid bill (#127): no bank, added by you.
+  tx('t-rent', 23, 'Rent', 'RENT_AND_UTILITIES', 150000, ME, { bill_id: 'rent', account_id: '', bank_name: null, account_mask: null, owner_user_id: '' }),
   tx('t5', 22, 'Nando’s', 'FOOD_AND_DRINK', 3875),
   // A place, for the map in the details (#60). Made up, like the rest.
   tx('t6', 22, 'Trader Joe’s', 'FOOD_AND_DRINK', 6430, ME, {

@@ -89,7 +89,7 @@ func TestBills(t *testing.T) {
 			if _, err := f.db.CreateBill(ctx, u, f.testHH, NewBill{Name: "x", AmountMinor: 1, Frequency: "monthly", DueDay: 1, StartsOn: "2026-11"}); err == nil {
 				t.Errorf("%s created a bill", u)
 			}
-			if err := f.db.MarkBillPaid(ctx, u, rent, billDay("2026-11-01"), 150000, today); !errors.Is(err, ErrNotFound) {
+			if err := f.db.MarkBillPaid(ctx, u, rent, billDay("2026-11-01"), 150000, today, ""); !errors.Is(err, ErrNotFound) {
 				t.Errorf("%s marked rent paid: %v", u, err)
 			}
 			if err := f.db.DeleteBill(ctx, u, rent); !errors.Is(err, ErrNotFound) {
@@ -115,10 +115,10 @@ func TestBills(t *testing.T) {
 		if dues[0].Status != "late" || dues[1].Status != "due" {
 			t.Errorf("statuses = %s, %s; want late, due", dues[0].Status, dues[1].Status)
 		}
-		if err := f.db.MarkBillPaid(ctx, alice, gas, billDay("2026-11-15"), 7135, today); err != nil {
+		if err := f.db.MarkBillPaid(ctx, alice, gas, billDay("2026-11-15"), 7135, today, ""); err != nil {
 			t.Fatal(err)
 		}
-		if err := f.db.MarkBillPaid(ctx, alice, rent, billDay("2026-11-02"), 150000, today); !errors.Is(err, ErrInvalid) {
+		if err := f.db.MarkBillPaid(ctx, alice, rent, billDay("2026-11-02"), 150000, today, ""); !errors.Is(err, ErrInvalid) {
 			t.Errorf("paid on a day it isn't due: %v, want ErrInvalid", err)
 		}
 		_, dues, _ = f.db.Bills(ctx, alice, f.testHH, nov, today)
@@ -163,4 +163,118 @@ func TestBills(t *testing.T) {
 			t.Errorf("after delete %d bills", len(bills))
 		}
 	})
+}
+
+// Paid bills count as spending (#127, 0030): in Transactions, Spending and
+// household budgets, for owners only, and not twice when paid from the bank.
+func TestBillsInSpending(t *testing.T) {
+	f := setup(t)
+	f.addDana(t)
+	ctx := context.Background()
+	today := billDay("2026-11-20")
+	rent, err := f.db.CreateBill(ctx, alice, f.testHH, NewBill{Name: "Rent", Category: "housing", AmountMinor: 150000, Frequency: "monthly", DueDay: 1, StartsOn: "2026-11"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	gas, err := f.db.CreateBill(ctx, alice, f.testHH, NewBill{Name: "Gas", Category: "utilities", AmountMinor: 6490, Frequency: "monthly", DueDay: 15, StartsOn: "2026-11"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := f.db.MarkBillPaid(ctx, alice, rent, billDay("2026-11-01"), 150000, billDay("2026-11-02"), ""); err != nil {
+		t.Fatal(err)
+	}
+	// Gas was paid from a linked bank: that transaction already counts.
+	acct := f.account(t, alice)
+	var txID string
+	if err := f.admin.QueryRow(ctx, `insert into transactions (household_id, account_id, plaid_transaction_id, amount_minor, currency, date, name, category_primary)
+		values ($1, $2, 'gas-co-1', 7135, 'USD', '2026-11-14', 'City Gas', 'RENT_AND_UTILITIES') returning id`, f.testHH, acct).Scan(&txID); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.db.MarkBillPaid(ctx, alice, gas, billDay("2026-11-15"), 7135, billDay("2026-11-14"), txID); err != nil {
+		t.Fatal(err)
+	}
+
+	rentUtilities := func(user string) int64 {
+		t.Helper()
+		list, err := f.db.Spending(ctx, user, f.testHH, "2026-11")
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, s := range list {
+			if s.Category == "RENT_AND_UTILITIES" {
+				return s.AmountMinor
+			}
+		}
+		return 0
+	}
+	if got := rentUtilities(alice); got != 150000+7135 {
+		t.Errorf("alice's rent and utilities = %d, want rent once and gas once", got)
+	}
+	if got := rentUtilities(danaG); got != 0 {
+		t.Errorf("dana sees %d of bills in spending", got)
+	}
+
+	list, _, err := f.db.Transactions(ctx, alice, f.testHH, TxFilter{Month: "2026-11"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	bills := 0
+	for _, tx := range list {
+		if tx.BillID != nil {
+			bills++
+			if *tx.BillID != rent || tx.AccountID != "" || tx.Date != "2026-11-02" || tx.AmountMinor != 150000 {
+				t.Errorf("bill line = %+v", tx)
+			}
+		}
+	}
+	if bills != 1 {
+		t.Errorf("%d bill lines in Transactions, want 1 (rent; gas came from the bank)", bills)
+	}
+	countBills := func(owner string) int {
+		list, _, err := f.db.Transactions(ctx, alice, f.testHH, TxFilter{Month: "2026-11", Owner: owner})
+		if err != nil {
+			t.Fatal(err)
+		}
+		n := 0
+		for _, tx := range list {
+			if tx.BillID != nil {
+				n++
+			}
+		}
+		return n
+	}
+	if n := countBills(alice); n != 1 {
+		t.Errorf("alice's own view (Yours) has %d bill lines, want 1", n)
+	}
+	if n := countBills(carl); n != 0 {
+		t.Errorf("filtering to Carl shows %d household bills", n)
+	}
+
+	// Alice counts her own spending in household budgets, so the bank's gas shows there too.
+	if err := f.db.SetCountInBudgets(ctx, alice, f.testHH, true); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.db.CreateBudget(ctx, alice, f.testHH, NewBudget{Category: "RENT_AND_UTILITIES", Period: "month", AmountMinor: 200000}); err != nil {
+		t.Fatal(err)
+	}
+	spent := func(user string) int64 {
+		t.Helper()
+		bs, _, err := f.db.Budgets(ctx, user, f.testHH, today)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, b := range bs {
+			if b.Category != nil && *b.Category == "RENT_AND_UTILITIES" && b.MemberUserID == nil {
+				return b.SpentMinor
+			}
+		}
+		t.Fatalf("%s can't see the household budget", user)
+		return 0
+	}
+	if got := spent(alice); got != 150000+7135 {
+		t.Errorf("alice's household budget spent = %d", got)
+	}
+	if got := spent(danaG); got != 7135 {
+		t.Errorf("dana's household budget spent = %d, want the bank's gas only", got)
+	}
 }
