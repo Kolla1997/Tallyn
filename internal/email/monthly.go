@@ -60,6 +60,7 @@ type Monthly struct {
 		Category    string
 		AmountMinor int64 `json:"amount_minor"`
 	}
+	Bills  *emailBills
 	Shared []struct {
 		Name    string
 		Kid     bool
@@ -89,6 +90,8 @@ type monthlyView struct {
 	CalNote, CatNote                                                                             string
 	Split                                                                                        []catView
 	Shared                                                                                       []sharedView
+	BillsLine                                                                                    string
+	BillRows                                                                                     []slipRow
 }
 
 type tile3 struct{ Label, Value, Meta string }
@@ -231,6 +234,8 @@ func ComposeMonthly(mo Monthly, links Links, token, household string) (Message, 
 		v.Shared = append(v.Shared, sv)
 	}
 
+	v.BillsLine, v.BillRows = mo.Bills.lineAndRows(m)
+
 	var html bytes.Buffer
 	if err := monthlyPage.Execute(&html, v); err != nil {
 		return Message{}, err
@@ -268,9 +273,19 @@ func weekdayShort(d string) string {
 
 func monthlyText(v monthlyView) string {
 	var b strings.Builder
-	b.WriteString(v.Heading + "\n\n" + v.Big + " " + v.Under + "\n\n")
+	b.WriteString(v.Heading + "\n\n" + v.Big + " " + v.Under + "\n")
+	if v.BillsLine != "" {
+		b.WriteString(v.BillsLine + "\n")
+	}
+	b.WriteString("\n")
 	for _, t := range v.Tiles {
 		b.WriteString(t.Label + ": " + t.Value + "\n")
+	}
+	if len(v.BillRows) > 0 {
+		b.WriteString("\nBills paid\n")
+		for _, r := range v.BillRows {
+			b.WriteString(r.Label + " (" + r.Meta + ") " + r.Value + "\n")
+		}
 	}
 	b.WriteString("\nHighlights\n")
 	for _, h := range v.Highlights {
@@ -293,6 +308,7 @@ var monthlyPage = template.Must(template.New("monthly").Funcs(funcs).Parse(frame
 <h1 style="margin:0;{{head}};font-weight:700;font-size:22px;line-height:1.25;color:#18181b">{{.Heading}}</h1>
 <div style="margin-top:12px;{{head}};font-weight:700;font-size:40px;line-height:1.1;color:#18181b;font-variant-numeric:tabular-nums">{{.Big}}</div>
 <p style="margin:6px 0 0;font-size:14px;color:#3f3f46">{{.Under}}</p>
+{{if .BillsLine}}<p style="margin:2px 0 0;font-size:14px;color:#52525b">{{.BillsLine}}</p>{{end}}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="6" style="margin-top:12px;border-collapse:separate;max-width:560px;margin-left:auto;margin-right:auto"><tr>
 {{range .Tiles}}<td align="center" width="33%" style="background:#fafafa;border:1px solid #e4e4e7;border-radius:14px;padding:10px 4px;text-align:center"><div style="font-size:12px;color:#52525b">{{.Label}}</div><div style="{{head}};font-weight:700;font-size:15px;color:#18181b;font-variant-numeric:tabular-nums">{{.Value}}</div></td>{{end}}
 </tr></table></div></td></tr>
@@ -308,6 +324,7 @@ var monthlyPage = template.Must(template.New("monthly").Funcs(funcs).Parse(frame
 {{range .Weeks}}<tr>{{range .}}{{if .Pad}}<td></td>{{else}}<td align="center" style="height:32px;border-radius:8px;font-size:12px;font-variant-numeric:tabular-nums;background:{{.Bg}};color:{{.Fg}}{{if .Empty}};border:1px solid #f4f4f5{{end}}">{{.Day}}</td>{{end}}{{end}}</tr>{{end}}
 </table>{{if .CalNote}}<p style="margin:8px 0 0;font-size:13px;color:#3f3f46;text-align:center">{{.CalNote}}</p>{{end}}</div>
 </div><div class="col" style="font-size:16px">
+{{if .BillRows}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">{{uniq}}Bills paid</div>{{template "slip" .BillRows}}{{end}}
 {{if .Split}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">{{uniq}}Where it went</div>
 <div class="shw" style="padding:12px 24px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-radius:8px;overflow:hidden;border-collapse:separate"><tr>
 {{range .Split}}<td width="{{printf "%.2f" .Width}}%" align="center" style="height:22px;background:{{.Color}};color:{{.Text}};font-size:11px;font-weight:700">{{if .Label}}{{.Pct}}{{end}}</td>{{end}}
