@@ -20,6 +20,7 @@ const TransactionsPage = lazy(() => import('./TransactionsPage.jsx'))
 const FamilyPage = lazy(() => import('./FamilyPage.jsx'))
 const Settings = lazy(() => import('./Settings.jsx'))
 const GoalsPage = lazy(() => import('./GoalsPage.jsx'))
+const BillsPage = lazy(() => import('./BillsPage.jsx'))
 
 const HOUSEHOLD_KEY = 'tallyn.household'
 
@@ -147,6 +148,9 @@ export default function Home({ email, onSignOut }) {
           }}
         />
       )
+      break
+    case '/bills':
+      page = <BillsPage household={household} refreshKey={refreshKey} />
       break
     case '/goals':
       page = <GoalsPage me={me} household={household} refreshKey={refreshKey} />

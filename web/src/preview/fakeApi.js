@@ -343,7 +343,49 @@ const NOTIFICATIONS = [
   },
 ]
 
+// Bills (#127): this month, around today, so the calendar has paid, late and coming-up bills.
+const BILL_MONTH = new Date().toLocaleDateString('en-CA').slice(0, 7)
+const bill = (id, name, day, amount, extra = {}) => ({
+  id,
+  name,
+  category: null,
+  amount_minor: amount,
+  currency: 'USD',
+  varies: false,
+  frequency: 'monthly',
+  due_day: day,
+  starts_on: BILL_MONTH,
+  paused: false,
+  note: null,
+  ...extra,
+})
+const BILLS = [
+  bill('rent', 'Rent', 1, 150000, { category: 'housing' }),
+  bill('net', 'Internet', 3, 7000, { category: 'utilities' }),
+  bill('care', 'Childcare', 5, 60000, { category: 'childcare' }),
+  bill('phone', 'Phone', 5, 4500),
+  bill('elec', 'Electric', 12, 14218, { varies: true, category: 'utilities' }),
+  bill('gas', 'Gas', 15, 6490, { varies: true, category: 'utilities' }),
+  bill('water', 'Water', 20, 4800, { frequency: 'quarterly' }),
+  bill('car', 'Car insurance', 28, 12600, { category: 'insurance' }),
+]
+const BILL_DUES = BILLS.map((b) => {
+  const due = `${BILL_MONTH}-${String(b.due_day).padStart(2, '0')}`
+  const paid = ['rent', 'care', 'phone'].includes(b.id)
+  return {
+    bill_id: b.id,
+    due,
+    expected_minor: b.amount_minor,
+    status: paid ? 'paid' : b.id === 'net' ? 'late' : 'due',
+    paid_minor: paid ? b.amount_minor : null,
+    paid_on: paid ? due : null,
+    match: b.id === 'elec' ? { transaction_id: 't-pge', name: 'PG&E', amount_minor: 14218, date: `${BILL_MONTH}-08` } : null,
+  }
+})
+
 const ROUTES = [
+  [/\/api\/bills\/[^/]+\/payments\//, null],
+  ['/api/bills', { today: new Date().toLocaleDateString('en-CA'), month: BILL_MONTH, bills: BILLS, dues: BILL_DUES }],
   ['/api/me', { user_id: ME, display_name: 'Maya', households: [{ id: 'hh-1', name: 'The Rivera family', role: 'owner', home_currency: 'USD' }] }],
   ['/api/banks', { banks: BANKS }],
   [/\/api\/households\/[^/]+\/members/, { members: MEMBERS }],

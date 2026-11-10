@@ -64,6 +64,13 @@ type Store interface {
 	UpdateGoal(ctx context.Context, userID, goalID string, g db.NewGoal) error
 	SetGoalSaved(ctx context.Context, userID, goalID string, savedMinor int64, today time.Time) error
 	DeleteGoal(ctx context.Context, userID, goalID string) error
+	// Bills Plaid can't see (#127).
+	Bills(ctx context.Context, userID, householdID string, month, today time.Time) ([]db.Bill, []db.BillDue, error)
+	CreateBill(ctx context.Context, userID, householdID string, b db.NewBill) (string, error)
+	UpdateBill(ctx context.Context, userID, billID string, b db.NewBill) error
+	DeleteBill(ctx context.Context, userID, billID string) error
+	MarkBillPaid(ctx context.Context, userID, billID string, due time.Time, paidMinor int64, paidOn time.Time) error
+	UnmarkBillPaid(ctx context.Context, userID, billID string, due time.Time) error
 	// In-app notifications (#267).
 	Notifications(ctx context.Context, userID string) ([]db.Notification, error)
 	MarkNotificationsRead(ctx context.Context, userID, id string) error
@@ -166,6 +173,12 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("PUT /api/goals/{id}", updateGoal(d.Store))
 	api.HandleFunc("PUT /api/goals/{id}/saved", setGoalSaved(d.Store))
 	api.HandleFunc("DELETE /api/goals/{id}", deleteGoal(d.Store))
+	api.HandleFunc("GET /api/bills", bills(d.Store)) // #127
+	api.HandleFunc("POST /api/bills", createBill(d.Store))
+	api.HandleFunc("PUT /api/bills/{id}", updateBill(d.Store))
+	api.HandleFunc("DELETE /api/bills/{id}", deleteBill(d.Store))
+	api.HandleFunc("PUT /api/bills/{id}/payments/{due}", markBillPaid(d.Store))
+	api.HandleFunc("DELETE /api/bills/{id}/payments/{due}", unmarkBillPaid(d.Store))
 	api.HandleFunc("GET /api/notifications", notifications(d.Store)) // #267
 	api.HandleFunc("POST /api/notifications/read", markNotificationsRead(d.Store))
 	api.HandleFunc("POST /api/notifications/dismiss", dismissNotifications(d.Store))

@@ -3,7 +3,18 @@ import logo from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-light.s
 import mark from '../../../brand/coinroof/logo/svg/coinroof-mark-outline.svg'
 import logoDark from '../../../brand/coinroof/logo/svg/coinroof-lockup-plain-dark.svg'
 import markDark from '../../../brand/coinroof/logo/svg/coinroof-mark.svg'
-import { AccountsIcon, BudgetsIcon, DebtsIcon, FamilyIcon, GoalsIcon, HomeIcon, MenuIcon, SettingsIcon, TransactionsIcon } from '../components/Icons.jsx'
+import {
+  AccountsIcon,
+  BillsIcon,
+  BudgetsIcon,
+  DebtsIcon,
+  FamilyIcon,
+  GoalsIcon,
+  HomeIcon,
+  MenuIcon,
+  SettingsIcon,
+  TransactionsIcon,
+} from '../components/Icons.jsx'
 import { Link } from '../lib/router.jsx'
 import Heading from '../components/Heading.jsx'
 import ThemeSwitch from '../components/calm/ThemeSwitch.jsx'
@@ -38,6 +49,7 @@ const NAV = [
 const SIDEBAR = [
   ...NAV.slice(0, 4),
   ['/debts', 'Debts', DebtsIcon],
+  ['/bills', 'Bills', BillsIcon, 'owner'], // #127: household owners only
   ['/family', 'Family', FamilyIcon],
   ['/goals', 'Goals', GoalsIcon],
   ['/settings', 'Settings', SettingsIcon],
@@ -172,7 +184,7 @@ export default function Shell({ me, household, households, onChooseHousehold, on
           </button>
         </div>
         <nav aria-label="Main" className="flex flex-col gap-0.5">
-          {SIDEBAR.map(([to, label, Icon]) => (
+          {SIDEBAR.filter(([, , , only]) => !only || household?.role === only).map(([to, label, Icon]) => (
             <Link key={to} to={to} className={`${NAV_LINK} ${collapsed ? 'w-[42px] justify-center' : 'px-3'}`}>
               <Icon width={18} height={18} />
               {collapsed ? (
@@ -410,6 +422,12 @@ function MobileMenu({ name, initial, household, onSignOut }) {
             <DebtsIcon width={18} height={18} />
             Debts
           </Link>
+          {household?.role === 'owner' && (
+            <Link to="/bills" role="menuitem" className={MENU_ITEM} onClick={() => close(false)}>
+              <BillsIcon width={18} height={18} />
+              Bills
+            </Link>
+          )}
           <Link to="/goals" role="menuitem" className={MENU_ITEM} onClick={() => close(false)}>
             <GoalsIcon width={18} height={18} />
             Goals
