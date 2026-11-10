@@ -59,6 +59,8 @@ export function asAccount(l, ownerId) {
       payoff_date: l.payoff_date,
       original_minor: l.principal_minor,
       ytd_interest_minor: l.interest_this_year_minor,
+      // A payment past its date and not marked paid is overdue, as Plaid's loans say.
+      is_overdue: !!l.next_due && l.next_due < new Date().toLocaleDateString('en-CA'),
     },
     bank: { owner_user_id: ownerId, status: 'active' },
   }
@@ -92,7 +94,7 @@ export function LoanDetail({ loan: l, money, onChanged }) {
   const pct = Math.round((Math.max(0, l.principal_minor - l.balance_minor) / l.principal_minor) * 100)
   const last = l.last
   return (
-    <section aria-labelledby="loan-detail-h" className="calm-card calm-glass min-w-0 rounded-2xl p-4">
+    <section aria-labelledby="loan-detail-h" className="calm-card calm-glass min-w-0 rounded-2xl p-4 lg:sticky lg:top-4">
       <p id="loan-detail-h" className={`m-0 text-[13px] ${MUTED}`}>
         {l.name} · left to pay
       </p>

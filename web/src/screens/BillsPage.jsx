@@ -369,14 +369,14 @@ function CardDue({ due, money }) {
           <span className="truncate">{due.name}</span>
         </span>
         <span className={`shrink-0 ${NUM}`} style={due.status === 'late' ? OWE : undefined}>
-          <span className={`text-[12px] font-medium ${MUTED}`}>min </span>
+          {!due.loan && <span className={`text-[12px] font-medium ${MUTED}`}>min </span>}
           {money(due.expected_minor, due.currency)}
         </span>
       </div>
       <div className={`flex flex-wrap gap-3 text-[13px] ${MUTED}`}>
         <span className="inline-flex items-center gap-1">
           <CreditCard className="size-3.5" aria-hidden="true" />
-          Card · {short(due.due)}
+          {due.loan ? 'Loan' : 'Card'} · {short(due.due)}
           {due.status === 'late' && ' · overdue'}
         </span>
         {due.statement_minor != null && <span className="tabular-nums">Statement {money(due.statement_minor, due.currency)}</span>}

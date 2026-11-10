@@ -52,6 +52,10 @@ describe('ManualLoan', () => {
       current_balance_minor: 2047664,
       loan: { rate_percent: '4.9', original_minor: 2500000, payoff_date: '2030-11-05' },
     })
+    expect(asAccount({ ...LOAN, next_due: '2020-01-05' }, 'u-me').loan.is_overdue).toBe(true)
+    expect(asAccount({ ...LOAN, next_due: '2999-01-05' }, 'u-me').loan).toMatchObject({
+      is_overdue: false,
+    })
   })
 
   it('shows what is left, three facts and where the last payment went', () => {
