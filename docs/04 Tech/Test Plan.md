@@ -2,7 +2,7 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-11-05
+updated: 2026-11-09
 issues: [111, 113, 153, 154, 155, 158, 159, 200, 201, 209, 267, 268, 269, 273, 274]
 tags: [spec, tech, testing]
 ---
@@ -105,7 +105,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Joining on a network error keeps the invite and offers Try again; a refused invite is cleared (#151) | P1 | Yes | — | — | `Join.test.jsx` |
 | Invite, accept, refuse, revoke | P0 | — | Yes | Yes (#113) | `invites_test.go`, `members_test.go` (`TestInviteRoutes`); `e2e-full/p0.spec.js` (invite a member, who accepts: link from the Family page, joined in a second browser) |
 | Change a member's role, remove a member | P0 | — | Yes | No | `invites_test.go` (`TestMemberManagement`), `members_test.go` |
-| Sharing is the owner's choice, step by step | P0 | — | Yes | Yes (#113) | `sharing_test.go` (db: 7 tests; api: `TestSharingRoutes`); `e2e-full/p0.spec.js` (share balances with a member, then stop sharing: the member's Home shows it, then doesn't) |
+| Sharing is the owner's choice, step by step | P0 | — | Yes | Yes (#113) | `sharing_test.go` (db: 7 tests; api: `TestSharingRoutes`); `e2e-full/p0.spec.js` (share balances with a member, then stop sharing: the member's Home shows the shared accounts, then doesn't). Locators follow the current screens: roles and visible text, not class names (#113, 2026-11-09) |
 | Leaving removes your shares | P0 | — | Yes | No | `sharing_test.go` (`TestLeavingRemovesShares`) |
 | Family page and sharing screen | P1 | Yes | — | Yes (#113) | `FamilyPage.test.jsx` (switches save, transactions before time and location, failure reverts, owner-only actions, remove needs name and code, no sharing with teens) |
 

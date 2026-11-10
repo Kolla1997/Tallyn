@@ -2,13 +2,16 @@
 type: log
 status: active
 owner: Dinesh
-updated: 2026-11-05
+updated: 2026-11-09
 tags: [log]
 ---
 
 # Log
 
 Newest first. One entry per working session or decision.
+
+## 2026-11-09
+- #113 Weekly End-to-end run failed since Oct 27: the app was fine, but four P0 tests used labels and class names the redesigns changed. Locators now use roles and visible text.
 
 ## 2026-11-08
 - #1 Board sync failed from Nov 8: the BOARD_TOKEN classic token expired (30 days), and newer `gh` also needs `read:org` and `read:discussion` to read Projects. New token with repo, project, read:org, read:discussion; sync uses `--owner @me` and logs the token's scopes (PR #303). CLAUDE.md updated.

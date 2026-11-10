@@ -45,8 +45,8 @@ test('Home shows the total in the home currency', async ({ page, person }) => {
 
   await signIn(page, me)
   const card = page.getByRole('region', { name: 'Your balance' })
-  await expect(card).toContainText('Your balance · USD')
-  await expect(card.locator('.total-big .sr-only')).toHaveText(money(yourBalance(banks, me.id))) // CountUp also shows it once more for sighted readers
+  await expect(card).toContainText('Your balance · in USD')
+  await expect(card.locator('.sr-only').first()).toHaveText(money(yourBalance(banks, me.id))) // the split-flap digits show it once more for sighted readers
 })
 
 test('connect a sandbox bank, then see its accounts and transactions', async ({ page, person }) => {
@@ -73,7 +73,7 @@ test('connect a sandbox bank, then see its accounts and transactions', async ({ 
     })
     .toBeGreaterThan(0)
   await page.goto('/transactions')
-  await expect(page.getByRole('region', { name: 'Transactions' }).locator('.tx-row').first()).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Transactions' }).getByRole('listitem').getByRole('button').first()).toBeVisible()
 })
 
 test('invite a member, who accepts', async ({ page, browser, person }) => {
@@ -86,7 +86,12 @@ test('invite a member, who accepts', async ({ page, browser, person }) => {
   await page.getByLabel('Their email').fill(member.email)
   await page.getByLabel('Role').selectOption('adult')
   await page.getByRole('button', { name: 'Create invite link' }).click()
-  const link = (await page.locator('.invite-form .secret').textContent()).trim()
+  const link = (
+    await page
+      .getByRole('status')
+      .getByText(/\/join#/)
+      .textContent()
+  ).trim()
   expect(link).toMatch(/\/join#[A-Za-z0-9_-]{43}$/)
 
   // The member opens the link in their own browser, signs in and joins.
@@ -124,14 +129,14 @@ test('share balances with a member, then stop sharing', async ({ page, browser, 
     .getByRole('button', { name: /Test Partner/ })
     .click()
   const balances = page.getByRole('switch', { name: 'Balances' })
-  const balancesSwitch = page.locator('label.switch', { hasText: 'Balances' }) // the styled switch people click; the checkbox itself is hidden
+  const balancesSwitch = page.locator('label', { has: balances }) // the styled switch people click; the checkbox itself is hidden
   await balancesSwitch.click()
   await expect(balances).toBeChecked()
 
   await p2.reload()
   const shared = p2.getByRole('region', { name: 'Shared with you' })
   await expect(shared).toContainText('Test Owner')
-  await expect(shared).toContainText('Shares balances')
+  await expect(shared).toContainText('From Test Owner') // one row per account they share
 
   // And stops: the member no longer sees it.
   await balancesSwitch.click()
