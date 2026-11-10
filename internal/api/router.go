@@ -71,6 +71,12 @@ type Store interface {
 	DeleteBill(ctx context.Context, userID, billID string) error
 	MarkBillPaid(ctx context.Context, userID, billID string, due time.Time, paidMinor int64, paidOn time.Time, transactionID string) error
 	UnmarkBillPaid(ctx context.Context, userID, billID string, due time.Time) error
+	// Loans Plaid can't see (#306).
+	Loans(ctx context.Context, userID, householdID string, today time.Time) ([]db.ManualLoan, error)
+	CreateLoan(ctx context.Context, userID, householdID string, l db.NewLoan, today time.Time) (string, error)
+	UpdateLoan(ctx context.Context, userID, loanID string, l db.NewLoan) error
+	SetLoanBalance(ctx context.Context, userID, loanID string, balanceMinor int64, on time.Time) error
+	AddLoanExtra(ctx context.Context, userID, loanID string, paidMinor int64, on time.Time) error
 	// In-app notifications (#267).
 	Notifications(ctx context.Context, userID string) ([]db.Notification, error)
 	MarkNotificationsRead(ctx context.Context, userID, id string) error
@@ -179,6 +185,11 @@ func NewRouter(d Deps) http.Handler {
 	api.HandleFunc("DELETE /api/bills/{id}", deleteBill(d.Store))
 	api.HandleFunc("PUT /api/bills/{id}/payments/{due}", markBillPaid(d.Store))
 	api.HandleFunc("DELETE /api/bills/{id}/payments/{due}", unmarkBillPaid(d.Store))
+	api.HandleFunc("GET /api/loans", loans(d.Store)) // #306
+	api.HandleFunc("POST /api/loans", createLoan(d.Store))
+	api.HandleFunc("PUT /api/loans/{id}", updateLoan(d.Store))
+	api.HandleFunc("PUT /api/loans/{id}/balance", setLoanBalance(d.Store))
+	api.HandleFunc("POST /api/loans/{id}/extra", addLoanExtra(d.Store))
 	api.HandleFunc("GET /api/notifications", notifications(d.Store)) // #267
 	api.HandleFunc("POST /api/notifications/read", markNotificationsRead(d.Store))
 	api.HandleFunc("POST /api/notifications/dismiss", dismissNotifications(d.Store))

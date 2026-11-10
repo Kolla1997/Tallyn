@@ -9,7 +9,9 @@ import { formatMoney } from '../lib/money.js'
 import CountUp from '../components/CountUp.jsx'
 import { nameOf } from '../lib/people.jsx'
 import { ReconnectBank } from './Banks.jsx'
-import { Head, Panel, Chips } from '../components/calm/ui.jsx'
+import { Head, Panel, Chips, Pill } from '../components/calm/ui.jsx'
+import { Plus } from 'lucide-react'
+import { LoanDetail, LoanDialog, LoanIcon, asAccount } from '../components/ManualLoan.jsx'
 
 // Debts (#27), in the calm redesign (#187, Dinesh picked layout F): a summary strip with a waffle
 // for the split by kind and four figures (you owe, due this month, interest this year, overdue),
@@ -69,20 +71,32 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
   const [who, setWho] = useState('yours')
   const [error, setError] = useState('')
   const [failed, setFailed] = useState(false) // the last load failed (#151)
+  const [loans, setLoans] = useState([]) // loans Plaid can't see (#306), owners only
+  const [openLoan, setOpenLoan] = useState(null)
+  const [adding, setAdding] = useState(false)
+  const owner = household.role === 'owner'
   const home = household.home_currency
   const money = useCallback((v) => formatMoney(v, home), [home])
 
   const load = useCallback(() => {
     const hh = encodeURIComponent(household.id)
-    return Promise.all([api(`/api/banks?household_id=${hh}`), api(`/api/households/${hh}/members`)]).then(
-      ([b, m]) => {
+    // Manual loans are a bonus: if they can't load, the bank debts still show.
+    const manual = owner
+      ? api(`/api/loans?household_id=${hh}&today=${todayISO()}`).then(
+          (l) => l.loans ?? [],
+          () => [],
+        )
+      : Promise.resolve([])
+    return Promise.all([api(`/api/banks?household_id=${hh}`), api(`/api/households/${hh}/members`), manual]).then(
+      ([b, m, l]) => {
         setBanks(b.banks)
         setMembers(m.members)
+        setLoans(l)
         setFailed(false)
       },
       () => setFailed(true),
     )
-  }, [household.id])
+  }, [household.id, owner])
 
   useEffect(() => {
     load()
@@ -93,7 +107,9 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
   const owners = [...new Set((banks ?? []).map((b) => b.owner_user_id))].filter((id) => id !== me.user_id)
   const showSwitch = !KID.has(household.role) && owners.length > 0
   const shown = (banks ?? []).filter((b) => who === 'everyone' || b.owner_user_id === (who === 'yours' ? me.user_id : who))
-  const owedAll = shown.flatMap((b) => b.accounts.filter((a) => a.type === 'credit' || a.type === 'loan').map((a) => ({ ...a, bank: b })))
+  // Manual loans belong to the household's owners: they show under Yours and Everyone.
+  const manual = who === 'yours' || who === 'everyone' ? loans.map((l) => asAccount(l, me.user_id)) : []
+  const owedAll = [...shown.flatMap((b) => b.accounts.filter((a) => a.type === 'credit' || a.type === 'loan').map((a) => ({ ...a, bank: b }))), ...manual]
   const debts = owedAll.filter((a) => a.currency === home && a.current_balance_minor != null)
   const others = owedAll.length - debts.length
   const owed = (a) => Math.max(0, a.current_balance_minor)
@@ -121,7 +137,23 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
 
   return (
     <div className="calm">
-      <Head title="Debts" sub="Everything you owe, in one place" />
+      <Head title="Debts" sub="Everything you owe, in one place">
+        {owner && (
+          <Pill icon={Plus} onClick={() => setAdding(true)}>
+            Add a loan
+          </Pill>
+        )}
+      </Head>
+      {adding && (
+        <LoanDialog
+          household={household}
+          onClose={() => setAdding(false)}
+          onSaved={() => {
+            setAdding(false)
+            load()
+          }}
+        />
+      )}
 
       {showSwitch && (
         <div className="mb-3">
@@ -190,36 +222,56 @@ export default function DebtsPage({ me, household, refreshKey, onChanged }) {
             </dl>
           </section>
 
-          <section aria-label="Your debts" className="calm-solid overflow-hidden rounded-2xl">
-            <div
-              className={`hidden grid-cols-[minmax(0,1fr)_240px_140px] gap-x-6 border-b border-zinc-200 dark:border-zinc-800 px-4 py-2.5 text-[13px] font-semibold sm:grid ${MUTED}`}
-            >
-              <span>Debt</span>
-              <span>Progress</span>
-              <span className="text-right">Balance</span>
-            </div>
-            {groups.map((g) => (
-              <div key={g.key} role="group" aria-labelledby={`debts-${g.key}`}>
-                <h2
-                  id={`debts-${g.key}`}
-                  className={`m-0 flex justify-between border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/60 px-4 py-1.5 font-[family-name:var(--font-body)] text-[13px] font-semibold ${MUTED}`}
-                >
-                  {g.label} <span className="tabular-nums">{money(g.value)}</span>
-                </h2>
-                <ul className="m-0 list-none p-0">
-                  {g.list.map((a) => (
-                    <DebtRow key={a.id} account={a} money={money} onChanged={onChanged} onError={setError} />
-                  ))}
-                </ul>
+          <div className={openLoan ? 'grid items-start gap-3 lg:grid-cols-[minmax(0,1fr)_380px]' : ''}>
+            <section aria-label="Your debts" className="calm-solid min-w-0 overflow-hidden rounded-2xl">
+              <div
+                className={`hidden grid-cols-[minmax(0,1fr)_240px_140px] gap-x-6 border-b border-zinc-200 dark:border-zinc-800 px-4 py-2.5 text-[13px] font-semibold sm:grid ${MUTED}`}
+              >
+                <span>Debt</span>
+                <span>Progress</span>
+                <span className="text-right">Balance</span>
               </div>
-            ))}
-            <p className="m-0 flex justify-between border-t border-zinc-200 dark:border-zinc-800 px-4 py-3 text-sm font-semibold">
-              {who === 'everyone' ? 'Everyone owes' : 'You owe'}
-              <span className={NUM} style={{ color: 'var(--color-redesign-owe-text)' }}>
-                {money(total)}
-              </span>
-            </p>
-          </section>
+              {groups.map((g) => (
+                <div key={g.key} role="group" aria-labelledby={`debts-${g.key}`}>
+                  <h2
+                    id={`debts-${g.key}`}
+                    className={`m-0 flex justify-between border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/60 px-4 py-1.5 font-[family-name:var(--font-body)] text-[13px] font-semibold ${MUTED}`}
+                  >
+                    {g.label} <span className="tabular-nums">{money(g.value)}</span>
+                  </h2>
+                  <ul className="m-0 list-none p-0">
+                    {g.list.map((a) => (
+                      <DebtRow
+                        key={a.id}
+                        account={a}
+                        money={money}
+                        onChanged={onChanged}
+                        onError={setError}
+                        open={a.manual && openLoan === a.manual.id}
+                        onOpen={a.manual ? () => setOpenLoan(openLoan === a.manual.id ? null : a.manual.id) : null}
+                      />
+                    ))}
+                  </ul>
+                </div>
+              ))}
+              <p className="m-0 flex justify-between border-t border-zinc-200 dark:border-zinc-800 px-4 py-3 text-sm font-semibold">
+                {who === 'everyone' ? 'Everyone owes' : 'You owe'}
+                <span className={NUM} style={{ color: 'var(--color-redesign-owe-text)' }}>
+                  {money(total)}
+                </span>
+              </p>
+            </section>
+            {openLoan && loans.find((l) => l.id === openLoan) && (
+              <LoanDetail
+                loan={loans.find((l) => l.id === openLoan)}
+                money={money}
+                onChanged={() => {
+                  load()
+                  onChanged?.()
+                }}
+              />
+            )}
+          </div>
 
           {others > 0 && (
             <p className={`m-0 mt-3 text-[13px] ${MUTED}`}>
@@ -278,7 +330,7 @@ function Waffle({ groups, total, money }) {
 }
 
 // A debt as a row: name and its details, a bar for how far along it is, the balance.
-function DebtRow({ account: a, money, onChanged, onError }) {
+function DebtRow({ account: a, money, onChanged, onError, open, onOpen }) {
   const m = measure(a)
   const owed = Math.max(0, a.current_balance_minor)
   const caption = m
@@ -294,10 +346,22 @@ function DebtRow({ account: a, money, onChanged, onError }) {
       className="calm-row grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-6 gap-y-2 border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 last:border-b-0 sm:grid-cols-[minmax(0,1fr)_240px_140px]"
     >
       <div className="flex min-w-0 items-center gap-3">
-        <AccountIcon account={a} />
+        {a.manual ? <LoanIcon /> : <AccountIcon account={a} />}
         <div className="min-w-0">
           <p className="name m-0 truncate text-[15px] font-semibold">
-            {a.name} {a.mask && <span className={`text-[13px] font-normal ${MUTED}`}>··{a.mask}</span>}
+            {onOpen ? (
+              <button
+                type="button"
+                aria-expanded={open}
+                onClick={onOpen}
+                className="border-0 bg-transparent p-0 text-left font-semibold underline-offset-4 hover:underline"
+              >
+                {a.name}
+              </button>
+            ) : (
+              a.name
+            )}{' '}
+            {a.mask && <span className={`text-[13px] font-normal ${MUTED}`}>··{a.mask}</span>}
           </p>
           <Details account={a} money={money} onChanged={onChanged} onError={onError} />
         </div>
@@ -377,6 +441,7 @@ function Details({ account: a, money, onChanged, onError }) {
           l.past_due_minor > 0 && `${money(l.past_due_minor)} past due`,
           end,
           l.repayment_plan,
+          a.manual && 'Added by you',
         ])}
       </p>
     )

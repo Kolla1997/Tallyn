@@ -4,6 +4,7 @@ import ConfirmDialog from '../components/ConfirmDialog.jsx'
 import LoadFailed from '../components/LoadFailed.jsx'
 import PageSkeleton from '../components/calm/PageSkeleton.jsx'
 import { api } from '../lib/api.js'
+import { navigate } from '../lib/router.jsx'
 import { CATEGORIES, FREQUENCIES, amountOf, byDay, cardDues, frequencyName, monthGrid, shiftMonth, totals } from '../lib/bills.js'
 import { fromMinor, toMinor } from '../lib/budgets.js'
 import { formatMoney } from '../lib/money.js'
@@ -133,7 +134,7 @@ export default function BillsPage({ household, refreshKey }) {
           onMarkPaid={markPaid}
           onUnmark={unmark}
           onDifferent={(bill, due) => setDialog({ kind: 'paid', bill, due })}
-          onEdit={(bill) => setDialog({ kind: 'bill', bill })}
+          onEdit={(bill) => (bill.category === 'loan' ? navigate('/debts') : setDialog({ kind: 'bill', bill }))}
         />
       )}
 
