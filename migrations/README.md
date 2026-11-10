@@ -31,6 +31,7 @@ Rules (see `CLAUDE.md` §7):
 | `0024_weekly_summary.sql` | weekly summary email: switches, the person's time zone, what the email shows (`weekly_summary`), who's due (`weekly_due`) and weeks already looked at (#273) |
 | `0029_bills.sql` | bills Plaid can't see and their payments; household owners only (#127) |
 | `0030_bills_in_spending.sql` | `spend_lines` view: transactions plus paid bills; household budgets count bills for owners; matched payments not counted twice (#127) |
+| `0031_bills_in_emails_and_plans.sql` | `email_bills` for the summary emails (owners only), `bill_due_date`, household income plans count paid bills (#127) |
 
 Apply them in order on the Supabase project (SQL editor, or `psql "$ADMIN_DATABASE_URL" -f <file>`). Migrations run as `postgres`; the app itself never does (ADR 0006).
 Tests apply them to a throwaway Postgres: see `internal/db/db_test.go`. `TestEveryTableHasRLS` fails if a table is missing RLS.

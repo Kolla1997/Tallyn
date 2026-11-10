@@ -13,6 +13,36 @@ import (
 // number, a bar per day, tiles for the month so far, against last month and
 // cash now, where it went, what's coming up, and (when asked) what's shared.
 
+// emailBills is email_bills' answer (0031, #127): owners only, else nil.
+// Paid bills are never in Spent; they get their own line and slip (Dinesh
+// picked C of drafts/127-bills-email.html).
+type emailBills struct {
+	PaidTotal int64 `json:"paid_total"`
+	Paid      []struct {
+		Name        string
+		PaidOn      string `json:"paid_on"`
+		AmountMinor int64  `json:"amount_minor"`
+	}
+	Due []struct {
+		Name        string
+		DueDate     string `json:"due_date"`
+		AmountMinor int64  `json:"amount_minor"`
+		Varies      bool
+	}
+}
+
+// lineAndRows: "Plus $X in bills you marked paid." and a slip row per bill.
+func (b *emailBills) lineAndRows(m func(int64) string) (string, []slipRow) {
+	if b == nil || len(b.Paid) == 0 {
+		return "", nil
+	}
+	var rows []slipRow
+	for _, p := range b.Paid {
+		rows = append(rows, slipRow{Label: p.Name, Meta: "Paid " + weekday(p.PaidOn) + ", " + longDate(p.PaidOn), Value: m(p.AmountMinor)})
+	}
+	return "Plus " + m(b.PaidTotal) + " in bills you marked paid.", rows
+}
+
 // Weekly is weekly_summary's answer (0024).
 type Weekly struct {
 	WeekStart string `json:"week_start"`
@@ -36,6 +66,7 @@ type Weekly struct {
 		AmountMinor *int64  `json:"amount_minor"`
 		Overdue     bool
 	}
+	Bills  *emailBills
 	Shared []struct {
 		Name    string
 		Kid     bool
@@ -67,6 +98,8 @@ type weeklyView struct {
 	Tiles                                                                                 []tile
 	Rows, Due                                                                             []slipRow
 	Shared                                                                                []sharedView
+	BillsLine                                                                             string
+	BillRows                                                                              []slipRow
 }
 
 type bar struct {
@@ -152,6 +185,16 @@ func ComposeWeekly(w Weekly, links Links, token, household string) (Message, err
 		}
 		v.Due = append(v.Due, r)
 	}
+	v.BillsLine, v.BillRows = w.Bills.lineAndRows(m)
+	if w.Bills != nil {
+		for _, d := range w.Bills.Due {
+			r := slipRow{Label: d.Name, Meta: "Bill · Due " + weekday(d.DueDate) + ", " + longDate(d.DueDate), Value: m(d.AmountMinor)}
+			if d.Varies {
+				r.Value = "about " + r.Value
+			}
+			v.Due = append(v.Due, r)
+		}
+	}
 	for _, s := range w.Shared {
 		sv := sharedView{
 			Name: s.Name, Now: m(s.Month.Spent), Then: m(s.Month.Last),
@@ -222,9 +265,19 @@ func shortDay(d string) string {
 
 func weeklyText(v weeklyView) string {
 	var b strings.Builder
-	b.WriteString(v.Heading + "\n\n" + v.Big + " " + v.Under + "\n\n")
+	b.WriteString(v.Heading + "\n\n" + v.Big + " " + v.Under + "\n")
+	if v.BillsLine != "" {
+		b.WriteString(v.BillsLine + "\n")
+	}
+	b.WriteString("\n")
 	for _, t := range v.Tiles {
 		b.WriteString(t.Label + ": " + t.Value + "\n")
+	}
+	if len(v.BillRows) > 0 {
+		b.WriteString("\nBills paid\n")
+		for _, r := range v.BillRows {
+			b.WriteString(r.Label + " (" + r.Meta + ") " + r.Value + "\n")
+		}
 	}
 	if len(v.Rows) > 0 {
 		b.WriteString("\nWhere it went\n")
@@ -254,6 +307,7 @@ var weeklyPage = template.Must(template.New("weekly").Funcs(funcs).Parse(frameHe
 <h1 style="margin:0;{{head}};font-weight:700;font-size:22px;line-height:1.25;color:#18181b">{{.Heading}}</h1>
 <div style="margin-top:12px;{{head}};font-weight:700;font-size:40px;line-height:1.1;color:#18181b;font-variant-numeric:tabular-nums">{{.Big}}</div>
 <p style="margin:6px 0 0;font-size:14px;color:#3f3f46">{{.Under}}</p>
+{{if .BillsLine}}<p style="margin:2px 0 0;font-size:14px;color:#52525b">{{.BillsLine}}</p>{{end}}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;max-width:480px;margin-left:auto;margin-right:auto"><tr>
 {{range .Bars}}<td align="center" valign="bottom" style="padding:0 3px;height:66px;vertical-align:bottom"><div style="height:{{.Height}}px;line-height:{{.Height}}px;font-size:0;max-width:34px;margin:0 auto;border-radius:6px 6px 2px 2px;background:{{.Color}}">&nbsp;</div></td>{{end}}
 </tr><tr>{{range .Bars}}<td align="center" style="padding-top:4px;font-size:12px;color:#52525b">{{.Day}}</td>{{end}}</tr></table>
@@ -262,6 +316,7 @@ var weeklyPage = template.Must(template.New("weekly").Funcs(funcs).Parse(frameHe
 </tr></table></div></td></tr>
 <tr><td style="padding:0"><div class="cols" style="margin:0 auto;font-size:0">
 <div class="col" style="font-size:16px">{{if .Rows}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">{{uniq}}Where it went</div>{{template "slip" .Rows}}{{end}}</div><div class="col" style="font-size:16px">
+{{if .BillRows}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">{{uniq}}Bills paid</div>{{template "slip" .BillRows}}{{end}}
 {{if .Due}}<div class="sh" style="padding:20px 24px 0;{{head}};font-weight:700;font-size:16px;text-align:left">{{uniq}}Coming up</div>{{template "slip" .Due}}{{end}}
 {{if .Shared}}<div class="shw" style="padding:20px 24px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px dashed #a1a1aa;border-radius:16px;border-collapse:separate">
 <tr><td style="padding:14px 16px 0;{{head}};font-weight:700;font-size:16px;text-align:center">{{uniq}}Shared with you</td></tr>

@@ -40,7 +40,8 @@ func (s *System) WeeklyDue(ctx context.Context, now time.Time) ([]WeeklyDue, err
 func (s *System) WeeklySummary(ctx context.Context, householdID, userID string, weekStart time.Time) (json.RawMessage, error) {
 	var out json.RawMessage
 	err := s.as(ctx, func(tx pgx.Tx) error {
-		return tx.QueryRow(ctx, `select public.weekly_summary($1, $2, $3::date)`, householdID, userID, weekStart).Scan(&out)
+		return tx.QueryRow(ctx, `select public.weekly_summary($1, $2, $3::date)
+			|| jsonb_build_object('bills', public.email_bills($1, $2, $3::date, $3::date + 6, $3::date + 7, $3::date + 14))`, householdID, userID, weekStart).Scan(&out)
 	})
 	return out, err
 }
@@ -79,7 +80,8 @@ func (s *System) MonthlyDue(ctx context.Context, now time.Time) ([]WeeklyDue, er
 func (s *System) MonthlySummary(ctx context.Context, householdID, userID string, monthStart time.Time) (json.RawMessage, error) {
 	var out json.RawMessage
 	err := s.as(ctx, func(tx pgx.Tx) error {
-		return tx.QueryRow(ctx, `select public.monthly_summary($1, $2, $3::date)`, householdID, userID, monthStart).Scan(&out)
+		return tx.QueryRow(ctx, `select public.monthly_summary($1, $2, $3::date)
+			|| jsonb_build_object('bills', public.email_bills($1, $2, $3::date, ($3::date + interval '1 month')::date - 1, null, null))`, householdID, userID, monthStart).Scan(&out)
 	})
 	return out, err
 }

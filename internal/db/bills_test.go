@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"testing"
 	"time"
@@ -276,5 +277,92 @@ func TestBillsInSpending(t *testing.T) {
 	}
 	if got := spent(danaG); got != 7135 {
 		t.Errorf("dana's household budget spent = %d, want the bank's gas only", got)
+	}
+}
+
+// Bills in the summary emails and household plans (#127, 0031): owners only,
+// never counted twice, and bills due the week after in the weekly email.
+func TestBillsInEmailsAndPlans(t *testing.T) {
+	f := setup(t)
+	f.addDana(t)
+	ctx := context.Background()
+	rent, err := f.db.CreateBill(ctx, alice, f.testHH, NewBill{Name: "Rent", Category: "housing", AmountMinor: 150000, Frequency: "monthly", DueDay: 1, StartsOn: "2026-11"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.db.CreateBill(ctx, alice, f.testHH, NewBill{Name: "Water", Category: "utilities", AmountMinor: 4800, Varies: true, Frequency: "monthly", DueDay: 18, StartsOn: "2026-11"}); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.db.MarkBillPaid(ctx, alice, rent, billDay("2026-11-01"), 150000, billDay("2026-11-10"), ""); err != nil {
+		t.Fatal(err)
+	}
+
+	type bills struct {
+		Bills *struct {
+			PaidTotal int64 `json:"paid_total"`
+			Paid      []struct {
+				Name string
+			}
+			Due []struct {
+				Name    string
+				DueDate string `json:"due_date"`
+			}
+		}
+	}
+	week := func(user string) bills {
+		t.Helper()
+		raw, err := f.sys.WeeklySummary(ctx, f.testHH, user, billDay("2026-11-09")) // Mon 9 – Sun 15; due window 16 – 23
+		if err != nil {
+			t.Fatal(err)
+		}
+		var b bills
+		if err := json.Unmarshal(raw, &b); err != nil {
+			t.Fatal(err)
+		}
+		return b
+	}
+	a := week(alice)
+	if a.Bills == nil || a.Bills.PaidTotal != 150000 || len(a.Bills.Paid) != 1 || a.Bills.Paid[0].Name != "Rent" {
+		t.Fatalf("alice's weekly bills = %+v", a.Bills)
+	}
+	if len(a.Bills.Due) != 1 || a.Bills.Due[0].Name != "Water" || a.Bills.Due[0].DueDate != "2026-11-18" {
+		t.Errorf("due next week = %+v", a.Bills.Due)
+	}
+	if d := week(danaG); d.Bills != nil {
+		t.Errorf("dana (adult) gets bills in her email: %+v", d.Bills)
+	}
+	raw, err := f.sys.MonthlySummary(ctx, f.testHH, alice, billDay("2026-11-01"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var mo bills
+	_ = json.Unmarshal(raw, &mo)
+	if mo.Bills == nil || mo.Bills.PaidTotal != 150000 || len(mo.Bills.Due) != 0 {
+		t.Errorf("monthly bills = %+v", mo.Bills)
+	}
+
+	// A household plan counts rent as an essential, for the owner only.
+	if _, err := f.db.SavePlan(ctx, alice, f.testHH, plan55); err != nil {
+		t.Fatal(err)
+	}
+	essentials := func(user string) int64 {
+		t.Helper()
+		plans, err := f.db.Plans(ctx, user, f.testHH, billDay("2026-11-20"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, p := range plans {
+			if p.MemberUserID == nil {
+				return p.Progress["essentials"]
+			}
+		}
+		t.Fatalf("%s can't see the household plan", user)
+		return 0
+	}
+	if got := essentials(alice); got != 150000 {
+		t.Errorf("alice's household plan needs = %d, want rent", got)
+	}
+	if got := essentials(danaG); got != 0 {
+		t.Errorf("dana's household plan needs = %d, want 0", got)
 	}
 }
