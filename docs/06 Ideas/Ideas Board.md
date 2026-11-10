@@ -10,7 +10,6 @@ kanban-plugin: board
 
 - [ ] [#2 Test idea, please ignore](https://github.com/Kolla1997/Tallyn/issues/2) #type/idea
 - [ ] [#33 Formulas to split available balance across goals](https://github.com/Kolla1997/Tallyn/issues/33) #type/idea #area/backend
-- [ ] [#126 Payment due dates calendar with reminders](https://github.com/Kolla1997/Tallyn/issues/126) #type/idea
 - [ ] [#131 Send Tallyn emails through our own provider](https://github.com/Kolla1997/Tallyn/issues/131) #type/idea #area/infra
 - [ ] [#132 Messaging between household members](https://github.com/Kolla1997/Tallyn/issues/132) #type/idea #area/backend
 - [ ] [#270 Push notifications on phones](https://github.com/Kolla1997/Tallyn/issues/270) #type/idea
@@ -26,6 +25,7 @@ kanban-plugin: board
 
 - [x] [#4 Test idea, please ignore](https://github.com/Kolla1997/Tallyn/issues/4) #type/feature
 - [x] [#111 Detailed test plan for unit and integration testing](https://github.com/Kolla1997/Tallyn/issues/111) #type/docs #area/infra
+- [x] [#126 Bill reminders: pop-up to record bills due](https://github.com/Kolla1997/Tallyn/issues/126) #type/feature #area/frontend
 - [x] [#127 Bills and recurring payments Plaid can't see](https://github.com/Kolla1997/Tallyn/issues/127) #type/feature #area/frontend #area/backend
 
 

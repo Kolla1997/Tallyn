@@ -395,3 +395,42 @@ func TestComposeBudget(t *testing.T) {
 		t.Errorf("over: %q", m.Subject)
 	}
 }
+
+// Bills in the summary emails (#127, Dinesh picked C): a line under the
+// headline, a "Bills paid" slip, and bills due next week in Coming up. Never in Spent.
+func TestEmailBills(t *testing.T) {
+	bills := `,"bills":{"paid_total":157135,"paid":[{"name":"Rent","paid_on":"2026-10-19","amount_minor":150000},{"name":"Gas","paid_on":"2026-10-22","amount_minor":7135}],"due":[{"name":"Water","due_date":"2026-10-28","amount_minor":4800,"varies":true}]}}`
+	var w Weekly
+	if err := json.Unmarshal([]byte(strings.TrimSuffix(strings.TrimSpace(sampleWeek), "}")+bills), &w); err != nil {
+		t.Fatal(err)
+	}
+	m, err := ComposeWeekly(w, Links{App: "https://coinroof.us"}, "t", "Trail House")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{"Plus $1,571.35 in bills you marked paid.", "Bills paid", ">Rent<", "Paid Monday, October 19", "Water", "Bill · Due Wednesday, October 28", "about $48.00", ">$1,506.33<"} {
+		if !strings.Contains(m.HTML, want) {
+			t.Errorf("weekly HTML is missing %q", want)
+		}
+	}
+	if !strings.Contains(m.Text, "Plus $1,571.35 in bills you marked paid.") || !strings.Contains(m.Text, "Bills paid") {
+		t.Errorf("weekly text: %q", m.Text)
+	}
+	var mo Monthly
+	if err := json.Unmarshal([]byte(strings.TrimSuffix(strings.TrimSpace(sampleMonth), "}")+bills), &mo); err != nil {
+		t.Fatal(err)
+	}
+	mm, err := ComposeMonthly(mo, Links{App: "https://coinroof.us"}, "t", "Trail House")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(mm.HTML, "Plus $1,571.35 in bills you marked paid.") || !strings.Contains(mm.HTML, "Bills paid") {
+		t.Error("monthly HTML has no bills")
+	}
+	// Not an owner: no bills at all.
+	var plain Weekly
+	_ = json.Unmarshal([]byte(sampleWeek), &plain)
+	if p, _ := ComposeWeekly(plain, Links{App: "https://coinroof.us"}, "t", "Trail House"); strings.Contains(p.HTML, "Bills paid") || strings.Contains(p.HTML, "in bills you marked paid") {
+		t.Error("an email without bills shows a bills part")
+	}
+}

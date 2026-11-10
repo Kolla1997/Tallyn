@@ -12,6 +12,9 @@ kanban-plugin: board
 - [ ] [#156 Say what other currencies are left out](https://github.com/Kolla1997/Tallyn/issues/156) #type/design #area/design #area/frontend #priority/p2
 - [ ] [#255 Turn on the transaction map where the app is hosted](https://github.com/Kolla1997/Tallyn/issues/255) #type/feature #area/infra #priority/p2
 - [ ] [#127 Bills and recurring payments Plaid can't see](https://github.com/Kolla1997/Tallyn/issues/127) #type/feature #area/frontend #area/backend
+- [ ] [#306 Loans and debts with monthly payments and payoff tracking](https://github.com/Kolla1997/Tallyn/issues/306) #type/feature #area/frontend #area/backend
+- [ ] [#307 Onboarding step: monthly commitments (bills and loans)](https://github.com/Kolla1997/Tallyn/issues/307) #type/feature #area/frontend
+- [ ] [#126 Bill reminders: pop-up to record bills due](https://github.com/Kolla1997/Tallyn/issues/126) #type/feature #area/frontend
 
 
 ## In Progress
