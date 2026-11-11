@@ -4,6 +4,7 @@ import { pendingInvite } from '../lib/invite.js'
 import { takePasswordChanged } from '../lib/recovery.js'
 import { Link, usePath } from '../lib/router.jsx'
 import CreateHousehold from './CreateHousehold.jsx'
+import MonthlyCommitments from './MonthlyCommitments.jsx'
 import HomePage from './HomePage.jsx'
 import Join from './Join.jsx'
 import Shell, { PageHead } from './Shell.jsx'
@@ -55,6 +56,8 @@ export default function Home({ email, onSignOut }) {
   const [refreshKey, setRefreshKey] = useState(0) // bumps when banks, sharing or members change
   const [selected, setSelected] = useState(savedHousehold)
   const [invite, setInvite] = useState(pendingInvite)
+  // Just created this household (#307): one skippable step for what the bank feed can't see.
+  const [settingUp, setSettingUp] = useState(false)
 
   const load = useCallback(() => {
     loadMe().then(setMe, (e) => setError(e.message))
@@ -110,11 +113,28 @@ export default function Home({ email, onSignOut }) {
         <section className="card">
           <Heading>Create your household</Heading>
           <p className="muted">Signed in as {email}, with 2FA.</p>
-          <CreateHousehold onCreated={load} />
+          <CreateHousehold
+            onCreated={() => {
+              setSettingUp(true)
+              load()
+            }}
+          />
           <button className="btn btn-secondary" onClick={onSignOut}>
             Sign out
           </button>
         </section>
+      </AuthPage>
+    )
+  }
+
+  if (settingUp) {
+    const done = () => {
+      setSettingUp(false)
+      refresh()
+    }
+    return (
+      <AuthPage bare>
+        <MonthlyCommitments household={household} onDone={done} />
       </AuthPage>
     )
   }

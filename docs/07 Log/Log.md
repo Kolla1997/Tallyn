@@ -11,6 +11,7 @@ tags: [log]
 Newest first. One entry per working session or decision.
 
 ## 2026-11-11
+- #307 Monthly payments step after Create household: Dinesh picked A (chips and rows) from the first draft, then A4 · Mix from round 2 (one-line rows, sentence editor, month notches). Saves bills and a car loan through the existing endpoints; no backend change. Decisions: a car loan asks for the four loan figures; a bill whose day has passed starts next month; copy says "change them later in Bills" (the ticket said Settings); no site footer on the step (Dinesh).
 - #126 Reopened and fixed: the reminder and Bills' Late list also cover bills still unpaid from the 3 months before (Dinesh chose 3); paused bills drop out. `GET /api/bills` returns `earlier` for this month.
 
 ## 2026-11-09

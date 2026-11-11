@@ -778,6 +778,14 @@ body:has(.calm-page)::before {
   }
 }
 
+/* Monthly commitments (#307): a payment's row or editor arrives once, quicker than a page load.
+   Reduced motion: it is simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  .mc-new {
+    animation: calm-rise 300ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+}
+
 /* The signed-out launch page (#220, C): headline across the top; video and the auth card side by
    side, same height; then About, features, safety and a closing call, all 1120px wide. Outside the
    components layer, so it wins over the old stylesheet's plain h2 rule. */
