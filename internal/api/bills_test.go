@@ -31,6 +31,9 @@ func (s *billStore) Bills(_ context.Context, _, _ string, month, _ time.Time) ([
 	return []db.Bill{{ID: "b1", Name: "Rent", AmountMinor: 150000, Currency: "USD", Frequency: "monthly", DueDay: 1}},
 		[]db.BillDue{{BillID: "b1", Due: "2026-11-01", Status: "due", ExpectedMinor: 150000}}, s.err
 }
+func (s *billStore) EarlierUnpaid(context.Context, string, string, time.Time) ([]db.BillDue, error) {
+	return []db.BillDue{{BillID: "b1", Due: "2026-10-01", Status: "late", ExpectedMinor: 150000}}, s.err
+}
 func (s *billStore) CreateBill(_ context.Context, _, _ string, b db.NewBill) (string, error) {
 	s.created = b
 	return "b1", s.err
@@ -52,6 +55,9 @@ func TestBillRoutes(t *testing.T) {
 	rec := send(h, "GET", "/api/bills?household_id="+testHH+"&month=2026-11", "")
 	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"name":"Rent"`) || !strings.Contains(rec.Body.String(), `"status":"due"`) || s.month.Month() != time.November {
 		t.Fatalf("GET bills: %d %s", rec.Code, rec.Body)
+	}
+	if rec := send(h, "GET", "/api/bills?household_id="+testHH+"&today=2026-11-11", ""); !strings.Contains(rec.Body.String(), `"earlier":[{"bill_id":"b1","due":"2026-10-01","status":"late"`) {
+		t.Errorf("this month has no earlier unpaid: %s", rec.Body)
 	}
 	if rec := send(h, "GET", "/api/bills?household_id="+testHH+"&month=nope", ""); rec.Code != http.StatusBadRequest {
 		t.Errorf("bad month: %d, want 400", rec.Code)

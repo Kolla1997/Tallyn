@@ -67,6 +67,25 @@ describe('BillsPage', () => {
     expect(side.getByText(/Paid \$1,500\.00 of \$1,634\.90/)).toBeInTheDocument()
   })
 
+  it('lists bills still unpaid from earlier months under Late on today', async () => {
+    routeApi(api, [
+      [/^\/api\/bills\/[a-z]+\/payments\//, null],
+      [
+        '/api/bills',
+        {
+          today: '2026-11-09',
+          month: '2026-11',
+          bills: BILLS,
+          dues: DUES,
+          earlier: [{ bill_id: 'rent', due: '2026-10-01', status: 'late', expected_minor: 150000 }],
+        },
+      ],
+    ])
+    await open()
+    const side = within(screen.getByRole('complementary'))
+    expect(side.getByText(/Oct 1/)).toBeInTheDocument()
+  })
+
   it('marks a bill paid at its amount', async () => {
     answers()
     await open()

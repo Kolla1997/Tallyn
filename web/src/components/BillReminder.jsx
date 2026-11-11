@@ -7,7 +7,7 @@ import PaidDialog from './PaidDialog.jsx'
 import { Pill, MUTED, NUM, OWE } from './calm/ui.jsx'
 
 // Bill reminders (#126, Dinesh picked B of drafts/126-bill-reminders.html): when an owner opens
-// Coinroof and a bill is due today or late this month, a dialog asks them to record it. "Not yet"
+// Coinroof and a bill is due today or late (this month or the 3 before), a dialog asks them to record it. "Not yet"
 // hides a bill until tomorrow; closing hides them all until tomorrow. Kept in this browser only
 // (a convenience, not a record), so it can come back in a private window. Owners only, like Bills.
 
@@ -51,7 +51,8 @@ export default function BillReminder({ household, onChanged }) {
     api(`/api/bills?household_id=${encodeURIComponent(household.id)}&month=${now.slice(0, 7)}&today=${now}`).then(
       (d) => {
         if (!live) return
-        const list = toRecord(d.dues ?? [], now, snoozed(now))
+        // Still unpaid from the 3 months before ask too, oldest first (#126).
+        const list = toRecord([...(d.earlier ?? []), ...(d.dues ?? [])], now, snoozed(now))
         setState({ now, bills: Object.fromEntries((d.bills ?? []).map((b) => [b.id, b])), list })
       },
       () => {}, // a reminder is never worth an error message

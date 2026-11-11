@@ -198,14 +198,15 @@ function Calendar({ data, month, now, picked, money, onPick, onMonth, onMarkPaid
   const pickedDay = Number(picked.slice(8))
   const dayDues = picked.slice(0, 7) === month ? (days_.get(pickedDay) ?? []) : []
   const isToday = picked === now
-  const late = isToday ? data.dues.filter((d) => d.status === 'late' && d.due !== picked) : []
+  // Late this month, and still unpaid from the 3 months before (#126), oldest first.
+  const late = isToday ? [...(data.earlier ?? []), ...data.dues.filter((d) => d.status === 'late' && d.due !== picked)] : []
   const matches = isToday ? data.dues.filter((d) => d.match && d.status !== 'paid') : []
   const card = (d) =>
     d.card ? (
-      <CardDue key={d.bill_id} due={d} money={money} />
+      <CardDue key={`${d.bill_id}|${d.due}`} due={d} money={money} />
     ) : (
       <BillCard
-        key={d.bill_id}
+        key={`${d.bill_id}|${d.due}`}
         bill={bills[d.bill_id]}
         due={d}
         money={money}

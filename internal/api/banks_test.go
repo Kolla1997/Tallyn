@@ -68,6 +68,9 @@ func (stubStore) DeleteGoal(context.Context, string, string) error { return erro
 func (stubStore) Bills(context.Context, string, string, time.Time, time.Time) ([]db.Bill, []db.BillDue, error) {
 	return nil, nil, errors.New("stub")
 }
+func (stubStore) EarlierUnpaid(context.Context, string, string, time.Time) ([]db.BillDue, error) {
+	return nil, errors.New("stub")
+}
 func (stubStore) CreateBill(context.Context, string, string, db.NewBill) (string, error) {
 	return "", errors.New("stub")
 }
