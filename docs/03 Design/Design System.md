@@ -2,7 +2,7 @@
 type: guide
 status: draft
 owner: Dinesh
-updated: 2026-11-05
+updated: 2026-11-11
 issue: 10
 tags: [design]
 ---
@@ -181,3 +181,4 @@ Full style guide: `docs/03 Design/Reference/tallyn-style-guide.pdf` (HTML copy a
 | 2026-11-05 | Fixed greys (#160): `redesign-zinc-50`, `-100`, `-200`, `-800`, `-900`, `-950` join `redesign-grey-1` to `-5` (zinc 300–700) as one fixed grey scale, the same in both themes. Stylesheets use them instead of written-out hex colours; a colour that changes with the theme still uses a theme token (`redesign-ink`, `redesign-page`) | About 100 hand-written greys in `app.css` and `styles.css` now come from `design-tokens.json`. Fixed, so a grey inside a dark-mode rule can't flip by accident |
 | 2026-11-05 | Sizes (#160, option C): the in-between steps the app uses on purpose are now spacing tokens (`x2`, `x6`, `x10`, `x14`, `x18`, `x20`, `x22`, `x28`, beside `s1`–`s8`) and corners `tiny` 4px, `small` 12px, `medium` 16px. One-off gaps snap to the nearest step (3→4, 7→8, 9→8, 11→12). Big layout sizes (36, 56, 96, 112px) aren't spacing and stay | Dinesh picked C: keep the look, drop the stray sizes. `--radius-card` and `--radius-input` are redefined for the redesign in `app.css`, so 22px and 14px corners stay as written |
 | 2026-11-05 | Spending-limit alert (#55, small F1): in the bell, a 44px ring with the category's icon, the category and days to go on the left, the amount left (or over, in red) on the right | Dinesh picked F1 small in `drafts/55-spending-limits.html` after five rounds |
+| 2026-11-11 | Monthly payments step (#307): chips add a payment, a sentence edits it (the words are the labels), it folds into a one-line row; 31 notches show the due days across the month; the total is last. A frosted card up to 600px, no site footer | Dinesh picked A4, the mix, in `drafts/307-monthly-commitments-2.html`, over the tally tape and plain form rows |

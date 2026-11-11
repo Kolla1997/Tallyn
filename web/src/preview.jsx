@@ -9,6 +9,8 @@ import './app.css'
 import Home from './screens/Home.jsx'
 import LaunchPage from './components/LaunchPage.jsx'
 import SignIn from './screens/SignIn.jsx'
+import AuthPage from './components/AuthPage.jsx'
+import MonthlyCommitments from './screens/MonthlyCommitments.jsx'
 
 globalThis.__tallynPreviewApi = fakeApi
 // Open /preview.html?p=accounts to start on a page; the app's router then takes over.
@@ -16,15 +18,21 @@ globalThis.__tallynPreviewApi = fakeApi
 const query = new URLSearchParams(location.search)
 const start = query.get('p')
 const theme = query.get('t')
-history.replaceState(null, '', start === 'signin' ? '/' : `/${start && start !== 'home' ? start : ''}`)
+history.replaceState(null, '', start === 'signin' || start === 'commitments' ? '/' : `/${start && start !== 'home' ? start : ''}`)
 if (theme === 'dark' || theme === 'light') setTheme(theme)
 else startTheme()
 
 // ?p=signin shows the sign-in screen in its launch page (#220) instead.
 const signIn = start === 'signin'
+// ?p=commitments shows the step after Create household (#307); saving always works here.
+const commitments = start === 'commitments'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {signIn ? (
+    {commitments ? (
+      <AuthPage bare>
+        <MonthlyCommitments household={{ id: 'preview', home_currency: 'USD' }} onDone={() => location.assign('/preview.html')} />
+      </AuthPage>
+    ) : signIn ? (
       <LaunchPage>
         <SignIn />
       </LaunchPage>

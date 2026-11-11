@@ -47,6 +47,17 @@ Dinesh picked **C · Mix** of `drafts/127-bills-calendar.html` (2026-11-09), aft
 
 Loading effect: the page mark, then cards fade in (`.calm-card`), day cells rise 18ms apart (`.calm-rise` with `--d`), bill cards rise (`.calm-row`) and the paid bar fills (`.calm-fill`). Reduced motion: drawn at once.
 
+### Monthly payments step (#307)
+Straight after **Create household**, once, the owner who created it is asked "What do you pay every month that isn't in your bank feed?" (`web/src/screens/MonthlyCommitments.jsx`). Dinesh picked **A4 · Mix** of `drafts/307-monthly-commitments-2.html` (2026-11-11):
+- **Chips** add a payment: Rent / Mortgage, Electric, Gas, Water, Internet, Car loan, Other (Other can be added more than once).
+- Each one is edited as a **sentence** ("$1,850.00 a month, on day 1") and folds into a **one-line row**: name, due day, amount. Tap a row to change it.
+- **Your month**: 31 notches, a tall one on each due day, and what is due in the first week. The total is last.
+- **Skip for now** is always there. Nothing is saved until **Save and continue**; rows show Saved one by one, and a payment that failed can be tried again or left for later. No site footer on this step (Dinesh).
+
+What is saved: rent, utilities, internet and Other as monthly bills (Electric, Gas and Water as an amount that changes); a car loan as a manual loan (#306) from its amount, APR, length and first payment. A bill whose day has already passed this month starts next month, so a new household doesn't open on a late bill. Everything can be changed later on Bills and Debts.
+
+Loading effect: the card fades in (`.calm-card`), chips rise 50ms apart (`.calm-rise`), a new row or editor rises once (`.mc-new`, 300ms), due-day notches pop (`.calm-pop`) and the total counts to its new value. Reduced motion: drawn at once.
+
 ## Tech notes
 - **Migration `0029_bills.sql`:**
   - `bills` (household_id, created_by, name, category, amount_minor, currency, varies, frequency, due_day, starts_on, paused, note).
