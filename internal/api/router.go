@@ -66,6 +66,7 @@ type Store interface {
 	DeleteGoal(ctx context.Context, userID, goalID string) error
 	// Bills Plaid can't see (#127).
 	Bills(ctx context.Context, userID, householdID string, month, today time.Time) ([]db.Bill, []db.BillDue, error)
+	EarlierUnpaid(ctx context.Context, userID, householdID string, today time.Time) ([]db.BillDue, error)
 	CreateBill(ctx context.Context, userID, householdID string, b db.NewBill) (string, error)
 	UpdateBill(ctx context.Context, userID, billID string, b db.NewBill) error
 	DeleteBill(ctx context.Context, userID, billID string) error

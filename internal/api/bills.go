@@ -31,7 +31,15 @@ func bills(store Store) http.HandlerFunc {
 			memberError(w, "bills", err)
 			return
 		}
-		writeJSON(w, http.StatusOK, map[string]any{"today": today.Format("2006-01-02"), "month": month.Format("2006-01"), "bills": list, "dues": dues})
+		// This month also carries what's still unpaid from the 3 months before (#126).
+		earlier := []db.BillDue{}
+		if month.Year() == today.Year() && month.Month() == today.Month() {
+			if earlier, err = store.EarlierUnpaid(r.Context(), uid, r.URL.Query().Get("household_id"), today); err != nil {
+				memberError(w, "bills", err)
+				return
+			}
+		}
+		writeJSON(w, http.StatusOK, map[string]any{"today": today.Format("2006-01-02"), "month": month.Format("2006-01"), "bills": list, "dues": dues, "earlier": earlier})
 	}
 }
 

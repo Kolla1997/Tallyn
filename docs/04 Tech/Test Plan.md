@@ -2,7 +2,7 @@
 type: spec
 status: draft
 owner: Dinesh
-updated: 2026-11-09
+updated: 2026-11-11
 issues: [111, 113, 153, 154, 155, 158, 159, 200, 201, 209, 267, 268, 269, 273, 274]
 tags: [spec, tech, testing]
 ---
@@ -150,7 +150,7 @@ Tallyn has a solid base of tests, but nothing says which use cases they cover an
 | Accounts page, bank cards, hidden balances | P1 | Yes | Yes | No | `AccountsPage.test.jsx` (columns by type, hidden balance as —, whose accounts, bank chips, status, Reconnect, Unlink); `TestBankHiddenWithoutBalances` |
 | Bills Plaid can't see (#127): add, edit, pause and delete a bill; each period makes an expected payment (31st → month's last day; every 3 months; yearly; once) | P1 | Yes | Yes | — | `db/bills_test.go` (`TestDueIn`, `TestBills`), `api/bills_test.go` (`TestBillRoutes`) |
 | Mark a bill paid, paid a different amount, or undo; late after its due day; the calendar, picked day and month totals | P1 | Yes | Yes | — | `db/bills_test.go` (`TestBills`), `BillsPage.test.jsx`, `lib/bills.test.js`. Gap: end-to-end mark paid (#113) once 0029 is on the sandbox |
-| Bill reminder pop-up on opening (#126): owners only; bills due today or late this month; Mark paid, Different amount, Not yet (until tomorrow), Later hides all until tomorrow | P1 | Yes | — | — | `BillReminder.test.jsx` (4). Checked on the sandbox with a late test bill. Gap: end-to-end once bills are seeded on the sandbox |
+| Bill reminder pop-up on opening (#126): owners only; bills due today or late this month or still unpaid from the 3 months before (`TestEarlierUnpaid`); Mark paid, Different amount, Not yet (until tomorrow), Later hides all until tomorrow | P1 | Yes | — | — | `BillReminder.test.jsx` (4). Checked on the sandbox with a late test bill. Gap: end-to-end once bills are seeded on the sandbox |
 | Paid bills in the weekly and monthly emails for owners only (line, Bills paid slip, due next week in Coming up), never in "You spent"; household income plans count them for owners | P1 | Yes | Yes | — | `email_test.go` (`TestEmailBills`), `db/bills_test.go` (`TestBillsInEmailsAndPlans`). Release checklist: a real weekly email to the test address |
 | Loans Plaid can't see (#306): monthly payment from amount, APR and length ($25,000 at 4.9% over 60 months = $470.64); each payment pays the month's interest first; extra payments go straight to the balance; a correction resets the balance from its date; next due and payoff date; owners only | P1 | Yes | Yes | — | `db/loans_test.go` (`TestLoanMaths`, `TestManualLoans`), `api/loans_test.go`, `ManualLoan.test.jsx` |
 | Every due date on the Bills calendar: bills, manual loans, credit cards and Plaid student loans and mortgages (read-only, overdue as late) | P1 | Yes | — | — | `lib/bills.test.js` (`cardDues`) |

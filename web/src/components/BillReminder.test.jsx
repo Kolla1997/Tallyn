@@ -69,6 +69,25 @@ describe('BillReminder', () => {
     expect(screen.getByRole('dialog', { name: '1 bill to record' })).toBeInTheDocument() // next day: Internet (still late) is back
   })
 
+  it('also asks about bills still unpaid from earlier months', async () => {
+    routeApi(api, [
+      [
+        '/api/bills',
+        {
+          today: '2026-11-09',
+          month: '2026-11',
+          bills: BILLS,
+          dues: DUES,
+          earlier: [{ bill_id: 'net', due: '2026-10-03', status: 'late', expected_minor: 7000 }],
+        },
+      ],
+    ])
+    await open()
+    const dlg = within(screen.getByRole('dialog', { name: '3 bills to record' }))
+    expect(dlg.getByText('Late · was due Oct 3')).toBeInTheDocument()
+    expect(dlg.getByText('Late · was due Nov 3')).toBeInTheDocument()
+  })
+
   it('never asks people who aren’t owners', async () => {
     answers()
     await open({ ...owner, role: 'adult' })

@@ -366,3 +366,38 @@ func TestBillsInEmailsAndPlans(t *testing.T) {
 		t.Errorf("dana's household plan needs = %d, want 0", got)
 	}
 }
+
+// Bills left unpaid from the 3 months before keep asking (#126).
+func TestEarlierUnpaid(t *testing.T) {
+	f := setup(t)
+	ctx := context.Background()
+	today := billDay("2026-11-11")
+	rent, err := f.db.CreateBill(ctx, alice, f.testHH, NewBill{Name: "Rent", AmountMinor: 150000, Frequency: "monthly", DueDay: 1, StartsOn: "2026-07"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := f.db.MarkBillPaid(ctx, alice, rent, billDay("2026-09-01"), 150000, billDay("2026-09-01"), ""); err != nil {
+		t.Fatal(err)
+	}
+	got, err := f.db.EarlierUnpaid(ctx, alice, f.testHH, today)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var dues []string
+	for _, d := range got {
+		dues = append(dues, d.Due)
+	}
+	// July is more than 3 months back; September was paid.
+	if len(dues) != 2 || dues[0] != "2026-08-01" || dues[1] != "2026-10-01" {
+		t.Errorf("earlier unpaid = %v, want Aug 1 and Oct 1", dues)
+	}
+	if _, err := f.db.EarlierUnpaid(ctx, carl, f.testHH, today); !errors.Is(err, ErrForbidden) {
+		t.Errorf("a child sees earlier bills: %v", err)
+	}
+	if err := f.db.UpdateBill(ctx, alice, rent, NewBill{Name: "Rent", AmountMinor: 150000, Frequency: "monthly", DueDay: 1, StartsOn: "2026-07", Paused: true}); err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := f.db.EarlierUnpaid(ctx, alice, f.testHH, today); len(got) != 0 {
+		t.Errorf("a paused bill still asks: %+v", got)
+	}
+}

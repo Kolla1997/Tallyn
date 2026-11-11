@@ -307,3 +307,24 @@ func (d *DB) UnmarkBillPaid(ctx context.Context, userID, billID string, due time
 		return nil
 	}))
 }
+
+// EarlierUnpaid lists bills still unpaid from the 3 months before today's
+// month (#126): a bill left late in October keeps asking in November.
+// Paused bills drop out, as in Bills. Oldest first.
+func (d *DB) EarlierUnpaid(ctx context.Context, userID, householdID string, today time.Time) ([]BillDue, error) {
+	out := []BillDue{}
+	first := time.Date(today.Year(), today.Month(), 1, 0, 0, 0, 0, time.UTC)
+	for k := 3; k >= 1; k-- {
+		_, dues, err := d.Bills(ctx, userID, householdID, first.AddDate(0, -k, 0), today)
+		if err != nil {
+			return out, err
+		}
+		for _, due := range dues {
+			if due.Status == "late" {
+				due.Match = nil // matches are only suggested for this month
+				out = append(out, due)
+			}
+		}
+	}
+	return out, nil
+}

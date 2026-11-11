@@ -2,13 +2,16 @@
 type: log
 status: active
 owner: Dinesh
-updated: 2026-11-09
+updated: 2026-11-11
 tags: [log]
 ---
 
 # Log
 
 Newest first. One entry per working session or decision.
+
+## 2026-11-11
+- #126 Reopened and fixed: the reminder and Bills' Late list also cover bills still unpaid from the 3 months before (Dinesh chose 3); paused bills drop out. `GET /api/bills` returns `earlier` for this month.
 
 ## 2026-11-09
 - #127 Bills Plaid can't see: promoted and scoped with Dinesh (owners only; reminders in-app and email). Split out #306 loans and debts and #307 onboarding "Monthly commitments" step; #126 carries reminders. Build order #127 → #306 → #307 → #126.
